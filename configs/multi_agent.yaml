@@ -1,0 +1,29 @@
+# ===========================================================================
+# Multi-Agent (Axis 4) configuration
+# ===========================================================================
+
+fleet:
+  max_agents: 10
+  default_vehicle_type: "uav"
+  safety_radius: 5.0               # metres — closer than this → conflict
+
+shared_map:
+  bounds: [-100, -100, -50, 100, 100, 0]   # x_min, y_min, z_min, x_max, y_max, z_max
+  resolution: 1.0                  # metres per grid cell
+  time_window: 30.0                # seconds of history to keep
+  cleanup_interval: 10.0           # seconds between automatic cleanups
+
+communication:
+  default_qos:
+    reliability: "reliable"        # "reliable" or "best_effort"
+    deadline_ms: 100.0
+    latency_budget_ms: 50.0
+    history_depth: 10
+    lifespan_sec: 5.0
+  simulated_latency_ms: 5.0       # mock channel latency
+  message_drop_rate: 0.0           # probability of simulated message drop
+
+coordination:
+  strategy: "round_robin"          # task assignment strategy
+  conflict_check_interval: 1.0    # seconds between conflict checks
+  state_broadcast_interval: 0.5   # seconds between state broadcasts

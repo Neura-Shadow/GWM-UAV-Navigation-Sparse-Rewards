@@ -1,0 +1,47 @@
+# Multi-Agent Swarm Navigation Example
+# 4 UAVs navigating to different goals with shared world model
+#
+# This configuration demonstrates the multi-agent shared world model
+# architecture.  Each agent maintains its own local encoder but reads from
+# and writes to a shared 4D spatiotemporal map.  The fleet coordinator
+# assigns time-slots (round-robin) to prevent path conflicts.
+
+fleet:
+  agents:
+    - id: "uav_0"
+      type: "uav"
+      start: [0.0, 0.0, -5.0]
+      goal: [50.0, 50.0, -8.0]
+    - id: "uav_1"
+      type: "uav"
+      start: [0.0, 10.0, -5.0]
+      goal: [50.0, -20.0, -8.0]
+    - id: "uav_2"
+      type: "uav"
+      start: [10.0, 0.0, -5.0]
+      goal: [-30.0, 40.0, -8.0]
+    - id: "uav_3"
+      type: "uav"
+      start: [10.0, 10.0, -5.0]
+      goal: [-30.0, -30.0, -8.0]
+
+shared_map:
+  resolution: 2.0          # metres per grid cell
+  time_window: 30.0        # seconds of future reservation
+
+coordination:
+  safety_radius: 5.0       # minimum inter-agent distance (metres)
+  strategy: "round_robin"  # time-slot allocation strategy
+  state_broadcast_interval: 0.5  # seconds between state broadcasts
+
+env:
+  type: "mock"
+  obstacles:
+    - position: [20.0, 20.0, -6.0]
+      radius: 4.0
+    - position: [30.0, -10.0, -7.0]
+      radius: 3.0
+
+safety:
+  min_obstacle_dist: 4.0
+  uncertainty_threshold: 0.6

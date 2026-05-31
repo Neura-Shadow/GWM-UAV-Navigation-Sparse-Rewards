@@ -1,0 +1,30 @@
+# ===========================================================================
+# Digital Twin (Axis 3) configuration
+# ===========================================================================
+
+scenario_extraction:
+  near_collision_threshold: 3.0    # metres — obstacle closer → corner case
+  uncertainty_threshold: 0.7       # world-model uncertainty above this → corner case
+  velocity_change_threshold: 3.0   # m/s delta between steps → sharp manoeuvre
+  min_scenario_duration: 5         # minimum consecutive violating steps
+
+domain_randomization:
+  seed: null                       # null → non-deterministic
+  obstacle_position_noise: 2.0     # metres of Gaussian noise on obstacle positions
+  obstacle_count_range: [0, 3]     # range of extra obstacles to add per variation
+  wind_speed_range: [0.0, 5.0]    # m/s
+  sensor_noise_range: [0.0, 0.1]  # scale factor
+  friction_range: [0.5, 1.5]      # friction coefficient
+  num_variations: 10               # variations per base scenario
+
+sim_scene:
+  world_bounds: [-100, -100, -50, 100, 100, 0]   # x_min, y_min, z_min, x_max, y_max, z_max
+  default_sensor_config:
+    lidar_channels: 16
+    lidar_range: 50.0
+    camera_fov: 90
+    depth_enabled: true
+
+sim2real:
+  policy_checkpoint_dir: "checkpoints/"
+  deployment_log_path: "logs/deployments.json"

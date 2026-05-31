@@ -1,0 +1,30 @@
+# ============================================================================
+# Domain Randomization Configuration
+# ============================================================================
+# Controls the range of randomised parameters for scenario generation.
+# Used by DomainRandomizer.from_config() to instantiate a randomiser.
+
+domain_randomization:
+  # Seed for reproducibility (null = random)
+  seed: null
+
+  # Obstacle position perturbation std-dev [metres]
+  obstacle_position_noise: 2.0
+
+  # Range of extra obstacles to add per variation [min, max]
+  obstacle_count_range: [0, 3]
+
+  # Wind speed range [m/s]
+  wind_speed_range: [0.0, 8.0]
+
+  # Per-sensor noise scale range [unitless]
+  sensor_noise_range: [0.0, 0.15]
+
+  # Surface friction coefficient range
+  friction_range: [0.5, 1.5]
+
+  # Lighting / time-of-day randomisation
+  lighting:
+    time_of_day_range: [6.0, 18.0]    # hours (6 AM to 6 PM)
+    intensity_range: [0.5, 1.5]        # multiplier
+    color_temp_range: [3000, 7000]     # Kelvin
