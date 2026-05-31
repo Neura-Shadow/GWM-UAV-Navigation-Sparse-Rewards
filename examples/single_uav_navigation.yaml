@@ -1,0 +1,29 @@
+# Single UAV Navigation Example
+# Run with: python scripts/evaluate_policy.py --config examples/single_uav_navigation.yaml --env mock
+#
+# This configuration defines a minimal single-agent navigation scenario with
+# two static obstacles. The UAV must fly from the origin to the goal while
+# avoiding collisions and maintaining safe clearance from obstacles.
+
+env:
+  type: "mock"
+  obstacles:
+    - position: [30.0, 10.0, -8.0]
+      radius: 3.0
+    - position: [45.0, 15.0, -6.0]
+      radius: 2.0
+
+goal:
+  x: 60.0
+  y: 20.0
+  z: -8.0
+
+planner:
+  target_speed: 4.0
+  horizon: 10
+  num_samples: 100
+  max_steps: 300
+
+safety:
+  min_obstacle_dist: 4.0
+  goal_reach_dist: 3.0

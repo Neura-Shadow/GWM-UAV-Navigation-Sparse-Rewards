@@ -1,0 +1,27 @@
+# ============================================================================
+# Sparse Reward Curriculum Configuration
+# ============================================================================
+# Controls progressive difficulty scaling for navigation training.
+# The scheduler advances when success_rate >= success_rate_threshold
+# and regresses when success_rate <= failure_rate_threshold.
+
+curriculum:
+  # Goal distance progression [metres]
+  initial_goal_distance: 15.0
+  max_goal_distance: 65.0
+  goal_distance_step: 5.0
+
+  # Obstacle count progression
+  initial_obstacle_count: 0
+  max_obstacle_count: 6
+  obstacle_count_step: 1
+
+  # Episode length progression [steps]
+  initial_max_steps: 100
+  max_max_steps: 600
+  steps_increment: 50
+
+  # Success / failure thresholds
+  success_rate_threshold: 0.7
+  failure_rate_threshold: 0.3
+  window_size: 10

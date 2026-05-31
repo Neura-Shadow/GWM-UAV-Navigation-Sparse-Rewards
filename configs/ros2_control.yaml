@@ -1,0 +1,40 @@
+# ============================================================================
+# ROS2 Control & Safety Configuration (Axis 2)
+# ============================================================================
+# Parameterises the asymmetric controller: high-level planner,
+# safety controller, takeover arbiter, and ROS2 bridge.
+
+high_level_planner:
+  horizon: 12                  # planning horizon (number of rollout steps)
+  num_candidates: 120          # random-shooting action candidates per plan step
+  action_dim: 3                # (vx, vy, vz)
+  target_speed: 4.0            # max speed used for candidate sampling (m/s)
+  control_dt: 0.4              # seconds per control step
+
+safety_controller:
+  min_obstacle_dist: 4.0       # distance (m) at which safety override triggers
+  retreat_speed: 2.0           # backward speed during retreat (m/s)
+  retreat_vz: -0.2             # vertical component during retreat (NED)
+
+takeover:
+  uncertainty_threshold: 0.7   # model uncertainty above which safety overrides
+  obstacle_threshold: 4.0      # obstacle distance below which safety overrides (m)
+  emergency_obstacle_threshold: 2.0  # distance below which emergency stop fires (m)
+
+ros2:
+  adapter: "mock"              # "mock" | "real" (real requires rclpy)
+  topics:
+    cmd_vel: "/cmd_vel"
+    odometry: "/odom"
+    lidar: "/scan"
+    depth: "/camera/depth"
+    takeover: "/safety/takeover"
+  rates:
+    cmd_publish_hz: 10.0
+    odom_subscribe_hz: 50.0
+
+goal:
+  x: 60.0
+  y: 20.0
+  z: -8.0
+  reach_dist: 3.0             # distance (m) at which the goal is "reached"

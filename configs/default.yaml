@@ -1,0 +1,51 @@
+# ============================================================================
+# GWM-UAV Navigation Framework — Default Configuration
+# ============================================================================
+
+env:
+  airsim_host: "127.0.0.1"
+  airsim_port: 41451
+  airsim_timeout_sec: 30
+  connect_retries: 8
+  connect_retry_interval: 1.5
+
+goal:
+  x: 60.0
+  y: 20.0
+  z: -8.0
+
+planner:
+  target_speed: 4.0
+  control_dt: 0.4
+  horizon: 12
+  num_samples: 120
+  max_steps: 600
+
+world_model:
+  state_dim: 8
+  action_dim: 3
+  hidden_dim: 128
+  learning_rate: 0.001
+  latent_dim: 32
+
+training:
+  train_after_steps: 40
+  train_every: 4
+  train_epochs: 2
+  batch_size: 128
+  replay_buffer_size: 50000
+  grad_clip_norm: 5.0
+
+safety:
+  min_obstacle_dist: 4.0
+  goal_reach_dist: 3.0
+  emergency_retreat_speed: 2.0
+  uncertainty_threshold: 0.7
+  takeover_obstacle_threshold: 4.0
+
+cost_weights:
+  goal: 1.0
+  obstacle: 15.0
+  smooth: 0.15
+  energy: 0.02
+  sparse_bonus: -120.0
