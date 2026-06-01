@@ -2,171 +2,104 @@
 
 ## Overview
 
-This framework uses an **adapter pattern** to decouple the navigation stack from ROS2.  All ROS2 interactions go through an abstract `ROS2AdapterBase` class, with two implementations:
+The framework uses an adapter pattern to keep the navigation stack testable
+without ROS2. Phase 3-A splits ROS2 integration into two layers:
 
-1. **`MockROS2Adapter`** — A pure-Python mock that simulates pub/sub and service calls without requiring `rclpy` or a ROS2 installation.  This is the default and is used for all unit tests and development.
-2. **`RealROS2Adapter`** (planned) — A thin wrapper around `rclpy` that connects to a real ROS2 graph for deployment.
+1. `ROS2Adapter` is the narrow control-facing contract. It sends
+   `ControlCommand` objects and returns the latest `SensorObservation`
+   odometry. `MockROS2Adapter` remains the default for tests and development.
+2. `ROS2Bridge` is the real ROS2 lifecycle wrapper. It owns the `rclpy` node,
+   publishers, subscriptions, services, `spin_once()`, and shutdown behavior.
 
----
+All ROS2 imports are guarded. Importing `src.ros2_bridge` works in a normal
+Python environment; constructing real ROS2 objects requires a ROS2 install.
 
-## Current Adapter Pattern
+## Current Interfaces
 
-### Abstract Interface
-
-```python
-from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict
-
-class ROS2AdapterBase(ABC):
-    """Abstract interface for ROS2 communication."""
-
-    @abstractmethod
-    def publish(self, topic: str, message: Any) -> None: ...
-
-    @abstractmethod
-    def subscribe(self, topic: str, callback: Callable) -> None: ...
-
-    @abstractmethod
-    def call_service(self, service: str, request: Any) -> Any: ...
-
-    @abstractmethod
-    def spin_once(self, timeout_sec: float = 0.1) -> None: ...
-```
-
-### Mock Implementation
-
-The `MockROS2Adapter` stores published messages in an in-memory dictionary and dispatches them to registered callbacks synchronously.  This allows the full control stack to be tested without any ROS2 installation:
+### Control Adapter
 
 ```python
-adapter = MockROS2Adapter()
-adapter.subscribe("/odom", lambda msg: print(msg))
-adapter.publish("/odom", {"x": 1.0, "y": 2.0, "z": -5.0})
-# Callback fires immediately with the published message
+class ROS2Adapter(ABC):
+    def connect(self) -> bool: ...
+    def disconnect(self) -> None: ...
+
+    @property
+    def is_connected(self) -> bool: ...
+
+    @abstractmethod
+    def send_command(self, command: ControlCommand) -> bool: ...
+
+    @abstractmethod
+    def get_odometry(self) -> SensorObservation | None: ...
 ```
 
----
+`MockROS2Adapter` implements this interface in memory. `RealROS2Adapter` uses
+`ROS2Bridge` internally and defaults to:
 
-## Planned ROS2 Topics
+| Purpose | Topic | ROS2 Message |
+|---------|-------|--------------|
+| Velocity command | `/cmd_vel` | `geometry_msgs/Twist` |
+| Odometry feedback | `/odom` | `nav_msgs/Odometry` |
 
-| Topic | Message Type | Direction | QoS | Description |
-|-------|-------------|-----------|-----|-------------|
-| `/uav/odom` | `nav_msgs/Odometry` | Pub | Reliable, 10 Hz | Vehicle odometry |
-| `/uav/imu` | `sensor_msgs/Imu` | Pub | Best-effort, 200 Hz | IMU data |
-| `/uav/depth` | `sensor_msgs/Image` | Pub | Best-effort, 30 Hz | Depth camera |
-| `/uav/lidar` | `sensor_msgs/PointCloud2` | Pub | Best-effort, 10 Hz | 3D LiDAR scan |
-| `/uav/cmd_vel` | `geometry_msgs/Twist` | Sub | Reliable, 50 Hz | Velocity command |
-| `/uav/trajectory` | `nav_msgs/Path` | Pub | Reliable, 5 Hz | Planned trajectory |
-| `/uav/takeover` | `std_msgs/Bool` | Pub | Reliable, event | Takeover notification |
-| `/uav/uncertainty` | `std_msgs/Float32` | Pub | Reliable, 10 Hz | Current uncertainty |
-| `/world_model/latent` | `std_msgs/Float32MultiArray` | Pub | Reliable, 10 Hz | Latent state vector |
+### ROS2 Bridge
 
----
+```python
+bridge = ROS2Bridge(node_name="gwm_uav_bridge", config=config)
+publisher = bridge.create_publisher("/cmd_vel", Twist, qos)
+subscription = bridge.create_subscription("/odom", Odometry, callback, qos)
+service = bridge.create_service("/planner/replan", Trigger, callback)
+bridge.spin_once(timeout_sec=0.1)
+bridge.shutdown()
+```
 
-## Planned ROS2 Services
+`ROS2Bridge` raises a clear `RuntimeError` if `rclpy` is unavailable.
 
-| Service | Type | Description |
-|---------|------|-------------|
-| `/world_model/predict` | Custom | Request future state prediction for a given action sequence |
-| `/planner/replan` | `std_srvs/Trigger` | Force the planner to recompute the trajectory |
-| `/safety/set_threshold` | Custom | Dynamically update safety thresholds |
+## Pure-Python Conversion Layer
 
----
+Message conversion is intentionally testable without ROS2 message packages:
 
-## Planned ROS2 Actions
+- `control_command_to_twist_dict(cmd)`
+- `twist_dict_to_control_command(twist)`
+- `odometry_dict_to_sensor_observation(odom)`
+- `sensor_observation_to_odom_dict(obs)`
 
-| Action | Type | Description |
-|--------|------|-------------|
-| `/navigate_to_goal` | `nav2_msgs/NavigateToPose` | Navigate to a goal pose with world-model guidance |
-| `/execute_trajectory` | Custom | Execute a pre-planned trajectory with safety monitoring |
+The real adapter converts through these dictionaries and then wraps or unwraps
+actual ROS2 message objects when ROS2 is present.
 
----
+## QoS Configuration
 
-## DDS QoS Configuration
-
-Quality-of-Service profiles are critical for deterministic real-time behaviour:
+Phase 3-A uses `configs/ros2_control.yaml`:
 
 ```yaml
-qos_profiles:
-  sensor_data:
-    reliability: BEST_EFFORT
-    durability: VOLATILE
-    history_depth: 1
-    deadline_ms: 50
-
-  control_commands:
-    reliability: RELIABLE
-    durability: TRANSIENT_LOCAL
-    history_depth: 5
-    deadline_ms: 20
-
-  state_broadcast:
-    reliability: RELIABLE
-    durability: TRANSIENT_LOCAL
-    history_depth: 10
-    deadline_ms: 100
+ros2:
+  node_name: "gwm_uav_bridge"
+  topics:
+    cmd_vel: "/cmd_vel"
+    odom: "/odom"
+  qos_profiles:
+    control_commands:
+      reliability: "reliable"
+      history_depth: 10
+      deadline_ms: 20.0
+      lifespan_sec: 1.0
+    odometry:
+      reliability: "best_effort"
+      history_depth: 5
+      deadline_ms: 100.0
+      lifespan_sec: 1.0
 ```
 
-- **Sensor data** uses `BEST_EFFORT` to avoid blocking on slow subscribers.
-- **Control commands** use `RELIABLE` to guarantee delivery.
-- **State broadcasts** (multi-agent) use `RELIABLE` with deeper history for late-joining agents.
+`QoSConfig` normalizes reliability values case-insensitively and currently
+supports `reliable` and `best_effort`.
 
----
+## Migration: Mock to Real ROS2
 
-## ros2_control Integration Plan
+1. Install ROS2 Humble or another compatible ROS2 distribution.
+2. Source the ROS2 environment so `rclpy`, `geometry_msgs`, and `nav_msgs` are
+   importable by Python.
+3. Load `configs/ros2_control.yaml`.
+4. Construct `RealROS2Adapter(config=config)` and use it anywhere a
+   `ROS2Adapter` is accepted.
 
-The framework will integrate with `ros2_control` for deterministic actuator control:
-
-1. **Hardware Interface** — Implement a `SystemInterface` plugin that bridges the flight controller (PX4 / ArduPilot) via MAVLink or serial.
-2. **Controller Manager** — Load a position/velocity controller that accepts setpoints from the world-model planner.
-3. **Safety Controller** — Implement as a `ros2_control` controller that runs at the highest priority and can override any other controller.
-
-```
-┌─────────────────────────────────────────────────┐
-│                Controller Manager                │
-│  ┌───────────┐  ┌──────────────┐  ┌───────────┐ │
-│  │  Planner  │  │   Safety     │  │  Telemetry│ │
-│  │ Controller│  │ Controller   │  │ Controller│ │
-│  │  (5 Hz)   │  │ (200 Hz)     │  │ (10 Hz)   │ │
-│  └─────┬─────┘  └──────┬───────┘  └─────┬─────┘ │
-│        │               │                │        │
-│        └───────┬───────┘                │        │
-│                ▼                        │        │
-│        Hardware Interface               │        │
-│        (PX4 / ArduPilot)               │        │
-└─────────────────────────────────────────┘        │
-                                                    │
-                                              Logging
-```
-
----
-
-## Nav2 Integration Plan
-
-For ground vehicles (UGV / AMR), the framework will integrate with Nav2:
-
-1. **Costmap Layer** — Custom costmap plugin that incorporates world-model uncertainty as a cost.
-2. **Planner Plugin** — Replace or augment the default planner with the world-model-guided planner.
-3. **Behaviour Tree** — Custom BT nodes for uncertainty checking and takeover.
-
----
-
-## Migration: Mock → Real ROS2
-
-Switching from mock to real ROS2 requires:
-
-1. **Install ROS2 Humble** (or later) and build the workspace.
-2. **Change config**:
-   ```yaml
-   ros2:
-     type: "rclpy"  # was "mock"
-   ```
-3. **Implement `RealROS2Adapter`** — a thin wrapper that:
-   - Creates a `rclpy.node.Node`.
-   - Maps topic names and message types.
-   - Handles serialisation/deserialisation.
-4. **Launch file** — Provide a ROS2 launch file that starts the node graph:
-   ```
-   ros2 launch gwm_nav bringup.launch.py config:=configs/ros2.yaml
-   ```
-
-The migration is designed to be incremental: individual topics can be switched from mock to real one at a time for debugging.
+The rest of Phase 3 remains out of scope for this slice: Isaac Sim, PX4,
+MAVSDK, distributed DDS, Nav2, and barrier certificates are planned separately.
