@@ -23,15 +23,33 @@ takeover:
 
 ros2:
   adapter: "mock"              # "mock" | "real" (real requires rclpy)
+  node_name: "gwm_uav_bridge"
   topics:
     cmd_vel: "/cmd_vel"
-    odometry: "/odom"
+    odom: "/odom"
+    odometry: "/odom"          # legacy alias used by earlier docs/config
     lidar: "/scan"
     depth: "/camera/depth"
     takeover: "/safety/takeover"
   rates:
     cmd_publish_hz: 10.0
     odom_subscribe_hz: 50.0
+  qos_profiles:
+    control_commands:
+      reliability: "reliable"
+      history_depth: 10
+      deadline_ms: 20.0
+      lifespan_sec: 1.0
+    odometry:
+      reliability: "best_effort"
+      history_depth: 5
+      deadline_ms: 100.0
+      lifespan_sec: 1.0
+    services:
+      reliability: "reliable"
+      history_depth: 10
+      deadline_ms: 100.0
+      lifespan_sec: 5.0
 
 goal:
   x: 60.0

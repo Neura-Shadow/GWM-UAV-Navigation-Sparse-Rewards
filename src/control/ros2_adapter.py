@@ -33,6 +33,22 @@ logger = logging.getLogger(__name__)
 class ROS2Adapter(ABC):
     """Abstract interface for ROS2 communication."""
 
+    def connect(self) -> bool:
+        """Connect to the underlying transport.
+
+        Existing adapters are assumed to be connected on construction, so the
+        default is a no-op for backward compatibility.
+        """
+        return True
+
+    def disconnect(self) -> None:
+        """Disconnect from the underlying transport."""
+
+    @property
+    def is_connected(self) -> bool:
+        """Return whether the adapter is ready to exchange messages."""
+        return True
+
     @abstractmethod
     def send_command(self, command: ControlCommand) -> bool:
         """Publish a velocity command.  Return ``True`` on success."""
@@ -57,6 +73,17 @@ class MockROS2Adapter(ROS2Adapter):
         self.command_history: List[ControlCommand] = []
         self._connected: bool = True
         logger.info("MockROS2Adapter created (simulated ROS2 bridge)")
+
+    @property
+    def is_connected(self) -> bool:
+        """Return whether the mock adapter is connected."""
+        return self._connected
+
+    def connect(self) -> bool:
+        """Simulate connection or reconnection."""
+        self._connected = True
+        logger.info("MockROS2Adapter: simulated connect")
+        return True
 
     def send_command(self, command: ControlCommand) -> bool:
         """Log the command and append to history."""
@@ -95,5 +122,4 @@ class MockROS2Adapter(ROS2Adapter):
 
     def reconnect(self) -> None:
         """Simulate reconnection."""
-        self._connected = True
-        logger.info("MockROS2Adapter: simulated reconnect")
+        self.connect()
