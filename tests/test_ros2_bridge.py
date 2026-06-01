@@ -5,8 +5,11 @@ These tests must pass without ROS2, rclpy, or ROS message packages installed.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
+import src.ros2_bridge.ros2_bridge as ros2_bridge_module
 from src.control.ros2_adapter import MockROS2Adapter
 from src.ros2_bridge import QoSConfig, ROS2Bridge, RealROS2Adapter
 from src.ros2_bridge.msg_converters import (
@@ -49,6 +52,53 @@ class _FakeBridge:
     def shutdown(self) -> None:
         self.shutdown_called = True
         self.is_shutdown = True
+
+
+class _FakeNode:
+    def __init__(self, node_name: str) -> None:
+        self.node_name = node_name
+        self.destroyed = False
+
+    def destroy_node(self) -> None:
+        self.destroyed = True
+
+
+class _FakeRclpy:
+    def __init__(self, ok: bool) -> None:
+        self._ok = ok
+        self.init_calls = 0
+        self.shutdown_calls = 0
+        self.nodes = []
+
+    def ok(self) -> bool:
+        return self._ok
+
+    def init(self, args=None) -> None:
+        self.init_calls += 1
+        self._ok = True
+
+    def create_node(self, node_name: str) -> _FakeNode:
+        node = _FakeNode(node_name)
+        self.nodes.append(node)
+        return node
+
+    def shutdown(self) -> None:
+        self.shutdown_calls += 1
+        self._ok = False
+
+
+class _FakeDuration:
+    def __init__(self, nanoseconds: int) -> None:
+        self.nanoseconds = nanoseconds
+
+
+class _FakeQoSProfile:
+    def __init__(self, depth: int) -> None:
+        self.depth = depth
+        self.history = None
+        self.reliability = None
+        self.deadline = None
+        self.lifespan = None
 
 
 def test_package_exports_public_interfaces() -> None:
@@ -130,6 +180,65 @@ def test_ros2_bridge_fails_gracefully_without_rclpy() -> None:
         ROS2Bridge("test_node")
 
 
+def test_ros2_bridge_shutdown_stops_owned_rclpy_context(monkeypatch) -> None:
+    fake_rclpy = _FakeRclpy(ok=False)
+    monkeypatch.setattr(ros2_bridge_module, "_HAS_RCLPY", True)
+    monkeypatch.setattr(ros2_bridge_module, "rclpy", fake_rclpy)
+
+    bridge = ROS2Bridge("owned_context")
+    bridge.shutdown()
+
+    assert fake_rclpy.init_calls == 1
+    assert fake_rclpy.shutdown_calls == 1
+    assert fake_rclpy.nodes[0].destroyed is True
+    assert bridge.is_shutdown is True
+
+
+def test_ros2_bridge_shutdown_preserves_external_rclpy_context(monkeypatch) -> None:
+    fake_rclpy = _FakeRclpy(ok=True)
+    monkeypatch.setattr(ros2_bridge_module, "_HAS_RCLPY", True)
+    monkeypatch.setattr(ros2_bridge_module, "rclpy", fake_rclpy)
+
+    bridge = ROS2Bridge("external_context")
+    bridge.shutdown()
+
+    assert fake_rclpy.init_calls == 0
+    assert fake_rclpy.shutdown_calls == 0
+    assert fake_rclpy.nodes[0].destroyed is True
+    assert bridge.is_shutdown is True
+
+
+def test_ros2_bridge_qos_conversion_applies_depth_reliability_and_durations(monkeypatch) -> None:
+    monkeypatch.setattr(ros2_bridge_module, "RclpyQoSProfile", _FakeQoSProfile)
+    monkeypatch.setattr(
+        ros2_bridge_module,
+        "HistoryPolicy",
+        SimpleNamespace(KEEP_LAST="keep_last"),
+    )
+    monkeypatch.setattr(
+        ros2_bridge_module,
+        "ReliabilityPolicy",
+        SimpleNamespace(BEST_EFFORT="best_effort", RELIABLE="reliable"),
+    )
+    monkeypatch.setattr(ros2_bridge_module, "RclpyDuration", _FakeDuration)
+
+    bridge = ROS2Bridge.__new__(ROS2Bridge)
+    profile = bridge._to_rclpy_qos(
+        QoSConfig(
+            reliability="best_effort",
+            history_depth=7,
+            deadline_ms=125.0,
+            lifespan_sec=2.5,
+        )
+    )
+
+    assert profile.depth == 7
+    assert profile.history == "keep_last"
+    assert profile.reliability == "best_effort"
+    assert profile.deadline.nanoseconds == 125_000_000
+    assert profile.lifespan.nanoseconds == 2_500_000_000
+
+
 def test_real_ros2_adapter_fails_gracefully_without_rclpy() -> None:
     if _HAS_RCLPY:
         pytest.skip("rclpy is installed in this environment")
@@ -149,6 +258,44 @@ def test_mock_ros2_adapter_lifecycle_helpers() -> None:
     assert adapter.connect() is True
     assert adapter.is_connected is True
     assert adapter.send_command(ControlCommand(vx=1.0)) is True
+
+
+def test_real_ros2_adapter_prefers_new_odom_topic_key() -> None:
+    bridge = _FakeBridge()
+    adapter = RealROS2Adapter(
+        config={
+            "ros2": {
+                "topics": {
+                    "cmd_vel": "/cmd",
+                    "odom": "/new_odom",
+                    "odometry": "/legacy_odom",
+                },
+            }
+        },
+        bridge=bridge,
+    )
+
+    assert adapter.odom_topic == "/new_odom"
+    assert bridge.subscription_args[0] == "/new_odom"
+
+
+def test_real_ros2_adapter_supports_legacy_odometry_topic_key() -> None:
+    bridge = _FakeBridge()
+    adapter = RealROS2Adapter(
+        config={"ros2": {"topics": {"cmd_vel": "/cmd", "odometry": "/legacy_odom"}}},
+        bridge=bridge,
+    )
+
+    assert adapter.odom_topic == "/legacy_odom"
+    assert bridge.subscription_args[0] == "/legacy_odom"
+
+
+def test_real_ros2_adapter_defaults_odom_topic_when_missing() -> None:
+    bridge = _FakeBridge()
+    adapter = RealROS2Adapter(config={"ros2": {"topics": {"cmd_vel": "/cmd"}}}, bridge=bridge)
+
+    assert adapter.odom_topic == "/odom"
+    assert bridge.subscription_args[0] == "/odom"
 
 
 def test_real_ros2_adapter_with_injected_bridge_uses_configured_topics() -> None:

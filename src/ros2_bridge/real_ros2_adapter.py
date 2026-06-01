@@ -42,7 +42,7 @@ class RealROS2Adapter(ROS2Adapter):
         qos_profiles = ros2_config.get("qos_profiles", {})
 
         self.command_topic = topics.get("cmd_vel", "/cmd_vel")
-        self.odom_topic = topics.get("odom", "/odom")
+        self.odom_topic = topics.get("odom", topics.get("odometry", "/odom"))
         self._latest_odometry: Optional[SensorObservation] = None
         self._connected = False
         self._owns_bridge = bridge is None
