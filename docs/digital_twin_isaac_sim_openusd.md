@@ -146,42 +146,68 @@ Each randomization parameter is specified as a range in the scenario YAML.  The 
 
 ---
 
-## Current Implementation: Mock Scene Builder
+## Current Implementation: Mock-First Scene Builders
 
-The current `MockSceneBuilder` provides a functional stand-in that:
+The current digital-twin scene layer provides two mock-first builders:
 
-- Parses the scenario YAML / `ScenarioSpec` dataclass.
-- Generates scene data as a Python dictionary or JSON file.
-- Supports obstacle placement with position noise for basic domain randomization.
-- Does **not** produce OpenUSD files or connect to Isaac Sim.
+1. `SimSceneBuilder` produces the existing simulator-agnostic JSON/YAML scene
+   descriptor.
+2. `IsaacSimSceneBuilder` produces an OpenUSD-style descriptor dictionary with
+   stable prim paths for `/World`, `/World/GroundPlane`, obstacles, vehicle,
+   sensors, and goal.
 
-This allows the full pipeline to be developed and tested without an NVIDIA GPU or Isaac Sim licence.
+`IsaacSimSceneBuilder.build(spec)` always works without NVIDIA GPU, Isaac Sim,
+or OpenUSD installed. It preserves the project's current coordinate convention
+exactly and records the pending Isaac conversion explicitly:
 
 ```python
-# Usage example
-from src.digital_twin.scene_builder import MockSceneBuilder
+from src.digital_twin import IsaacSimSceneBuilder
 
-builder = MockSceneBuilder()
-scene = builder.build_from_spec(scenario_spec)
-builder.export_json(scene, "outputs/scenes/scene_001.json")
+builder = IsaacSimSceneBuilder()
+descriptor = builder.build(scenario_spec)
+builder.export_json(descriptor, "outputs/scenes/scene_001.json")
+```
+
+Descriptor metadata includes:
+
+```yaml
+source_coordinate_frame: "project_default"
+target_coordinate_frame: "isaac_z_up_pending"
+coordinate_conversion_applied: false
+```
+
+`build_usd_stage(spec, output_path)` is guarded and raises a clear
+`RuntimeError` when Isaac Sim / OpenUSD Python APIs are unavailable. Phase 3-B
+exports descriptor JSON first; real `.usd` / `.usda` generation remains an
+optional later step.
+
+Switching builders is done through the factory:
+
+```python
+from src.digital_twin import SimSceneBuilder
+
+mock_builder = SimSceneBuilder.create(backend="mock")
+isaac_descriptor_builder = SimSceneBuilder.create(backend="isaac_sim")
 ```
 
 ---
 
 ## Future Integration Plan
 
-### Phase 2: Isaac Sim Connection
+### Phase 3-B2: Isaac Sim Runtime Connection
 
-1. Implement `IsaacSimSceneBuilder` that creates OpenUSD stages programmatically using the `omni.isaac.core` API.
-2. Connect to a headless Isaac Sim instance for batch scene generation.
-3. Use Replicator for domain randomization.
+1. Add real OpenUSD stage generation with installed Isaac Sim / OpenUSD APIs.
+2. Convert the project coordinate frame to Isaac Z-up explicitly.
+3. Connect to a headless Isaac Sim instance for batch scene generation.
+4. Use Replicator for domain randomization.
 
-### Phase 3: Full Pipeline
+### Phase 3-C+: Full Pipeline
 
-1. Bidirectional sync between the latent world model and the Isaac Sim environment.
-2. Real-time digital twin mirroring: update the OpenUSD scene from live sensor data.
-3. Multi-agent simulation with PhysX-based inter-agent collision detection.
-4. Photorealistic synthetic data generation for visual policy pre-training.
+1. Add an Isaac Sim navigation environment wrapper.
+2. Bidirectional sync between the latent world model and the Isaac Sim environment.
+3. Real-time digital twin mirroring: update the OpenUSD scene from live sensor data.
+4. Multi-agent simulation with PhysX-based inter-agent collision detection.
+5. Photorealistic synthetic data generation for visual policy pre-training.
 
 ### Integration architecture
 
