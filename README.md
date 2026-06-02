@@ -1,304 +1,140 @@
 <!-- badges -->
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![Phase 1](https://img.shields.io/badge/status-Phase%201%20Complete-brightgreen)
+![Mock-first framework](https://img.shields.io/badge/status-Mock--first%20checkpoint-brightgreen)
 ![Research](https://img.shields.io/badge/type-Research%20Framework-blueviolet)
 
 # World-Model-Guided Digital-Twin UAV Navigation Research Framework
 
-> **Physical Consistency > Pixel Fidelity**
->
-> A research framework for training autonomous UAV (and multi-robot) navigation policies using latent world models, digital-twin simulation, and Real2Sim2Real data engines — designed to operate under **sparse rewards** without reward shaping.
+> Physical Consistency > Pixel Fidelity
 
----
+This repository is a mock-first research framework for UAV / UGV / AMR
+navigation under sparse rewards. It connects latent world models,
+Real2Sim2Real scenario generation, OpenUSD-style digital-twin descriptors,
+ROS2 bridge architecture, distributed multi-agent coordination, and safe
+deployment-interface primitives.
 
-## Project Vision
+The code is designed to run and test without GPU, AirSim, ROS2, Isaac Sim,
+PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
-Autonomous navigation in unstructured 3D environments remains an open challenge.  Conventional approaches either rely on hand-crafted reward functions that do not generalise, or on end-to-end learned policies that lack safety guarantees.  This framework explores a middle path: **world-model-guided planning** — where a learned latent dynamics model imagines future states, quantifies its own uncertainty, and hands off to a deterministic safety controller when confidence is low.
+## Current Status
 
-The framework is built around the principle that **a robot does not need a photorealistic digital twin to act intelligently**.  What it needs is a *physically consistent* internal model that captures causal dynamics — how obstacles move, how wind affects trajectory, how actions lead to outcomes.  A compact latent world model trained on real and simulated data can provide this at a fraction of the computational cost of a full physics simulation.
+Completed mock-first slices:
 
-To bridge the persistent sim-to-real gap, the framework implements a **Real2Sim2Real data engine** that continuously extracts challenging real-world scenarios, reconstructs them as digital-twin environments, applies domain randomization, and fine-tunes the policy in simulation before redeploying.  This closed loop ensures the policy improves from every real-world flight.
+| Slice | Status | Key capability |
+| --- | --- | --- |
+| Phase 1 | Complete | Research-ready modular refactor, mocks, docs, tests |
+| Phase 2 | Complete mock-first slice | World-model training, sparse curriculum, Real2Sim2Real pipeline |
+| Phase 3-A | Complete mock-first slice | ROS2 bridge and adapter contracts with guarded imports |
+| Phase 3-B | Complete mock-first slice | Isaac Sim / OpenUSD-style descriptor builder and JSON export |
+| Phase 3-C | Complete mock-first slice | Distributed coordination, DDS-style channel, shared latent map |
+| Phase 3-D | Complete mock-first slice | MAVLink, hardware, Nav2-style, and CBF deployment interfaces |
 
----
+Future runtime work is not started: real SITL/HIL automation, real hardware
+flight, real Nav2 plugins, real `ros2_control` C++ plugins, Isaac Sim runtime
+execution, and certification proof.
 
-## Why Sparse Rewards Matter
+## Safety Defaults
 
-Dense reward shaping (e.g., distance-to-goal at every step) introduces human bias, requires per-task engineering, and often leads to reward hacking.  **Sparse rewards** — a single +1 for reaching the goal, 0 otherwise — force the agent to discover its own strategy, but they make exploration exponentially harder.
+The deployment layer is safe by default:
 
-This framework tackles sparse rewards through:
+```yaml
+deployment:
+  mock: true
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+```
 
-- **World-model imagination**: the agent can *predict* whether a candidate trajectory will reach the goal, even before executing it.
-- **Uncertainty-driven exploration**: high-uncertainty regions are intrinsically interesting, providing a natural exploration bonus.
-- **Curriculum via domain randomization**: progressively harder scenarios guide the agent from easy to difficult goals.
+Phase 3-D does not enable autonomous real flight. `ControlBarrierFunction` is a
+baseline runtime filter, not a formal certification proof.
 
----
-
-## Why World Models Matter
-
-> *Physical Consistency > Pixel Fidelity*
-
-A world model is a learned simulator inside the agent's head.  It compresses raw observations into a latent state, predicts how that state will evolve under different actions, and estimates how confident those predictions are.
-
-| Benefit | Description |
-|---------|-------------|
-| **Sample efficiency** | Plan in imagination instead of costly real-world rollouts |
-| **Uncertainty quantification** | Know when you don't know — trigger safety fallbacks |
-| **Causal reasoning** | Predict consequences of actions, not just correlations |
-| **Transfer** | Latent dynamics transfer better across visual domains than pixel-level policies |
-
----
-
-## Why Digital Twin / Isaac Sim / OpenUSD Matter
-
-> *Generative Environment Proxy*
-
-The digital twin is not a static replica — it is a **generative engine** that produces diverse training environments from compact scene specifications.
-
-- **Isaac Sim** provides GPU-accelerated physics (PhysX) and photorealistic rendering.
-- **OpenUSD** enables composable, versionable scene descriptions.
-- **Domain randomization** in Isaac Sim produces unlimited environment variants.
-- **Real2Sim2Real** closes the loop: real scenarios → sim training → real deployment.
-
-The framework uses an **adapter pattern** so that Isaac Sim is optional — all development and testing works with a mock backend.
-
----
-
-## Why ROS2 Matters
-
-> *Real-time Control, DDS Middleware*
-
-ROS2 provides the deterministic, real-time communication layer required for safety-critical robotics:
-
-- **DDS middleware** with configurable QoS for reliable or best-effort delivery.
-- **ros2_control** for deterministic actuator control at 200+ Hz.
-- **Nav2** for ground vehicle navigation with costmap integration.
-- **Lifecycle nodes** for managed startup/shutdown.
-
-The framework wraps all ROS2 interactions behind a mock adapter, enabling development without a ROS2 installation.
-
----
-
-## System Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
-    A[UAV / UGV / AMR Sensors] --> B[ROS2 / DDS Middleware]
-    B --> C[World Model Encoder]
-    C --> D[Latent Dynamics Predictor]
-    D --> E[Uncertainty Estimator]
-    E --> F{Confidence High?}
-    F -- Yes --> G[World-Model-Guided Planner]
-    F -- No --> H[Deterministic Safety Controller]
-    G --> I[ROS2 Control / Nav2]
+    A["Mock / future real sensors"] --> B["ROS2 / DDS adapter layer"]
+    B --> C["World model encoder"]
+    C --> D["Latent dynamics predictor"]
+    D --> E["Uncertainty estimator"]
+    E --> F{"Confidence high?"}
+    F -- "yes" --> G["World-model-guided planner"]
+    F -- "no" --> H["Safety controller / CBF filter"]
+    G --> I["Mock-first deployment interface"]
     H --> I
-    I --> J[Physical Vehicle Action]
+    I --> J["Mock vehicle state / future hardware"]
 
-    K[Real Logs / ROS Bag] --> L[Scenario Extractor]
-    L --> M[Digital Twin Scene Builder]
-    M --> N[Isaac Sim / OpenUSD Environment]
-    N --> O[Domain Randomization]
-    O --> P[RL Fine-Tuning]
+    K["Real or mock logs"] --> L["Scenario extractor"]
+    L --> M["Digital twin scene builder"]
+    M --> N["OpenUSD-style descriptor JSON"]
+    N --> O["Domain randomization"]
+    O --> P["Training / evaluation"]
     P --> G
 ```
 
-| Layer | Core Technology | Role |
-|-------|----------------|------|
-| **Cognitive / Imagination** | World Model | Causal reasoning, planning, future prediction |
-| **Spatiotemporal Environment** | Digital Twin / Isaac Sim / OpenUSD | Simulation, synthetic data, physics-consistent environment |
-| **Middleware / Control** | ROS2 / DDS / ros2_control | Communication, scheduling, deterministic control |
-| **Physical Embodiment** | UAV / UGV / AMR | Real-world execution and validation |
+Core package areas:
 
-See [docs/architecture.md](docs/architecture.md) for the full architecture breakdown.
-
----
-
-## Four Research Axes
-
-### Axis 1: Latent World Model instead of Pure Geometric Digital Twin
-
-Replace static geometric twins with a learned latent dynamics model that enables imagination-based planning and uncertainty quantification.
-
-→ [Full details](docs/research_axes.md#axis-1-latent-world-model-instead-of-pure-geometric-digital-twin)
-
-### Axis 2: Asymmetric Control (Brain vs Cerebellum)
-
-Separate slow deliberative planning (world model) from fast reflexive safety control (deterministic controller), with the safety layer always having override authority.
-
-→ [Full details](docs/research_axes.md#axis-2-asymmetric-control-between-world-model-brain-and-ros2-cerebellum)
-
-### Axis 3: Real2Sim2Real Digital Twin Data Engine
-
-Continuously extract real-world challenges, reproduce them in simulation with domain randomization, and fine-tune policies before redeployment.
-
-→ [Full details](docs/research_axes.md#axis-3-real2sim2real-digital-twin-data-engine)
-
-### Axis 4: Multi-Agent Shared World Model
-
-Enable fleet-scale coordination through a shared 4D spatiotemporal latent map that agents contribute to and plan over collectively.
-
-→ [Full details](docs/research_axes.md#axis-4-multi-agent-shared-world-model)
-
----
-
-## Repository Structure
-
-```
-GWM-UAV-Navigation-Sparse-Rewards/
-├── README.md                               # This file
-├── main.py                                 # Legacy entry point
-│
-├── src/                                    # Core source code
-│   ├── __init__.py
-│   ├── world_model/                        # Latent dynamics, encoder, uncertainty
-│   │   └── __init__.py
-│   ├── env/                                # Environment wrappers (mock, AirSim)
-│   │   └── __init__.py
-│   ├── rl/                                 # Reinforcement learning agents
-│   │   └── __init__.py
-│   ├── control/                            # Safety controller, takeover logic
-│   │   └── __init__.py
-│   ├── digital_twin/                       # Scene builder, domain randomization
-│   │   └── __init__.py
-│   ├── ros2_bridge/                        # ROS2 adapter (mock / rclpy)
-│   │   └── __init__.py
-│   ├── multi_agent/                        # Shared map, fleet coordination
-│   │   └── __init__.py
-│   ├── evaluation/                         # Metrics tracker, evaluation tools
-│   │   ├── __init__.py
-│   │   └── metrics.py
-│   └── utils/                              # Config loading, logging utilities
-│       └── __init__.py
-│
-├── scripts/                                # Runnable entry points
-│   ├── train_world_model.py                # World model pre-training
-│   ├── evaluate_policy.py                  # Policy evaluation with metrics
-│   ├── run_real2sim2real_loop.py            # Real2Sim2Real data engine
-│   └── run_digital_twin_generation.py      # Scene generation + randomization
-│
-├── configs/                                # Configuration files
-│   └── airsim/                             # AirSim-specific settings
-│
-├── examples/                               # Example scenario configs
-│   ├── single_uav_navigation.yaml          # Single UAV with obstacles
-│   ├── corner_case_slip.yaml               # Wind + friction corner case
-│   └── multi_agent_swarm.yaml              # 4-UAV swarm navigation
-│
-├── docs/                                   # Documentation
-│   ├── architecture.md                     # System architecture
-│   ├── research_axes.md                    # Four research axes
-│   ├── real2sim2real_pipeline.md            # R2S2R pipeline details
-│   ├── ros2_integration.md                 # ROS2 integration guide
-│   ├── digital_twin_isaac_sim_openusd.md   # Isaac Sim / OpenUSD guide
-│   ├── multi_agent_shared_world_model.md   # Multi-agent architecture
-│   └── roadmap.md                          # Development roadmap
-│
-├── tests/                                  # Test suite
-├── tools/                                  # Development tools
-├── legacy/                                 # Archived legacy code
-└── references/                             # Reference papers and materials
-```
-
----
+- `src/world_model/`: latent encoders, dynamics, uncertainty, policy intent.
+- `src/rl/`: replay buffer, trainer, sparse curriculum, baseline world model.
+- `src/digital_twin/`: scenario extraction, domain randomization, scene descriptors.
+- `src/control/`: planner, takeover, safety controller, CBF filter.
+- `src/ros2_bridge/`: ROS2 adapter, MAVLink/hardware/Nav2-style mock interfaces.
+- `src/multi_agent/`: agent registry, mock DDS, shared maps, swarm coordinator.
+- `src/evaluation/`: metrics and sim-to-real gap helpers.
 
 ## Quick Start
 
-### Installation
-
 ```bash
-# Clone the repository
-git clone https://github.com/Neura-Shadow/GWM-UAV-Navigation-Sparse-Rewards.git
-cd GWM-UAV-Navigation-Sparse-Rewards
-
-# Create a virtual environment (Python 3.10+)
 python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # Linux / macOS
-
-# Install core dependencies
-pip install torch numpy pyyaml
-
-# Verify the installation
-python -c "from src.evaluation.metrics import MetricsTracker; print('OK')"
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m pytest tests/ -q
 ```
 
-### Run Mock Policy Evaluation
+The test suite is the main readiness check and must pass without optional
+robotics runtimes.
+
+## Script Smoke Commands
 
 ```bash
-# Evaluate a random policy for 50 episodes in mock environment
-python scripts/evaluate_policy.py --num-episodes 50 --env mock --output outputs/metrics.json
+python scripts/train_baseline.py --env mock --max-steps 20
+python scripts/train_world_model.py --env mock --model baseline --steps 100
+python scripts/train_world_model.py --env mock --model latent --steps 100
+python scripts/run_real2sim2real_loop.py --mock --episode-steps 30 --variants 2
+python scripts/run_digital_twin_generation.py --num-variations 2
+python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
-### Run Script Help
+Help is available for every script:
 
 ```bash
+python scripts/train_baseline.py --help
 python scripts/train_world_model.py --help
 python scripts/run_real2sim2real_loop.py --help
 python scripts/run_digital_twin_generation.py --help
 python scripts/evaluate_policy.py --help
+python scripts/diagnose_airsim.py --help
 ```
 
-### Run Tests
+## Documentation
 
-```bash
-# Run all tests (no GPU / AirSim / ROS2 required)
-python -m pytest tests/ -v
-```
-
----
-
-## Current Status
-
-**Phase 1: Research-Ready Refactor** is complete.  All interfaces are defined, mock implementations are in place, and the full stack can be developed and tested on any machine without GPU, AirSim, ROS2, or Isaac Sim.
-
-Key deliverables:
-- ✅ Modular source structure with abstract interfaces
-- ✅ Mock adapters for all external dependencies
-- ✅ Evaluation metrics with sim-to-real gap tracking
-- ✅ Example configurations for single-agent, corner-case, and multi-agent scenarios
-- ✅ Placeholder scripts with full `--help` documentation
-- ✅ Comprehensive architecture and research documentation
-
----
-
-## Roadmap
-
-| Phase | Status | Key Milestone |
-|-------|--------|--------------|
-| **Phase 1**: Research-Ready Refactor | ✅ Complete | Interfaces, mocks, documentation |
-| **Phase 2**: Simulation-Driven Training | 🔲 In Progress | World model training, RL fine-tuning, R2S2R loop |
-| **Phase 3**: ROS2 / Isaac Sim / Multi-Agent | 🔲 Planned | Real deployment, swarm coordination |
-
-→ [Full roadmap with checkboxes](docs/roadmap.md)
-
----
+- [Architecture](docs/architecture.md)
+- [Roadmap](docs/roadmap.md)
+- [ROS2 integration](docs/ros2_integration.md)
+- [Deployment hardware interface](docs/deployment_hardware_interface.md)
+- [Digital twin / Isaac Sim / OpenUSD](docs/digital_twin_isaac_sim_openusd.md)
+- [Multi-agent shared world model](docs/multi_agent_shared_world_model.md)
+- [Real2Sim2Real pipeline](docs/real2sim2real_pipeline.md)
+- [Sparse rewards](docs/sparse_rewards.md)
 
 ## Citation / Research Direction
 
-If you use this framework in your research, please cite:
-
 ```bibtex
 @software{gwm_uav_nav_2026,
-  title   = {World-Model-Guided Digital-Twin UAV Navigation
-             Research Framework},
+  title   = {World-Model-Guided Digital-Twin UAV Navigation Research Framework},
   author  = {Neura-Shadow},
   year    = {2026},
   url     = {https://github.com/Neura-Shadow/GWM-UAV-Navigation-Sparse-Rewards},
-  note    = {Sparse-reward navigation via latent world models,
-             asymmetric control, and Real2Sim2Real data engines}
+  note    = {Sparse-reward navigation via latent world models, asymmetric control,
+             Real2Sim2Real data engines, and mock-first deployment interfaces}
 }
 ```
-
-### Key References
-
-- Ha & Schmidhuber, *World Models* (2018) — Learned environment models for planning.
-- Hafner et al., *DreamerV3* (2023) — World model–based RL across diverse domains.
-- Tobin et al., *Domain Randomization for Sim2Real Transfer* (2017) — Randomised simulation for robust transfer.
-- NVIDIA Isaac Sim — GPU-accelerated robotics simulation.
-- Open Robotics ROS2 — Real-time robotics middleware.
-
----
-
-<p align="center">
-  <em>Built for research. Designed for reality.</em>
-</p>
