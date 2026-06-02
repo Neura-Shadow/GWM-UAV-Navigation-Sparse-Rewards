@@ -24,6 +24,12 @@ from src.ros2_bridge.ros2_control_interface import (
     ROS2ControlHardwareInterface,
 )
 from src.ros2_bridge.ros2_bridge import ROS2Bridge
+from src.ros2_bridge.sensor_sync import (
+    ROS2SensorSynchronizer,
+    SensorFrame,
+    SensorSyncConfig,
+    SynchronizedSensorPacket,
+)
 
 __all__ = [
     "HardwareInterface",
@@ -33,7 +39,11 @@ __all__ = [
     "QoSConfig",
     "ROS2Bridge",
     "ROS2ControlHardwareInterface",
+    "ROS2SensorSynchronizer",
     "RealROS2Adapter",
+    "SensorFrame",
+    "SensorSyncConfig",
+    "SynchronizedSensorPacket",
     "WorldModelCostmapLayer",
     "WorldModelPlannerPlugin",
     "control_command_to_twist_dict",
