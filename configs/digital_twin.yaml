@@ -18,12 +18,20 @@ domain_randomization:
   num_variations: 10               # variations per base scenario
 
 sim_scene:
+  backend: "mock"                # "mock" | "isaac_sim" descriptor builder
   world_bounds: [-100, -100, -50, 100, 100, 0]   # x_min, y_min, z_min, x_max, y_max, z_max
   default_sensor_config:
     lidar_channels: 16
     lidar_range: 50.0
     camera_fov: 90
     depth_enabled: true
+  isaac_sim:
+    headless: true
+    stage_units: 1.0
+    descriptor_extension: ".json"
+    source_coordinate_frame: "project_default"
+    target_coordinate_frame: "isaac_z_up_pending"
+    coordinate_conversion_applied: false
 
 sim2real:
   policy_checkpoint_dir: "checkpoints/"

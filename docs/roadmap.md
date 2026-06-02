@@ -42,7 +42,7 @@ Build out the training and data pipelines, enabling world model pre-training and
 Connect the framework to real-world platforms and high-fidelity simulators for deployment-ready validation.
 
 - [ ] ROS2 bridge implementation (`RealROS2Adapter` with `rclpy`)
-- [ ] Isaac Sim / OpenUSD scene generation (`IsaacSimSceneBuilder`)
+- [x] Isaac Sim / OpenUSD scene descriptor generation (`IsaacSimSceneBuilder`, mock-first)
 - [ ] Isaac Sim RL gym environment wrapper
 - [ ] Multi-agent shared map (distributed 4D voxel grid)
 - [ ] Swarm coordination (round-robin → priority → consensus)

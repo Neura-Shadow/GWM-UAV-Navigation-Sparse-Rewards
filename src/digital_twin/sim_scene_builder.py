@@ -45,10 +45,28 @@ class SimSceneBuilder:
         self,
         world_bounds: tuple = _DEFAULT_WORLD_BOUNDS,
         sensor_config: Dict[str, Any] | None = None,
+        backend: str = "mock",
     ) -> None:
         self.world_bounds = world_bounds
         self.sensor_config = sensor_config or dict(_DEFAULT_SENSOR_CONFIG)
+        self.backend = backend
         logger.info("SimSceneBuilder initialised with bounds=%s", self.world_bounds)
+
+    @classmethod
+    def create(
+        cls,
+        backend: str = "mock",
+        world_bounds: tuple = _DEFAULT_WORLD_BOUNDS,
+        sensor_config: Dict[str, Any] | None = None,
+    ):
+        """Create a scene builder for the requested backend."""
+        if backend == "mock":
+            return cls(world_bounds=world_bounds, sensor_config=sensor_config, backend=backend)
+        if backend == "isaac_sim":
+            from src.digital_twin.isaac_sim_builder import IsaacSimSceneBuilder
+
+            return IsaacSimSceneBuilder(world_bounds=world_bounds, sensor_config=sensor_config)
+        raise ValueError(f"Unsupported scene builder backend: {backend}")
 
     # ------------------------------------------------------------------
     # Public API
