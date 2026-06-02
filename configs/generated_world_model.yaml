@@ -1,0 +1,78 @@
+# ============================================================================
+# Phase 4-A Generated World Model Core Configuration
+# ============================================================================
+# Lightweight CPU-safe baseline. This file does not enable Isaac Sim, ROS2,
+# MAVSDK, PX4, SITL, or real hardware.
+
+model:
+  image_channels: 3
+  depth_channels: 1
+  image_height: 32
+  image_width: 32
+  pose_dim: 6
+  velocity_dim: 3
+  action_dim: 3
+  intention_dim: 4
+  latent_dim: 32
+  visual_feature_dim: 32
+  state_feature_dim: 16
+  conditioning_dim: 32
+  hidden_dim: 64
+  context_length: 4
+  horizon: 3
+
+training:
+  synthetic: true
+  batch_size: 4
+  steps: 20
+  learning_rate: 1.0e-3
+  device: "cpu"
+  checkpoint_dir: null
+  seed: 7
+  modes:
+    teacher_forcing: true
+    autoregressive: true
+    scheduled_sampling: true
+
+losses:
+  rgb: 1.0
+  depth: 0.5
+  latent_regularization: 0.01
+  uncertainty_regularization: 0.01
+
+rollout:
+  mode: "autoregressive"
+  horizon: 3
+
+trajectory_scoring:
+  weights:
+    goal_progress: 1.0
+    collision_risk: 8.0
+    uncertainty: 2.0
+    energy: 0.05
+    smoothness: 0.1
+    altitude_violation: 10.0
+    geofence_violation: 10.0
+  safety_context:
+    min_safe_depth: 1.0
+    altitude_bounds: [0.5, 120.0]
+    geofence: null
+
+dataset:
+  root: "datasets/generated_world_model"
+  metadata_file: "metadata.json"
+  sequence_dir: "sequences"
+  shard_format: "npz"
+  commit_generated_data: false
+
+runtime_boundaries:
+  isaac_sim_required: false
+  ros2_required: false
+  mavsdk_required: false
+  px4_required: false
+  real_hardware_enabled: false
+  phase_4b_future_frame_projection: false
+  phase_4c_isaac_runtime: false
+  phase_4d_ros2_runtime: false
+  phase_4e_mavsdk_px4_sitl: false
+  phase_4f_end_to_end_demo: false
