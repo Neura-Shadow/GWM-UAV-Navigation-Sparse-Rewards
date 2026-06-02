@@ -19,6 +19,11 @@ PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
+The current repository checkpoint is the annotated tag
+`v0.3.0-mock-first`. It captures a complete mock-first research framework
+baseline: all required tests pass locally without optional robotics runtimes,
+and future real-runtime integrations remain explicitly out of scope.
+
 Completed mock-first slices:
 
 | Slice | Status | Key capability |
@@ -118,6 +123,8 @@ python scripts/diagnose_airsim.py --help
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Paper-style project summary](docs/project_summary.md)
+- [v0.3.0 mock-first release note](docs/releases/v0.3.0-mock-first.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)
