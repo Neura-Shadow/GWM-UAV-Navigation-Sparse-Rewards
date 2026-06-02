@@ -34,6 +34,24 @@ ros2:
   rates:
     cmd_publish_hz: 10.0
     odom_subscribe_hz: 50.0
+  sensor_sync:
+    enabled: false
+    real_mode: false
+    topics:
+      rgb: "/camera/rgb"
+      depth: "/camera/depth"
+      lidar: "/scan"
+      odom: "/odom"
+      imu: "/imu"
+    required_streams: ["rgb", "depth", "lidar", "odom"]
+    slop_sec: 0.05
+    queue_size: 10
+    allow_headerless: false
+    qos:
+      reliability: "best_effort"
+      history_depth: 10
+      deadline_ms: 50.0
+      lifespan_sec: 1.0
   qos_profiles:
     control_commands:
       reliability: "reliable"

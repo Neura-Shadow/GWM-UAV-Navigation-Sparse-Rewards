@@ -62,9 +62,47 @@ Message conversion is intentionally testable without ROS2 message packages:
 - `twist_dict_to_control_command(twist)`
 - `odometry_dict_to_sensor_observation(odom)`
 - `sensor_observation_to_odom_dict(obs)`
+- `image_to_rgb_array(image)`
+- `image_to_depth_array(depth)`
+- `lidar_to_array(scan_or_cloud)`
 
 The real adapter converts through these dictionaries and then wraps or unwraps
 actual ROS2 message objects when ROS2 is present.
+
+## Phase 4-D Sensor Synchronization
+
+Phase 4-D adds `ROS2SensorSynchronizer`, a mock-first synchronization layer for
+Generated World Model observations. It aligns RGB, depth, LiDAR, optional IMU,
+and odometry messages into one `SensorObservation`.
+
+```python
+from src.ros2_bridge import ROS2SensorSynchronizer
+
+synchronizer = ROS2SensorSynchronizer()
+synchronizer.ingest("rgb", rgb_msg)
+synchronizer.ingest("depth", depth_msg)
+synchronizer.ingest("lidar", lidar_msg)
+synchronizer.ingest("odom", odom_msg)
+observation = synchronizer.latest_observation()
+```
+
+Normal tests use manual ingest with dictionaries or object-like payloads. Real
+ROS2 mode is optional and guarded behind `message_filters`, `sensor_msgs`, and
+`nav_msgs`. The implementation follows ROS2's approximate timestamp
+synchronization pattern, but importing the package still works without ROS2.
+
+Default synchronized topics:
+
+| Purpose | Topic | ROS2 Message |
+|---------|-------|--------------|
+| RGB image | `/camera/rgb` | `sensor_msgs/Image` |
+| Depth image | `/camera/depth` | `sensor_msgs/Image` |
+| LiDAR | `/scan` | `sensor_msgs/LaserScan` or `sensor_msgs/PointCloud2` |
+| Odometry | `/odom` | `nav_msgs/Odometry` |
+| IMU metadata | `/imu` | `sensor_msgs/Imu` |
+
+Header timestamps are required by default. Setting `allow_headerless: true`
+uses receipt time and records that choice in observation metadata.
 
 ## QoS Configuration
 
@@ -87,6 +125,13 @@ ros2:
       history_depth: 5
       deadline_ms: 100.0
       lifespan_sec: 1.0
+  sensor_sync:
+    enabled: false
+    real_mode: false
+    required_streams: ["rgb", "depth", "lidar", "odom"]
+    slop_sec: 0.05
+    queue_size: 10
+    allow_headerless: false
 ```
 
 `QoSConfig` normalizes reliability values case-insensitively and currently

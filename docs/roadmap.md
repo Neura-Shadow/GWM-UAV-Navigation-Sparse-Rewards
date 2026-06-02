@@ -72,7 +72,7 @@ real-runtime integration while keeping every slice independently testable.
 - [x] Generated World Model core (`ObservationEncoder`, `ActionConditioner`, `VideoDynamicsModel`, `AutoregressiveRollout`, `TrajectoryScorer`)
 - [x] Future Frame Projection geometry prior (`FutureFrameProjection`, `CameraIntrinsics`, masked projection loss)
 - [x] Guarded Isaac Sim runtime environment wrapper (`IsaacSimRuntime`, `IsaacSimNavigationEnv`)
-- [ ] ROS2 image/depth/lidar/odom synchronization
+- [x] Mock-first ROS2 image/depth/lidar/odom synchronization (`ROS2SensorSynchronizer`)
 - [ ] MAVSDK / PX4 SITL command path
 - [ ] End-to-end Generated World Model navigation demo
 

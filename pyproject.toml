@@ -33,6 +33,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "isaac_runtime: optional Isaac Sim runtime smoke tests",
+    "ros2_runtime: optional ROS2 runtime smoke tests",
 ]
 
 [tool.ruff]

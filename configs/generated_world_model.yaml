@@ -82,11 +82,13 @@ dataset:
 runtime_boundaries:
   isaac_sim_required: false
   ros2_required: false
+  ros2_sensor_sync_required: false
   mavsdk_required: false
   px4_required: false
   real_hardware_enabled: false
   phase_4b_future_frame_projection: true
   phase_4c_isaac_runtime: false
+  phase_4d_ros2_sensor_sync: true
   phase_4d_ros2_runtime: false
   phase_4e_mavsdk_px4_sitl: false
   phase_4f_end_to_end_demo: false

@@ -23,6 +23,11 @@ Phase 4-C adds a guarded Isaac Sim runtime interface for connecting generated
 world model experiments to an optional digital-twin runtime. The interface is
 import-safe without Isaac Sim and all normal tests use fake backends.
 
+Phase 4-D adds mock-first ROS2 sensor synchronization. RGB, depth, LiDAR,
+optional IMU, and odometry payloads can be aligned into `SensorObservation`
+objects and appended to an `ObservationBuffer` for generated-world-model
+context windows. Normal tests still do not require ROS2.
+
 ## Core Idea
 
 The UAV receives a short context window containing RGB, depth, pose, and
@@ -122,13 +127,33 @@ target_coordinate_frame: "isaac_z_up_pending"
 coordinate_conversion_applied: false
 ```
 
+## Optional ROS2 Sensor Synchronization
+
+`ROS2SensorSynchronizer` lives in `src.ros2_bridge`. Its default path is manual
+mock ingest:
+
+```python
+from src.ros2_bridge import ROS2SensorSynchronizer
+
+synchronizer = ROS2SensorSynchronizer(observation_buffer=buffer)
+synchronizer.ingest("rgb", rgb_msg)
+synchronizer.ingest("depth", depth_msg)
+synchronizer.ingest("lidar", lidar_msg)
+synchronizer.ingest("odom", odom_msg)
+```
+
+When all required streams are within the configured timestamp slop, the
+synchronizer emits a `SensorObservation` containing RGB, depth, LiDAR, pose,
+velocity, stream timestamps, frame ids, and optional IMU metadata. Real ROS2
+mode remains opt-in and guarded behind ROS2 Python packages.
+
 ## Safety Boundary
 
-Phase 4-A/4-B/4-C do not require:
+Phase 4-A/4-B/4-C/4-D do not require:
 
 - Isaac Sim for normal tests
 - GPU for normal tests
-- ROS2 image/depth synchronization
+- ROS2 for normal tests
 - MAVSDK real runtime
 - PX4 SITL
 - real UAV hardware
@@ -136,7 +161,8 @@ Phase 4-A/4-B/4-C do not require:
 - diffusion models
 - transformer video models
 - Replicator
-- Phase 4-D, 4-E, or 4-F
+- Phase 4-E or 4-F
 
-Deployment defaults remain safe. Phase 4-C adds an optional runtime adapter
-only; it does not enable real flight or hardware execution.
+Deployment defaults remain safe. Phase 4-D adds an optional sensor
+synchronization bridge only; it does not enable real flight, hardware
+execution, Nav2, MAVSDK, or PX4.
