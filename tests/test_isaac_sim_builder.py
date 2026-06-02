@@ -142,6 +142,28 @@ def test_isaac_builder_normalizes_existing_flat_sensor_config() -> None:
     assert sensors["/World/Vehicle/UAV/Sensors/Lidar"]["attributes"]["config"]["range"] == 75.0
 
 
+def test_add_sensors_normalizes_existing_flat_sensor_config() -> None:
+    builder = IsaacSimSceneBuilder()
+    stage = MockUSDStage()
+
+    builder.add_sensors(
+        stage,
+        {
+            "lidar_channels": 16,
+            "lidar_range": 50.0,
+            "camera_fov": 90,
+            "depth_enabled": True,
+        },
+    )
+
+    assert "/World/Vehicle/UAV/Sensors/Lidar" in stage.prims
+    assert "/World/Vehicle/UAV/Sensors/DepthCamera" in stage.prims
+    assert "/World/Vehicle/UAV/Sensors/Imu" in stage.prims
+    assert "/World/Vehicle/UAV/Sensors/LidarChannels" not in stage.prims
+    assert "/World/Vehicle/UAV/Sensors/LidarRange" not in stage.prims
+    assert "/World/Vehicle/UAV/Sensors/CameraFov" not in stage.prims
+
+
 def test_sim_scene_builder_factory_rejects_unknown_backend() -> None:
     with pytest.raises(ValueError, match="Unsupported scene builder backend"):
         SimSceneBuilder.create(backend="unknown")

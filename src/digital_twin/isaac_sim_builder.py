@@ -181,7 +181,8 @@ class IsaacSimSceneBuilder:
 
     def add_sensors(self, stage: MockUSDStage, sensor_config: Dict[str, Any]) -> None:
         """Add configured sensor prims to a mock stage."""
-        for sensor in self._build_sensors(sensor_config):
+        normalized_config = self._normalize_sensor_config(sensor_config)
+        for sensor in self._build_sensors(normalized_config):
             prim = stage.DefinePrim(sensor["path"], sensor["prim_type"])
             prim.set_attribute("sensor", sensor["attributes"])
 
