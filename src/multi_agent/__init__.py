@@ -13,6 +13,9 @@ from src.multi_agent.communication import (
     MockDDSChannel,
     QoSProfile,
 )
+from src.multi_agent.priority_coordinator import PriorityCoordinator
+from src.multi_agent.ros2_dds_channel import ROS2DDSChannel
+from src.multi_agent.shared_latent_map import SharedLatentMap
 from src.multi_agent.shared_map import SharedSpatiotemporalMap
 from src.multi_agent.swarm_coordinator import SwarmCoordinator
 
@@ -22,7 +25,10 @@ __all__ = [
     "CommunicationChannel",
     "MessageType",
     "MockDDSChannel",
+    "PriorityCoordinator",
     "QoSProfile",
+    "ROS2DDSChannel",
+    "SharedLatentMap",
     "SharedSpatiotemporalMap",
     "SwarmCoordinator",
 ]

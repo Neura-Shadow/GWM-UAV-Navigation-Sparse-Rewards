@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 
@@ -20,6 +20,7 @@ from src.multi_agent.communication import (
     CommunicationChannel,
     MessageType,
 )
+from src.multi_agent.priority_coordinator import PriorityCoordinator
 from src.multi_agent.shared_map import SharedSpatiotemporalMap
 from src.utils.data_types import AgentStatus, ControlCommand
 
@@ -35,13 +36,23 @@ class SwarmCoordinator:
         shared_map: SharedSpatiotemporalMap,
         channel: CommunicationChannel,
         safety_radius: float = 5.0,
+        strategy: str = "round_robin",
+        priority_coordinator: Optional[PriorityCoordinator] = None,
     ) -> None:
         self.registry = registry
         self.shared_map = shared_map
         self.channel = channel
         self.safety_radius = safety_radius
+        self.strategy = strategy
+        self.priority_coordinator = priority_coordinator
+
+        if self.strategy not in {"round_robin", "priority"}:
+            raise ValueError(f"Unknown coordination strategy: {self.strategy}")
+
         logger.info(
-            "SwarmCoordinator initialised (safety_radius=%.1f).", safety_radius,
+            "SwarmCoordinator initialised (safety_radius=%.1f, strategy=%s).",
+            safety_radius,
+            strategy,
         )
 
     # ------------------------------------------------------------------
@@ -49,7 +60,7 @@ class SwarmCoordinator:
     # ------------------------------------------------------------------
 
     def assign_tasks(self, tasks: List[Dict[str, Any]]) -> Dict[str, str]:
-        """Assign tasks to available (IDLE) agents using round-robin.
+        """Assign tasks to available (IDLE) agents using the configured strategy.
 
         Args:
             tasks: List of task dicts, each must contain ``"task_id"``.
@@ -57,6 +68,12 @@ class SwarmCoordinator:
         Returns:
             Mapping ``{agent_id: task_id}`` for all assignments made.
         """
+        if self.strategy == "priority":
+            return self._assign_tasks_by_priority(tasks)
+        return self._assign_tasks_round_robin(tasks)
+
+    def _assign_tasks_round_robin(self, tasks: List[Dict[str, Any]]) -> Dict[str, str]:
+        """Assign tasks to available agents using the existing round-robin path."""
         idle_agents = self.registry.get_by_status(AgentStatus.IDLE)
         assignments: Dict[str, str] = {}
 
@@ -67,22 +84,8 @@ class SwarmCoordinator:
 
             agent = idle_agents.pop(0)
             task_id = task.get("task_id", f"task_{i}")
-            self.registry.update_state(
-                agent.agent_id,
-                task_id=task_id,
-                status=AgentStatus.NAVIGATING,
-            )
-            assignments[agent.agent_id] = task_id
-
-            # Notify agent via communication channel
-            msg = AgentMessage(
-                sender_id="coordinator",
-                message_type=MessageType.TASK_ASSIGNMENT,
-                payload={"task_id": task_id, "task": task},
-                timestamp=time.time(),
-                priority=5,
-            )
-            self.channel.send(msg)
+            self._apply_task_assignment(agent.agent_id, str(task_id), task)
+            assignments[agent.agent_id] = str(task_id)
 
         logger.info(
             "Assigned %d task(s) to %d agent(s).",
@@ -90,6 +93,48 @@ class SwarmCoordinator:
             len(assignments),
         )
         return assignments
+
+    def _assign_tasks_by_priority(self, tasks: List[Dict[str, Any]]) -> Dict[str, str]:
+        """Assign tasks using priority scoring while preserving lifecycle side effects."""
+        coordinator = self.priority_coordinator or PriorityCoordinator(self.registry)
+        assignments: Dict[str, str] = {}
+
+        for assignment in coordinator.plan_assignments(tasks):
+            self._apply_task_assignment(
+                assignment.agent_id,
+                assignment.task_id,
+                assignment.task,
+            )
+            assignments[assignment.agent_id] = assignment.task_id
+
+        logger.info(
+            "Priority-assigned %d task(s) to %d agent(s).",
+            len(assignments),
+            len(assignments),
+        )
+        return assignments
+
+    def _apply_task_assignment(
+        self,
+        agent_id: str,
+        task_id: str,
+        task: Dict[str, Any],
+    ) -> None:
+        """Apply assignment state and notify the selected agent."""
+        self.registry.update_state(
+            agent_id,
+            task_id=task_id,
+            status=AgentStatus.NAVIGATING,
+        )
+
+        msg = AgentMessage(
+            sender_id="coordinator",
+            message_type=MessageType.TASK_ASSIGNMENT,
+            payload={"task_id": task_id, "task": task},
+            timestamp=time.time(),
+            priority=5,
+        )
+        self.channel.send(msg)
 
     # ------------------------------------------------------------------
     # Conflict detection
