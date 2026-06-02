@@ -46,7 +46,7 @@ and RL fine-tuning entirely in simulation.
 Connect the framework to real-world platforms and high-fidelity simulators for
 deployment-ready validation.
 
-- [ ] ROS2 bridge implementation (`RealROS2Adapter` with `rclpy`)
+- [x] Mock-first ROS2 bridge and adapter (`ROS2Bridge`, `RealROS2Adapter`, guarded `rclpy`)
 - [x] Isaac Sim / OpenUSD scene descriptor generation (`IsaacSimSceneBuilder`, mock-first)
 - [ ] Isaac Sim RL gym environment wrapper
 - [x] Distributed multi-agent coordination infrastructure (`ROS2DDSChannel`, `PriorityCoordinator`, `SharedLatentMap`)

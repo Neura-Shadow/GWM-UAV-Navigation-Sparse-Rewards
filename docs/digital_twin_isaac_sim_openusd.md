@@ -230,7 +230,10 @@ flowchart LR
     end
 ```
 
-The adapter pattern ensures that switching from mock to Isaac Sim requires only a configuration change:
+The adapter pattern lets callers select the mock scene builder or the
+Isaac/OpenUSD-style descriptor builder through configuration. Real Isaac Sim
+runtime execution is still a future step and requires the installed Isaac Sim /
+OpenUSD Python APIs:
 
 ```yaml
 digital_twin:

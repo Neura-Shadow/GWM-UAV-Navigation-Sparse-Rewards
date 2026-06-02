@@ -9,10 +9,10 @@ build/
 *.whl
 
 # Virtual environments
-.venv/
-venv/
-env/
-ENV/
+/.venv/
+/venv/
+/env/
+/ENV/
 
 # PyTorch
 *.pt
