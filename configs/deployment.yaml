@@ -1,0 +1,64 @@
+# ============================================================================
+# Phase 3-D Mock-First Deployment Interface Configuration
+# ============================================================================
+# Safe defaults for CI and local development. This file does not launch SITL,
+# connect to real hardware, or enable autonomous real flight.
+
+deployment:
+  level: 0                         # 0=mock, 1=SITL/HIL-ready, 2=real hardware docs only
+  mock: true
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+mavlink:
+  mock: true
+  autopilot: "px4"                 # "px4" or "ardupilot"
+  connection_url: "udp://:14540"
+  real_hardware_enabled: false
+  command_frame: "body_ned"
+
+ros2_control:
+  mock: true
+  real_hardware_enabled: false
+  read_rate_hz: 50.0
+  write_rate_hz: 20.0
+
+nav2:
+  mock: true
+  costmap:
+    lethal_cost: 254
+    inflation_radius: 2.0
+  planner:
+    step_size: 1.0
+
+safety:
+  emergency_stop_enabled: true
+  safe_hover_enabled: true
+  safe_land_enabled: true
+  command_saturation_enabled: true
+  velocity_limits:
+    max_vx: 4.0
+    max_vy: 4.0
+    max_vz: 2.0
+    max_yaw_rate: 1.0
+  altitude_bounds:
+    min_altitude: 0.5
+    max_altitude: 120.0
+  geofence:
+    enabled: false
+    x: [-100.0, 100.0]
+    y: [-100.0, 100.0]
+    z: [-120.0, 0.0]
+  cbf:
+    enabled: true
+    min_obstacle_distance: 4.0
+    alpha: 1.0
+
+testing_boundaries:
+  level_0_mock_deployment: true
+  level_1_sitl_hil_ready_interface_only: true
+  level_2_real_hardware_documented_only: true
+  launch_px4_sitl: false
+  launch_ardupilot_sitl: false
+  run_real_mavsdk_connection_tests: false
+  run_real_hardware_tests: false
