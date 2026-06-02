@@ -63,6 +63,20 @@ deployment-ready validation.
 
 ---
 
+## Phase 4: Generated World Model UAV Navigation
+
+Evolve the mock-first framework toward generated observation rollouts and
+real-runtime integration while keeping every slice independently testable.
+
+- [x] Generated World Model core (`ObservationEncoder`, `ActionConditioner`, `VideoDynamicsModel`, `AutoregressiveRollout`, `TrajectoryScorer`)
+- [x] Future Frame Projection geometry prior (`FutureFrameProjection`, `CameraIntrinsics`, masked projection loss)
+- [ ] Isaac Sim runtime environment wrapper
+- [ ] ROS2 image/depth/lidar/odom synchronization
+- [ ] MAVSDK / PX4 SITL command path
+- [ ] End-to-end Generated World Model navigation demo
+
+---
+
 ## Timeline
 
 | Phase | Target | Key Milestone |
@@ -70,6 +84,7 @@ deployment-ready validation.
 | Phase 1 | Complete | All interfaces defined, mock stack testable |
 | Phase 2 | Q3-Q4 2026 | World model trained, RL fine-tuning in simulation |
 | Phase 3 | 2027 | First real-world flight with world-model guidance |
+| Phase 4 | 2027+ | Generated observation rollouts and guarded runtime paths |
 
 ---
 
