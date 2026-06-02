@@ -48,7 +48,8 @@ deployment-ready validation.
 
 - [x] Mock-first ROS2 bridge and adapter (`ROS2Bridge`, `RealROS2Adapter`, guarded `rclpy`)
 - [x] Isaac Sim / OpenUSD scene descriptor generation (`IsaacSimSceneBuilder`, mock-first)
-- [ ] Isaac Sim RL gym environment wrapper
+- [x] Guarded Isaac Sim runtime adapter (`IsaacSimRuntime`, `IsaacSimNavigationEnv`; optional, mock-first)
+- [ ] Full Isaac Sim RL gym environment wrapper
 - [x] Distributed multi-agent coordination infrastructure (`ROS2DDSChannel`, `PriorityCoordinator`, `SharedLatentMap`)
 - [x] Swarm coordination strategy extension (round-robin and priority; consensus remains future work)
 - [ ] Real-time digital twin mirroring (live sensor to OpenUSD sync)
@@ -70,7 +71,7 @@ real-runtime integration while keeping every slice independently testable.
 
 - [x] Generated World Model core (`ObservationEncoder`, `ActionConditioner`, `VideoDynamicsModel`, `AutoregressiveRollout`, `TrajectoryScorer`)
 - [x] Future Frame Projection geometry prior (`FutureFrameProjection`, `CameraIntrinsics`, masked projection loss)
-- [ ] Isaac Sim runtime environment wrapper
+- [x] Guarded Isaac Sim runtime environment wrapper (`IsaacSimRuntime`, `IsaacSimNavigationEnv`)
 - [ ] ROS2 image/depth/lidar/odom synchronization
 - [ ] MAVSDK / PX4 SITL command path
 - [ ] End-to-end Generated World Model navigation demo

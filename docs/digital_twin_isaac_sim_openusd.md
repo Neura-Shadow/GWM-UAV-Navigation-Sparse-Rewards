@@ -192,22 +192,58 @@ isaac_descriptor_builder = SimSceneBuilder.create(backend="isaac_sim")
 
 ---
 
+## Guarded Isaac Sim Runtime
+
+Phase 4-C adds two import-safe runtime interfaces:
+
+- `IsaacSimRuntime` in `src.digital_twin`
+- `IsaacSimNavigationEnv` in `src.env`
+
+Normal tests inject a fake backend and do not require Isaac Sim, OpenUSD, GPU,
+ROS2, MAVSDK, PX4, Nav2, or Replicator. The runtime imports Isaac Sim only
+inside guarded lifecycle helpers such as `launch()`.
+
+```python
+from src.digital_twin import IsaacSimRuntime
+from src.env import IsaacSimNavigationEnv
+
+runtime = IsaacSimRuntime(backend=fake_or_real_backend)
+env = IsaacSimNavigationEnv(descriptor=descriptor, runtime=runtime)
+obs = env.reset()
+obs, reward, done, info = env.step([1.0, 0.0, 0.0])
+env.close()
+```
+
+`IsaacSimRuntime.load_descriptor()` accepts descriptor dictionaries, descriptor
+JSON paths, and guarded `.usd` / `.usda` / `.usdc` stage references. Actual USD
+stage opening remains optional and occurs only when launched from an Isaac Sim
+Python environment.
+
+Sensor snapshots are normalized into `SensorObservation`:
+
+- RGB or image data -> `image`
+- Depth map -> `depth`
+- LiDAR point cloud -> `lidar`
+- IMU payload -> `metadata["imu"]`
+- pose, velocity, goal distance, and obstacle distance -> state-vector fields
+
+Coordinate conversion remains intentionally pending. Runtime metadata preserves:
+
+```yaml
+source_coordinate_frame: "project_default"
+target_coordinate_frame: "isaac_z_up_pending"
+coordinate_conversion_applied: false
+```
+
 ## Future Integration Plan
 
-### Phase 3-B2: Isaac Sim Runtime Connection
-
-1. Add real OpenUSD stage generation with installed Isaac Sim / OpenUSD APIs.
-2. Convert the project coordinate frame to Isaac Z-up explicitly.
-3. Connect to a headless Isaac Sim instance for batch scene generation.
-4. Use Replicator for domain randomization.
-
-### Phase 3-C+: Full Pipeline
-
-1. Add an Isaac Sim navigation environment wrapper.
-2. Bidirectional sync between the latent world model and the Isaac Sim environment.
-3. Real-time digital twin mirroring: update the OpenUSD scene from live sensor data.
-4. Multi-agent simulation with PhysX-based inter-agent collision detection.
-5. Photorealistic synthetic data generation for visual policy pre-training.
+1. Add audited project-to-Isaac Z-up coordinate conversion.
+2. Add real OpenUSD stage generation and richer sensor extraction when Isaac
+   Sim / OpenUSD APIs are installed.
+3. Use Replicator for domain randomization.
+4. Add bidirectional sync between the latent world model and the Isaac Sim
+   environment.
+5. Add real-time digital twin mirroring and multi-agent simulation.
 
 ### Integration architecture
 
@@ -231,14 +267,14 @@ flowchart LR
 ```
 
 The adapter pattern lets callers select the mock scene builder or the
-Isaac/OpenUSD-style descriptor builder through configuration. Real Isaac Sim
-runtime execution is still a future step and requires the installed Isaac Sim /
-OpenUSD Python APIs:
+Isaac/OpenUSD-style descriptor builder through configuration. Optional Isaac Sim
+runtime execution requires the installed Isaac Sim / OpenUSD Python APIs:
 
 ```yaml
 digital_twin:
   type: "isaac_sim"  # was "mock"
-  isaac_sim:
+  isaac_runtime:
+    enabled: false
     headless: true
-    gpu_id: 0
+    launch_mode: "mock_or_connect"
 ```
