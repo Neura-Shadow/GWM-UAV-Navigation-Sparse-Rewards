@@ -55,7 +55,11 @@ deployment-ready validation.
 - [ ] ros2_control integration (hardware interface and controller plugins)
 - [ ] Nav2 integration (custom costmap layer and planner plugin)
 - [ ] Real deployment interface (PX4 / ArduPilot MAVLink bridge)
-- [ ] Safety certification baseline (barrier certificates for Cerebellum controller)
+- [x] Mock deployment hardware interface (`MAVLinkBridge`, `MockHardwareInterface`, Nav2-style skeletons)
+- [x] Baseline CBF-style safety filter (runtime filter only, not certification proof)
+- [ ] Real SITL / HIL launch automation
+- [ ] Real hardware flight validation
+- [ ] Safety certification proof for Cerebellum controller
 
 ---
 

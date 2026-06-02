@@ -101,5 +101,29 @@ supports `reliable` and `best_effort`.
 4. Construct `RealROS2Adapter(config=config)` and use it anywhere a
    `ROS2Adapter` is accepted.
 
-The rest of Phase 3 remains out of scope for this slice: Isaac Sim, PX4,
-MAVSDK, distributed DDS, Nav2, and barrier certificates are planned separately.
+## Phase 3-D Deployment Interfaces
+
+Phase 3-D adds mock-first deployment interfaces next to the existing ROS2
+adapter layer:
+
+- `MAVLinkBridge` converts `ControlCommand` objects into MAVLink-like command
+  dictionaries and records async mock command history.
+- `HardwareInterface` and `MockHardwareInterface` expose a `read()` / `write()`
+  contract inspired by `ros2_control`.
+- `ROS2ControlHardwareInterface` is a guarded Python stub, not a real
+  `ros2_control` C++ plugin.
+- `WorldModelCostmapLayer` and `WorldModelPlannerPlugin` are pure-Python
+  Nav2-style skeletons, not runtime Nav2 plugins.
+- `ControlBarrierFunction` is a baseline runtime filter, not a certification
+  proof.
+
+The deployment config defaults to:
+
+```yaml
+deployment:
+  mock: true
+  real_hardware_enabled: false
+```
+
+PX4, ArduPilot, MAVSDK, Nav2 runtime integration, SITL/HIL automation, and real
+hardware flight remain future work.
