@@ -51,3 +51,29 @@ def generated_world_model_loss(
         "uncertainty_regularization": float(uncertainty_reg.detach().item()),
     }
     return total, metrics
+
+
+def future_frame_projection_loss(
+    predicted_rgb: torch.Tensor,
+    projected_rgb: torch.Tensor,
+    valid_mask: torch.Tensor,
+    weight: float = 1.0,
+) -> torch.Tensor:
+    """Masked RGB consistency loss against a projected geometry prior."""
+    if predicted_rgb.shape != projected_rgb.shape:
+        raise ValueError("predicted_rgb and projected_rgb shapes must match.")
+    if valid_mask.ndim != predicted_rgb.ndim:
+        while valid_mask.ndim < predicted_rgb.ndim:
+            valid_mask = valid_mask.unsqueeze(1)
+    if valid_mask.shape[0] != predicted_rgb.shape[0] or valid_mask.shape[-2:] != predicted_rgb.shape[-2:]:
+        raise ValueError("valid_mask must share batch and spatial dimensions with predicted_rgb.")
+
+    mask = valid_mask.to(device=predicted_rgb.device, dtype=predicted_rgb.dtype)
+    if mask.shape[1] == 1 and predicted_rgb.shape[1] != 1:
+        mask = mask.expand(-1, predicted_rgb.shape[1], *([-1] * (predicted_rgb.ndim - 2)))
+    valid_count = mask.sum()
+    if float(valid_count.detach().item()) <= 0.0:
+        return predicted_rgb.sum() * 0.0
+
+    error = (predicted_rgb - projected_rgb.to(device=predicted_rgb.device, dtype=predicted_rgb.dtype)).pow(2)
+    return float(weight) * (error * mask).sum() / valid_count.clamp_min(1.0)

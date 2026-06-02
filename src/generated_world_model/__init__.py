@@ -8,6 +8,13 @@ from src.generated_world_model.dataset import (
     save_npz_sequence,
 )
 from src.generated_world_model.losses import generated_world_model_loss
+from src.generated_world_model.future_frame_projection import (
+    CameraIntrinsics,
+    FutureFrameProjection,
+    ProjectionConfig,
+    ProjectionResult,
+)
+from src.generated_world_model.losses import future_frame_projection_loss
 from src.generated_world_model.observation_buffer import ObservationBuffer
 from src.generated_world_model.observation_encoder import ObservationEncoder
 from src.generated_world_model.planner import GeneratedWorldModelPlanner
@@ -34,7 +41,9 @@ __all__ = [
     "ActionConditioner",
     "ActionSequence",
     "AutoregressiveRollout",
+    "CameraIntrinsics",
     "CandidateTrajectorySampler",
+    "FutureFrameProjection",
     "GeneratedObservation",
     "GeneratedRollout",
     "GeneratedWorldModelDataset",
@@ -43,6 +52,8 @@ __all__ = [
     "ObservationBatch",
     "ObservationBuffer",
     "ObservationEncoder",
+    "ProjectionConfig",
+    "ProjectionResult",
     "TrajectoryCandidate",
     "TrajectoryScore",
     "TrajectoryScorer",
@@ -50,6 +61,7 @@ __all__ = [
     "build_baseline_components",
     "create_synthetic_batch",
     "generated_world_model_loss",
+    "future_frame_projection_loss",
     "load_npz_sequence",
     "make_synthetic_training_batch",
     "save_npz_sequence",
