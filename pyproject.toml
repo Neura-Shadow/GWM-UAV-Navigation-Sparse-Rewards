@@ -31,6 +31,9 @@ include = ["src*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "isaac_runtime: optional Isaac Sim runtime smoke tests",
+]
 
 [tool.ruff]
 line-length = 100

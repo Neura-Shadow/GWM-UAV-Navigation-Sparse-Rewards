@@ -33,6 +33,26 @@ sim_scene:
     target_coordinate_frame: "isaac_z_up_pending"
     coordinate_conversion_applied: false
 
+isaac_runtime:
+  enabled: false
+  headless: true
+  launch_mode: "mock_or_connect"
+  launch_on_reset: false
+  optional_smoke_tests: false
+  descriptor_path: null
+  timestep: 0.05
+  vehicle_path: "/World/Vehicle/UAV"
+  goal_path: "/World/Goal"
+  sensor_paths:
+    rgb: "/World/Vehicle/UAV/Sensors/DepthCamera"
+    depth: "/World/Vehicle/UAV/Sensors/DepthCamera"
+    lidar: "/World/Vehicle/UAV/Sensors/Lidar"
+    imu: "/World/Vehicle/UAV/Sensors/Imu"
+  coordinate_frames:
+    source_coordinate_frame: "project_default"
+    target_coordinate_frame: "isaac_z_up_pending"
+    coordinate_conversion_applied: false
+
 sim2real:
   policy_checkpoint_dir: "checkpoints/"
   deployment_log_path: "logs/deployments.json"
