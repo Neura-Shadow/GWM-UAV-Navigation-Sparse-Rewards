@@ -19,12 +19,12 @@ PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
-The current repository checkpoint is the annotated tag
-`v0.3.0-mock-first`. It captures a complete mock-first research framework
-baseline: all required tests pass locally without optional robotics runtimes,
-and future real-runtime integrations remain explicitly out of scope.
+The current Phase 4 checkpoint target is `v0.4.0-gwm-uav-runtime`. It captures
+the generated-world-model UAV runtime demo baseline: all normal tests pass
+locally without optional robotics runtimes, while real hardware execution and
+autonomous real flight remain disabled by default.
 
-Completed mock-first slices:
+Completed mock-first and guarded-runtime slices:
 
 | Slice | Status | Key capability |
 | --- | --- | --- |
@@ -34,10 +34,17 @@ Completed mock-first slices:
 | Phase 3-B | Complete mock-first slice | Isaac Sim / OpenUSD-style descriptor builder and JSON export |
 | Phase 3-C | Complete mock-first slice | Distributed coordination, DDS-style channel, shared latent map |
 | Phase 3-D | Complete mock-first slice | MAVLink, hardware, Nav2-style, and CBF deployment interfaces |
+| Phase 4-A | Complete mock-first slice | Generated World Model core |
+| Phase 4-B | Complete mock-first slice | Future Frame Projection geometry prior |
+| Phase 4-C | Complete guarded-runtime slice | Isaac Sim runtime adapter with fake-backend tests |
+| Phase 4-D | Complete mock-first slice | ROS2 image/depth/LiDAR/odom sensor synchronization |
+| Phase 4-E | Complete guarded-runtime slice | MAVSDK / PX4 SITL command path |
+| Phase 4-F | Complete mock-first slice | End-to-end GWM navigation demo |
 
-Future runtime work is not started: real SITL/HIL automation, real hardware
-flight, real Nav2 plugins, real `ros2_control` C++ plugins, Isaac Sim runtime
-execution, and certification proof.
+The Phase 4 runtime hooks are optional, guarded opt-ins. The repository does
+not claim real flight validation, production readiness, automatic PX4 launch,
+real Nav2 plugins, real `ros2_control` C++ plugins, or formal safety
+certification.
 
 ## Safety Defaults
 
@@ -46,12 +53,15 @@ The deployment layer is safe by default:
 ```yaml
 deployment:
   mock: true
+  sitl_enabled: false
   real_hardware_enabled: false
   autonomous_real_flight_enabled: false
 ```
 
-Phase 3-D does not enable autonomous real flight. `ControlBarrierFunction` is a
-baseline runtime filter, not a formal certification proof.
+Normal tests require no Isaac Sim, ROS2, MAVSDK, PX4, GPU, SITL, or real
+hardware. Optional Isaac Sim, ROS2 sensor synchronization, and MAVSDK / PX4
+SITL paths require explicit opt-in. `ControlBarrierFunction` is a baseline
+runtime filter, not a formal certification proof.
 
 ## Architecture
 
@@ -106,6 +116,8 @@ python scripts/train_world_model.py --env mock --model baseline --steps 100
 python scripts/train_world_model.py --env mock --model latent --steps 100
 python scripts/run_real2sim2real_loop.py --mock --episode-steps 30 --variants 2
 python scripts/run_digital_twin_generation.py --num-variations 2
+python scripts/train_generated_world_model.py --synthetic --steps 20
+python scripts/run_gwm_navigation_demo.py --backend mock --steps 5 --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
@@ -124,7 +136,9 @@ python scripts/diagnose_airsim.py --help
 
 - [Architecture](docs/architecture.md)
 - [Paper-style project summary](docs/project_summary.md)
+- [v0.4.0 GWM UAV runtime release note](docs/releases/v0.4.0-gwm-uav-runtime.md)
 - [v0.3.0 mock-first release note](docs/releases/v0.3.0-mock-first.md)
+- [Generated World Model navigation](docs/generated_world_model_navigation.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)
