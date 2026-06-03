@@ -33,6 +33,12 @@ safety-filtered `ControlCommand` objects flow toward an optional PX4 SITL
 MAVSDK client. Normal tests use fake clients and do not require MAVSDK, PX4, or
 SITL.
 
+Phase 4-F adds the end-to-end Generated World Model navigation demo. The default
+demo is mock-only and connects synthetic observations, `ObservationBuffer`, GWM
+rollout planning, trajectory scoring, a CBF safety gate, and a mock command
+backend. Isaac Sim, ROS2 sensor sync, and MAVSDK/PX4 SITL paths remain guarded
+operator opt-ins.
+
 ## Core Idea
 
 The UAV receives a short context window containing RGB, depth, pose, and
@@ -65,11 +71,20 @@ Important interfaces:
 - `GeneratedWorldModelPlanner`
 - `FutureFrameProjection`
 - `CameraIntrinsics`
+- `GWMDemoRunner`
+- `GWMDemoConfig`
+- `run_demo`
 
 Synthetic training can be run with:
 
 ```bash
 python scripts/train_generated_world_model.py --synthetic --steps 20
+```
+
+The safe end-to-end demo can be run with:
+
+```bash
+python scripts/run_gwm_navigation_demo.py --backend mock --steps 5 --no-write-output
 ```
 
 ## Dataset Layout
@@ -186,9 +201,44 @@ Frame convention:
 body_ned: vx forward, vy right, vz down, yaw_rate in rad/s converted to deg/s
 ```
 
+## End-to-End Demo
+
+`GWMDemoRunner` lives in `src.generated_world_model`. It wires the current
+mock-first stack into one control-loop style demo:
+
+```text
+Observation source
+  -> ObservationBuffer
+  -> Generated World Model rollout
+  -> CandidateTrajectorySampler
+  -> TrajectoryScorer
+  -> ControlBarrierFunction
+  -> execution backend
+```
+
+Default configuration is in `configs/gwm_navigation_demo.yaml`:
+
+```yaml
+deployment:
+  mock: true
+  sitl_enabled: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+```
+
+The default observation source and execution backend are both `mock`. Optional
+runtime paths require explicit opt-in through `allow_optional_runtime`; real
+hardware and autonomous real-flight flags are rejected before execution.
+
+Result JSON uses schema `gwm_navigation_demo_v1` and records run metadata,
+backend summary, per-step pose/score/command/safety records, aggregate metrics,
+and a final status such as `completed`, `timeout`, `safety_stop`, or
+`runtime_unavailable`. Results under `outputs/` are local artifacts and should
+not be committed.
+
 ## Safety Boundary
 
-Phase 4-A/4-B/4-C/4-D/4-E do not require:
+Phase 4-A/4-B/4-C/4-D/4-E/4-F do not require:
 
 - Isaac Sim for normal tests
 - GPU for normal tests
@@ -200,8 +250,7 @@ Phase 4-A/4-B/4-C/4-D/4-E do not require:
 - diffusion models
 - transformer video models
 - Replicator
-- Phase 4-F
 
-Deployment defaults remain safe. Phase 4-E adds optional PX4 SITL command
-plumbing only; it does not enable real flight, hardware execution, Nav2, or
-automatic SITL launch.
+Deployment defaults remain safe. Phase 4-F adds an integration demo only; it
+does not enable real flight, hardware execution, Nav2, formal CBF
+certification, Replicator, or automatic SITL launch.
