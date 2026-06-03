@@ -2,11 +2,12 @@
 
 ## Overview
 
-Phase 3-D adds a mock-first deployment interface layer. It prepares the
-framework for PX4, ArduPilot, MAVLink, `ros2_control`, Nav2, and CBF-style
-safety integration without requiring any of those runtimes in CI.
+Phase 3-D adds a mock-first deployment interface layer. Phase 4-E extends the
+MAVLink path with a guarded MAVSDK / PX4 SITL command interface. The framework
+still does not require PX4, ArduPilot, MAVSDK, ROS2, Nav2, Isaac Sim, GPU, SITL,
+or real hardware in normal tests.
 
-This slice does not enable autonomous real flight.
+These slices do not enable autonomous real flight.
 
 ## Deployment Levels
 
@@ -26,19 +27,36 @@ Default config:
 ```yaml
 deployment:
   mock: true
+  sitl_enabled: false
   real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
 ```
 
 ### Level 1: SITL / HIL-Ready Interface
 
-Level 1 provides command conversion and connection configuration only.
+Level 1 provides guarded SITL command plumbing only.
 
 - `MAVLinkBridge` can convert `ControlCommand` objects into MAVLink-like dicts.
+- `MAVLinkBridge` can connect to an injected fake MAVSDK client or optional
+  MAVSDK `System` when SITL is explicitly enabled.
+- PX4 SITL uses `udp://:14540` by default.
+- Offboard mode requires an initial safe setpoint before start.
 - `HardwareInterface` exposes a `read()` / `write()` contract.
 - `ROS2ControlHardwareInterface` is a guarded stub, not a real controller plugin.
 - `WorldModelCostmapLayer` and `WorldModelPlannerPlugin` are pure-Python Nav2-style skeletons.
 
-Phase 3-D does not launch PX4 SITL, ArduPilot SITL, MAVSDK connections, or HIL sessions.
+Phase 4-E does not launch PX4 SITL automatically. The operator must start SITL
+externally before enabling the optional command path.
+
+Explicit SITL opt-in:
+
+```yaml
+deployment:
+  mock: false
+  sitl_enabled: true
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+```
 
 ### Level 2: Real Hardware Deployment
 
@@ -68,10 +86,27 @@ No autonomous real flight is enabled by default.
 - `send_velocity(vx, vy, vz, yaw_rate)`
 - `land()`
 - `emergency_stop()`
+- `wait_until_ready(timeout_sec)`
+- `start_offboard(initial_command)`
+- `stop_offboard()`
+- `send_command(command)`
+- `hold()`
+- `return_to_launch()`
 - `command_to_mavlink(command)`
 
-Real mode is guarded. Without MAVSDK or an injected client, real connection
-attempts raise a clear `RuntimeError`.
+SITL mode is guarded. Without MAVSDK or an injected client, optional SITL
+connection attempts raise a clear `RuntimeError`. Real hardware flags are
+rejected in Phase 4-E even if a fake client is injected.
+
+Frame convention:
+
+```text
+frame: body_ned
+vx: forward
+vy: right
+vz: down
+yaw_rate: rad/s input, converted to deg/s for MAVSDK-style velocity payloads
+```
 
 ### Hardware Interface
 
@@ -109,23 +144,25 @@ approved separately.
 
 ## Out Of Scope
 
-- Real PX4 SITL launch automation
+- Automatic PX4 SITL launch automation
 - Real ArduPilot SITL launch automation
-- Real MAVSDK connection tests
+- Required MAVSDK connection tests
 - Real hardware flight
+- Autonomous real flight
 - Real Nav2 plugin build system
 - Real `ros2_control` C++ plugin
 - Formal CBF certification proof
-- Isaac Sim runtime execution
-- Phase 4 work
+- Isaac Sim runtime execution changes
+- Phase 4-F end-to-end demo
 
 ## Verification
 
-All Phase 3-D tests must pass without PX4, ArduPilot, MAVSDK, ROS2, Nav2,
-Isaac Sim, GPU, or real hardware:
+All Phase 3-D / 4-E tests must pass without PX4, ArduPilot, MAVSDK, ROS2, Nav2,
+Isaac Sim, GPU, SITL, or real hardware:
 
 ```bash
+python -m pytest tests/test_mavsdk_sitl.py -q
 python -m pytest tests/test_deployment.py -q
 python -m pytest tests/ -q
-python -m compileall -q src/control src/ros2_bridge tests/test_deployment.py
+python -m compileall -q src/control src/ros2_bridge tests/test_mavsdk_sitl.py
 ```

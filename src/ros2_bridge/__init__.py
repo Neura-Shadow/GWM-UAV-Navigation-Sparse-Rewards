@@ -10,7 +10,7 @@ from src.ros2_bridge.msg_converters import (
     sensor_observation_to_odom_dict,
     twist_dict_to_control_command,
 )
-from src.ros2_bridge.mavlink_bridge import MAVLinkBridge
+from src.ros2_bridge.mavlink_bridge import MAVLinkBridge, MAVSDKSITLConfig
 from src.ros2_bridge.nav2_costmap_plugin import (
     WorldModelCostmapLayer,
     WorldModelPlannerPlugin,
@@ -35,6 +35,7 @@ __all__ = [
     "HardwareInterface",
     "HardwareState",
     "MAVLinkBridge",
+    "MAVSDKSITLConfig",
     "MockHardwareInterface",
     "QoSConfig",
     "ROS2Bridge",

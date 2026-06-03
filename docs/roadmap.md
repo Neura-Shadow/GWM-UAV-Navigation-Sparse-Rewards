@@ -55,6 +55,7 @@ deployment-ready validation.
 - [ ] Real-time digital twin mirroring (live sensor to OpenUSD sync)
 - [ ] ros2_control integration (hardware interface and controller plugins)
 - [ ] Nav2 integration (custom costmap layer and planner plugin)
+- [x] Guarded PX4 SITL MAVSDK command path (`MAVLinkBridge`; optional, fake-client tested)
 - [ ] Real deployment interface (PX4 / ArduPilot MAVLink bridge)
 - [x] Mock deployment hardware interface (`MAVLinkBridge`, `MockHardwareInterface`, Nav2-style skeletons)
 - [x] Baseline CBF-style safety filter (runtime filter only, not certification proof)
@@ -73,7 +74,7 @@ real-runtime integration while keeping every slice independently testable.
 - [x] Future Frame Projection geometry prior (`FutureFrameProjection`, `CameraIntrinsics`, masked projection loss)
 - [x] Guarded Isaac Sim runtime environment wrapper (`IsaacSimRuntime`, `IsaacSimNavigationEnv`)
 - [x] Mock-first ROS2 image/depth/lidar/odom synchronization (`ROS2SensorSynchronizer`)
-- [ ] MAVSDK / PX4 SITL command path
+- [x] MAVSDK / PX4 SITL command path (`MAVLinkBridge`, guarded optional MAVSDK)
 - [ ] End-to-end Generated World Model navigation demo
 
 ---
