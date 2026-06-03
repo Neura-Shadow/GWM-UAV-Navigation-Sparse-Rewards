@@ -12,6 +12,7 @@ from src.ros2_bridge import (
     HardwareInterface,
     HardwareState,
     MAVLinkBridge,
+    MAVSDKSITLConfig,
     MockHardwareInterface,
     ROS2ControlHardwareInterface,
     WorldModelCostmapLayer,
@@ -77,11 +78,22 @@ def test_mavlink_bridge_mock_async_lifecycle_records_history() -> None:
 
 
 def test_mavlink_bridge_real_mode_requires_explicit_hardware_enable() -> None:
-    """Real mode remains gated even before optional MAVSDK matters."""
+    """Non-mock mode remains gated behind explicit SITL opt-in."""
     bridge = MAVLinkBridge(mock=False, real_hardware_enabled=False)
 
-    with pytest.raises(RuntimeError, match="real_hardware_enabled"):
+    with pytest.raises(RuntimeError, match="sitl_enabled"):
         asyncio.run(bridge.connect())
+
+
+def test_mavsdk_sitl_config_imports_without_mavsdk() -> None:
+    """The SITL config is pure Python and defaults to safe mock mode."""
+    config = MAVSDKSITLConfig()
+
+    assert config.connection_url == "udp://:14540"
+    assert config.autopilot == "px4"
+    assert config.mock is True
+    assert config.sitl_enabled is False
+    assert config.real_hardware_enabled is False
 
 
 def test_mock_hardware_interface_read_write_and_emergency_stop() -> None:

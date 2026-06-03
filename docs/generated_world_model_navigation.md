@@ -28,6 +28,11 @@ optional IMU, and odometry payloads can be aligned into `SensorObservation`
 objects and appended to an `ObservationBuffer` for generated-world-model
 context windows. Normal tests still do not require ROS2.
 
+Phase 4-E adds a guarded MAVSDK / PX4 SITL command path. It lets planned and
+safety-filtered `ControlCommand` objects flow toward an optional PX4 SITL
+MAVSDK client. Normal tests use fake clients and do not require MAVSDK, PX4, or
+SITL.
+
 ## Core Idea
 
 The UAV receives a short context window containing RGB, depth, pose, and
@@ -147,22 +152,56 @@ synchronizer emits a `SensorObservation` containing RGB, depth, LiDAR, pose,
 velocity, stream timestamps, frame ids, and optional IMU metadata. Real ROS2
 mode remains opt-in and guarded behind ROS2 Python packages.
 
+## Optional MAVSDK / PX4 SITL Command Path
+
+`MAVLinkBridge` remains the deployment-facing command adapter. Phase 4-E adds a
+guarded SITL mode:
+
+```yaml
+deployment:
+  mock: false
+  sitl_enabled: true
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+```
+
+The default remains safe:
+
+```yaml
+deployment:
+  mock: true
+  sitl_enabled: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+```
+
+PX4 SITL is not launched by the framework. The operator must start SITL
+externally, then connect through the optional MAVSDK path. Offboard mode sends a
+safe initial setpoint before start. `ControlBarrierFunction.saturate()` clamps
+velocity and yaw-rate commands before MAVSDK writes.
+
+Frame convention:
+
+```text
+body_ned: vx forward, vy right, vz down, yaw_rate in rad/s converted to deg/s
+```
+
 ## Safety Boundary
 
-Phase 4-A/4-B/4-C/4-D do not require:
+Phase 4-A/4-B/4-C/4-D/4-E do not require:
 
 - Isaac Sim for normal tests
 - GPU for normal tests
 - ROS2 for normal tests
-- MAVSDK real runtime
+- MAVSDK for normal tests
 - PX4 SITL
 - real UAV hardware
 - autonomous real flight
 - diffusion models
 - transformer video models
 - Replicator
-- Phase 4-E or 4-F
+- Phase 4-F
 
-Deployment defaults remain safe. Phase 4-D adds an optional sensor
-synchronization bridge only; it does not enable real flight, hardware
-execution, Nav2, MAVSDK, or PX4.
+Deployment defaults remain safe. Phase 4-E adds optional PX4 SITL command
+plumbing only; it does not enable real flight, hardware execution, Nav2, or
+automatic SITL launch.

@@ -90,5 +90,5 @@ runtime_boundaries:
   phase_4c_isaac_runtime: false
   phase_4d_ros2_sensor_sync: true
   phase_4d_ros2_runtime: false
-  phase_4e_mavsdk_px4_sitl: false
+  phase_4e_mavsdk_px4_sitl: true
   phase_4f_end_to_end_demo: false

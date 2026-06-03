@@ -1,5 +1,5 @@
 # ============================================================================
-# Phase 3-D Mock-First Deployment Interface Configuration
+# Phase 3-D / 4-E Mock-First Deployment Interface Configuration
 # ============================================================================
 # Safe defaults for CI and local development. This file does not launch SITL,
 # connect to real hardware, or enable autonomous real flight.
@@ -7,15 +7,21 @@
 deployment:
   level: 0                         # 0=mock, 1=SITL/HIL-ready, 2=real hardware docs only
   mock: true
+  sitl_enabled: false
   real_hardware_enabled: false
   autonomous_real_flight_enabled: false
 
 mavlink:
   mock: true
+  sitl_enabled: false
   autopilot: "px4"                 # "px4" or "ardupilot"
   connection_url: "udp://:14540"
-  real_hardware_enabled: false
+  takeoff_altitude_m: 5.0
   command_frame: "body_ned"
+  offboard_initial_setpoint_required: true
+  health_timeout_sec: 10.0
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
 
 ros2_control:
   mock: true
