@@ -75,7 +75,7 @@ real-runtime integration while keeping every slice independently testable.
 - [x] Guarded Isaac Sim runtime environment wrapper (`IsaacSimRuntime`, `IsaacSimNavigationEnv`)
 - [x] Mock-first ROS2 image/depth/lidar/odom synchronization (`ROS2SensorSynchronizer`)
 - [x] MAVSDK / PX4 SITL command path (`MAVLinkBridge`, guarded optional MAVSDK)
-- [ ] End-to-end Generated World Model navigation demo
+- [x] End-to-end Generated World Model navigation demo (`GWMDemoRunner`, mock-first CLI)
 
 ---
 

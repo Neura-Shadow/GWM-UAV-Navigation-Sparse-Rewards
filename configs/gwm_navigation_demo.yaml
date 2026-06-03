@@ -1,0 +1,120 @@
+# ============================================================================
+# Phase 4-F End-to-End GWM Navigation Demo Configuration
+# ============================================================================
+# Safe mock-first defaults. This demo does not require or enable Isaac Sim,
+# ROS2, MAVSDK, PX4, SITL launch automation, real hardware, or autonomous real
+# flight unless explicitly overridden by an operator for guarded runtime smoke.
+
+demo:
+  schema_version: "gwm_navigation_demo_config_v1"
+  observation_source: "mock"          # "mock" | "isaac" | "ros2"
+  execution_backend: "mock"          # "mock" | "isaac" | "mavsdk_sitl"
+  steps: 5
+  horizon: 3
+  num_candidates: 4
+  seed: 7
+  device: "cpu"
+  checkpoint_path: null
+  output_path: "outputs/gwm_demo/latest.json"
+  write_output: true
+  allow_optional_runtime: false
+  fail_on_runtime_unavailable: false
+  start_pose: [0.0, 0.0, -5.0]
+  goal: [10.0, 0.0, -5.0]
+  control_dt: 0.4
+  max_speed: 2.0
+  context_length: 4
+  image_height: 32
+  image_width: 32
+  goal_reach_dist: 1.0
+  collision_dist: 0.5
+  mock_obstacle_distance: 20.0
+  min_safe_depth: 1.0
+  min_obstacle_distance: 4.0
+
+deployment:
+  mock: true
+  sitl_enabled: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+model:
+  image_channels: 3
+  depth_channels: 1
+  image_height: 32
+  image_width: 32
+  pose_dim: 6
+  velocity_dim: 3
+  action_dim: 3
+  intention_dim: 4
+  latent_dim: 32
+  visual_feature_dim: 32
+  state_feature_dim: 16
+  conditioning_dim: 32
+  hidden_dim: 64
+  context_length: 4
+  horizon: 3
+
+trajectory_scoring:
+  weights:
+    goal_progress: 1.0
+    collision_risk: 8.0
+    uncertainty: 2.0
+    energy: 0.05
+    smoothness: 0.1
+    altitude_violation: 10.0
+    geofence_violation: 10.0
+
+safety:
+  emergency_stop_enabled: true
+  command_saturation_enabled: true
+  velocity_limits:
+    max_vx: 4.0
+    max_vy: 4.0
+    max_vz: 2.0
+    max_yaw_rate: 1.0
+  altitude_bounds:
+    min_altitude: 0.5
+    max_altitude: 120.0
+  geofence:
+    enabled: false
+    x: [-100.0, 100.0]
+    y: [-100.0, 100.0]
+    z: [-120.0, 0.0]
+  cbf:
+    enabled: true
+    min_obstacle_distance: 4.0
+    alpha: 1.0
+
+isaac:
+  runtime:
+    enabled: false
+    headless: true
+    launch_mode: "mock_or_connect"
+
+ros2:
+  sensor_sync:
+    enabled: false
+    real_mode: false
+
+mavlink:
+  mock: true
+  sitl_enabled: false
+  autopilot: "px4"
+  connection_url: "udp://:14540"
+  takeoff_altitude_m: 5.0
+  command_frame: "body_ned"
+  offboard_initial_setpoint_required: true
+  health_timeout_sec: 10.0
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+runtime_boundaries:
+  isaac_sim_required: false
+  ros2_required: false
+  mavsdk_required: false
+  px4_required: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+  launch_px4_sitl: false
+  autonomous_real_flight: false

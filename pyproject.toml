@@ -34,6 +34,7 @@ testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
     "isaac_runtime: optional Isaac Sim runtime smoke tests",
+    "gwm_demo_runtime: optional end-to-end GWM runtime smoke tests",
     "mavsdk_sitl: optional MAVSDK / PX4 SITL smoke tests",
     "ros2_runtime: optional ROS2 runtime smoke tests",
 ]

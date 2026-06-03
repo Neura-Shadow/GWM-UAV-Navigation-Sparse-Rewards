@@ -7,6 +7,12 @@ from src.generated_world_model.dataset import (
     load_npz_sequence,
     save_npz_sequence,
 )
+from src.generated_world_model.demo import (
+    GWMDemoConfig,
+    GWMDemoResult,
+    GWMDemoRunner,
+    run_demo,
+)
 from src.generated_world_model.losses import generated_world_model_loss
 from src.generated_world_model.future_frame_projection import (
     CameraIntrinsics,
@@ -46,6 +52,9 @@ __all__ = [
     "FutureFrameProjection",
     "GeneratedObservation",
     "GeneratedRollout",
+    "GWMDemoConfig",
+    "GWMDemoResult",
+    "GWMDemoRunner",
     "GeneratedWorldModelDataset",
     "GeneratedWorldModelPlanner",
     "GWMConfig",
@@ -64,6 +73,7 @@ __all__ = [
     "future_frame_projection_loss",
     "load_npz_sequence",
     "make_synthetic_training_batch",
+    "run_demo",
     "save_npz_sequence",
     "train_synthetic_step",
 ]
