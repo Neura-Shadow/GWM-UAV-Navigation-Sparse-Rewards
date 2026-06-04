@@ -79,6 +79,19 @@ real-runtime integration while keeping every slice independently testable.
 
 ---
 
+## Phase 5: Real-Runtime Readiness and SITL Integration
+
+Validate optional runtime paths gradually while preserving safe defaults and
+mock-first normal tests.
+
+- [x] Runtime capability detection (`RuntimeCapabilityDetector`, read-only probes)
+- [ ] Guarded Isaac Sim runtime smoke test
+- [ ] Guarded ROS2 sensor synchronization runtime smoke test
+- [ ] Guarded MAVSDK / PX4 SITL command-path smoke test
+- [ ] Closed-loop mock-to-SITL integration plan
+
+---
+
 ## Timeline
 
 | Phase | Target | Key Milestone |
@@ -87,6 +100,7 @@ real-runtime integration while keeping every slice independently testable.
 | Phase 2 | Q3-Q4 2026 | World model trained, RL fine-tuning in simulation |
 | Phase 3 | 2027 | First real-world flight with world-model guidance |
 | Phase 4 | 2027+ | Generated observation rollouts and guarded runtime paths |
+| Phase 5 | 2027+ | Real-runtime readiness checks and guarded SITL validation |
 
 ---
 
