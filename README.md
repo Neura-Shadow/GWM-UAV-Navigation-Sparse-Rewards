@@ -118,6 +118,7 @@ python scripts/run_real2sim2real_loop.py --mock --episode-steps 30 --variants 2
 python scripts/run_digital_twin_generation.py --num-variations 2
 python scripts/train_generated_world_model.py --synthetic --steps 20
 python scripts/run_gwm_navigation_demo.py --backend mock --steps 5 --no-write-output
+python scripts/check_runtime_capabilities.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
@@ -139,6 +140,7 @@ python scripts/diagnose_airsim.py --help
 - [v0.4.0 GWM UAV runtime release note](docs/releases/v0.4.0-gwm-uav-runtime.md)
 - [v0.3.0 mock-first release note](docs/releases/v0.3.0-mock-first.md)
 - [Generated World Model navigation](docs/generated_world_model_navigation.md)
+- [Phase 5 runtime validation](docs/phase5_runtime_validation.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)

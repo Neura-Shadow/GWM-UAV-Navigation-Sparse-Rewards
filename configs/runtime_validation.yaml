@@ -1,0 +1,25 @@
+# ============================================================================
+# Phase 5-A Runtime Capability Detection Configuration
+# ============================================================================
+# Read-only probes only. This configuration must not launch Isaac Sim, ROS2,
+# MAVSDK, PX4 SITL, or hardware interfaces.
+
+runtime_validation:
+  write_report: true
+  output_dir: outputs/runtime_validation
+  include_path_hints: true
+  redact_sensitive_env: true
+  probes:
+    python: true
+    cuda: true
+    nvidia_smi: true
+    isaac_sim: true
+    ros2: true
+    mavsdk: true
+    px4: true
+    github_cli: true
+  safety:
+    launch_runtimes: false
+    connect_to_sitl: false
+    connect_to_hardware: false
+
