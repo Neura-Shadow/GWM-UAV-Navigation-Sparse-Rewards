@@ -235,6 +235,30 @@ target_coordinate_frame: "isaac_z_up_pending"
 coordinate_conversion_applied: false
 ```
 
+## Phase 5-B Optional Smoke Test
+
+Phase 5-B adds a guarded smoke runner for the runtime adapter. The normal path
+still does not launch Isaac Sim:
+
+```bash
+python scripts/run_isaac_runtime_smoke.py --no-write-output
+```
+
+A real Isaac Sim launch attempt requires both explicit gates:
+
+```text
+GWM_RUN_ISAAC_RUNTIME_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+```
+
+When the gates are present and Isaac Sim is available, the runner launches
+headless, loads a tiny descriptor, steps a safe zero action for a few frames,
+reads sensor metadata, converts the snapshot into `SensorObservation`, and
+closes the runtime. Missing gates or missing Isaac Sim produce a clean skipped
+result by default. This smoke test is runtime plumbing validation only; it is
+not real UAV flight validation, formal safety certification, or a production
+readiness claim.
+
 ## Future Integration Plan
 
 1. Add audited project-to-Isaac Z-up coordinate conversion.

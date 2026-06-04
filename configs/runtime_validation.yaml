@@ -9,6 +9,18 @@ runtime_validation:
   output_dir: outputs/runtime_validation
   include_path_hints: true
   redact_sensitive_env: true
+  isaac_runtime_smoke:
+    enabled: false
+    frames: 3
+    headless: true
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/isaac_runtime_smoke.json
+    write_output: true
+    fail_on_unavailable: false
+    descriptor_path: null
+    required_env_gates:
+      - GWM_RUN_ISAAC_RUNTIME_TESTS
+      - GWM_ALLOW_OPTIONAL_RUNTIME
   probes:
     python: true
     cuda: true
@@ -22,4 +34,3 @@ runtime_validation:
     launch_runtimes: false
     connect_to_sitl: false
     connect_to_hardware: false
-
