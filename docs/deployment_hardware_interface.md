@@ -58,6 +58,29 @@ deployment:
   autonomous_real_flight_enabled: false
 ```
 
+### Phase 5-D Guarded SITL Smoke
+
+Phase 5-D adds an optional command-path smoke runner for `MAVLinkBridge`.
+Default runs do not connect to MAVSDK or PX4 SITL:
+
+```bash
+python scripts/run_mavsdk_px4_sitl_smoke.py --no-write-output
+```
+
+A real SITL command attempt requires all gates:
+
+```text
+GWM_RUN_MAVSDK_SITL_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_ALLOW_SITL_COMMANDS=1
+```
+
+PX4 SITL must already be running externally. The smoke runner never launches
+PX4, never enables real hardware, and never enables autonomous real flight. It
+sends only a safe zero-velocity command through the guarded offboard path and
+records command-history metadata. This is SITL command-path plumbing
+validation, not real flight validation or certified safety evidence.
+
 ### Level 2: Real Hardware Deployment
 
 Level 2 is documented only in this slice.
