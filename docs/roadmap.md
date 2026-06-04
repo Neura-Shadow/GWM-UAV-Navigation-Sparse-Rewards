@@ -86,7 +86,7 @@ mock-first normal tests.
 
 - [x] Runtime capability detection (`RuntimeCapabilityDetector`, read-only probes)
 - [x] Guarded Isaac Sim runtime smoke test (`run_isaac_runtime_smoke`, env-gated)
-- [ ] Guarded ROS2 sensor synchronization runtime smoke test
+- [x] Guarded ROS2 sensor synchronization runtime smoke test (`run_ros2_sensor_sync_smoke`, env-gated)
 - [ ] Guarded MAVSDK / PX4 SITL command-path smoke test
 - [ ] Closed-loop mock-to-SITL integration plan
 
