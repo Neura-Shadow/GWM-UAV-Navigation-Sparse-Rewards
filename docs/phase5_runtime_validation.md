@@ -36,6 +36,47 @@ outputs/runtime_validation/runtime_capability_report.json
 
 Runtime reports are machine-specific artifacts and should not be committed.
 
+## Guarded Isaac Runtime Smoke
+
+Phase 5-B adds an optional Isaac Sim runtime smoke runner around the existing
+`IsaacSimRuntime` and `IsaacSimNavigationEnv` interfaces. The default command
+does not launch Isaac Sim unless both opt-in gates are set:
+
+```text
+GWM_RUN_ISAAC_RUNTIME_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+```
+
+Without those gates, the smoke runner reports `status=skipped`, exits with code
+`0`, and performs no Isaac launch:
+
+```bash
+python scripts/run_isaac_runtime_smoke.py --no-write-output
+python scripts/run_isaac_runtime_smoke.py --json --pretty --no-write-output
+```
+
+The guarded real-runtime form is:
+
+```bash
+GWM_RUN_ISAAC_RUNTIME_TESTS=1 GWM_ALLOW_OPTIONAL_RUNTIME=1 \
+python scripts/run_isaac_runtime_smoke.py --frames 3 --headless
+```
+
+The runner loads a tiny descriptor, steps a safe zero action for a few frames,
+reads sensor metadata, converts the snapshot to `SensorObservation`, and closes
+the runtime in `finally`. A successful optional smoke confirms only that the
+local Isaac runtime path can launch, step, and return metadata through this
+adapter; it is not real flight validation, production readiness, or certified
+safety evidence.
+
+The default output path is:
+
+```text
+outputs/runtime_validation/isaac_runtime_smoke.json
+```
+
+Smoke reports are machine-specific artifacts and should not be committed.
+
 ## Safety Boundary
 
 The detector uses safe probes only:
@@ -89,5 +130,4 @@ are redacted. The detector never dumps the full environment.
 - Phase 5-D: guarded MAVSDK / PX4 SITL command-path smoke test.
 - Phase 5-E: closed-loop mock-to-SITL integration plan.
 
-These future slices remain opt-in and are not part of Phase 5-A.
-
+Phase 5-C and later slices remain opt-in and are not part of Phase 5-B.

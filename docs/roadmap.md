@@ -85,7 +85,7 @@ Validate optional runtime paths gradually while preserving safe defaults and
 mock-first normal tests.
 
 - [x] Runtime capability detection (`RuntimeCapabilityDetector`, read-only probes)
-- [ ] Guarded Isaac Sim runtime smoke test
+- [x] Guarded Isaac Sim runtime smoke test (`run_isaac_runtime_smoke`, env-gated)
 - [ ] Guarded ROS2 sensor synchronization runtime smoke test
 - [ ] Guarded MAVSDK / PX4 SITL command-path smoke test
 - [ ] Closed-loop mock-to-SITL integration plan
