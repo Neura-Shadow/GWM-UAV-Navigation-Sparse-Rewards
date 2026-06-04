@@ -104,6 +104,28 @@ Default synchronized topics:
 Header timestamps are required by default. Setting `allow_headerless: true`
 uses receipt time and records that choice in observation metadata.
 
+## Phase 5-C Guarded Runtime Smoke
+
+Phase 5-C adds an optional smoke runner for `ROS2SensorSynchronizer`. Normal
+tests and default CLI runs remain ROS2-free:
+
+```bash
+python scripts/run_ros2_sensor_sync_smoke.py --no-write-output
+```
+
+The command reports `status=skipped` unless both runtime gates are set:
+
+```text
+GWM_RUN_ROS2_SENSOR_SYNC_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+```
+
+With both gates set and ROS2 sensor modules importable, the runner can start
+guarded real-mode synchronization and wait briefly for a synchronized packet.
+It does not create ROS2 publishers, launch ROS2, inspect live topics by default,
+or touch MAVSDK, PX4, Isaac Sim, Nav2, or hardware. Mock tests exercise the same
+conversion path using synthetic RGB, depth, LiDAR, odometry, and IMU payloads.
+
 ## QoS Configuration
 
 Phase 3-A uses `configs/ros2_control.yaml`:

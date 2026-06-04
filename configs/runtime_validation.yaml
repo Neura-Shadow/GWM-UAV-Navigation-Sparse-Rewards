@@ -21,6 +21,18 @@ runtime_validation:
     required_env_gates:
       - GWM_RUN_ISAAC_RUNTIME_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
+  ros2_sensor_sync_smoke:
+    enabled: false
+    packets: 1
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/ros2_sensor_sync_smoke.json
+    write_output: true
+    fail_on_unavailable: false
+    slop_sec: 0.05
+    queue_size: 10
+    required_env_gates:
+      - GWM_RUN_ROS2_SENSOR_SYNC_TESTS
+      - GWM_ALLOW_OPTIONAL_RUNTIME
   probes:
     python: true
     cuda: true

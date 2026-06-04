@@ -77,6 +77,48 @@ outputs/runtime_validation/isaac_runtime_smoke.json
 
 Smoke reports are machine-specific artifacts and should not be committed.
 
+## Guarded ROS2 Sensor Sync Smoke
+
+Phase 5-C adds an optional ROS2 sensor synchronization smoke runner around the
+existing `ROS2SensorSynchronizer`. The default command does not start real ROS2
+subscriptions or inspect live topics unless both opt-in gates are set:
+
+```text
+GWM_RUN_ROS2_SENSOR_SYNC_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+```
+
+Without those gates, the smoke runner reports `status=skipped`, exits with code
+`0`, and performs no real ROS2 startup:
+
+```bash
+python scripts/run_ros2_sensor_sync_smoke.py --no-write-output
+python scripts/run_ros2_sensor_sync_smoke.py --json --pretty --no-write-output
+```
+
+The guarded real-runtime form is:
+
+```bash
+GWM_RUN_ROS2_SENSOR_SYNC_TESTS=1 GWM_ALLOW_OPTIONAL_RUNTIME=1 \
+python scripts/run_ros2_sensor_sync_smoke.py --packets 1
+```
+
+Normal tests use synthetic RGB, depth, LiDAR, odometry, and IMU dictionaries
+through manual ingest. A guarded real-runtime run starts the synchronizer only
+when `message_filters`, `sensor_msgs`, and `nav_msgs` are importable. A
+successful optional smoke confirms only that the local ROS2 sensor-sync adapter
+can start and produce synchronized `SensorObservation` data; it is not live UAV
+validation, a ROS2 deployment test, production readiness, or certified safety
+evidence.
+
+The default output path is:
+
+```text
+outputs/runtime_validation/ros2_sensor_sync_smoke.json
+```
+
+ROS2 smoke reports are machine-specific artifacts and should not be committed.
+
 ## Safety Boundary
 
 The detector uses safe probes only:
@@ -100,9 +142,9 @@ deployment:
   autonomous_real_flight_enabled: false
 ```
 
-Phase 5-A does not enable real hardware flight, autonomous real flight, real
-hardware tests, PX4 launch, Isaac Sim launch, ROS2 live-topic tests, or MAVSDK
-connections.
+Phase 5-A through Phase 5-C do not enable real hardware flight, autonomous real
+flight, real hardware tests, PX4 launch, Isaac Sim launch by default, ROS2
+live-topic tests by default, or MAVSDK connections.
 
 ## Environment Handling
 
@@ -130,4 +172,4 @@ are redacted. The detector never dumps the full environment.
 - Phase 5-D: guarded MAVSDK / PX4 SITL command-path smoke test.
 - Phase 5-E: closed-loop mock-to-SITL integration plan.
 
-Phase 5-C and later slices remain opt-in and are not part of Phase 5-B.
+Phase 5-D and later slices remain opt-in and are not part of Phase 5-C.

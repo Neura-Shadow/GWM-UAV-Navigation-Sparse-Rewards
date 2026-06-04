@@ -12,19 +12,31 @@ from src.runtime_validation.isaac_runtime_smoke import (
     run_isaac_runtime_smoke,
 )
 from src.runtime_validation.reporting import report_to_dict, report_to_json, write_report
+from src.runtime_validation.ros2_sensor_sync_smoke import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_ROS2_SENSOR_SYNC_SMOKE_OUTPUT_PATH,
+    ROS2SensorSyncSmokeConfig,
+    ROS2SensorSyncSmokeResult,
+    build_mock_sensor_messages,
+    run_ros2_sensor_sync_smoke,
+)
 from src.runtime_validation.types import CapabilityStatus, RuntimeCapabilityReport
 
 __all__ = [
     "CapabilityStatus",
     "DEFAULT_ISAAC_RUNTIME_SMOKE_OUTPUT_PATH",
+    "DEFAULT_ROS2_SENSOR_SYNC_SMOKE_OUTPUT_PATH",
     "ENV_ALLOWLIST",
     "IsaacRuntimeSmokeConfig",
     "IsaacRuntimeSmokeResult",
+    "ROS2SensorSyncSmokeConfig",
+    "ROS2SensorSyncSmokeResult",
     "RuntimeCapabilityDetector",
     "RuntimeCapabilityReport",
+    "build_mock_sensor_messages",
     "build_tiny_isaac_descriptor",
     "report_to_dict",
     "report_to_json",
     "run_isaac_runtime_smoke",
+    "run_ros2_sensor_sync_smoke",
     "write_report",
 ]
