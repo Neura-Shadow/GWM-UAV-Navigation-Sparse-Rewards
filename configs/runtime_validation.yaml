@@ -48,6 +48,23 @@ runtime_validation:
       - GWM_RUN_MAVSDK_SITL_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
       - GWM_ALLOW_SITL_COMMANDS
+  closed_loop_readiness:
+    enabled: false
+    steps: 5
+    timeout_sec: 60.0
+    output_path: outputs/runtime_validation/closed_loop_readiness.json
+    write_output: true
+    fail_on_unavailable: false
+    require_prior_smokes: false
+    prior_smoke_reports:
+      isaac_runtime: outputs/runtime_validation/isaac_runtime_smoke.json
+      ros2_sensor_sync: outputs/runtime_validation/ros2_sensor_sync_smoke.json
+      mavsdk_px4_sitl: outputs/runtime_validation/mavsdk_sitl_smoke.json
+    deployment:
+      mock: true
+      sitl_enabled: false
+      real_hardware_enabled: false
+      autonomous_real_flight_enabled: false
   probes:
     python: true
     cuda: true
