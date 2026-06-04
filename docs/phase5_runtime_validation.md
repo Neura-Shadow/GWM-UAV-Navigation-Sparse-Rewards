@@ -119,6 +119,52 @@ outputs/runtime_validation/ros2_sensor_sync_smoke.json
 
 ROS2 smoke reports are machine-specific artifacts and should not be committed.
 
+## Guarded MAVSDK / PX4 SITL Smoke
+
+Phase 5-D adds an optional MAVSDK / PX4 SITL command-path smoke runner around
+the existing `MAVLinkBridge`. The default command does not connect to MAVSDK,
+connect to PX4 SITL, launch PX4, or touch hardware unless all opt-in gates are
+set:
+
+```text
+GWM_RUN_MAVSDK_SITL_TESTS=1
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_ALLOW_SITL_COMMANDS=1
+```
+
+Without those gates, the smoke runner reports `status=skipped`, exits with code
+`0`, and performs no SITL connection:
+
+```bash
+python scripts/run_mavsdk_px4_sitl_smoke.py --no-write-output
+python scripts/run_mavsdk_px4_sitl_smoke.py --json --pretty --no-write-output
+```
+
+The guarded real-runtime form is:
+
+```bash
+GWM_RUN_MAVSDK_SITL_TESTS=1 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_ALLOW_SITL_COMMANDS=1 \
+python scripts/run_mavsdk_px4_sitl_smoke.py --commands 1 --connection-url udp://:14540
+```
+
+PX4 SITL must be started externally by the operator before running the guarded
+command. The runner never launches PX4. Normal tests use an injected fake
+MAVSDK client and exercise connect, readiness, initial offboard setpoint, safe
+zero-velocity command dispatch, offboard stop, and disconnect. A successful
+optional smoke confirms only that the local MAVSDK/PX4 SITL command path can
+send a guarded command to an externally managed SITL endpoint; it is not real
+flight validation, autonomous flight enablement, production readiness, or
+certified safety evidence.
+
+The default output path is:
+
+```text
+outputs/runtime_validation/mavsdk_sitl_smoke.json
+```
+
+MAVSDK/PX4 SITL smoke reports are machine-specific artifacts and should not be
+committed.
+
 ## Safety Boundary
 
 The detector uses safe probes only:
@@ -142,9 +188,9 @@ deployment:
   autonomous_real_flight_enabled: false
 ```
 
-Phase 5-A through Phase 5-C do not enable real hardware flight, autonomous real
+Phase 5-A through Phase 5-D do not enable real hardware flight, autonomous real
 flight, real hardware tests, PX4 launch, Isaac Sim launch by default, ROS2
-live-topic tests by default, or MAVSDK connections.
+live-topic tests by default, or MAVSDK/PX4 SITL connections by default.
 
 ## Environment Handling
 
@@ -172,4 +218,4 @@ are redacted. The detector never dumps the full environment.
 - Phase 5-D: guarded MAVSDK / PX4 SITL command-path smoke test.
 - Phase 5-E: closed-loop mock-to-SITL integration plan.
 
-Phase 5-D and later slices remain opt-in and are not part of Phase 5-C.
+Phase 5-E remains future work and is not part of Phase 5-D.

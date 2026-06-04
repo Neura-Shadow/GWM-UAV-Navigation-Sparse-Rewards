@@ -33,6 +33,21 @@ runtime_validation:
     required_env_gates:
       - GWM_RUN_ROS2_SENSOR_SYNC_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
+  mavsdk_sitl_smoke:
+    enabled: false
+    commands: 1
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/mavsdk_sitl_smoke.json
+    write_output: true
+    fail_on_unavailable: false
+    connection_url: "udp://:14540"
+    autopilot: "px4"
+    takeoff_altitude_m: 5.0
+    health_timeout_sec: 10.0
+    required_env_gates:
+      - GWM_RUN_MAVSDK_SITL_TESTS
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_ALLOW_SITL_COMMANDS
   probes:
     python: true
     cuda: true
