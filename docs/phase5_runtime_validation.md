@@ -165,6 +165,49 @@ outputs/runtime_validation/mavsdk_sitl_smoke.json
 MAVSDK/PX4 SITL smoke reports are machine-specific artifacts and should not be
 committed.
 
+## Closed-Loop Mock-To-SITL Readiness
+
+Phase 5-E adds a mock-first readiness runner for the end-to-end GWM navigation
+pipeline. It records how the Phase 4-F demo can later connect to optional
+Isaac, ROS2 sensor-sync, and MAVSDK/PX4 SITL backends after the independent
+Phase 5-B/C/D smoke tests pass.
+
+The default command runs only the mock GWM demo path:
+
+```bash
+python scripts/run_closed_loop_readiness.py --steps 3 --no-write-output
+python scripts/run_closed_loop_readiness.py --json --pretty --no-write-output
+```
+
+The pipeline plan in the JSON result is:
+
+```text
+Observation backend
+  -> ObservationBuffer
+  -> Generated World Model rollout
+  -> Candidate trajectory sampler
+  -> Trajectory scorer
+  -> ControlBarrierFunction safety gate
+  -> Execution backend
+  -> Runtime metrics / failure handling
+```
+
+The runner records runtime gate status for Isaac, ROS2 sensor sync, and
+MAVSDK/PX4 SITL. It does not run the Phase 5-B/C/D smoke tests. If
+`--require-prior-smokes` is set, it checks only whether prior smoke report
+files exist under `outputs/runtime_validation/` and reports missing files
+without launching or connecting to any runtime.
+
+The default output path is:
+
+```text
+outputs/runtime_validation/closed_loop_readiness.json
+```
+
+Closed-loop readiness reports are machine-specific artifacts and should not be
+committed. The runner rejects any config that enables real hardware or
+autonomous real flight before the mock demo is executed.
+
 ## Safety Boundary
 
 The detector uses safe probes only:
@@ -188,7 +231,7 @@ deployment:
   autonomous_real_flight_enabled: false
 ```
 
-Phase 5-A through Phase 5-D do not enable real hardware flight, autonomous real
+Phase 5-A through Phase 5-E do not enable real hardware flight, autonomous real
 flight, real hardware tests, PX4 launch, Isaac Sim launch by default, ROS2
 live-topic tests by default, or MAVSDK/PX4 SITL connections by default.
 
@@ -216,6 +259,8 @@ are redacted. The detector never dumps the full environment.
 - Phase 5-B: guarded Isaac Sim runtime smoke test.
 - Phase 5-C: guarded ROS2 sensor synchronization smoke test.
 - Phase 5-D: guarded MAVSDK / PX4 SITL command-path smoke test.
-- Phase 5-E: closed-loop mock-to-SITL integration plan.
+- Phase 5-E: closed-loop mock-to-SITL readiness check.
 
-Phase 5-E remains future work and is not part of Phase 5-D.
+Later work may use the Phase 5-B/C/D reports to enable a guarded optional
+runtime demo. That future work must remain opt-in and must not enable real
+hardware or autonomous real flight by default.

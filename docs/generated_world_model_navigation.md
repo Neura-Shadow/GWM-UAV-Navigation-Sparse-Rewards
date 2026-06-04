@@ -236,6 +236,35 @@ and a final status such as `completed`, `timeout`, `safety_stop`, or
 `runtime_unavailable`. Results under `outputs/` are local artifacts and should
 not be committed.
 
+## Closed-Loop Runtime Readiness
+
+Phase 5-E adds a readiness runner that reuses the safe mock demo path and emits
+an integration plan for later optional runtime demos:
+
+```text
+Observation backend
+  -> ObservationBuffer
+  -> Generated World Model rollout
+  -> Candidate trajectory sampler
+  -> Trajectory scorer
+  -> ControlBarrierFunction safety gate
+  -> Execution backend
+  -> Runtime metrics / failure handling
+```
+
+Run it with:
+
+```bash
+python scripts/run_closed_loop_readiness.py --steps 3 --no-write-output
+```
+
+The result uses schema `gwm_closed_loop_readiness_v1`. It summarizes the mock
+demo, safe deployment defaults, optional backend gate status, planned
+connection points, and any missing prior Phase 5-B/C/D smoke reports when
+`--require-prior-smokes` is requested. It does not launch Isaac Sim, start ROS2
+nodes, connect to MAVSDK/PX4 SITL, launch PX4, run hardware checks, or enable
+autonomous real flight.
+
 ## Safety Boundary
 
 Phase 4-A/4-B/4-C/4-D/4-E/4-F do not require:
