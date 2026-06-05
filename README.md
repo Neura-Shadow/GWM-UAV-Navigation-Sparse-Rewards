@@ -48,12 +48,12 @@ not claim real flight validation, production readiness, automatic PX4 launch,
 real Nav2 plugins, real `ros2_control` C++ plugins, or formal safety
 certification.
 
-Phase 6-A/6-B/6-C/6-D are simulation/SITL-only and do not enable real hardware or
-autonomous real flight. Phase 6-B adds a guarded Isaac Sim / Isaac Lab sensor
-runtime runner, Phase 6-C adds a guarded ROS2 simulation sensor bridge, and
-Phase 6-D adds guarded PX4 SITL + MAVSDK command validation. These report
-unavailable runtimes clearly when the required optional stack is not installed
-or gated.
+Phase 6-A/6-B/6-C/6-D/6-E are simulation/SITL-only and do not enable real
+hardware or autonomous real flight. Phase 6-B adds a guarded Isaac Sim / Isaac
+Lab sensor runtime runner, Phase 6-C adds a guarded ROS2 simulation sensor
+bridge, Phase 6-D adds guarded PX4 SITL + MAVSDK command validation, and Phase
+6-E adds an Isaac/PX4 bridge-design readiness report. These report unavailable
+runtimes clearly when the required optional stack is not installed or gated.
 
 ## Safety Defaults
 
@@ -131,6 +131,7 @@ python scripts/check_runtime_capabilities.py --no-write-output
 python scripts/run_isaac_sensor_runtime.py --no-write-output
 python scripts/run_ros2_sim_sensor_bridge.py --no-write-output
 python scripts/run_px4_sitl_command_validation.py --no-write-output
+python scripts/run_isaac_px4_bridge_design.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
@@ -154,6 +155,7 @@ python scripts/diagnose_airsim.py --help
 - [Generated World Model navigation](docs/generated_world_model_navigation.md)
 - [Phase 5 runtime validation](docs/phase5_runtime_validation.md)
 - [Phase 6 pure-simulation runtime](docs/phase6_pure_simulation_runtime.md)
+- [Phase 6 Isaac / PX4 bridge design](docs/phase6_isaac_px4_bridge.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)
