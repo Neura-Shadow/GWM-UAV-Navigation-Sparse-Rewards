@@ -56,6 +56,11 @@ bridge, Phase 6-D adds guarded PX4 SITL + MAVSDK command validation, and Phase
 guarded GWM / WAM closed-loop simulation demo. These report unavailable
 runtimes clearly when the required optional stack is not installed or gated.
 
+Phase 7 adds AirSim / CosysAirSim as an optional simulator backend through a
+pluggable backend registry. AirSim is not the Phase 6 Isaac/PX4 mainline, is not
+launched automatically, and requires explicit runtime gates before live API
+control is attempted.
+
 ## Safety Defaults
 
 The deployment layer is safe by default:
@@ -69,8 +74,8 @@ deployment:
 ```
 
 Normal tests require no Isaac Sim, ROS2, MAVSDK, PX4, GPU, SITL, or real
-hardware. Optional Isaac Sim, ROS2 sensor synchronization, and MAVSDK / PX4
-SITL paths require explicit opt-in. `ControlBarrierFunction` is a baseline
+hardware. Optional Isaac Sim, AirSim, ROS2 sensor synchronization, and MAVSDK /
+PX4 SITL paths require explicit opt-in. `ControlBarrierFunction` is a baseline
 runtime filter, not a formal certification proof.
 
 ## Architecture
@@ -101,6 +106,7 @@ Core package areas:
 - `src/world_model/`: latent encoders, dynamics, uncertainty, policy intent.
 - `src/rl/`: replay buffer, trainer, sparse curriculum, baseline world model.
 - `src/digital_twin/`: scenario extraction, domain randomization, scene descriptors.
+- `src/simulator_backends/`: optional simulator backend registry.
 - `src/control/`: planner, takeover, safety controller, CBF filter.
 - `src/ros2_bridge/`: ROS2 adapter, MAVLink/hardware/Nav2-style mock interfaces.
 - `src/multi_agent/`: agent registry, mock DDS, shared maps, swarm coordinator.
@@ -135,6 +141,9 @@ python scripts/run_px4_sitl_command_validation.py --no-write-output
 python scripts/run_isaac_px4_bridge_design.py --no-write-output
 python scripts/run_phase6_gwm_simulation_demo.py --no-write-output
 python scripts/run_phase6_gwm_simulation_demo.py --runtime-mode fake --steps 3 --no-require-prior-reports --no-write-output
+python scripts/run_airsim_runtime_smoke.py --no-write-output
+python scripts/run_multisim_gwm_demo.py --simulator-backend mock --steps 3 --no-write-output
+python scripts/run_simulator_backend_comparison.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
@@ -160,6 +169,7 @@ python scripts/diagnose_airsim.py --help
 - [Phase 6 pure-simulation runtime](docs/phase6_pure_simulation_runtime.md)
 - [Phase 6 Isaac / PX4 bridge design](docs/phase6_isaac_px4_bridge.md)
 - [Phase 6 GWM / WAM simulation demo](docs/phase6_gwm_wam_simulation_demo.md)
+- [Phase 7 optional AirSim backend](docs/phase7_multisim_airsim_backend.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)

@@ -20,6 +20,11 @@ from src.generated_world_model.sim_runtime_demo import (
     Phase6RuntimeReadiness,
     run_phase6_gwm_simulation_demo,
 )
+from src.generated_world_model.multisim_demo import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_MULTISIM_GWM_DEMO_OUTPUT_PATH,
+    MultiSimGWMDemoConfig,
+    run_multisim_gwm_demo,
+)
 from src.generated_world_model.losses import generated_world_model_loss
 from src.generated_world_model.future_frame_projection import (
     CameraIntrinsics,
@@ -63,9 +68,11 @@ __all__ = [
     "GWMDemoResult",
     "GWMDemoRunner",
     "DEFAULT_PHASE6_GWM_SIMULATION_DEMO_OUTPUT_PATH",
+    "DEFAULT_MULTISIM_GWM_DEMO_OUTPUT_PATH",
     "GeneratedWorldModelDataset",
     "GeneratedWorldModelPlanner",
     "GWMConfig",
+    "MultiSimGWMDemoConfig",
     "ObservationBatch",
     "ObservationBuffer",
     "ObservationEncoder",
@@ -85,6 +92,7 @@ __all__ = [
     "load_npz_sequence",
     "make_synthetic_training_batch",
     "run_demo",
+    "run_multisim_gwm_demo",
     "run_phase6_gwm_simulation_demo",
     "save_npz_sequence",
     "train_synthetic_step",

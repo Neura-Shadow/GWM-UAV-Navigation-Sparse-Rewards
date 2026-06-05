@@ -32,6 +32,7 @@ class RuntimeCapabilityReport:
     cuda: Dict[str, Any]
     gpu: Dict[str, Any]
     isaac_sim: CapabilityStatus
+    airsim: CapabilityStatus
     ros2: CapabilityStatus
     mavsdk: CapabilityStatus
     px4: CapabilityStatus
@@ -42,8 +43,7 @@ class RuntimeCapabilityReport:
     def to_dict(self) -> Dict[str, Any]:
         """Return a JSON-safe dictionary."""
         data = asdict(self)
-        for key in ("isaac_sim", "ros2", "mavsdk", "px4", "github_cli"):
+        for key in ("isaac_sim", "airsim", "ros2", "mavsdk", "px4", "github_cli"):
             value = getattr(self, key)
             data[key] = value.to_dict()
         return data
-

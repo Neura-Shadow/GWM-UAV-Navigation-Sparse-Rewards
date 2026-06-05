@@ -58,6 +58,7 @@ def test_detector_returns_schema_compatible_report() -> None:
     assert payload["platform"]["system"]
     assert payload["python"]["version"]
     assert payload["isaac_sim"]["available"] is False
+    assert payload["airsim"]["available"] is False
     assert payload["ros2"]["available"] is False
     assert payload["mavsdk"]["available"] is False
     assert payload["px4"]["available"] is False
@@ -115,13 +116,14 @@ def test_missing_optional_runtimes_produce_unavailable_not_failure() -> None:
     report = detector.detect()
 
     assert report.isaac_sim.available is False
+    assert report.airsim.available is False
     assert report.ros2.available is False
     assert report.mavsdk.available is False
     assert report.github_cli.available is False
 
 
 def test_mocked_import_availability_sets_capability_details() -> None:
-    available = {"isaacsim", "rclpy", "message_filters", "mavsdk"}
+    available = {"isaacsim", "cosysairsim", "rclpy", "message_filters", "mavsdk"}
 
     def _spec(name: str) -> object | None:
         if name in available:
@@ -137,6 +139,8 @@ def test_mocked_import_availability_sets_capability_details() -> None:
     report = detector.detect()
 
     assert report.isaac_sim.available is True
+    assert report.airsim.available is True
+    assert report.airsim.version == "cosysairsim"
     assert report.ros2.available is True
     assert report.ros2.version == "humble"
     assert report.mavsdk.available is True
@@ -242,6 +246,9 @@ def test_no_real_runtime_launch_or_connection_flags_are_set() -> None:
     payload = detector.detect().to_dict()
 
     assert payload["isaac_sim"]["details"]["simulation_app_instantiated"] is False
+    assert payload["airsim"]["details"]["connection_attempted"] is False
+    assert payload["airsim"]["details"]["api_control_enabled"] is False
+    assert payload["airsim"]["details"]["unreal_launch_attempted"] is False
     assert payload["ros2"]["details"]["nodes_started"] is False
     assert payload["ros2"]["details"]["live_topics_checked"] is False
     assert payload["mavsdk"]["details"]["connection_attempted"] is False
@@ -271,4 +278,3 @@ def test_detector_does_not_touch_codegraph(tmp_path: Path, monkeypatch: pytest.M
     detector.detect()
 
     assert (tmp_path / ".codegraph").exists() is False
-

@@ -21,6 +21,7 @@ DEFAULT_PROBES: Dict[str, bool] = {
     "cuda": True,
     "nvidia_smi": True,
     "isaac_sim": True,
+    "airsim": True,
     "ros2": True,
     "mavsdk": True,
     "px4": True,
@@ -30,6 +31,8 @@ DEFAULT_PROBES: Dict[str, bool] = {
 ENV_ALLOWLIST = (
     "GWM_RUNTIME_ARTIFACT_DIR",
     "GWM_RUN_ISAAC_RUNTIME_TESTS",
+    "GWM_RUN_AIRSIM_RUNTIME_TESTS",
+    "GWM_ALLOW_AIRSIM_API_CONTROL",
     "GWM_RUN_ROS2_SENSOR_SYNC_TESTS",
     "GWM_RUN_MAVSDK_SITL_TESTS",
     "GWM_ALLOW_OPTIONAL_RUNTIME",
@@ -74,6 +77,7 @@ class RuntimeCapabilityDetector:
             cuda=self._detect_cuda() if probes.get("cuda", True) else {},
             gpu=self._detect_gpu(probes) if probes.get("cuda", True) else {},
             isaac_sim=self._detect_isaac_sim() if probes.get("isaac_sim", True) else _skipped("isaac_sim"),
+            airsim=self._detect_airsim() if probes.get("airsim", True) else _skipped("airsim"),
             ros2=self._detect_ros2() if probes.get("ros2", True) else _skipped("ros2"),
             mavsdk=self._detect_mavsdk() if probes.get("mavsdk", True) else _skipped("mavsdk"),
             px4=self._detect_px4() if probes.get("px4", True) else _skipped("px4"),
@@ -169,6 +173,30 @@ class RuntimeCapabilityDetector:
                 "modules": modules,
                 "probe_only": True,
                 "simulation_app_instantiated": False,
+            },
+            error=_first_error(modules),
+        )
+
+    def _detect_airsim(self) -> CapabilityStatus:
+        modules = {
+            "cosysairsim": self._safe_find_spec("cosysairsim"),
+            "airsim": self._safe_find_spec("airsim"),
+        }
+        preferred = None
+        for name in ("cosysairsim", "airsim"):
+            if modules[name]["available"]:
+                preferred = name
+                break
+        return CapabilityStatus(
+            name="airsim",
+            available=preferred is not None,
+            version=preferred,
+            details={
+                "modules": modules,
+                "preferred_module": preferred,
+                "connection_attempted": False,
+                "api_control_enabled": False,
+                "unreal_launch_attempted": False,
             },
             error=_first_error(modules),
         )
@@ -400,4 +428,3 @@ def _first_error(items: Mapping[str, Mapping[str, Any]]) -> Optional[str]:
         if error:
             return str(error)
     return None
-

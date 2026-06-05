@@ -1,0 +1,73 @@
+# ============================================================================
+# Phase 7 Optional AirSim Backend Profile
+# ============================================================================
+# This profile documents AirSim / CosysAirSim as a pluggable simulator backend.
+# It is optional and must not replace the Phase 6 Isaac + ROS2 + PX4 SITL +
+# MAVSDK mainline.
+
+schema_version: "gwm_phase7_optional_airsim_backend_profile_v1"
+
+profile:
+  name: "optional_airsim_backend"
+  phase: "7"
+  label: "Multi-Simulator Backend Expansion / Optional AirSim Backend"
+  mode: "optional_simulation_backend_only"
+  status: "setup_required"
+
+simulator:
+  default_backend: mock
+  optional_backend: airsim
+  supported_modules: ["cosysairsim", "airsim"]
+  preferred_module: cosysairsim
+  launch_airsim_by_repo: false
+  require_external_airsim_session: true
+
+deployment:
+  mock: true
+  sitl_enabled: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+airsim_live_profile:
+  simulator:
+    backend: airsim
+    live_runtime_enabled: true
+  deployment:
+    mock: false
+    sitl_enabled: false
+    real_hardware_enabled: false
+    autonomous_real_flight_enabled: false
+
+required_env_gates:
+  airsim_runtime:
+    - GWM_ALLOW_OPTIONAL_RUNTIME
+    - GWM_RUN_AIRSIM_RUNTIME_TESTS
+    - GWM_ALLOW_AIRSIM_API_CONTROL
+
+refusal_rules:
+  refuse_real_hardware: true
+  refuse_autonomous_real_flight: true
+  refuse_airsim_api_control_without_gate: true
+  refuse_unreal_or_airsim_auto_launch: true
+  refuse_routing_phase6_isaac_px4_mainline_through_airsim: true
+
+coordinate_frames:
+  airsim_world_frame: airsim_ned
+  project_frame: project_default
+  isaac_world_frame: isaac_z_up
+  coordinate_conversion_applied: false
+  silent_conversion_allowed: false
+
+runtime_artifacts:
+  output_dir: outputs/runtime_validation
+  commit_reports: false
+  commit_logs: false
+  commit_screenshots: false
+
+verification:
+  capability_preflight: "python scripts/check_runtime_capabilities.py --no-write-output"
+  airsim_smoke_no_gate: "python scripts/run_airsim_runtime_smoke.py --no-write-output"
+  multisim_mock_demo: "python scripts/run_multisim_gwm_demo.py --simulator-backend mock --steps 3 --no-write-output"
+  backend_comparison: "python scripts/run_simulator_backend_comparison.py --no-write-output"
+  expected_no_gate_status: skipped
+  expected_mock_backend_status: timeout

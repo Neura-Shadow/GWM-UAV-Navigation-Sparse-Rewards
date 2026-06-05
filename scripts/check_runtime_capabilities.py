@@ -81,6 +81,7 @@ def _summary_line(report: Any) -> str:
         "python=ok "
         f"cuda={_bool_text(cuda_available)} "
         f"isaac={_bool_text(report.isaac_sim.available)} "
+        f"airsim={_bool_text(report.airsim.available)} "
         f"ros2={_bool_text(report.ros2.available)} "
         f"mavsdk={_bool_text(report.mavsdk.available)} "
         f"px4={_bool_text(report.px4.available)}"

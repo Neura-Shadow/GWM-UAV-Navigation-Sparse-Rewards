@@ -4,6 +4,12 @@ from src.runtime_validation.capability_detector import (
     ENV_ALLOWLIST,
     RuntimeCapabilityDetector,
 )
+from src.runtime_validation.airsim_runtime_smoke import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_AIRSIM_RUNTIME_SMOKE_OUTPUT_PATH,
+    AirSimRuntimeSmokeConfig,
+    AirSimRuntimeSmokeResult,
+    run_airsim_runtime_smoke,
+)
 from src.runtime_validation.closed_loop_readiness import (
     DEFAULT_OUTPUT_PATH as DEFAULT_CLOSED_LOOP_READINESS_OUTPUT_PATH,
     ClosedLoopReadinessConfig,
@@ -61,12 +67,21 @@ from src.runtime_validation.ros2_sim_sensor_bridge import (
     ROS2SimulationSensorBridge,
     run_ros2_sim_sensor_bridge,
 )
+from src.runtime_validation.simulator_backend_comparison import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_SIMULATOR_BACKEND_COMPARISON_OUTPUT_PATH,
+    SimulatorBackendComparisonConfig,
+    SimulatorBackendComparisonResult,
+    run_simulator_backend_comparison,
+)
 from src.runtime_validation.types import CapabilityStatus, RuntimeCapabilityReport
 
 __all__ = [
     "CapabilityStatus",
+    "AirSimRuntimeSmokeConfig",
+    "AirSimRuntimeSmokeResult",
     "ClosedLoopReadinessConfig",
     "ClosedLoopReadinessResult",
+    "DEFAULT_AIRSIM_RUNTIME_SMOKE_OUTPUT_PATH",
     "DEFAULT_CLOSED_LOOP_READINESS_OUTPUT_PATH",
     "DEFAULT_ISAAC_RUNTIME_SMOKE_OUTPUT_PATH",
     "DEFAULT_ISAAC_PX4_BRIDGE_DESIGN_OUTPUT_PATH",
@@ -75,6 +90,7 @@ __all__ = [
     "DEFAULT_PX4_SITL_COMMAND_VALIDATION_OUTPUT_PATH",
     "DEFAULT_ROS2_SENSOR_SYNC_SMOKE_OUTPUT_PATH",
     "DEFAULT_ROS2_SIM_SENSOR_BRIDGE_OUTPUT_PATH",
+    "DEFAULT_SIMULATOR_BACKEND_COMPARISON_OUTPUT_PATH",
     "ENV_ALLOWLIST",
     "IsaacRuntimeSmokeConfig",
     "IsaacRuntimeSmokeResult",
@@ -94,6 +110,8 @@ __all__ = [
     "ROS2SimulationSensorBridge",
     "RuntimeCapabilityDetector",
     "RuntimeCapabilityReport",
+    "SimulatorBackendComparisonConfig",
+    "SimulatorBackendComparisonResult",
     "build_closed_loop_pipeline_plan",
     "build_isaac_px4_bridge_plan",
     "build_mock_sensor_messages",
@@ -102,6 +120,7 @@ __all__ = [
     "build_tiny_isaac_descriptor",
     "report_to_dict",
     "report_to_json",
+    "run_airsim_runtime_smoke",
     "run_closed_loop_readiness",
     "run_isaac_runtime_smoke",
     "run_isaac_px4_bridge_design",
@@ -110,5 +129,6 @@ __all__ = [
     "run_px4_sitl_command_validation",
     "run_ros2_sensor_sync_smoke",
     "run_ros2_sim_sensor_bridge",
+    "run_simulator_backend_comparison",
     "write_report",
 ]
