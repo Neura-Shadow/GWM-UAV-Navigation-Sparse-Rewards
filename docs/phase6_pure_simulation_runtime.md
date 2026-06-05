@@ -193,6 +193,41 @@ Normal tests inject a fake backend through `IsaacSimRuntime` and still exercise
 not start ROS2, connect to MAVSDK / PX4 SITL, launch PX4, or run hardware
 checks.
 
+## Phase 6-C ROS2 Simulation Sensor Bridge Command
+
+Phase 6-C adds:
+
+```bash
+python scripts/run_ros2_sim_sensor_bridge.py --no-write-output
+python scripts/run_ros2_sim_sensor_bridge.py --frames 3 --json --pretty --no-write-output
+```
+
+Without the ROS2 gates, the command reports `status=skipped` and does not
+create a real ROS2 node, publisher, or subscriber:
+
+```text
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_RUN_ROS2_SENSOR_SYNC_TESTS=1
+```
+
+When both gates are set, the command checks for `rclpy`, `message_filters`,
+`sensor_msgs`, and `nav_msgs`. If the active Python environment cannot import
+those ROS2 modules, it returns `status=runtime_unavailable` with setup
+instructions. It must not fake success.
+
+The default report path is:
+
+```text
+outputs/runtime_validation/ros2_sim_sensor_bridge.json
+```
+
+Normal tests inject a fake publisher bridge and a manual
+`ROS2SensorSynchronizer`. They exercise simulation-only RGB, depth, LiDAR, IMU,
+and odometry publishing, synchronization into `SensorObservation`, appending
+into `ObservationBuffer`, and JSON-safe report generation. They do not launch
+Isaac Sim, start Nav2, connect to MAVSDK / PX4 SITL, launch PX4, or run
+hardware checks.
+
 ## Coordinate Frames
 
 Phase 6-A records the frame problem explicitly and does not silently convert:

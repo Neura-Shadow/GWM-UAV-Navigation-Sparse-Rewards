@@ -49,6 +49,28 @@ runtime_validation:
     required_env_gates:
       - GWM_RUN_ROS2_SENSOR_SYNC_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
+  ros2_sim_sensor_bridge:
+    enabled: false
+    frames: 3
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/ros2_sim_sensor_bridge.json
+    write_output: true
+    fail_on_unavailable: false
+    slop_sec: 0.05
+    queue_size: 10
+    context_length: 3
+    image_height: 32
+    image_width: 32
+    node_name: gwm_phase6_ros2_sim_sensor_bridge
+    publish_rate_hz: 20.0
+    include_imu: true
+    use_live_topics: false
+    allow_headerless: false
+    required_env_gates:
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_RUN_ROS2_SENSOR_SYNC_TESTS
+    optional_env_gates:
+      - GWM_ROS2_LIVE_TOPICS
   mavsdk_sitl_smoke:
     enabled: false
     commands: 1

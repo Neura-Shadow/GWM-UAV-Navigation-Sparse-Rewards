@@ -39,6 +39,13 @@ from src.runtime_validation.ros2_sensor_sync_smoke import (
     build_mock_sensor_messages,
     run_ros2_sensor_sync_smoke,
 )
+from src.runtime_validation.ros2_sim_sensor_bridge import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_ROS2_SIM_SENSOR_BRIDGE_OUTPUT_PATH,
+    ROS2SimSensorBridgeConfig,
+    ROS2SimSensorBridgeResult,
+    ROS2SimulationSensorBridge,
+    run_ros2_sim_sensor_bridge,
+)
 from src.runtime_validation.types import CapabilityStatus, RuntimeCapabilityReport
 
 __all__ = [
@@ -50,6 +57,7 @@ __all__ = [
     "DEFAULT_ISAAC_SENSOR_RUNTIME_OUTPUT_PATH",
     "DEFAULT_MAVSDK_SITL_SMOKE_OUTPUT_PATH",
     "DEFAULT_ROS2_SENSOR_SYNC_SMOKE_OUTPUT_PATH",
+    "DEFAULT_ROS2_SIM_SENSOR_BRIDGE_OUTPUT_PATH",
     "ENV_ALLOWLIST",
     "IsaacRuntimeSmokeConfig",
     "IsaacRuntimeSmokeResult",
@@ -59,6 +67,9 @@ __all__ = [
     "MAVSDKSITLSmokeResult",
     "ROS2SensorSyncSmokeConfig",
     "ROS2SensorSyncSmokeResult",
+    "ROS2SimSensorBridgeConfig",
+    "ROS2SimSensorBridgeResult",
+    "ROS2SimulationSensorBridge",
     "RuntimeCapabilityDetector",
     "RuntimeCapabilityReport",
     "build_closed_loop_pipeline_plan",
@@ -72,5 +83,6 @@ __all__ = [
     "run_isaac_sensor_runtime",
     "run_mavsdk_sitl_smoke",
     "run_ros2_sensor_sync_smoke",
+    "run_ros2_sim_sensor_bridge",
     "write_report",
 ]

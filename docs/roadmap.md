@@ -99,7 +99,7 @@ continuing to reject real hardware and autonomous real flight.
 
 - [x] Pure simulation runtime profile (`configs/runtime_profiles/pure_sim_isaac_px4_ros2.yaml`)
 - [x] Isaac Sim / Isaac Lab sensor runtime execution (`run_isaac_sensor_runtime`, env-gated)
-- [ ] ROS2 simulation sensor bridge
+- [x] ROS2 simulation sensor bridge (`run_ros2_sim_sensor_bridge`, env-gated)
 - [ ] PX4 SITL + MAVSDK command validation
 - [ ] Isaac + PX4 SITL closed-loop bridge design
 - [ ] GWM / WAM closed-loop simulation demo

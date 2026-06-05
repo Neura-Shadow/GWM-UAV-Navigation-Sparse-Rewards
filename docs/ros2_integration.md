@@ -126,6 +126,41 @@ It does not create ROS2 publishers, launch ROS2, inspect live topics by default,
 or touch MAVSDK, PX4, Isaac Sim, Nav2, or hardware. Mock tests exercise the same
 conversion path using synthetic RGB, depth, LiDAR, odometry, and IMU payloads.
 
+## Phase 6-C Simulation Sensor Bridge
+
+Phase 6-C adds a guarded simulation-only publisher/synchronizer bridge around
+the same `ROS2SensorSynchronizer` path:
+
+```bash
+python scripts/run_ros2_sim_sensor_bridge.py --no-write-output
+```
+
+The bridge target is:
+
+```text
+simulation RGB/depth/LiDAR/IMU/odom payloads
+  -> ROS2 publishers when ROS2 is available and gated
+  -> ROS2SensorSynchronizer
+  -> SensorObservation
+  -> ObservationBuffer
+  -> JSON-safe runtime report
+```
+
+Default CLI runs are safe and report `status=skipped` unless both gates are
+set:
+
+```text
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_RUN_ROS2_SENSOR_SYNC_TESTS=1
+```
+
+With the gates set, the runner checks `rclpy`, `message_filters`,
+`sensor_msgs`, and `nav_msgs`. If those modules are unavailable, the report
+uses `status=runtime_unavailable` and includes setup guidance. Normal tests use
+fake publishers and manual synchronization, so they do not require ROS2, start
+Nav2, launch Isaac Sim, connect MAVSDK / PX4 SITL, or touch hardware. Optional
+live simulation topics remain operator-controlled through `GWM_ROS2_LIVE_TOPICS`.
+
 ## QoS Configuration
 
 Phase 3-A uses `configs/ros2_control.yaml`:
