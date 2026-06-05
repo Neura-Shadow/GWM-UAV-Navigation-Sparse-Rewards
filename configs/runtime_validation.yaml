@@ -134,6 +134,43 @@ runtime_validation:
       - GWM_ALLOW_OPTIONAL_RUNTIME
       - GWM_RUN_MAVSDK_SITL_TESTS
       - GWM_ALLOW_SITL_COMMANDS
+  isaac_px4_bridge_design:
+    enabled: false
+    output_path: outputs/runtime_validation/isaac_px4_bridge_design.json
+    write_output: true
+    require_prior_reports: false
+    fail_on_not_ready: false
+    use_ros2_sensor_path: true
+    bridge_strategy: mavsdk_lightweight
+    future_coupled_execution_requested: false
+    px4_launch_requested: false
+    isaac_step_sec: 0.05
+    safety_fast_loop_hz: 50.0
+    gwm_planner_hz: 2.0
+    mavsdk_command_hz: 10.0
+    stale_observation_timeout_sec: 0.25
+    stale_command_timeout_sec: 0.2
+    deployment:
+      mock: false
+      sitl_enabled: true
+      real_hardware_enabled: false
+      autonomous_real_flight_enabled: false
+    prior_reports:
+      isaac_sensor_runtime: outputs/runtime_validation/isaac_sensor_runtime.json
+      ros2_sim_sensor_bridge: outputs/runtime_validation/ros2_sim_sensor_bridge.json
+      px4_sitl_command_validation: outputs/runtime_validation/px4_sitl_command_validation.json
+    frame_transform_policy:
+      project_frame: project_default
+      isaac_world_frame: isaac_z_up
+      px4_world_frame: px4_ned
+      mavsdk_command_frame: px4_body_ned
+      ros2_frames_preserved_from_headers: true
+      coordinate_conversion_applied: false
+      transforms_defined: false
+      blocks_silent_conversion: true
+      stale_transform_rejection: true
+      max_transform_age_sec: 0.1
+      required_before_phase6f_live_loop: true
   closed_loop_readiness:
     enabled: false
     steps: 5

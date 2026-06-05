@@ -136,6 +136,8 @@ instructions. They must not fake success.
     handling.
   - Starts with a MAVSDK-only lightweight path; ROS2 / Micro XRCE-DDS remains a
     later option.
+  - Adds a dry-run design/readiness report and does not launch or connect
+    runtimes.
 - **Phase 6-F: GWM / WAM closed-loop simulation demo**
   - Runs the full pure-simulation loop after Phase 6-B/C/D are validated.
 
@@ -265,6 +267,40 @@ stops offboard, optionally lands, and disconnects in cleanup. Normal tests use
 an injected fake MAVSDK client only. They do not launch Isaac Sim, start ROS2
 nodes, start Nav2, launch PX4, connect to hardware, or enable autonomous real
 flight.
+
+## Phase 6-E Isaac + PX4 SITL Bridge Design Command
+
+Phase 6-E adds:
+
+```bash
+python scripts/run_isaac_px4_bridge_design.py --no-write-output
+python scripts/run_isaac_px4_bridge_design.py --require-prior-reports --json --pretty
+```
+
+The command is a dry-run design/readiness check. It defines Isaac/PX4 state
+ownership, command and telemetry paths, coordinate-frame policy, update rates,
+safety stops, refusal rules, and the prior Phase 6-B/C/D reports needed before
+future coupled execution.
+
+It does not launch Isaac Sim, start ROS2 nodes, connect to MAVSDK / PX4 SITL,
+launch PX4, connect to hardware, or run the Phase 6-F closed-loop demo.
+
+The default report path is:
+
+```text
+outputs/runtime_validation/isaac_px4_bridge_design.json
+```
+
+With `--require-prior-reports`, the runner checks existing report files only:
+
+```text
+outputs/runtime_validation/isaac_sensor_runtime.json
+outputs/runtime_validation/ros2_sim_sensor_bridge.json
+outputs/runtime_validation/px4_sitl_command_validation.json
+```
+
+Missing or unready reports produce `status=not_ready`; the runner does not run
+Phase 6-B, 6-C, or 6-D for the operator.
 
 ## Coordinate Frames
 
