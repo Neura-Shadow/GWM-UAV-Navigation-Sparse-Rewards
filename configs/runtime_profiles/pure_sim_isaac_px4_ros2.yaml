@@ -1,0 +1,139 @@
+# ============================================================================
+# Phase 6-A Pure-Simulation Runtime Profile
+# ============================================================================
+# This profile describes the intended Isaac Sim / Isaac Lab + ROS2 + PX4 SITL +
+# MAVSDK runtime stack. It is not a default deployment config and must not be
+# used for real hardware or autonomous real flight.
+
+schema_version: "gwm_phase6_pure_sim_runtime_profile_v1"
+
+profile:
+  name: "pure_sim_isaac_px4_ros2"
+  phase: "6-A"
+  label: "Pure-Simulation Full-Stack Runtime Integration"
+  mode: "pure_simulation_sitl_only"
+  status: "setup_required"
+  description: >
+    Reproducible profile for validating the full GWM UAV stack in Isaac Sim or
+    Isaac Lab with simulation-only ROS2 topics, externally managed PX4 SITL,
+    MAVSDK offboard commands, and the CBF safety gate.
+
+default_safe_deployment:
+  mock: true
+  sitl_enabled: false
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+pure_simulation_deployment:
+  mock: false
+  sitl_enabled: true
+  real_hardware_enabled: false
+  autonomous_real_flight_enabled: false
+
+runtime_stack:
+  isaac:
+    required: true
+    accepted_targets: ["isaac_sim", "isaac_lab"]
+    launch_mode: "headless_or_attach"
+    headless: true
+    role: "simulated_world_and_virtual_sensor_source"
+  ros2:
+    required: true
+    live_topics_optional_gate: "GWM_ROS2_LIVE_TOPICS"
+    role: "simulation_sensor_transport_and_timestamp_sync"
+  px4_sitl:
+    required: true
+    externally_started: true
+    automatic_launch_allowed: false
+    connection_url: "udp://:14540"
+    role: "simulation_only_offboard_flight_stack"
+  mavsdk:
+    required: true
+    role: "simulation_only_command_bridge_to_px4_sitl"
+  gwm_wam_planner:
+    required: true
+    role: "future_rollout_candidate_scoring_and_action_selection"
+  safety_gate:
+    required: true
+    implementation: "ControlBarrierFunction"
+    role: "command_saturation_obstacle_altitude_and_geofence_filter"
+
+required_env_gates:
+  common:
+    - "GWM_ALLOW_OPTIONAL_RUNTIME"
+  isaac:
+    - "GWM_ALLOW_OPTIONAL_RUNTIME"
+    - "GWM_RUN_ISAAC_RUNTIME_TESTS"
+  ros2:
+    - "GWM_ALLOW_OPTIONAL_RUNTIME"
+    - "GWM_RUN_ROS2_SENSOR_SYNC_TESTS"
+  mavsdk_px4_sitl:
+    - "GWM_ALLOW_OPTIONAL_RUNTIME"
+    - "GWM_RUN_MAVSDK_SITL_TESTS"
+    - "GWM_ALLOW_SITL_COMMANDS"
+  optional_live_ros2_topics:
+    - "GWM_ROS2_LIVE_TOPICS"
+  future_px4_launch_approval:
+    - "GWM_ALLOW_PX4_LAUNCH"
+
+required_external_processes:
+  - name: "isaac_sim_or_isaac_lab"
+    started_by_repo_by_default: false
+    operator_action: "Launch headless through Isaac Python or attach to an existing simulation session."
+  - name: "ros2_environment"
+    started_by_repo_by_default: false
+    operator_action: "Source ROS2 so rclpy, message_filters, sensor_msgs, nav_msgs, and geometry_msgs are importable."
+  - name: "px4_sitl"
+    started_by_repo_by_default: false
+    operator_action: "Start PX4 SITL externally before MAVSDK command validation."
+  - name: "mavsdk_python"
+    started_by_repo_by_default: false
+    operator_action: "Install MAVSDK Python package in the active runtime environment."
+
+topic_map:
+  rgb: "/camera/rgb"
+  depth: "/camera/depth"
+  lidar: "/scan"
+  imu: "/imu"
+  odom: "/odom"
+  command_velocity: "mavsdk_velocity_body_yawspeed"
+
+coordinate_frames:
+  source_coordinate_frame: "project_default"
+  isaac_world_frame: "isaac_z_up"
+  px4_world_frame: "ned"
+  mavsdk_command_frame: "body_ned"
+  ros2_frames_preserved_from_headers: true
+  coordinate_conversion_applied: false
+  conversion_policy_required_before_coupled_loop: true
+
+runtime_rates:
+  isaac_step_hz: 20.0
+  ros2_sensor_sync_hz: 20.0
+  safety_fast_loop_hz: 50.0
+  gwm_planner_hz: 2.0
+  mavsdk_command_hz: 10.0
+
+refusal_rules:
+  refuse_real_hardware_enabled: true
+  refuse_autonomous_real_flight_enabled: true
+  refuse_physical_flight_controller_connection: true
+  refuse_mavsdk_when_sitl_disabled: true
+  refuse_mavsdk_when_mock_enabled: true
+  refuse_missing_runtime_gates: true
+  refuse_missing_required_runtime_capability: true
+  refuse_px4_launch_without_later_explicit_approval: true
+
+runtime_artifacts:
+  output_dir: "outputs/runtime_validation"
+  commit_reports: false
+  commit_logs: false
+  commit_rosbags: false
+  commit_sitl_artifacts: false
+  commit_isaac_artifacts: false
+
+verification:
+  normal_tests_require_optional_runtimes: false
+  capability_preflight: "python scripts/check_runtime_capabilities.py --no-write-output"
+  expected_missing_runtime_status: "runtime_unavailable"
+  no_fake_success_when_runtime_missing: true
