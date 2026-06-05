@@ -259,6 +259,25 @@ result by default. This smoke test is runtime plumbing validation only; it is
 not real UAV flight validation, formal safety certification, or a production
 readiness claim.
 
+## Phase 6-B Isaac Sensor Runtime
+
+Phase 6-B adds a guarded sensor-runtime runner that exercises the existing
+`IsaacSimRuntime` and `IsaacSimNavigationEnv` path more directly:
+
+```bash
+python scripts/run_isaac_sensor_runtime.py --no-write-output
+```
+
+When the Isaac gates are present and Isaac Sim / Isaac Lab is importable, the
+runner launches or attaches headless, loads the tiny UAV descriptor, steps the
+simulation, converts virtual sensor snapshots into `SensorObservation`, and
+fills an `ObservationBuffer`. Missing gates skip cleanly. Missing Isaac runtime
+returns `runtime_unavailable` with setup instructions; it does not fake success.
+
+This slice remains Isaac-only. It does not start ROS2 nodes, connect to
+MAVSDK / PX4 SITL, launch PX4, run hardware checks, or enable autonomous real
+flight.
+
 ## Future Integration Plan
 
 1. Add audited project-to-Isaac Z-up coordinate conversion.

@@ -135,5 +135,7 @@ runtime_artifacts:
 verification:
   normal_tests_require_optional_runtimes: false
   capability_preflight: "python scripts/check_runtime_capabilities.py --no-write-output"
+  phase6b_isaac_sensor_runtime: "python scripts/run_isaac_sensor_runtime.py --frames 5"
+  phase6b_report_path: "outputs/runtime_validation/isaac_sensor_runtime.json"
   expected_missing_runtime_status: "runtime_unavailable"
   no_fake_success_when_runtime_missing: true
