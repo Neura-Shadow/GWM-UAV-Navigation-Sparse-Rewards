@@ -102,7 +102,7 @@ continuing to reject real hardware and autonomous real flight.
 - [x] ROS2 simulation sensor bridge (`run_ros2_sim_sensor_bridge`, env-gated)
 - [x] PX4 SITL + MAVSDK command validation (`run_px4_sitl_command_validation`, env-gated)
 - [x] Isaac + PX4 SITL closed-loop bridge design (`run_isaac_px4_bridge_design`, dry-run)
-- [ ] GWM / WAM closed-loop simulation demo
+- [x] GWM / WAM closed-loop simulation demo (`run_phase6_gwm_simulation_demo`, env-gated)
 
 ---
 

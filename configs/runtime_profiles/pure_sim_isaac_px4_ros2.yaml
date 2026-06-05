@@ -143,5 +143,8 @@ verification:
   phase6d_report_path: "outputs/runtime_validation/px4_sitl_command_validation.json"
   phase6e_isaac_px4_bridge_design: "python scripts/run_isaac_px4_bridge_design.py --require-prior-reports"
   phase6e_report_path: "outputs/runtime_validation/isaac_px4_bridge_design.json"
+  phase6f_gwm_simulation_demo: "python scripts/run_phase6_gwm_simulation_demo.py --require-prior-reports"
+  phase6f_fake_mode_check: "python scripts/run_phase6_gwm_simulation_demo.py --runtime-mode fake --steps 3 --no-require-prior-reports --no-write-output"
+  phase6f_report_path: "outputs/runtime_validation/phase6_gwm_simulation_demo.json"
   expected_missing_runtime_status: "runtime_unavailable"
   no_fake_success_when_runtime_missing: true

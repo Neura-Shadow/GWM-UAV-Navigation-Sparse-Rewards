@@ -139,7 +139,10 @@ instructions. They must not fake success.
   - Adds a dry-run design/readiness report and does not launch or connect
     runtimes.
 - **Phase 6-F: GWM / WAM closed-loop simulation demo**
-  - Runs the full pure-simulation loop after Phase 6-B/C/D are validated.
+  - Runs the guarded pure-simulation planning loop after Phase 6-B/C/D/E are
+    validated.
+  - Uses command-mirrored Isaac stepping unless PX4 telemetry state coupling is
+    explicitly available and reported.
 
 ## Data Flow
 
@@ -302,6 +305,56 @@ outputs/runtime_validation/px4_sitl_command_validation.json
 Missing or unready reports produce `status=not_ready`; the runner does not run
 Phase 6-B, 6-C, or 6-D for the operator.
 
+## Phase 6-F GWM / WAM Closed-Loop Simulation Demo Command
+
+Phase 6-F adds:
+
+```bash
+python scripts/run_phase6_gwm_simulation_demo.py --no-write-output
+python scripts/run_phase6_gwm_simulation_demo.py --runtime-mode fake --steps 3 --no-require-prior-reports --no-write-output
+python scripts/run_phase6_gwm_simulation_demo.py --require-prior-reports --json --pretty
+```
+
+The dedicated Phase 6-F demo note is
+[`docs/phase6_gwm_wam_simulation_demo.md`](phase6_gwm_wam_simulation_demo.md).
+
+The command connects the Phase 6 simulation/SITL seams into one guarded loop:
+
+```text
+Isaac Sim / Isaac Lab sensors
+  -> direct Isaac observation or ROS2 sensor sync
+  -> ObservationBuffer
+  -> Generated World Model / WAM rollout
+  -> candidate trajectory scoring
+  -> ControlBarrierFunction
+  -> MAVLinkBridge / MAVSDK
+  -> externally running PX4 SITL
+```
+
+Normal tests inject fake Isaac, ROS2, and MAVSDK/PX4 objects. The explicit
+`--runtime-mode fake` CLI path uses the same style of local fake runtime facades
+for final loop verification. Live runtime mode requires the Isaac and
+MAVSDK/PX4 SITL gates, plus the ROS2 gate when `--observation-path ros2` is
+selected. The runner never launches PX4 and never connects to real hardware.
+
+The default report path is:
+
+```text
+outputs/runtime_validation/phase6_gwm_simulation_demo.json
+```
+
+The v1 state update policy is explicit:
+
+```text
+state_coupling: command_mirror
+px4_telemetry_used_for_isaac_state: false
+```
+
+That means the safe command sent toward PX4 SITL is also used to advance the
+Isaac-side simulation step. The report must not claim full physics-coupled PX4
+telemetry-to-Isaac synchronization unless a later slice implements and verifies
+that bridge.
+
 ## Coordinate Frames
 
 Phase 6-A records the frame problem explicitly and does not silently convert:
@@ -360,7 +413,8 @@ Do not commit:
 6. Set the required Phase 6 gates.
 7. Run capability preflight.
 8. Run Phase 6-B, Phase 6-C, and Phase 6-D independently.
-9. Run Phase 6-E/F only after the independent reports are green.
+9. Run Phase 6-E only after the independent reports are green.
+10. Run Phase 6-F only after Phase 6-B/C/D/E reports are green.
 
 ## Non-Goals
 
