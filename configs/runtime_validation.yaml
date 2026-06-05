@@ -86,6 +86,54 @@ runtime_validation:
       - GWM_RUN_MAVSDK_SITL_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
       - GWM_ALLOW_SITL_COMMANDS
+  px4_sitl_command_validation:
+    enabled: false
+    commands: 1
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/px4_sitl_command_validation.json
+    write_output: true
+    fail_on_unavailable: false
+    connection_url: "udp://:14540"
+    autopilot: "px4"
+    health_timeout_sec: 10.0
+    takeoff_altitude_m: 5.0
+    allow_arm: false
+    land_after_validation: true
+    command:
+      vx: 0.25
+      vy: 0.0
+      vz: 0.0
+      yaw_rate: 0.0
+      duration: 0.2
+    validation_state:
+      position: [0.0, 0.0, -5.0]
+      altitude_m: 5.0
+      obstacle_position: null
+    deployment:
+      mock: false
+      sitl_enabled: true
+      real_hardware_enabled: false
+      autonomous_real_flight_enabled: false
+    safety:
+      min_obstacle_distance: 4.0
+      limits:
+        velocity_limits:
+          max_vx: 4.0
+          max_vy: 4.0
+          max_vz: 2.0
+          max_yaw_rate: 1.0
+        altitude_bounds:
+          min_altitude: 0.5
+          max_altitude: 120.0
+        geofence:
+          enabled: false
+          x: [-100.0, 100.0]
+          y: [-100.0, 100.0]
+          z: [-120.0, 0.0]
+    required_env_gates:
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_RUN_MAVSDK_SITL_TESTS
+      - GWM_ALLOW_SITL_COMMANDS
   closed_loop_readiness:
     enabled: false
     steps: 5

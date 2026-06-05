@@ -228,6 +228,44 @@ into `ObservationBuffer`, and JSON-safe report generation. They do not launch
 Isaac Sim, start Nav2, connect to MAVSDK / PX4 SITL, launch PX4, or run
 hardware checks.
 
+## Phase 6-D PX4 SITL Command Validation Command
+
+Phase 6-D adds:
+
+```bash
+python scripts/run_px4_sitl_command_validation.py --no-write-output
+python scripts/run_px4_sitl_command_validation.py --commands 1 --connection-url udp://:14540 --no-write-output
+```
+
+Without the MAVSDK/PX4 SITL gates, the command reports `status=skipped` and
+does not instantiate or connect a real `MAVLinkBridge`:
+
+```text
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_RUN_MAVSDK_SITL_TESTS=1
+GWM_ALLOW_SITL_COMMANDS=1
+```
+
+When all gates are set, the command checks whether the MAVSDK Python runtime is
+importable. If MAVSDK is unavailable in the active Python environment, it
+returns `status=runtime_unavailable`. PX4 SITL must already be running
+externally; the runner never launches PX4 and does not use
+`GWM_ALLOW_PX4_LAUNCH`.
+
+The default report path is:
+
+```text
+outputs/runtime_validation/px4_sitl_command_validation.json
+```
+
+The validation path builds a deterministic initial zero setpoint plus bounded
+velocity command sequence, applies `ControlBarrierFunction` before each bridge
+write, starts offboard mode, sends the safe commands through `MAVLinkBridge`,
+stops offboard, optionally lands, and disconnects in cleanup. Normal tests use
+an injected fake MAVSDK client only. They do not launch Isaac Sim, start ROS2
+nodes, start Nav2, launch PX4, connect to hardware, or enable autonomous real
+flight.
+
 ## Coordinate Frames
 
 Phase 6-A records the frame problem explicitly and does not silently convert:
