@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-airsim = ["airsim"]
+airsim = ["airsim", "cosysairsim"]
 sitl = ["mavsdk"]
 dev = [
     "pytest>=7.0",
@@ -33,6 +33,7 @@ include = ["src*"]
 testpaths = ["tests"]
 pythonpath = ["."]
 markers = [
+    "airsim_runtime: optional AirSim / CosysAirSim runtime smoke tests",
     "isaac_runtime: optional Isaac Sim runtime smoke tests",
     "gwm_demo_runtime: optional end-to-end GWM runtime smoke tests",
     "mavsdk_sitl: optional MAVSDK / PX4 SITL smoke tests",

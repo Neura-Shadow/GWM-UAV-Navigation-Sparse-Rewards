@@ -37,6 +37,25 @@ runtime_validation:
     required_env_gates:
       - GWM_ALLOW_OPTIONAL_RUNTIME
       - GWM_RUN_ISAAC_RUNTIME_TESTS
+  airsim_runtime_smoke:
+    enabled: false
+    frames: 3
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/airsim_runtime_smoke.json
+    write_output: true
+    fail_on_unavailable: false
+    host: "127.0.0.1"
+    port: 41451
+    vehicle_name: ""
+    api_control_enabled: true
+    reset_on_reset: false
+    arm_on_reset: false
+    takeoff_on_reset: false
+    control_dt: 0.1
+    required_env_gates:
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_RUN_AIRSIM_RUNTIME_TESTS
+      - GWM_ALLOW_AIRSIM_API_CONTROL
   ros2_sensor_sync_smoke:
     enabled: false
     packets: 1
@@ -259,11 +278,34 @@ runtime_validation:
       sitl_enabled: false
       real_hardware_enabled: false
       autonomous_real_flight_enabled: false
+  multisim_gwm_demo:
+    enabled: false
+    simulator_backend: mock
+    steps: 3
+    output_path: outputs/runtime_validation/multisim_gwm_demo.json
+    write_output: true
+    fail_on_unavailable: false
+    airsim:
+      host: "127.0.0.1"
+      port: 41451
+      vehicle_name: ""
+      api_control_enabled: true
+    deployment:
+      mock: true
+      sitl_enabled: false
+      real_hardware_enabled: false
+      autonomous_real_flight_enabled: false
+  simulator_backend_comparison:
+    enabled: false
+    output_path: outputs/runtime_validation/simulator_backend_comparison.json
+    write_output: true
+    include_runtime_availability: true
   probes:
     python: true
     cuda: true
     nvidia_smi: true
     isaac_sim: true
+    airsim: true
     ros2: true
     mavsdk: true
     px4: true
