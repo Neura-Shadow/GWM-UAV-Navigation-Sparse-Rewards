@@ -48,8 +48,9 @@ not claim real flight validation, production readiness, automatic PX4 launch,
 real Nav2 plugins, real `ros2_control` C++ plugins, or formal safety
 certification.
 
-The Phase 6-A profile is simulation/SITL-only and does not enable real hardware
-or autonomous real flight.
+Phase 6-A/6-B are simulation/SITL-only and do not enable real hardware or
+autonomous real flight. Phase 6-B adds a guarded Isaac Sim / Isaac Lab sensor
+runtime runner that reports `runtime_unavailable` when Isaac is not installed.
 
 ## Safety Defaults
 
@@ -124,6 +125,7 @@ python scripts/run_digital_twin_generation.py --num-variations 2
 python scripts/train_generated_world_model.py --synthetic --steps 20
 python scripts/run_gwm_navigation_demo.py --backend mock --steps 5 --no-write-output
 python scripts/check_runtime_capabilities.py --no-write-output
+python scripts/run_isaac_sensor_runtime.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 

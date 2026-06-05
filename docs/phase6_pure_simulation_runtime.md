@@ -120,7 +120,7 @@ instructions. They must not fake success.
   - Adds this profile and documentation.
   - Does not launch runtimes.
 - **Phase 6-B: Isaac Sim sensor runtime execution**
-  - Launches or attaches to Isaac Sim when available and gated.
+  - Launches or attaches to Isaac Sim / Isaac Lab when available and gated.
   - Steps a tiny scene, reads virtual sensors, converts to `SensorObservation`,
     and fills `ObservationBuffer`.
 - **Phase 6-C: ROS2 simulation sensor bridge**
@@ -159,6 +159,39 @@ flowchart TD
     L --> M["Simulated UAV State"]
     M --> A
 ```
+
+## Phase 6-B Isaac Sensor Runtime Command
+
+Phase 6-B adds:
+
+```bash
+python scripts/run_isaac_sensor_runtime.py --no-write-output
+python scripts/run_isaac_sensor_runtime.py --frames 5 --json --pretty --no-write-output
+```
+
+Without the Isaac gates, the command reports `status=skipped` and does not
+launch Isaac Sim:
+
+```text
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_RUN_ISAAC_RUNTIME_TESTS=1
+```
+
+When both gates are set, the command checks `IsaacSimRuntime.is_available()`.
+If Isaac Sim / Isaac Lab is not importable in the active Python environment, it
+returns `status=runtime_unavailable` with setup instructions. It must not fake
+success.
+
+The default report path is:
+
+```text
+outputs/runtime_validation/isaac_sensor_runtime.json
+```
+
+Normal tests inject a fake backend through `IsaacSimRuntime` and still exercise
+`IsaacSimNavigationEnv`, `SensorObservation`, and `ObservationBuffer`. They do
+not start ROS2, connect to MAVSDK / PX4 SITL, launch PX4, or run hardware
+checks.
 
 ## Coordinate Frames
 

@@ -21,6 +21,22 @@ runtime_validation:
     required_env_gates:
       - GWM_RUN_ISAAC_RUNTIME_TESTS
       - GWM_ALLOW_OPTIONAL_RUNTIME
+  isaac_sensor_runtime:
+    enabled: false
+    frames: 5
+    headless: true
+    timeout_sec: 60.0
+    output_path: outputs/runtime_validation/isaac_sensor_runtime.json
+    write_output: true
+    fail_on_unavailable: false
+    descriptor_path: null
+    context_length: 3
+    image_height: 32
+    image_width: 32
+    timestep: 0.05
+    required_env_gates:
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_RUN_ISAAC_RUNTIME_TESTS
   ros2_sensor_sync_smoke:
     enabled: false
     packets: 1

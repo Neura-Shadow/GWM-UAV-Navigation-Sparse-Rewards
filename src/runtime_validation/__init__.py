@@ -18,6 +18,12 @@ from src.runtime_validation.isaac_runtime_smoke import (
     build_tiny_isaac_descriptor,
     run_isaac_runtime_smoke,
 )
+from src.runtime_validation.isaac_sensor_runtime import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_ISAAC_SENSOR_RUNTIME_OUTPUT_PATH,
+    IsaacSensorRuntimeConfig,
+    IsaacSensorRuntimeResult,
+    run_isaac_sensor_runtime,
+)
 from src.runtime_validation.mavsdk_sitl_smoke import (
     DEFAULT_OUTPUT_PATH as DEFAULT_MAVSDK_SITL_SMOKE_OUTPUT_PATH,
     MAVSDKSITLSmokeConfig,
@@ -41,11 +47,14 @@ __all__ = [
     "ClosedLoopReadinessResult",
     "DEFAULT_CLOSED_LOOP_READINESS_OUTPUT_PATH",
     "DEFAULT_ISAAC_RUNTIME_SMOKE_OUTPUT_PATH",
+    "DEFAULT_ISAAC_SENSOR_RUNTIME_OUTPUT_PATH",
     "DEFAULT_MAVSDK_SITL_SMOKE_OUTPUT_PATH",
     "DEFAULT_ROS2_SENSOR_SYNC_SMOKE_OUTPUT_PATH",
     "ENV_ALLOWLIST",
     "IsaacRuntimeSmokeConfig",
     "IsaacRuntimeSmokeResult",
+    "IsaacSensorRuntimeConfig",
+    "IsaacSensorRuntimeResult",
     "MAVSDKSITLSmokeConfig",
     "MAVSDKSITLSmokeResult",
     "ROS2SensorSyncSmokeConfig",
@@ -60,6 +69,7 @@ __all__ = [
     "report_to_json",
     "run_closed_loop_readiness",
     "run_isaac_runtime_smoke",
+    "run_isaac_sensor_runtime",
     "run_mavsdk_sitl_smoke",
     "run_ros2_sensor_sync_smoke",
     "write_report",
