@@ -139,5 +139,7 @@ verification:
   phase6b_report_path: "outputs/runtime_validation/isaac_sensor_runtime.json"
   phase6c_ros2_sim_sensor_bridge: "python scripts/run_ros2_sim_sensor_bridge.py --frames 3"
   phase6c_report_path: "outputs/runtime_validation/ros2_sim_sensor_bridge.json"
+  phase6d_px4_sitl_command_validation: "python scripts/run_px4_sitl_command_validation.py --commands 1"
+  phase6d_report_path: "outputs/runtime_validation/px4_sitl_command_validation.json"
   expected_missing_runtime_status: "runtime_unavailable"
   no_fake_success_when_runtime_missing: true

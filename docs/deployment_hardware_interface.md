@@ -81,6 +81,38 @@ sends only a safe zero-velocity command through the guarded offboard path and
 records command-history metadata. This is SITL command-path plumbing
 validation, not real flight validation or certified safety evidence.
 
+### Phase 6-D PX4 SITL Command Validation
+
+Phase 6-D adds a stricter pure-simulation command-validation runner:
+
+```bash
+python scripts/run_px4_sitl_command_validation.py --no-write-output
+```
+
+Default runs skip safely unless all SITL command gates are set:
+
+```text
+GWM_ALLOW_OPTIONAL_RUNTIME=1
+GWM_RUN_MAVSDK_SITL_TESTS=1
+GWM_ALLOW_SITL_COMMANDS=1
+```
+
+When gated and MAVSDK is importable, the runner expects PX4 SITL to be running
+externally at the configured endpoint, normally `udp://:14540`. It never
+launches PX4. It builds an initial zero setpoint and bounded validation command
+sequence, applies `ControlBarrierFunction` before every `MAVLinkBridge` write,
+starts and stops offboard mode, optionally lands, records raw and safe command
+metadata, and disconnects in cleanup.
+
+The Phase 6-D report path is:
+
+```text
+outputs/runtime_validation/px4_sitl_command_validation.json
+```
+
+This is pure PX4 SITL command validation only. It is not real hardware flight,
+autonomous real flight, production readiness, or certified safety evidence.
+
 ### Level 2: Real Hardware Deployment
 
 Level 2 is documented only in this slice.
@@ -180,12 +212,14 @@ approved separately.
 
 ## Verification
 
-All Phase 3-D / 4-E tests must pass without PX4, ArduPilot, MAVSDK, ROS2, Nav2,
-Isaac Sim, GPU, SITL, or real hardware:
+All Phase 3-D / 4-E / 6-D tests must pass without PX4, ArduPilot, MAVSDK, ROS2,
+Nav2, Isaac Sim, GPU, SITL, or real hardware:
 
 ```bash
 python -m pytest tests/test_mavsdk_sitl.py -q
 python -m pytest tests/test_deployment.py -q
+python -m pytest tests/test_phase6_px4_sitl_command_validation.py -q
 python -m pytest tests/ -q
-python -m compileall -q src/control src/ros2_bridge tests/test_mavsdk_sitl.py
+python -m compileall -q src/control src/ros2_bridge src/runtime_validation tests/test_mavsdk_sitl.py tests/test_phase6_px4_sitl_command_validation.py
+python scripts/run_px4_sitl_command_validation.py --no-write-output
 ```

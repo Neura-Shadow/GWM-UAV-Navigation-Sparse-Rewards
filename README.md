@@ -22,9 +22,9 @@ PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 The latest released checkpoint is `v0.5.0-runtime-readiness`. It captures the
 Phase 5 guarded runtime-readiness layer: all normal tests pass locally without
 optional robotics runtimes, while real hardware execution and autonomous real
-flight remain disabled by default. Phase 6-A is now in progress as a
-pure-simulation profile for Isaac Sim / Isaac Lab, ROS2, externally managed
-PX4 SITL, MAVSDK, and the GWM safety-gated planning loop.
+flight remain disabled by default. Phase 6 is now adding pure-simulation
+runtime validation for Isaac Sim / Isaac Lab, ROS2, externally managed PX4
+SITL, MAVSDK, and the GWM safety-gated planning loop.
 
 Completed mock-first and guarded-runtime slices:
 
@@ -48,11 +48,12 @@ not claim real flight validation, production readiness, automatic PX4 launch,
 real Nav2 plugins, real `ros2_control` C++ plugins, or formal safety
 certification.
 
-Phase 6-A/6-B/6-C are simulation/SITL-only and do not enable real hardware or
+Phase 6-A/6-B/6-C/6-D are simulation/SITL-only and do not enable real hardware or
 autonomous real flight. Phase 6-B adds a guarded Isaac Sim / Isaac Lab sensor
-runtime runner, and Phase 6-C adds a guarded ROS2 simulation sensor bridge.
-Both report unavailable runtimes clearly when the required optional stack is not
-installed or gated.
+runtime runner, Phase 6-C adds a guarded ROS2 simulation sensor bridge, and
+Phase 6-D adds guarded PX4 SITL + MAVSDK command validation. These report
+unavailable runtimes clearly when the required optional stack is not installed
+or gated.
 
 ## Safety Defaults
 
@@ -129,6 +130,7 @@ python scripts/run_gwm_navigation_demo.py --backend mock --steps 5 --no-write-ou
 python scripts/check_runtime_capabilities.py --no-write-output
 python scripts/run_isaac_sensor_runtime.py --no-write-output
 python scripts/run_ros2_sim_sensor_bridge.py --no-write-output
+python scripts/run_px4_sitl_command_validation.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
 ```
 
