@@ -265,9 +265,51 @@ connection points, and any missing prior Phase 5-B/C/D smoke reports when
 nodes, connect to MAVSDK/PX4 SITL, launch PX4, run hardware checks, or enable
 autonomous real flight.
 
+## Phase 6-F Pure-Simulation Closed Loop
+
+Phase 6-F adds the guarded GWM / WAM simulation demo:
+
+```bash
+python scripts/run_phase6_gwm_simulation_demo.py --no-write-output
+```
+
+It connects:
+
+```text
+Isaac Sim / Isaac Lab simulated sensors
+  -> direct Isaac observations or ROS2 sensor synchronization
+  -> ObservationBuffer
+  -> Generated World Model / WAM rollout
+  -> candidate trajectory scoring
+  -> ControlBarrierFunction
+  -> MAVLinkBridge / MAVSDK
+  -> externally running PX4 SITL
+```
+
+Normal tests use injected fake Isaac, ROS2, and MAVSDK/PX4 objects. Live
+runtime attempts require explicit Phase 6 gates and existing readiness reports
+when `--require-prior-reports` is used. Missing runtimes produce skipped,
+`runtime_unavailable`, or `not_ready` status; they are not treated as success.
+
+The Phase 6-F report uses schema `gwm_phase6_simulation_demo_v1`. It records
+runtime gates, prior-report readiness, runtime invocation summary, per-step
+planner/safety/command records, metrics, cleanup status, and whether PX4
+telemetry was actually used for Isaac state coupling.
+
+The v1 coupling policy is transparent:
+
+```text
+state_coupling: command_mirror
+px4_telemetry_used_for_isaac_state: false
+```
+
+PX4 SITL must be started externally. Phase 6-F does not launch PX4, connect to
+real hardware, enable autonomous real flight, add Nav2, claim production
+readiness, or provide certified safety evidence.
+
 ## Safety Boundary
 
-Phase 4-A/4-B/4-C/4-D/4-E/4-F do not require:
+Phase 4-A/4-B/4-C/4-D/4-E/4-F and normal Phase 6 tests do not require:
 
 - Isaac Sim for normal tests
 - GPU for normal tests
