@@ -19,10 +19,12 @@ PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
-The current Phase 4 checkpoint target is `v0.4.0-gwm-uav-runtime`. It captures
-the generated-world-model UAV runtime demo baseline: all normal tests pass
-locally without optional robotics runtimes, while real hardware execution and
-autonomous real flight remain disabled by default.
+The latest released checkpoint is `v0.5.0-runtime-readiness`. It captures the
+Phase 5 guarded runtime-readiness layer: all normal tests pass locally without
+optional robotics runtimes, while real hardware execution and autonomous real
+flight remain disabled by default. Phase 6-A is now in progress as a
+pure-simulation profile for Isaac Sim / Isaac Lab, ROS2, externally managed
+PX4 SITL, MAVSDK, and the GWM safety-gated planning loop.
 
 Completed mock-first and guarded-runtime slices:
 
@@ -45,6 +47,9 @@ The Phase 4 runtime hooks are optional, guarded opt-ins. The repository does
 not claim real flight validation, production readiness, automatic PX4 launch,
 real Nav2 plugins, real `ros2_control` C++ plugins, or formal safety
 certification.
+
+The Phase 6-A profile is simulation/SITL-only and does not enable real hardware
+or autonomous real flight.
 
 ## Safety Defaults
 
@@ -141,6 +146,7 @@ python scripts/diagnose_airsim.py --help
 - [v0.3.0 mock-first release note](docs/releases/v0.3.0-mock-first.md)
 - [Generated World Model navigation](docs/generated_world_model_navigation.md)
 - [Phase 5 runtime validation](docs/phase5_runtime_validation.md)
+- [Phase 6 pure-simulation runtime](docs/phase6_pure_simulation_runtime.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)
