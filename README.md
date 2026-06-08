@@ -19,11 +19,11 @@ ROS2, Isaac Sim, PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
-The latest released checkpoint is `v0.7.0-optional-airsim-backend`. It captures
-the Phase 7 optional multi-simulator backend expansion: all normal tests pass
-locally without optional robotics runtimes, while real hardware execution and
-autonomous real flight remain disabled by default. Phase 6 remains the
-pure-simulation Isaac Sim / Isaac Lab, ROS2, externally managed PX4 SITL,
+The latest released checkpoint is `v0.7.1-cosys-airsim-live-validation`. It
+captures the Phase 7-B optional live Cosys-AirSim validation slice: all normal
+tests pass locally without optional robotics runtimes, while real hardware
+execution and autonomous real flight remain disabled by default. Phase 6 remains
+the pure-simulation Isaac Sim / Isaac Lab, ROS2, externally managed PX4 SITL,
 MAVSDK, and GWM safety-gated planning baseline.
 
 Completed mock-first and guarded-runtime slices:
@@ -42,6 +42,10 @@ Completed mock-first and guarded-runtime slices:
 | Phase 4-D | Complete mock-first slice | ROS2 image/depth/LiDAR/odom sensor synchronization |
 | Phase 4-E | Complete guarded-runtime slice | MAVSDK / PX4 SITL command path |
 | Phase 4-F | Complete mock-first slice | End-to-end GWM navigation demo |
+| Phase 5-A..E | Complete guarded-runtime readiness | Runtime capability detection, guarded Isaac/ROS2/MAVSDK smokes, closed-loop readiness |
+| Phase 6-A..F | Complete pure-simulation/SITL slice | Isaac + ROS2 + PX4 SITL + MAVSDK runtime profile, command validation, bridge design, GWM/WAM simulation demo |
+| Phase 7 | Complete optional simulator slice | Cosys-AirSim primary / legacy AirSim fallback backend, multisim wrapper, comparison report |
+| Phase 7-B | Complete optional live-validation slice | Externally started Cosys-AirSim / legacy AirSim validation runner with no-gate safe skip |
 
 The Phase 4 runtime hooks are optional, guarded opt-ins. The repository does
 not claim real flight validation, production readiness, automatic PX4 launch,
@@ -58,9 +62,11 @@ runtimes clearly when the required optional stack is not installed or gated.
 
 Phase 7 adds Cosys-AirSim / `cosysairsim` as the primary AirSim-family optional
 simulator backend, with legacy AirSim / `airsim` retained as a fallback. The
-backend registry name remains `airsim`. This optional backend is not the Phase 6
-Isaac/PX4 mainline, is not launched automatically, and requires explicit runtime
-gates before live API control is attempted.
+backend registry name remains `airsim`. Phase 7-B adds a richer live validation
+runner for externally started Cosys-AirSim or legacy AirSim sessions. This
+optional backend is not the Phase 6 Isaac/PX4 mainline, is not launched
+automatically, and requires explicit runtime gates before live API control is
+attempted.
 
 ## Safety Defaults
 
@@ -144,6 +150,7 @@ python scripts/run_isaac_px4_bridge_design.py --no-write-output
 python scripts/run_phase6_gwm_simulation_demo.py --no-write-output
 python scripts/run_phase6_gwm_simulation_demo.py --runtime-mode fake --steps 3 --no-require-prior-reports --no-write-output
 python scripts/run_airsim_runtime_smoke.py --no-write-output
+python scripts/run_airsim_live_validation.py --no-write-output
 python scripts/run_multisim_gwm_demo.py --simulator-backend mock --steps 3 --no-write-output
 python scripts/run_simulator_backend_comparison.py --no-write-output
 python scripts/evaluate_policy.py --env mock --num-episodes 3
@@ -164,6 +171,9 @@ python scripts/diagnose_airsim.py --help
 
 - [Architecture](docs/architecture.md)
 - [Paper-style project summary](docs/project_summary.md)
+- [v0.7.1 Cosys-AirSim live validation release note](docs/releases/v0.7.1-cosys-airsim-live-validation.md)
+- [v0.7.0 optional Cosys-AirSim backend release note](docs/releases/v0.7.0-optional-airsim-backend.md)
+- [v0.6.0 pure-simulation runtime release note](docs/releases/v0.6.0-pure-simulation-runtime.md)
 - [v0.4.0 GWM UAV runtime release note](docs/releases/v0.4.0-gwm-uav-runtime.md)
 - [v0.3.0 mock-first release note](docs/releases/v0.3.0-mock-first.md)
 - [Generated World Model navigation](docs/generated_world_model_navigation.md)
