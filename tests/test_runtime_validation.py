@@ -141,6 +141,12 @@ def test_mocked_import_availability_sets_capability_details() -> None:
     assert report.isaac_sim.available is True
     assert report.airsim.available is True
     assert report.airsim.version == "cosysairsim"
+    assert report.airsim.details["backend_registry_name"] == "airsim"
+    assert report.airsim.details["primary_runtime"] == "cosysairsim"
+    assert report.airsim.details["primary_runtime_label"] == "Cosys-AirSim"
+    assert report.airsim.details["fallback_runtime"] == "airsim"
+    assert report.airsim.details["fallback_runtime_label"] == "legacy AirSim"
+    assert report.airsim.details["preferred_runtime_label"] == "Cosys-AirSim"
     assert report.ros2.available is True
     assert report.ros2.version == "humble"
     assert report.mavsdk.available is True

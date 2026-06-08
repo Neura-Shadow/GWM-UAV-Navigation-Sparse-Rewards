@@ -39,6 +39,11 @@ runtime_validation:
       - GWM_RUN_ISAAC_RUNTIME_TESTS
   airsim_runtime_smoke:
     enabled: false
+    backend_registry_name: airsim
+    primary_runtime: cosysairsim
+    primary_runtime_label: Cosys-AirSim
+    fallback_runtime: airsim
+    fallback_runtime_label: legacy AirSim
     frames: 3
     timeout_sec: 30.0
     output_path: outputs/runtime_validation/airsim_runtime_smoke.json
@@ -286,6 +291,11 @@ runtime_validation:
     write_output: true
     fail_on_unavailable: false
     airsim:
+      backend_registry_name: airsim
+      primary_runtime: cosysairsim
+      primary_runtime_label: Cosys-AirSim
+      fallback_runtime: airsim
+      fallback_runtime_label: legacy AirSim
       host: "127.0.0.1"
       port: 41451
       vehicle_name: ""

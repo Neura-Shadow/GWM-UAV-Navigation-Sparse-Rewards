@@ -122,7 +122,10 @@ def run_multisim_gwm_demo(config: dict | MultiSimGWMDemoConfig | None = None) ->
             return _finalize(payload, demo_config, start)
         if not AirSimRuntime.is_available():
             payload["status"] = "runtime_unavailable"
-            payload["reason"] = "AirSim / CosysAirSim Python runtime is unavailable."
+            payload["reason"] = (
+                "Cosys-AirSim / cosysairsim is unavailable; legacy AirSim / airsim "
+                "fallback is also unavailable."
+            )
             return _finalize(payload, demo_config, start)
         payload["runtime_invocation_summary"]["airsim_runtime_attempted"] = True
         env = create_navigation_env(

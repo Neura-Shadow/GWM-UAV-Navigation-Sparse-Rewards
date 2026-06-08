@@ -1,7 +1,9 @@
-"""Guarded AirSim / CosysAirSim runtime access.
+"""Guarded Cosys-AirSim primary / legacy AirSim fallback runtime access.
 
-AirSim is optional. This module is import-safe without ``airsim`` or
-``cosysairsim`` installed, and tests can exercise it with injected fake clients.
+The simulator backend registry key remains ``airsim``. At runtime this wrapper
+prefers ``cosysairsim`` (Cosys-AirSim) and falls back to the legacy ``airsim``
+package when needed. The module is import-safe without either package installed,
+and tests can exercise it with injected fake clients.
 """
 
 from __future__ import annotations
@@ -16,7 +18,19 @@ import numpy as np
 
 from src.utils.data_types import SensorObservation
 
+AIRSIM_BACKEND_REGISTRY_NAME = "airsim"
+AIRSIM_PRIMARY_MODULE = "cosysairsim"
+AIRSIM_PRIMARY_LABEL = "Cosys-AirSim"
+AIRSIM_FALLBACK_MODULE = "airsim"
+AIRSIM_FALLBACK_LABEL = "legacy AirSim"
+AIRSIM_IMPORT_ORDER = (AIRSIM_PRIMARY_MODULE, AIRSIM_FALLBACK_MODULE)
+
 _DEFAULT_CONFIG: Dict[str, Any] = {
+    "backend_registry_name": AIRSIM_BACKEND_REGISTRY_NAME,
+    "primary_runtime": AIRSIM_PRIMARY_MODULE,
+    "primary_runtime_label": AIRSIM_PRIMARY_LABEL,
+    "fallback_runtime": AIRSIM_FALLBACK_MODULE,
+    "fallback_runtime_label": AIRSIM_FALLBACK_LABEL,
     "host": "127.0.0.1",
     "port": 41451,
     "vehicle_name": "",
@@ -34,7 +48,10 @@ _DEFAULT_CONFIG: Dict[str, Any] = {
 
 
 class AirSimRuntime:
-    """Optional AirSim runtime wrapper.
+    """Optional AirSim-family runtime wrapper.
+
+    ``cosysairsim`` / Cosys-AirSim is the preferred implementation. The legacy
+    ``airsim`` package is retained only as a fallback for older installations.
 
     Parameters
     ----------
@@ -64,7 +81,7 @@ class AirSimRuntime:
 
     @staticmethod
     def is_available() -> bool:
-        """Return whether ``cosysairsim`` or ``airsim`` is importable."""
+        """Return whether Cosys-AirSim or the legacy AirSim package is importable."""
         return _find_airsim_module_name() is not None
 
     @property
@@ -76,7 +93,7 @@ class AirSimRuntime:
         return self._client
 
     def connect(self) -> None:
-        """Connect to AirSim or an injected fake client."""
+        """Connect to Cosys-AirSim, legacy AirSim, or an injected fake client."""
         if self._client is None:
             self._airsim = self._airsim or _load_airsim_module()
             kwargs: Dict[str, Any] = {"port": int(self.config["port"])}
@@ -158,7 +175,7 @@ class AirSimRuntime:
             "dt": duration,
             "action": action_array.tolist(),
             "command_sent": True,
-            "backend": "airsim",
+            **self._runtime_metadata(),
         }
 
     def read_sensors(self) -> Dict[str, Any]:
@@ -177,7 +194,7 @@ class AirSimRuntime:
             "depth": depth,
             "lidar": lidar,
             "metadata": {
-                "backend": "airsim",
+                **self._runtime_metadata(),
                 "source_frame": "airsim_ned",
                 "target_frame": "project_default",
                 "coordinate_conversion_applied": False,
@@ -218,7 +235,7 @@ class AirSimRuntime:
             depth=depth,
             metadata={
                 **dict(snapshot.get("metadata") or {}),
-                "backend": "airsim",
+                **self._runtime_metadata(),
                 "source_frame": "airsim_ned",
                 "target_frame": "project_default",
                 "coordinate_conversion_applied": False,
@@ -321,9 +338,22 @@ class AirSimRuntime:
         if not self._connected:
             raise RuntimeError("AirSim runtime is not connected. Call connect() first.")
 
+    def _runtime_metadata(self) -> Dict[str, Any]:
+        selected_runtime = _selected_runtime_module(self._airsim)
+        return {
+            "backend": AIRSIM_BACKEND_REGISTRY_NAME,
+            "backend_registry_name": AIRSIM_BACKEND_REGISTRY_NAME,
+            "primary_runtime": AIRSIM_PRIMARY_MODULE,
+            "primary_runtime_label": AIRSIM_PRIMARY_LABEL,
+            "fallback_runtime": AIRSIM_FALLBACK_MODULE,
+            "fallback_runtime_label": AIRSIM_FALLBACK_LABEL,
+            "selected_runtime": selected_runtime,
+            "selected_runtime_label": _runtime_label(selected_runtime),
+        }
+
 
 def _find_airsim_module_name() -> str | None:
-    for name in ("cosysairsim", "airsim"):
+    for name in AIRSIM_IMPORT_ORDER:
         if importlib.util.find_spec(name) is not None:
             return name
     return None
@@ -333,10 +363,30 @@ def _load_airsim_module() -> object:
     module_name = _find_airsim_module_name()
     if module_name is None:
         raise RuntimeError(
-            "AirSim Python runtime is unavailable. Install cosysairsim or airsim, "
-            "or inject a fake client for tests."
+            "AirSim-family Python runtime is unavailable. Install Cosys-AirSim "
+            "(cosysairsim) or the legacy AirSim fallback package (airsim), or "
+            "inject a fake client for tests."
         )
     return importlib.import_module(module_name)
+
+
+def _selected_runtime_module(airsim_module: object | None) -> str:
+    if airsim_module is None:
+        return "unresolved"
+    module_name = getattr(airsim_module, "__name__", None)
+    if module_name in AIRSIM_IMPORT_ORDER:
+        return str(module_name)
+    return "injected"
+
+
+def _runtime_label(runtime_module: str) -> str:
+    if runtime_module == AIRSIM_PRIMARY_MODULE:
+        return AIRSIM_PRIMARY_LABEL
+    if runtime_module == AIRSIM_FALLBACK_MODULE:
+        return AIRSIM_FALLBACK_LABEL
+    if runtime_module == "injected":
+        return "injected AirSim-family client"
+    return "unresolved AirSim-family runtime"
 
 
 def _call_if_present(target: object | None, name: str, *args: Any, **kwargs: Any) -> Any:

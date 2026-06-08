@@ -1,9 +1,10 @@
 # ============================================================================
 # Phase 7 Optional AirSim Backend Profile
 # ============================================================================
-# This profile documents AirSim / CosysAirSim as a pluggable simulator backend.
-# It is optional and must not replace the Phase 6 Isaac + ROS2 + PX4 SITL +
-# MAVSDK mainline.
+# This profile documents Cosys-AirSim / cosysairsim as the primary AirSim-family
+# runtime and legacy AirSim / airsim as a fallback. The backend registry name is
+# still "airsim". This optional backend must not replace the Phase 6 Isaac +
+# ROS2 + PX4 SITL + MAVSDK mainline.
 
 schema_version: "gwm_phase7_optional_airsim_backend_profile_v1"
 
@@ -17,6 +18,11 @@ profile:
 simulator:
   default_backend: mock
   optional_backend: airsim
+  backend_registry_name: airsim
+  primary_runtime: cosysairsim
+  primary_runtime_label: Cosys-AirSim
+  fallback_runtime: airsim
+  fallback_runtime_label: legacy AirSim
   supported_modules: ["cosysairsim", "airsim"]
   preferred_module: cosysairsim
   launch_airsim_by_repo: false

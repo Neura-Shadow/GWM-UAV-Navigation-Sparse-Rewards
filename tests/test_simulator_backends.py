@@ -85,6 +85,11 @@ def test_simulator_backend_comparison_is_read_only() -> None:
     assert result["status"] == "passed"
     assert result["backend_readiness"]["mock"]["default_backend"] is True
     assert result["backend_readiness"]["airsim"]["phase6_mainline"] is False
+    assert result["backend_readiness"]["airsim"]["backend_registry_name"] == "airsim"
+    assert result["backend_readiness"]["airsim"]["primary_runtime"] == "cosysairsim"
+    assert result["backend_readiness"]["airsim"]["primary_runtime_label"] == "Cosys-AirSim"
+    assert result["backend_readiness"]["airsim"]["fallback_runtime"] == "airsim"
+    assert result["backend_readiness"]["airsim"]["fallback_runtime_label"] == "legacy AirSim"
     assert result["safety_summary"]["simulators_launched"] is False
     assert result["safety_summary"]["runtime_connections_attempted"] is False
 
@@ -96,6 +101,11 @@ def test_runtime_validation_config_contains_phase7_defaults() -> None:
     comparison = config["runtime_validation"]["simulator_backend_comparison"]
 
     assert airsim["enabled"] is False
+    assert airsim["backend_registry_name"] == "airsim"
+    assert airsim["primary_runtime"] == "cosysairsim"
+    assert airsim["primary_runtime_label"] == "Cosys-AirSim"
+    assert airsim["fallback_runtime"] == "airsim"
+    assert airsim["fallback_runtime_label"] == "legacy AirSim"
     assert airsim["output_path"] == "outputs/runtime_validation/airsim_runtime_smoke.json"
     assert airsim["required_env_gates"] == [
         "GWM_ALLOW_OPTIONAL_RUNTIME",
@@ -120,6 +130,11 @@ def test_optional_airsim_profile_documents_safe_defaults() -> None:
     )
 
     assert profile["simulator"]["default_backend"] == "mock"
+    assert profile["simulator"]["backend_registry_name"] == "airsim"
+    assert profile["simulator"]["primary_runtime"] == "cosysairsim"
+    assert profile["simulator"]["primary_runtime_label"] == "Cosys-AirSim"
+    assert profile["simulator"]["fallback_runtime"] == "airsim"
+    assert profile["simulator"]["fallback_runtime_label"] == "legacy AirSim"
     assert profile["simulator"]["launch_airsim_by_repo"] is False
     assert profile["deployment"] == {
         "mock": True,
