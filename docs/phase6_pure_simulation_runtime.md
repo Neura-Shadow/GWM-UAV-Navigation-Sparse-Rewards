@@ -2,9 +2,9 @@
 
 ## Status
 
-Phase 6 begins the pure-simulation full-stack runtime integration path. It is
-allowed to use real simulation/runtime technologies when they are installed and
-explicitly gated:
+Phase 6 is complete as the guarded pure-simulation full-stack runtime baseline
+for the current `v0.7.1` research-framework state. It is allowed to use real
+simulation/runtime technologies when they are installed and explicitly gated:
 
 - NVIDIA Isaac Sim or Isaac Lab
 - ROS2
@@ -15,6 +15,11 @@ explicitly gated:
 
 This is simulation and SITL only. It is not real hardware flight validation,
 autonomous real flight, production readiness, or certified safety evidence.
+
+The baseline stack is Isaac Sim / Isaac Lab + ROS2 + PX4 SITL + MAVSDK +
+Generated World Model / WAM-style planning + Safety Gate / CBF. Phase 7 adds
+the optional Cosys-AirSim-preferred simulator backend as an extension, not a
+replacement for this baseline.
 
 Current local capability probing reported Isaac Sim, ROS2, MAVSDK, and PX4
 unavailable in the active Python/shell environment. Phase 6 runtime scripts
