@@ -10,6 +10,12 @@ from src.runtime_validation.airsim_runtime_smoke import (
     AirSimRuntimeSmokeResult,
     run_airsim_runtime_smoke,
 )
+from src.runtime_validation.airsim_live_validation import (
+    DEFAULT_OUTPUT_PATH as DEFAULT_AIRSIM_LIVE_VALIDATION_OUTPUT_PATH,
+    AirSimLiveValidationConfig,
+    AirSimLiveValidationResult,
+    run_airsim_live_validation,
+)
 from src.runtime_validation.closed_loop_readiness import (
     DEFAULT_OUTPUT_PATH as DEFAULT_CLOSED_LOOP_READINESS_OUTPUT_PATH,
     ClosedLoopReadinessConfig,
@@ -79,6 +85,9 @@ __all__ = [
     "CapabilityStatus",
     "AirSimRuntimeSmokeConfig",
     "AirSimRuntimeSmokeResult",
+    "AirSimLiveValidationConfig",
+    "AirSimLiveValidationResult",
+    "DEFAULT_AIRSIM_LIVE_VALIDATION_OUTPUT_PATH",
     "ClosedLoopReadinessConfig",
     "ClosedLoopReadinessResult",
     "DEFAULT_AIRSIM_RUNTIME_SMOKE_OUTPUT_PATH",
@@ -121,6 +130,7 @@ __all__ = [
     "report_to_dict",
     "report_to_json",
     "run_airsim_runtime_smoke",
+    "run_airsim_live_validation",
     "run_closed_loop_readiness",
     "run_isaac_runtime_smoke",
     "run_isaac_px4_bridge_design",

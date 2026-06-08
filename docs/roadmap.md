@@ -116,6 +116,7 @@ ROS2 + PX4 SITL + MAVSDK mainline stable. The backend registry name remains
 - [x] Simulator backend registry (`mock`, `isaac`, `airsim`)
 - [x] Guarded Cosys-AirSim primary / legacy AirSim fallback runtime and navigation environment hardening
 - [x] AirSim-family capability detection and disabled-by-default runtime smoke
+- [x] Optional live Cosys-AirSim validation runner for externally started sessions
 - [x] Multi-simulator GWM demo wrapper with mock default
 - [x] Backend comparison report for mock / Isaac readiness / AirSim-family readiness
 - [ ] Optional live validation on an externally started Cosys-AirSim or legacy AirSim session

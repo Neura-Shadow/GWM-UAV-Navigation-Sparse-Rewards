@@ -97,6 +97,7 @@ def test_simulator_backend_comparison_is_read_only() -> None:
 def test_runtime_validation_config_contains_phase7_defaults() -> None:
     config = yaml.safe_load(Path("configs/runtime_validation.yaml").read_text(encoding="utf-8"))
     airsim = config["runtime_validation"]["airsim_runtime_smoke"]
+    airsim_live = config["runtime_validation"]["airsim_live_validation"]
     multisim = config["runtime_validation"]["multisim_gwm_demo"]
     comparison = config["runtime_validation"]["simulator_backend_comparison"]
 
@@ -112,6 +113,13 @@ def test_runtime_validation_config_contains_phase7_defaults() -> None:
         "GWM_RUN_AIRSIM_RUNTIME_TESTS",
         "GWM_ALLOW_AIRSIM_API_CONTROL",
     ]
+    assert airsim_live["enabled"] is False
+    assert airsim_live["output_path"] == "outputs/runtime_validation/airsim_live_validation.json"
+    assert airsim_live["required_env_gates"] == [
+        "GWM_ALLOW_OPTIONAL_RUNTIME",
+        "GWM_RUN_AIRSIM_RUNTIME_TESTS",
+    ]
+    assert airsim_live["api_control_env_gate"] == "GWM_ALLOW_AIRSIM_API_CONTROL"
     assert multisim["simulator_backend"] == "mock"
     assert multisim["deployment"] == {
         "mock": True,
@@ -136,6 +144,11 @@ def test_optional_airsim_profile_documents_safe_defaults() -> None:
     assert profile["simulator"]["fallback_runtime"] == "airsim"
     assert profile["simulator"]["fallback_runtime_label"] == "legacy AirSim"
     assert profile["simulator"]["launch_airsim_by_repo"] is False
+    assert (
+        profile["runtime_artifacts"]["live_validation_report"]
+        == "outputs/runtime_validation/airsim_live_validation.json"
+    )
+    assert "run_airsim_live_validation.py" in profile["verification"]["airsim_live_validation_no_gate"]
     assert profile["deployment"] == {
         "mock": True,
         "sitl_enabled": False,
