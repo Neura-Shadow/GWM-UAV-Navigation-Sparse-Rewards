@@ -9,6 +9,13 @@ from pathlib import Path
 from typing import Any, Dict, Mapping
 
 from src.digital_twin import AirSimRuntime, IsaacSimRuntime
+from src.digital_twin.airsim_runtime import (
+    AIRSIM_BACKEND_REGISTRY_NAME,
+    AIRSIM_FALLBACK_LABEL,
+    AIRSIM_FALLBACK_MODULE,
+    AIRSIM_PRIMARY_LABEL,
+    AIRSIM_PRIMARY_MODULE,
+)
 from src.simulator_backends import SimulatorBackendRegistry
 
 SCHEMA_VERSION = "gwm_phase7_simulator_backend_comparison_v1"
@@ -43,7 +50,7 @@ class SimulatorBackendComparisonResult:
 def run_simulator_backend_comparison(
     config: dict | SimulatorBackendComparisonConfig | None = None,
 ) -> dict:
-    """Build a read-only comparison report for mock, Isaac, and AirSim."""
+    """Build a read-only comparison report for mock, Isaac, and AirSim-family backends."""
     comparison_config = _normalize_config(config)
     start = time.perf_counter()
     registry = SimulatorBackendRegistry()
@@ -71,6 +78,11 @@ def run_simulator_backend_comparison(
             },
             "airsim": {
                 "registered": "airsim" in registry.names(),
+                "backend_registry_name": AIRSIM_BACKEND_REGISTRY_NAME,
+                "primary_runtime": AIRSIM_PRIMARY_MODULE,
+                "primary_runtime_label": AIRSIM_PRIMARY_LABEL,
+                "fallback_runtime": AIRSIM_FALLBACK_MODULE,
+                "fallback_runtime_label": AIRSIM_FALLBACK_LABEL,
                 "normal_tests_require_runtime": False,
                 "availability": (
                     AirSimRuntime.is_available()

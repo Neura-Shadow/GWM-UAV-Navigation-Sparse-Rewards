@@ -108,15 +108,17 @@ continuing to reject real hardware and autonomous real flight.
 
 ## Phase 7: Multi-Simulator Backend Expansion
 
-Add AirSim / CosysAirSim as an optional, pluggable simulator backend while
-leaving the Phase 6 Isaac + ROS2 + PX4 SITL + MAVSDK mainline stable.
+Add Cosys-AirSim / `cosysairsim` as the primary AirSim-family optional backend,
+with legacy AirSim / `airsim` as a fallback, while leaving the Phase 6 Isaac +
+ROS2 + PX4 SITL + MAVSDK mainline stable. The backend registry name remains
+`airsim`.
 
 - [x] Simulator backend registry (`mock`, `isaac`, `airsim`)
-- [x] Guarded AirSim runtime and navigation environment hardening
-- [x] AirSim capability detection and disabled-by-default runtime smoke
+- [x] Guarded Cosys-AirSim primary / legacy AirSim fallback runtime and navigation environment hardening
+- [x] AirSim-family capability detection and disabled-by-default runtime smoke
 - [x] Multi-simulator GWM demo wrapper with mock default
-- [x] Backend comparison report for mock / Isaac readiness / AirSim readiness
-- [ ] Optional live AirSim validation on an externally started AirSim session
+- [x] Backend comparison report for mock / Isaac readiness / AirSim-family readiness
+- [ ] Optional live validation on an externally started Cosys-AirSim or legacy AirSim session
 
 ---
 
@@ -130,7 +132,7 @@ leaving the Phase 6 Isaac + ROS2 + PX4 SITL + MAVSDK mainline stable.
 | Phase 4 | 2027+ | Generated observation rollouts and guarded runtime paths |
 | Phase 5 | 2027+ | Real-runtime readiness checks and guarded SITL validation |
 | Phase 6 | 2027+ | Pure-simulation Isaac / ROS2 / PX4 SITL closed-loop integration |
-| Phase 7 | 2027+ | Optional AirSim backend and multi-simulator comparison |
+| Phase 7 | 2027+ | Optional Cosys-AirSim primary / legacy AirSim fallback backend and multi-simulator comparison |
 
 ---
 

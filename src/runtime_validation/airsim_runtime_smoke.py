@@ -1,4 +1,4 @@
-"""Guarded AirSim / CosysAirSim runtime smoke test."""
+"""Guarded Cosys-AirSim primary / legacy AirSim fallback runtime smoke test."""
 
 from __future__ import annotations
 
@@ -10,6 +10,13 @@ from pathlib import Path
 from typing import Any, Dict, Mapping
 
 from src.digital_twin import AirSimRuntime
+from src.digital_twin.airsim_runtime import (
+    AIRSIM_BACKEND_REGISTRY_NAME,
+    AIRSIM_FALLBACK_LABEL,
+    AIRSIM_FALLBACK_MODULE,
+    AIRSIM_PRIMARY_LABEL,
+    AIRSIM_PRIMARY_MODULE,
+)
 
 SCHEMA_VERSION = "gwm_phase7_airsim_runtime_smoke_v1"
 DEFAULT_OUTPUT_PATH = "outputs/runtime_validation/airsim_runtime_smoke.json"
@@ -22,7 +29,7 @@ REQUIRED_ENV_GATES = (
 
 @dataclass
 class AirSimRuntimeSmokeConfig:
-    """Configuration for the guarded AirSim runtime smoke."""
+    """Configuration for the guarded AirSim-family runtime smoke."""
 
     frames: int = 3
     timeout_sec: float = 30.0
@@ -41,7 +48,7 @@ class AirSimRuntimeSmokeConfig:
 
 @dataclass
 class AirSimRuntimeSmokeResult:
-    """JSON-safe result for a guarded AirSim runtime smoke run."""
+    """JSON-safe result for a guarded AirSim-family runtime smoke run."""
 
     schema_version: str = SCHEMA_VERSION
     status: str = "skipped"
@@ -65,11 +72,12 @@ def run_airsim_runtime_smoke(
     *,
     runtime: AirSimRuntime | None = None,
 ) -> dict:
-    """Run the guarded AirSim runtime smoke and return a JSON-safe dict."""
+    """Run the guarded AirSim-family runtime smoke and return a JSON-safe dict."""
     smoke_config = _normalize_config(config)
     start = time.perf_counter()
     result = AirSimRuntimeSmokeResult(
         env_gates=_env_gates(),
+        availability=_runtime_availability_metadata(connection_attempted=False),
         frames_requested=int(smoke_config.frames),
         timings={"started_at_unix": time.time()},
     )
@@ -79,14 +87,17 @@ def run_airsim_runtime_smoke(
         missing = [name for name, present in result.env_gates.items() if not present]
         if missing:
             result.status = "skipped"
-            result.reason = f"Missing required AirSim runtime env gates: {', '.join(missing)}"
+            result.reason = f"Missing required AirSim-family runtime env gates: {', '.join(missing)}"
             return _finalize(result, smoke_config, start)
 
         available = AirSimRuntime.is_available()
-        result.availability = {"airsim_available": available, "connection_attempted": False}
+        result.availability.update({"airsim_available": available, "connection_attempted": False})
         if not available:
             result.status = "runtime_unavailable"
-            result.reason = "AirSim / CosysAirSim Python runtime is unavailable."
+            result.reason = (
+                "Cosys-AirSim / cosysairsim is unavailable; legacy AirSim / airsim "
+                "fallback is also unavailable."
+            )
             if smoke_config.fail_on_unavailable:
                 result.errors.append({"type": "RuntimeError", "message": result.reason})
             return _finalize(result, smoke_config, start)
@@ -179,6 +190,17 @@ def _runtime_config(config: AirSimRuntimeSmokeConfig) -> dict:
 
 def _env_gates() -> Dict[str, bool]:
     return {name: os.environ.get(name) == "1" for name in REQUIRED_ENV_GATES}
+
+
+def _runtime_availability_metadata(*, connection_attempted: bool) -> Dict[str, Any]:
+    return {
+        "backend_registry_name": AIRSIM_BACKEND_REGISTRY_NAME,
+        "primary_runtime": AIRSIM_PRIMARY_MODULE,
+        "primary_runtime_label": AIRSIM_PRIMARY_LABEL,
+        "fallback_runtime": AIRSIM_FALLBACK_MODULE,
+        "fallback_runtime_label": AIRSIM_FALLBACK_LABEL,
+        "connection_attempted": connection_attempted,
+    }
 
 
 def _finalize(

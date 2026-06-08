@@ -14,17 +14,17 @@ Real2Sim2Real scenario generation, OpenUSD-style digital-twin descriptors,
 ROS2 bridge architecture, distributed multi-agent coordination, and safe
 deployment-interface primitives.
 
-The code is designed to run and test without GPU, AirSim, ROS2, Isaac Sim,
-PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
+The code is designed to run and test without GPU, Cosys-AirSim, legacy AirSim,
+ROS2, Isaac Sim, PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
-The latest released checkpoint is `v0.5.0-runtime-readiness`. It captures the
-Phase 5 guarded runtime-readiness layer: all normal tests pass locally without
-optional robotics runtimes, while real hardware execution and autonomous real
-flight remain disabled by default. Phase 6 is now adding pure-simulation
-runtime validation for Isaac Sim / Isaac Lab, ROS2, externally managed PX4
-SITL, MAVSDK, and the GWM safety-gated planning loop.
+The latest released checkpoint is `v0.7.0-optional-airsim-backend`. It captures
+the Phase 7 optional multi-simulator backend expansion: all normal tests pass
+locally without optional robotics runtimes, while real hardware execution and
+autonomous real flight remain disabled by default. Phase 6 remains the
+pure-simulation Isaac Sim / Isaac Lab, ROS2, externally managed PX4 SITL,
+MAVSDK, and GWM safety-gated planning baseline.
 
 Completed mock-first and guarded-runtime slices:
 
@@ -56,10 +56,11 @@ bridge, Phase 6-D adds guarded PX4 SITL + MAVSDK command validation, and Phase
 guarded GWM / WAM closed-loop simulation demo. These report unavailable
 runtimes clearly when the required optional stack is not installed or gated.
 
-Phase 7 adds AirSim / CosysAirSim as an optional simulator backend through a
-pluggable backend registry. AirSim is not the Phase 6 Isaac/PX4 mainline, is not
-launched automatically, and requires explicit runtime gates before live API
-control is attempted.
+Phase 7 adds Cosys-AirSim / `cosysairsim` as the primary AirSim-family optional
+simulator backend, with legacy AirSim / `airsim` retained as a fallback. The
+backend registry name remains `airsim`. This optional backend is not the Phase 6
+Isaac/PX4 mainline, is not launched automatically, and requires explicit runtime
+gates before live API control is attempted.
 
 ## Safety Defaults
 
@@ -73,10 +74,11 @@ deployment:
   autonomous_real_flight_enabled: false
 ```
 
-Normal tests require no Isaac Sim, ROS2, MAVSDK, PX4, GPU, SITL, or real
-hardware. Optional Isaac Sim, AirSim, ROS2 sensor synchronization, and MAVSDK /
-PX4 SITL paths require explicit opt-in. `ControlBarrierFunction` is a baseline
-runtime filter, not a formal certification proof.
+Normal tests require no Isaac Sim, ROS2, MAVSDK, PX4, GPU, SITL, Cosys-AirSim,
+legacy AirSim, or real hardware. Optional Isaac Sim, AirSim-family, ROS2 sensor
+synchronization, and MAVSDK / PX4 SITL paths require explicit opt-in.
+`ControlBarrierFunction` is a baseline runtime filter, not a formal
+certification proof.
 
 ## Architecture
 

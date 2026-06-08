@@ -1,4 +1,4 @@
-"""Tests for guarded AirSim / CosysAirSim runtime integration."""
+"""Tests for guarded Cosys-AirSim primary / legacy AirSim fallback integration."""
 
 from __future__ import annotations
 
@@ -145,7 +145,14 @@ def test_airsim_runtime_fake_client_observation_and_step() -> None:
     runtime.close()
 
     assert observation.metadata["backend"] == "airsim"
+    assert observation.metadata["backend_registry_name"] == "airsim"
+    assert observation.metadata["primary_runtime"] == "cosysairsim"
+    assert observation.metadata["primary_runtime_label"] == "Cosys-AirSim"
+    assert observation.metadata["fallback_runtime"] == "airsim"
+    assert observation.metadata["fallback_runtime_label"] == "legacy AirSim"
+    assert observation.metadata["selected_runtime"] == "injected"
     assert diagnostics["command_sent"] is True
+    assert diagnostics["primary_runtime"] == "cosysairsim"
     assert converted.image is not None
     assert converted.depth is not None
     assert converted.lidar is not None
@@ -175,6 +182,7 @@ def test_airsim_navigation_env_uses_injected_runtime() -> None:
     env.close()
 
     assert obs.metadata["backend"] == "airsim"
+    assert obs.metadata["primary_runtime"] == "cosysairsim"
     assert next_obs.velocity[0] == pytest.approx(0.5)
     assert isinstance(reward, float)
     assert done is False
@@ -247,4 +255,4 @@ def test_airsim_smoke_cli_help_works() -> None:
     )
 
     assert result.returncode == 0, result.stderr
-    assert "AirSim runtime smoke" in result.stdout
+    assert "AirSim" in result.stdout

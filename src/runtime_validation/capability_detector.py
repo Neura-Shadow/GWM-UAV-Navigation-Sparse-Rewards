@@ -13,6 +13,12 @@ from typing import Any, Callable, Dict, Mapping, Optional, Sequence
 
 from src.runtime_validation.types import CapabilityStatus, RuntimeCapabilityReport
 
+AIRSIM_BACKEND_REGISTRY_NAME = "airsim"
+AIRSIM_PRIMARY_MODULE = "cosysairsim"
+AIRSIM_PRIMARY_LABEL = "Cosys-AirSim"
+AIRSIM_FALLBACK_MODULE = "airsim"
+AIRSIM_FALLBACK_LABEL = "legacy AirSim"
+AIRSIM_IMPORT_ORDER = (AIRSIM_PRIMARY_MODULE, AIRSIM_FALLBACK_MODULE)
 
 SCHEMA_VERSION = "gwm_runtime_capability_report_v1"
 
@@ -179,21 +185,27 @@ class RuntimeCapabilityDetector:
 
     def _detect_airsim(self) -> CapabilityStatus:
         modules = {
-            "cosysairsim": self._safe_find_spec("cosysairsim"),
-            "airsim": self._safe_find_spec("airsim"),
+            AIRSIM_PRIMARY_MODULE: self._safe_find_spec(AIRSIM_PRIMARY_MODULE),
+            AIRSIM_FALLBACK_MODULE: self._safe_find_spec(AIRSIM_FALLBACK_MODULE),
         }
         preferred = None
-        for name in ("cosysairsim", "airsim"):
+        for name in AIRSIM_IMPORT_ORDER:
             if modules[name]["available"]:
                 preferred = name
                 break
         return CapabilityStatus(
-            name="airsim",
+            name=AIRSIM_BACKEND_REGISTRY_NAME,
             available=preferred is not None,
             version=preferred,
             details={
+                "backend_registry_name": AIRSIM_BACKEND_REGISTRY_NAME,
                 "modules": modules,
+                "primary_runtime": AIRSIM_PRIMARY_MODULE,
+                "primary_runtime_label": AIRSIM_PRIMARY_LABEL,
+                "fallback_runtime": AIRSIM_FALLBACK_MODULE,
+                "fallback_runtime_label": AIRSIM_FALLBACK_LABEL,
                 "preferred_module": preferred,
+                "preferred_runtime_label": _airsim_runtime_label(preferred),
                 "connection_attempted": False,
                 "api_control_enabled": False,
                 "unreal_launch_attempted": False,
@@ -427,4 +439,12 @@ def _first_error(items: Mapping[str, Mapping[str, Any]]) -> Optional[str]:
         error = value.get("error")
         if error:
             return str(error)
+    return None
+
+
+def _airsim_runtime_label(module_name: Optional[str]) -> Optional[str]:
+    if module_name == AIRSIM_PRIMARY_MODULE:
+        return AIRSIM_PRIMARY_LABEL
+    if module_name == AIRSIM_FALLBACK_MODULE:
+        return AIRSIM_FALLBACK_LABEL
     return None

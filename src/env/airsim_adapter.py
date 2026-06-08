@@ -1,4 +1,4 @@
-"""Guarded AirSim / CosysAirSim navigation environment."""
+"""Guarded Cosys-AirSim primary / legacy AirSim fallback navigation environment."""
 
 from __future__ import annotations
 
@@ -14,8 +14,10 @@ from src.utils.data_types import SensorObservation
 class AirSimNavigationEnv(BaseNavigationEnv):
     """Navigation environment backed by ``AirSimRuntime``.
 
-    The class is import-safe without AirSim installed. Tests can inject a fake
-    runtime or fake client through ``AirSimRuntime``.
+    The backend registry key remains ``airsim``. Cosys-AirSim / ``cosysairsim``
+    is preferred, while legacy AirSim / ``airsim`` is retained as an optional
+    fallback. The class is import-safe without either package installed. Tests
+    can inject a fake runtime or fake client through ``AirSimRuntime``.
     """
 
     def __init__(
