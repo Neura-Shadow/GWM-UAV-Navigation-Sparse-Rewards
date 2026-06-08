@@ -54,7 +54,8 @@ Recent released checkpoints:
 artifact. The remaining roadmap items are classified in `docs/roadmap.md` as
 completed in mock-first / guarded-runtime form, planned research extensions,
 deferred work beyond the current project scope, or safety out-of-scope items.
-They should not be read as accidental incompletion of the repository.
+They should not be read as accidental incompletion of the repository. Phase
+8-A completes this roadmap closure framing.
 
 ## System Overview
 
@@ -108,8 +109,8 @@ The current checkpoint contributes:
   reporting.
 - A Phase 6 pure-simulation runtime integration layer for Isaac Sim / Isaac Lab,
   ROS2 simulation sensor bridging, externally managed PX4 SITL command
-  validation through MAVSDK, Isaac/PX4 bridge design, and a guarded GWM/WAM
-  simulation demo.
+  validation through MAVSDK, Isaac/PX4 bridge design, a guarded GWM/WAM
+  simulation demo, and mandatory CBF safety-gate checks before command writes.
 - A Phase 7 multi-simulator backend layer where Cosys-AirSim / `cosysairsim` is
   the preferred AirSim-family runtime, legacy AirSim / `airsim` is fallback, and
   the backend registry key remains `airsim`.

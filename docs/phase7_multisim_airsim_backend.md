@@ -5,6 +5,11 @@ simulator backend beside the Phase 6 Isaac Sim / ROS2 / PX4 SITL / MAVSDK
 mainline. Legacy AirSim / `airsim` remains a fallback for older installations.
 The stable backend registry name is still `airsim`.
 
+As of `v0.7.1-cosys-airsim-live-validation`, this Phase 7 extension is complete
+for the current research-framework scope. Phase 8-A closes the roadmap by
+classifying remaining live-runtime experiments as planned extensions, deferred
+scope, or safety out-of-scope work rather than project blockers.
+
 This phase does not replace Phase 6. Isaac remains the pure-simulation
 full-stack baseline for PX4 SITL integration, while the AirSim-family backend is
 a pluggable navigation environment for simulator comparison and optional runtime

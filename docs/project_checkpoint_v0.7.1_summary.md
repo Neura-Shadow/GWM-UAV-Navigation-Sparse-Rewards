@@ -4,6 +4,8 @@
 
 - Latest checkpoint: `v0.7.1-cosys-airsim-live-validation`
 - Target commit: `1d45a4b Add optional Cosys-AirSim live validation`
+- Current project state: completed safe research framework through `v0.7.1`
+- Phase 8-A: roadmap closure complete
 - Related checkpoints:
   - `v0.6.0-pure-simulation-runtime`
   - `v0.7.0-optional-airsim-backend`

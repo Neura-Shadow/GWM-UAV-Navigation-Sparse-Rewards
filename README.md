@@ -30,6 +30,7 @@ The project is complete as a research-framework artifact through `v0.7.1`.
 The roadmap now classifies remaining legacy ideas as completed in mock-first /
 guarded-runtime form, planned research extensions, deferred scope, or safety
 out-of-scope work rather than unresolved project-completion blockers.
+Phase 8-A completed this roadmap closure pass.
 
 Completed mock-first and guarded-runtime slices:
 
@@ -48,7 +49,7 @@ Completed mock-first and guarded-runtime slices:
 | Phase 4-E | Complete guarded-runtime slice | MAVSDK / PX4 SITL command path |
 | Phase 4-F | Complete mock-first slice | End-to-end GWM navigation demo |
 | Phase 5-A..E | Complete guarded-runtime readiness | Runtime capability detection, guarded Isaac/ROS2/MAVSDK smokes, closed-loop readiness |
-| Phase 6-A..F | Complete pure-simulation/SITL slice | Isaac + ROS2 + PX4 SITL + MAVSDK runtime profile, command validation, bridge design, GWM/WAM simulation demo |
+| Phase 6-A..F | Complete pure-simulation/SITL slice | Isaac Sim / Isaac Lab + ROS2 + PX4 SITL + MAVSDK + GWM/WAM + CBF baseline |
 | Phase 7 | Complete optional simulator slice | Cosys-AirSim primary / legacy AirSim fallback backend, multisim wrapper, comparison report |
 | Phase 7-B | Complete optional live-validation slice | Externally started Cosys-AirSim / legacy AirSim validation runner with no-gate safe skip |
 
