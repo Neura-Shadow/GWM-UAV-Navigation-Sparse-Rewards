@@ -26,6 +26,11 @@ execution and autonomous real flight remain disabled by default. Phase 6 remains
 the pure-simulation Isaac Sim / Isaac Lab, ROS2, externally managed PX4 SITL,
 MAVSDK, and GWM safety-gated planning baseline.
 
+The project is complete as a research-framework artifact through `v0.7.1`.
+The roadmap now classifies remaining legacy ideas as completed in mock-first /
+guarded-runtime form, planned research extensions, deferred scope, or safety
+out-of-scope work rather than unresolved project-completion blockers.
+
 Completed mock-first and guarded-runtime slices:
 
 | Slice | Status | Key capability |
@@ -171,6 +176,7 @@ python scripts/diagnose_airsim.py --help
 
 - [Architecture](docs/architecture.md)
 - [Paper-style project summary](docs/project_summary.md)
+- [v0.7.1 project checkpoint summary](docs/project_checkpoint_v0.7.1_summary.md)
 - [v0.7.1 Cosys-AirSim live validation release note](docs/releases/v0.7.1-cosys-airsim-live-validation.md)
 - [v0.7.0 optional Cosys-AirSim backend release note](docs/releases/v0.7.0-optional-airsim-backend.md)
 - [v0.6.0 pure-simulation runtime release note](docs/releases/v0.6.0-pure-simulation-runtime.md)

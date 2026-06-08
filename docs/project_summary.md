@@ -48,6 +48,14 @@ Recent released checkpoints:
   runner for externally started Cosys-AirSim / legacy AirSim sessions, with
   no-gate safe skip behavior.
 
+## Completion Framing
+
+`v0.7.1-cosys-airsim-live-validation` completes the current research-framework
+artifact. The remaining roadmap items are classified in `docs/roadmap.md` as
+completed in mock-first / guarded-runtime form, planned research extensions,
+deferred work beyond the current project scope, or safety out-of-scope items.
+They should not be read as accidental incompletion of the repository.
+
 ## System Overview
 
 The framework is organized around seven connected research layers:
@@ -163,12 +171,13 @@ than required runtimes.
 
 ## Future Work
 
-Future work can extend the checkpoint toward simulation and deployment realism
-through trained generated world models, audited coordinate conversion, richer
-simulator comparisons, externally managed runtime experiments, runtime latency
-measurement, and safety analysis. Real-world flight experiments, certified
-safety, automatic simulator launch automation, and production deployment remain
-outside the current checkpoint.
+Future work can extend the checkpoint through planned research extensions such
+as PPO / SAC fine-tuning, metrics dashboards, Sim2Real gap tracking, audited
+coordinate conversion, richer simulator comparisons, externally managed runtime
+experiments, runtime latency measurement, and safety analysis. Real-world
+flight experiments, certified safety, hardware launch automation, and
+production deployment remain outside the current project scope for safety and
+scope-control reasons.
 
 ## Citation
 

@@ -65,6 +65,16 @@ deployment:
 - The checkpoint does not claim production readiness, real flight validation,
   or certified safety.
 
+## Roadmap Closure
+
+The project should be read as complete through `v0.7.1` for the current
+research-framework scope. `docs/roadmap.md` classifies remaining legacy ideas
+as completed in mock-first / guarded-runtime form, planned research
+extensions, deferred work beyond the current scope, or explicitly safety
+out-of-scope items. Missing real hardware validation, real Nav2 plugins, real
+`ros2_control` plugins, automatic SITL/HIL launch automation, and formal safety
+certification are not unresolved requirements for this checkpoint.
+
 ## Research Position
 
 This checkpoint should be read as a research framework milestone rather than a
