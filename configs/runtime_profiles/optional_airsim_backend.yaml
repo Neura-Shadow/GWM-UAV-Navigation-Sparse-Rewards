@@ -66,6 +66,7 @@ coordinate_frames:
 
 runtime_artifacts:
   output_dir: outputs/runtime_validation
+  live_validation_report: outputs/runtime_validation/airsim_live_validation.json
   commit_reports: false
   commit_logs: false
   commit_screenshots: false
@@ -73,6 +74,8 @@ runtime_artifacts:
 verification:
   capability_preflight: "python scripts/check_runtime_capabilities.py --no-write-output"
   airsim_smoke_no_gate: "python scripts/run_airsim_runtime_smoke.py --no-write-output"
+  airsim_live_validation_no_gate: "python scripts/run_airsim_live_validation.py --no-write-output"
+  airsim_live_validation_gated: "GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_AIRSIM_RUNTIME_TESTS=1 python scripts/run_airsim_live_validation.py --host 127.0.0.1 --port 41451 --frames 3 --no-write-output"
   multisim_mock_demo: "python scripts/run_multisim_gwm_demo.py --simulator-backend mock --steps 3 --no-write-output"
   backend_comparison: "python scripts/run_simulator_backend_comparison.py --no-write-output"
   expected_no_gate_status: skipped

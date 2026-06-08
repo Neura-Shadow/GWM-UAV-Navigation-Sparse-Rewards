@@ -61,6 +61,31 @@ runtime_validation:
       - GWM_ALLOW_OPTIONAL_RUNTIME
       - GWM_RUN_AIRSIM_RUNTIME_TESTS
       - GWM_ALLOW_AIRSIM_API_CONTROL
+  airsim_live_validation:
+    enabled: false
+    backend_registry_name: airsim
+    primary_runtime: cosysairsim
+    primary_runtime_label: Cosys-AirSim
+    fallback_runtime: airsim
+    fallback_runtime_label: legacy AirSim
+    frames: 3
+    timeout_sec: 30.0
+    output_path: outputs/runtime_validation/airsim_live_validation.json
+    write_output: true
+    fail_on_unavailable: false
+    host: "127.0.0.1"
+    port: 41451
+    vehicle_name: ""
+    lidar_name: LidarSensor1
+    rgb_camera_name: "0"
+    depth_camera_name: "0"
+    control_dt: 0.1
+    validate_zero_command: false
+    api_control_enabled: false
+    required_env_gates:
+      - GWM_ALLOW_OPTIONAL_RUNTIME
+      - GWM_RUN_AIRSIM_RUNTIME_TESTS
+    api_control_env_gate: GWM_ALLOW_AIRSIM_API_CONTROL
   ros2_sensor_sync_smoke:
     enabled: false
     packets: 1

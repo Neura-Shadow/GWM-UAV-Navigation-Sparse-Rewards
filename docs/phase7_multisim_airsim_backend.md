@@ -77,12 +77,12 @@ Phase 7 does not silently convert AirSim-family NED metadata to Isaac Z-up.
 
 ## Runtime Gates
 
-AirSim-family live smoke requires:
+AirSim-family live smoke and live validation require:
 
 ```text
 GWM_ALLOW_OPTIONAL_RUNTIME=1
 GWM_RUN_AIRSIM_RUNTIME_TESTS=1
-GWM_ALLOW_AIRSIM_API_CONTROL=1
+GWM_ALLOW_AIRSIM_API_CONTROL=1  # only for API-control / zero-command validation
 ```
 
 Without those gates:
@@ -93,6 +93,31 @@ python scripts/run_airsim_runtime_smoke.py --no-write-output
 
 returns a safe skipped status and does not connect to Cosys-AirSim, legacy
 AirSim, or Unreal.
+
+## Optional Live Validation
+
+Phase 7-B adds a richer live validation command:
+
+```bash
+python scripts/run_airsim_live_validation.py --no-write-output
+```
+
+Without gates, it skips before constructing a runtime client. With
+`GWM_ALLOW_OPTIONAL_RUNTIME=1` and `GWM_RUN_AIRSIM_RUNTIME_TESTS=1`, it attempts
+to validate an externally started Cosys-AirSim session, falling back to legacy
+AirSim only if `cosysairsim` is unavailable. The repository never launches
+Cosys-AirSim, legacy AirSim, or Unreal.
+
+The live validation records:
+
+- selected runtime module and backend registry name `airsim`
+- connection target and vehicle selection
+- settings metadata when supported by the runtime package
+- RGB, depth, LiDAR, pose, velocity, and `SensorObservation` conversion status
+- zero-command validation only when `GWM_ALLOW_AIRSIM_API_CONTROL=1` is set
+
+The zero-command path sends only `[0, 0, 0]`, does not arm, does not take off,
+and relinquishes API control during cleanup.
 
 ## Multi-Simulator Demo Wrapper
 
@@ -129,6 +154,7 @@ python -m pytest tests/test_airsim_runtime.py -q
 python -m pytest tests/ -q
 python -m compileall -q src tests scripts
 python scripts/run_airsim_runtime_smoke.py --no-write-output
+python scripts/run_airsim_live_validation.py --no-write-output
 python scripts/run_multisim_gwm_demo.py --simulator-backend mock --steps 3 --no-write-output
 python scripts/run_simulator_backend_comparison.py --no-write-output
 ```
