@@ -5,6 +5,20 @@ Digital-Twin UAV Navigation Research Framework.
 
 ---
 
+## Project Completion Status
+
+`v0.7.1-cosys-airsim-live-validation` completes the current
+research-framework artifact. The repository now contains the mock-first,
+guarded-runtime, pure-simulation/SITL, and optional multi-simulator layers
+needed for the scoped project.
+
+Remaining legacy roadmap ideas are not required completion blockers. They are
+classified below as completed in mock-first / guarded-runtime form, planned
+research extensions, deferred work beyond the current project scope, or
+explicitly out of scope for safety reasons.
+
+---
+
 ## Phase 1: Research-Ready Refactor
 
 Establish a clean, modular codebase with abstract interfaces and mock
@@ -34,10 +48,10 @@ and RL fine-tuning entirely in simulation.
 - [x] Real2Sim2Real loop
 - [x] World model pre-training
 - [x] Sparse reward curriculum
-- [ ] RL fine-tuning loop (PPO / SAC with world-model-augmented rewards)
-- [ ] Evaluation metrics dashboard (TensorBoard / Weights & Biases integration)
+- PPO / SAC fine-tuning: planned research extension
+- Metrics dashboard: planned research extension
 - [x] Automated test suite
-- [ ] Sim2Real gap tracking
+- Sim2Real gap tracking: planned research extension
 
 ---
 
@@ -49,19 +63,19 @@ deployment-ready validation.
 - [x] Mock-first ROS2 bridge and adapter (`ROS2Bridge`, `RealROS2Adapter`, guarded `rclpy`)
 - [x] Isaac Sim / OpenUSD scene descriptor generation (`IsaacSimSceneBuilder`, mock-first)
 - [x] Guarded Isaac Sim runtime adapter (`IsaacSimRuntime`, `IsaacSimNavigationEnv`; optional, mock-first)
-- [ ] Full Isaac Sim RL gym environment wrapper
+- Full Isaac Gym wrapper: deferred beyond current project scope
 - [x] Distributed multi-agent coordination infrastructure (`ROS2DDSChannel`, `PriorityCoordinator`, `SharedLatentMap`)
 - [x] Swarm coordination strategy extension (round-robin and priority; consensus remains future work)
-- [ ] Real-time digital twin mirroring (live sensor to OpenUSD sync)
-- [ ] ros2_control integration (hardware interface and controller plugins)
-- [ ] Nav2 integration (custom costmap layer and planner plugin)
+- Live digital twin mirroring: deferred beyond current project scope
+- `ros2_control`: completed in mock-first / guarded-runtime form; real controller plugins explicitly out of scope for safety reasons
+- Nav2: completed in mock-first / guarded-runtime form; real Nav2 plugins explicitly out of scope for safety reasons
 - [x] Guarded PX4 SITL MAVSDK command path (`MAVLinkBridge`; optional, fake-client tested)
-- [ ] Real deployment interface (PX4 / ArduPilot MAVLink bridge)
+- Real deployment interface: completed in guarded-runtime/SITL form; physical UAV deployment explicitly out of scope for safety reasons
 - [x] Mock deployment hardware interface (`MAVLinkBridge`, `MockHardwareInterface`, Nav2-style skeletons)
 - [x] Baseline CBF-style safety filter (runtime filter only, not certification proof)
-- [ ] Real SITL / HIL launch automation
-- [ ] Real hardware flight validation
-- [ ] Safety certification proof for Cerebellum controller
+- SITL / HIL launch automation: deferred beyond current project scope; HIL/hardware automation explicitly out of scope for safety reasons
+- Real hardware validation: explicitly out of scope for safety reasons
+- Safety certification proof: explicitly out of scope for safety reasons
 
 ---
 
@@ -119,27 +133,60 @@ ROS2 + PX4 SITL + MAVSDK mainline stable. The backend registry name remains
 - [x] Optional live Cosys-AirSim validation runner for externally started sessions
 - [x] Multi-simulator GWM demo wrapper with mock default
 - [x] Backend comparison report for mock / Isaac readiness / AirSim-family readiness
-- [ ] Optional live validation on an externally started Cosys-AirSim or legacy AirSim session
+- Operator-run live validation on an externally started Cosys-AirSim or legacy AirSim session: planned research extension
+
+---
+
+## Completion Classification Matrix
+
+These classifications close the legacy roadmap items that remain useful as
+research directions but are not required for the completed `v0.7.1` framework.
+
+| Item | Classification |
+| --- | --- |
+| PPO / SAC fine-tuning | planned research extension |
+| Metrics dashboard | planned research extension |
+| Sim2Real gap tracking | planned research extension |
+| Full Isaac Gym wrapper | deferred beyond current project scope |
+| Live digital twin mirroring | deferred beyond current project scope |
+| ros2_control | completed in mock-first / guarded-runtime form; real controller plugins explicitly out of scope for safety reasons |
+| Nav2 | completed in mock-first / guarded-runtime form; real Nav2 plugins explicitly out of scope for safety reasons |
+| Real deployment interface | completed in guarded-runtime/SITL form; physical UAV deployment explicitly out of scope for safety reasons |
+| SITL / HIL launch automation | deferred beyond current project scope; HIL/hardware automation explicitly out of scope for safety reasons |
+| Real hardware validation | explicitly out of scope for safety reasons |
+| Safety certification proof | explicitly out of scope for safety reasons |
+| Optional live Cosys-AirSim / legacy AirSim validation | planned research extension |
+
+The category vocabulary is:
+
+- completed in mock-first / guarded-runtime form
+- planned research extension
+- deferred beyond current project scope
+- explicitly out of scope for safety reasons
 
 ---
 
 ## Timeline
 
-| Phase | Target | Key Milestone |
+| Phase | Status | Key Milestone |
 | --- | --- | --- |
 | Phase 1 | Complete | All interfaces defined, mock stack testable |
-| Phase 2 | Q3-Q4 2026 | World model trained, RL fine-tuning in simulation |
-| Phase 3 | 2027 | First real-world flight with world-model guidance |
-| Phase 4 | 2027+ | Generated observation rollouts and guarded runtime paths |
-| Phase 5 | 2027+ | Real-runtime readiness checks and guarded SITL validation |
-| Phase 6 | 2027+ | Pure-simulation Isaac / ROS2 / PX4 SITL closed-loop integration |
-| Phase 7 | 2027+ | Optional Cosys-AirSim primary / legacy AirSim fallback backend and multi-simulator comparison |
+| Phase 2 | Complete framework baseline | World model training, sparse curriculum, Real2Sim2Real, and planned research extensions classified |
+| Phase 3 | Complete guarded interfaces | ROS2, Isaac, MAVLink, Nav2-style, hardware-style, and CBF interfaces completed in mock-first / guarded-runtime form |
+| Phase 4 | Complete | Generated observation rollouts and guarded runtime paths |
+| Phase 5 | Complete | Runtime readiness checks and guarded SITL validation |
+| Phase 6 | Complete | Pure-simulation Isaac / ROS2 / PX4 SITL closed-loop integration |
+| Phase 7 | Complete | Optional Cosys-AirSim primary / legacy AirSim fallback backend and multi-simulator comparison |
+| Phase 8-A | Complete | Roadmap closure and research-framework completion framing |
 
 ---
 
 ## How to Contribute
 
-1. Pick an unchecked item from Phase 2 or Phase 3.
-2. Create a feature branch: `git checkout -b feature/<item-name>`.
-3. Implement with tests. All modules must pass `pytest` without GPU, AirSim, or ROS2.
-4. Submit a pull request referencing this roadmap item.
+1. Start from the completion classification matrix above.
+2. Treat `planned research extension` and `deferred beyond current project scope`
+   items as explicit new research proposals, not unfinished project blockers.
+3. Do not implement items marked `explicitly out of scope for safety reasons`
+   inside this project without a separate safety review and scope reset.
+4. Keep normal tests runnable without GPU, Isaac Sim, ROS2, Cosys-AirSim,
+   legacy AirSim, MAVSDK, PX4, Nav2, SITL, or real hardware.
