@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Generate digital-twin scenes with domain randomization.
+"""Plan digital-twin scene generation with domain-randomization settings.
 
-This is a **placeholder** entry-point.  When fully implemented it will:
+This is a scoped planning entry point retained for lightweight CLI and config
+audits. It does not launch Isaac Sim, OpenUSD tooling, or any simulator. A
+future scene-export extension would:
 
 1. Load a scenario specification file (YAML) describing the base scene
-   layout — obstacles, terrain, goal locations, and physics parameters.
+   layout, obstacles, terrain, goal locations, and physics parameters.
 2. Instantiate a ``DigitalTwinSceneBuilder`` (Isaac Sim / OpenUSD backend
    or mock fallback).
 3. For each of ``--num-variations`` iterations, apply domain randomization
@@ -13,8 +15,9 @@ This is a **placeholder** entry-point.  When fully implemented it will:
 4. Export each variant as an OpenUSD ``.usd`` file (or mock JSON) to
    ``--output-dir`` for downstream RL training or evaluation.
 
-Currently it parses CLI arguments, loads the config, prints the plan, and
-exits so that the script's ``--help`` and import work correctly.
+The current project completion state treats runtime scene export as a planned
+research extension, not an unfinished blocker. This command parses CLI
+arguments, loads the config, prints the generation plan, and exits.
 """
 
 from __future__ import annotations
@@ -110,14 +113,14 @@ def main(argv: list[str] | None = None) -> None:
     if scenario:
         logger.info("Scenario keys  : %s", list(scenario.keys()))
     logger.info("-" * 60)
-    logger.info("Steps (placeholder — not yet executed):")
+    logger.info("Steps (planning audit - not executed):")
     logger.info("  1. Parse base scene from %s", args.scenario_file)
     logger.info("  2. Instantiate DigitalTwinSceneBuilder")
     for v in range(1, args.num_variations + 1):
         logger.info("  3.%d Generate variation %d/%d with domain randomization", v, v, args.num_variations)
     logger.info("  4. Export scenes to %s", args.output_dir)
     logger.info("=" * 60)
-    logger.info("Scene generation not yet implemented — exiting.")
+    logger.info("Scene export is deferred beyond the current scoped project; exiting after plan.")
 
 
 if __name__ == "__main__":

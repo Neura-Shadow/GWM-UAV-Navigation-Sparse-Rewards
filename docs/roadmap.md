@@ -178,6 +178,7 @@ The category vocabulary is:
 | Phase 6 | Complete | Pure-simulation Isaac / ROS2 / PX4 SITL closed-loop integration |
 | Phase 7 | Complete | Optional Cosys-AirSim primary / legacy AirSim fallback backend and multi-simulator comparison |
 | Phase 8-A | Complete | Roadmap closure and research-framework completion framing |
+| Phase 8-C | Complete | Placeholder audit and intentionally scoped extension-point cleanup |
 
 ---
 

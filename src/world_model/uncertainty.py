@@ -3,10 +3,10 @@
 Provides an abstract ``UncertaintyEstimator`` and two concrete
 implementations:
 
-* ``ThresholdUncertainty`` — returns the uncertainty already embedded in a
+* ``ThresholdUncertainty`` - returns the uncertainty already embedded in a
   ``LatentState``, clamped to [0, 1].
-* ``EnsembleUncertainty`` — stub for variance-based estimation across an
-  ensemble of dynamics models (future work).
+* ``EnsembleUncertainty`` - compatibility estimator for the deferred
+  variance-based ensemble extension.
 """
 
 from __future__ import annotations
@@ -41,11 +41,13 @@ class ThresholdUncertainty(UncertaintyEstimator):
 
 
 class EnsembleUncertainty(UncertaintyEstimator):
-    """Stub for future ensemble-based uncertainty estimation.
+    """Compatibility estimator for deferred ensemble-based uncertainty.
 
     When a list of dynamics models is provided, the estimator will
-    eventually compute the variance of their one-step predictions.
-    Until then it returns a default moderate value.
+    eventually compute the variance of their one-step predictions. The current
+    scoped framework keeps that richer estimator as a planned research
+    extension while preserving the historical deterministic return values used
+    by tests and demos.
 
     Parameters
     ----------
@@ -61,7 +63,7 @@ class EnsembleUncertainty(UncertaintyEstimator):
 
     def estimate(self, latent: LatentState) -> float:
         if not self.models:
-            # No ensemble available — report moderate uncertainty
+            # No ensemble available: report moderate uncertainty.
             return 0.5
-        # TODO: forward latent through each model, compute variance
+        # Deferred extension: forward latent through each model and compute variance.
         return 0.0

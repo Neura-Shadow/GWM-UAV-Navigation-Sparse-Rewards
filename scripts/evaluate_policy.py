@@ -7,8 +7,9 @@ efficiency, etc.) using ``src.evaluation.metrics.MetricsTracker``.
 
 When ``--env mock`` is specified (default), the script synthesises random
 mock episodes so it can run anywhere without a GPU, AirSim, or any
-simulator installed.  In the future ``--env airsim`` will connect to the
-AirSim plugin for realistic evaluation.
+simulator installed. ``--env airsim`` is intentionally not routed through this
+legacy evaluator; use ``scripts/run_multisim_gwm_demo.py`` or the guarded
+AirSim-family validation scripts for optional simulator-backed checks.
 
 Example::
 
@@ -145,8 +146,8 @@ def main(argv: list[str] | None = None) -> None:
     logger.info("Seed         : %d", args.seed)
 
     if args.env == "airsim":
-        logger.error("AirSim environment is not yet implemented.")
-        logger.error("Use --env mock for placeholder evaluation.")
+        logger.error("AirSim-family evaluation is intentionally not handled by this legacy evaluator.")
+        logger.error("Use --env mock here, or use run_multisim_gwm_demo.py with explicit runtime gates.")
         sys.exit(1)
 
     # Run mock episodes
