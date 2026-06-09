@@ -178,6 +178,8 @@ python scripts/diagnose_airsim.py --help
 - [Architecture](docs/architecture.md)
 - [Paper-style project summary](docs/project_summary.md)
 - [v0.7.1 project checkpoint summary](docs/project_checkpoint_v0.7.1_summary.md)
+- [Final verification bundle](docs/final_verification_bundle.md)
+- [Placeholder audit](docs/placeholder_audit.md)
 - [v0.7.1 Cosys-AirSim live validation release note](docs/releases/v0.7.1-cosys-airsim-live-validation.md)
 - [v0.7.0 optional Cosys-AirSim backend release note](docs/releases/v0.7.0-optional-airsim-backend.md)
 - [v0.6.0 pure-simulation runtime release note](docs/releases/v0.6.0-pure-simulation-runtime.md)
