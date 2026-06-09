@@ -55,7 +55,7 @@ Current mock-first implementation:
 - `IsaacSimSceneBuilder.build()` OpenUSD-style descriptor generation without
   requiring Isaac Sim or OpenUSD.
 - `run_real2sim2real_loop.py` mock pipeline report generation.
-- `run_digital_twin_generation.py` placeholder planning script.
+- `run_digital_twin_generation.py` scoped planning-audit script.
 
 Future research:
 

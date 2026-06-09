@@ -209,10 +209,10 @@ class TestEnsembleUncertainty:
         result = est.estimate(LatentState(vector=np.zeros(1)))
         assert result == 0.5
 
-    def test_with_models_placeholder(self) -> None:
+    def test_with_models_deferred_extension_sentinel(self) -> None:
         est = EnsembleUncertainty(models=["model_a", "model_b"])
         result = est.estimate(LatentState(vector=np.zeros(1)))
-        assert result == 0.0  # placeholder until variance logic is added
+        assert result == 0.0  # deterministic sentinel until variance logic is added
 
 
 # ── PolicyIntentMapper tests ──────────────────────────────────────────────

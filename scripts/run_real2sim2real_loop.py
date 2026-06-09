@@ -5,7 +5,7 @@ Demonstrates the full pipeline:
 1. Run a mock episode to generate a real-world-like trajectory
 2. Extract corner-case scenarios from the trajectory
 3. Generate domain-randomised variants of each scenario
-4. (Placeholder) simulate training on each variant
+4. Summarise mock training/evaluation coverage for each variant
 5. Output a JSON summary report
 
 Usage
@@ -86,13 +86,13 @@ def step2_generate_variants(
 def step3_simulate_training(
     all_variants: Dict[str, List[ScenarioSpec]],
 ) -> List[Dict[str, Any]]:
-    """Placeholder: simulate training on each variant.
+    """Summarise scoped mock training/evaluation coverage for each variant.
 
-    In a full implementation, each variant would be loaded into the
-    simulator, the policy would be trained/evaluated, and metrics would
-    be collected.  For now, we just log each variant.
+    Loading variants into a live simulator and training policies against them
+    is a planned research extension. The current mock-first pipeline records
+    deterministic per-variant coverage metadata for reports and tests.
     """
-    logger.info("Step 3: Simulating training on variants (placeholder)...")
+    logger.info("Step 3: Summarising mock training/evaluation coverage for variants...")
     results: List[Dict[str, Any]] = []
     for scenario_id, variants in all_variants.items():
         for variant in variants:

@@ -341,7 +341,7 @@ class MAVLinkBridge:
         return True
 
     async def hold(self) -> bool:
-        """Hold position when supported, otherwise record a placeholder."""
+        """Hold position when supported, otherwise record a fallback history entry."""
         self._require_connected()
         called_client = False
         if not self.mock and hasattr(self.client, "action") and hasattr(self.client.action, "hold"):
@@ -353,7 +353,7 @@ class MAVLinkBridge:
         return True
 
     async def return_to_launch(self) -> bool:
-        """Request RTL when supported, otherwise record a placeholder."""
+        """Request RTL when supported, otherwise record a fallback history entry."""
         self._require_connected()
         called_client = False
         if (

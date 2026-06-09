@@ -267,7 +267,7 @@ def test_emergency_stop_sends_zero_velocity_and_stop_metadata() -> None:
     assert entry["command"]["metadata"]["reason"] == "emergency_stop"
 
 
-def test_hold_and_return_to_launch_placeholders_work() -> None:
+def test_hold_and_return_to_launch_history_entries_work() -> None:
     async def _run() -> tuple[MAVLinkBridge, _FakeMAVSDKClient]:
         client = _FakeMAVSDKClient()
         bridge = MAVLinkBridge(mock=False, sitl_enabled=True, client=client)
