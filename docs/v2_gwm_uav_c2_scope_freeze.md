@@ -111,6 +111,9 @@ v2-1 may implement:
 - mock mission event replay
 - unit tests for serialization and validation
 
+The v2-1 planning specification is tracked in
+`docs/v2_1_mission_data_model_event_bus_plan.md`.
+
 v2-1 must not implement:
 
 - real simulator connection

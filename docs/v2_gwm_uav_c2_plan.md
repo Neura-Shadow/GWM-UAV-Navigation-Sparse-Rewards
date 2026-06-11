@@ -3,6 +3,9 @@
 v2-0 scope freeze is tracked in
 `docs/v2_gwm_uav_c2_scope_freeze.md`.
 
+v2-1 mission data model and event bus planning is tracked in
+`docs/v2_1_mission_data_model_event_bus_plan.md`.
+
 ## 1. Purpose
 
 `v1.0.0-research-framework-complete` remains the completed archived research
