@@ -207,6 +207,10 @@ extension:
 
 - [x] v2-0 C2 concept and scope freeze
 - [ ] v2-1 Mission data model and event bus
+  - [x] v2-1 planning spec
+  - [ ] v2-1A Mission dataclasses and validation
+  - [ ] v2-1B Event bus and state store
+  - [ ] v2-1C Mock replay and metrics
 - [ ] v2-2 Mission dispatcher and fleet manager
 - [ ] v2-3 Defensive threat and risk prediction
 - [ ] v2-4 Risk-aware planning and UTM-style airspace layer
