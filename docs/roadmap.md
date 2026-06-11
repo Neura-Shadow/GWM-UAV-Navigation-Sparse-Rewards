@@ -205,7 +205,7 @@ artifact.
 Future work may explore a separate UAV command and mission intelligence
 extension:
 
-- [ ] v2-0 C2 concept and scope freeze
+- [x] v2-0 C2 concept and scope freeze
 - [ ] v2-1 Mission data model and event bus
 - [ ] v2-2 Mission dispatcher and fleet manager
 - [ ] v2-3 Defensive threat and risk prediction

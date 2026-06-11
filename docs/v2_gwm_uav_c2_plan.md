@@ -1,5 +1,8 @@
 # GWM-UAV-C2 Post-v1 Extension Plan
 
+v2-0 scope freeze is tracked in
+`docs/v2_gwm_uav_c2_scope_freeze.md`.
+
 ## 1. Purpose
 
 `v1.0.0-research-framework-complete` remains the completed archived research
