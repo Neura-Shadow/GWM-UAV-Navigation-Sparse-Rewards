@@ -19,18 +19,22 @@ ROS2, Isaac Sim, PX4, ArduPilot, MAVSDK, Nav2, or real hardware.
 
 ## Current Status
 
-The latest released checkpoint is `v0.7.1-cosys-airsim-live-validation`. It
+Latest archive release: `v1.0.0-research-framework-complete`.
+
+Latest implementation checkpoint: `v0.7.1-cosys-airsim-live-validation`. It
 captures the Phase 7-B optional live Cosys-AirSim validation slice: all normal
 tests pass locally without optional robotics runtimes, while real hardware
 execution and autonomous real flight remain disabled by default. Phase 6 remains
 the pure-simulation Isaac Sim / Isaac Lab, ROS2, externally managed PX4 SITL,
 MAVSDK, and GWM safety-gated planning baseline.
 
-The project is complete as a research-framework artifact through `v0.7.1`.
+The project is complete as a research-framework artifact through `v1.0.0`.
 The roadmap now classifies remaining legacy ideas as completed in mock-first /
 guarded-runtime form, planned research extensions, deferred scope, or safety
 out-of-scope work rather than unresolved project-completion blockers.
-Phase 8-A completed this roadmap closure pass.
+Phase 8 completed the roadmap closure, artifact consistency pass, placeholder
+audit, final verification bundle, and archive release documentation. `v1.0.0`
+does not add new runtime features.
 
 Completed mock-first and guarded-runtime slices:
 
@@ -179,6 +183,7 @@ python scripts/diagnose_airsim.py --help
 - [Paper-style project summary](docs/project_summary.md)
 - [v0.7.1 project checkpoint summary](docs/project_checkpoint_v0.7.1_summary.md)
 - [Final verification bundle](docs/final_verification_bundle.md)
+- [v1.0.0 research-framework-complete release note](docs/releases/v1.0.0-research-framework-complete.md)
 - [Placeholder audit](docs/placeholder_audit.md)
 - [v0.7.1 Cosys-AirSim live validation release note](docs/releases/v0.7.1-cosys-airsim-live-validation.md)
 - [v0.7.0 optional Cosys-AirSim backend release note](docs/releases/v0.7.0-optional-airsim-backend.md)

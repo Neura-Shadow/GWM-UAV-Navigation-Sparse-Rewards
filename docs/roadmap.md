@@ -181,6 +181,7 @@ The category vocabulary is:
 | Phase 8-B | Complete | v0.7.1 documentation artifact consistency pass |
 | Phase 8-C | Complete | Placeholder audit and intentionally scoped extension-point cleanup |
 | Phase 8-D | Complete | Final verification bundle and mock/no-write-output evidence |
+| Phase 8-E | Complete | Final archive tag and GitHub Release documentation |
 
 ---
 
