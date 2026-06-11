@@ -194,3 +194,23 @@ The category vocabulary is:
    inside this project without a separate safety review and scope reset.
 4. Keep normal tests runnable without GPU, Isaac Sim, ROS2, Cosys-AirSim,
    legacy AirSim, MAVSDK, PX4, Nav2, SITL, or real hardware.
+
+---
+
+## Post-v1 Optional Extension: GWM-UAV-C2
+
+`v1.0.0-research-framework-complete` remains the completed archived research
+artifact.
+
+Future work may explore a separate UAV command and mission intelligence
+extension:
+
+- [ ] v2-0 C2 concept and scope freeze
+- [ ] v2-1 Mission data model and event bus
+- [ ] v2-2 Mission dispatcher and fleet manager
+- [ ] v2-3 Defensive threat and risk prediction
+- [ ] v2-4 Risk-aware planning and UTM-style airspace layer
+- [ ] v2-5 Dashboard replay and metrics
+- [ ] v2-6 Optional simulator benchmark integration
+
+These are optional post-v1 extensions and are not blockers for `v1.0.0`.
