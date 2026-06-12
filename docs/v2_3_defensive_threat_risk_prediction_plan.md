@@ -294,3 +294,10 @@ Recommended implementation slices:
 
 v2-3A should be the next implementation slice after this planning spec is
 reviewed.
+
+## 15. Status Update
+
+v2-3A implements the defensive risk predictor core, category validation,
+`RiskSignal` factory, and `ThreatAssessment` factory in
+`src/c2/risk_prediction.py`. Rule-based risk mapping and state-store/replay
+integration remain planned but not implemented.
