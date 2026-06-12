@@ -8,9 +8,12 @@ v2-1 will define the mock-first mission data foundation for GWM-UAV-C2.
 boundaries. v2-1 is the first implementation-oriented planning slice, but this
 document is docs-only.
 
-Status update: v2-1A now implements the mission dataclasses and validation
-helpers in `src/c2/mission_types.py`. The v2-1B event bus / state store and
-v2-1C mock replay / metrics slices remain planned but not implemented.
+Status update: v2-1A implements the mission dataclasses and validation
+helpers in `src/c2/mission_types.py`.
+
+Status update: v2-1B now implements the mock-first event bus and in-memory
+mission state store in `src/c2/event_bus.py` and `src/c2/state_store.py`.
+The v2-1C mock replay / metrics slice remains planned but not implemented.
 
 ## 2. Relationship to v2-0 Scope Freeze
 
