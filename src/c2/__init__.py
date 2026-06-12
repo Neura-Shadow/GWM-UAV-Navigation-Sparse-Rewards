@@ -5,6 +5,7 @@ simulator, ROS2, MAVSDK/PX4, Nav2, database, or network runtime packages.
 """
 
 from src.c2.event_bus import MissionEventBus
+from src.c2.mission_dispatcher import MissionDispatcher
 from src.c2.mission_types import (
     ALLOWED_DEFENSIVE_RISK_CATEGORIES,
     AirspaceConstraint,
@@ -38,6 +39,7 @@ __all__ = [
     "MetricSummary",
     "MissionEvent",
     "MissionEventBus",
+    "MissionDispatcher",
     "MissionReplayEngine",
     "MissionReplayResult",
     "MissionRequest",

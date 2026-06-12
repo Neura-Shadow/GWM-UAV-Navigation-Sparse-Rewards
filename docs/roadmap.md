@@ -213,7 +213,7 @@ extension:
   - [x] v2-1C Mock replay and metrics
 - [ ] v2-2 Mission dispatcher and fleet manager
   - [x] v2-2 planning spec
-  - [ ] v2-2A Mission dispatcher
+  - [x] v2-2A Mission dispatcher
   - [ ] v2-2B Fleet manager
   - [ ] v2-2C Dispatcher/Fleet integration and replay validation
 - [ ] v2-3 Defensive threat and risk prediction

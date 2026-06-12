@@ -10,6 +10,10 @@ boundaries. v2-1 completed the mission data model, event bus, state store,
 replay, and metrics foundation. v2-2 is the next implementation-oriented
 planning slice, but this document is docs-only.
 
+Status update: v2-2A implements the mock-first `MissionDispatcher` in
+`src/c2/mission_dispatcher.py`. `FleetManager` and dispatcher/fleet integration
+remain planned but not implemented.
+
 ## 2. Relationship to v2-1 Foundation
 
 v2-2 must build only on:
