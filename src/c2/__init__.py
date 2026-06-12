@@ -26,6 +26,7 @@ from src.c2.mission_types import (
     ThreatRecommendation,
     UAVState,
 )
+from src.c2.replay import MissionReplayEngine, MissionReplayResult
 from src.c2.state_store import MissionStateStore
 
 __all__ = [
@@ -37,6 +38,8 @@ __all__ = [
     "MetricSummary",
     "MissionEvent",
     "MissionEventBus",
+    "MissionReplayEngine",
+    "MissionReplayResult",
     "MissionRequest",
     "MissionStateStore",
     "MissionTask",

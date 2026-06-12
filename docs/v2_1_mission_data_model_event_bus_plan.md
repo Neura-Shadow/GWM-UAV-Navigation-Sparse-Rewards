@@ -13,7 +13,10 @@ helpers in `src/c2/mission_types.py`.
 
 Status update: v2-1B now implements the mock-first event bus and in-memory
 mission state store in `src/c2/event_bus.py` and `src/c2/state_store.py`.
-The v2-1C mock replay / metrics slice remains planned but not implemented.
+
+Status update: v2-1C implements mock replay and metrics aggregation in
+`src/c2/replay.py`. With v2-1A, v2-1B, and v2-1C complete, v2-1 provides the
+mock-first mission data foundation for later C2 modules.
 
 ## 2. Relationship to v2-0 Scope Freeze
 
