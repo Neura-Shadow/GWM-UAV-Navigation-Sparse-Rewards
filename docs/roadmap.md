@@ -217,6 +217,10 @@ extension:
   - [x] v2-2B Fleet manager
   - [x] v2-2C Dispatcher/Fleet integration and replay validation
 - [ ] v2-3 Defensive threat and risk prediction
+  - [x] v2-3 planning spec
+  - [ ] v2-3A Defensive risk predictor core
+  - [ ] v2-3B Rule-based risk mapping and recommendation policy
+  - [ ] v2-3C Risk event, state store, and replay metrics integration
 - [ ] v2-4 Risk-aware planning and UTM-style airspace layer
 - [ ] v2-5 Dashboard replay and metrics
 - [ ] v2-6 Optional simulator benchmark integration
