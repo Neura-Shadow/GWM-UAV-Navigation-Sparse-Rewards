@@ -214,7 +214,7 @@ extension:
 - [ ] v2-2 Mission dispatcher and fleet manager
   - [x] v2-2 planning spec
   - [x] v2-2A Mission dispatcher
-  - [ ] v2-2B Fleet manager
+  - [x] v2-2B Fleet manager
   - [ ] v2-2C Dispatcher/Fleet integration and replay validation
 - [ ] v2-3 Defensive threat and risk prediction
 - [ ] v2-4 Risk-aware planning and UTM-style airspace layer

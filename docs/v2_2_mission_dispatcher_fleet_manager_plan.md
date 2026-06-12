@@ -11,8 +11,11 @@ replay, and metrics foundation. v2-2 is the next implementation-oriented
 planning slice, but this document is docs-only.
 
 Status update: v2-2A implements the mock-first `MissionDispatcher` in
-`src/c2/mission_dispatcher.py`. `FleetManager` and dispatcher/fleet integration
-remain planned but not implemented.
+`src/c2/mission_dispatcher.py`.
+
+Status update: v2-2B implements the mock-first `FleetManager` in
+`src/c2/fleet_manager.py`. Dispatcher/fleet integration remains planned but not
+implemented.
 
 ## 2. Relationship to v2-1 Foundation
 
