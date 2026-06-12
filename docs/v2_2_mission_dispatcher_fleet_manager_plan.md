@@ -14,8 +14,12 @@ Status update: v2-2A implements the mock-first `MissionDispatcher` in
 `src/c2/mission_dispatcher.py`.
 
 Status update: v2-2B implements the mock-first `FleetManager` in
-`src/c2/fleet_manager.py`. Dispatcher/fleet integration remains planned but not
-implemented.
+`src/c2/fleet_manager.py`.
+
+Status update: v2-2C validates dispatcher/fleet integration and deterministic
+replay through `tests/test_c2_dispatcher_fleet_integration.py`. With v2-2A,
+v2-2B, and v2-2C complete, v2-2 provides the mock-first mission dispatch and
+fleet allocation layer.
 
 ## 2. Relationship to v2-1 Foundation
 
