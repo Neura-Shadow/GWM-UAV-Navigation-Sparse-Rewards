@@ -6,6 +6,9 @@ v2-0 scope freeze is tracked in
 v2-1 mission data model and event bus planning is tracked in
 `docs/v2_1_mission_data_model_event_bus_plan.md`.
 
+v2-2 mission dispatcher and fleet manager planning is tracked in
+`docs/v2_2_mission_dispatcher_fleet_manager_plan.md`.
+
 ## 1. Purpose
 
 `v1.0.0-research-framework-complete` remains the completed archived research
