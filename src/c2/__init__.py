@@ -28,12 +28,15 @@ from src.c2.mission_types import (
     ThreatRecommendation,
     UAVState,
 )
+from src.c2.risk_prediction import ALLOWED_RISK_RECOMMENDATIONS, DefensiveRiskPredictor
 from src.c2.replay import MissionReplayEngine, MissionReplayResult
 from src.c2.state_store import MissionStateStore
 
 __all__ = [
     "ALLOWED_DEFENSIVE_RISK_CATEGORIES",
+    "ALLOWED_RISK_RECOMMENDATIONS",
     "AirspaceConstraint",
+    "DefensiveRiskPredictor",
     "FleetAsset",
     "FleetManager",
     "HumanApprovalDecision",
