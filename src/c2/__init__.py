@@ -34,6 +34,13 @@ from src.c2.mission_types import (
     UAVState,
 )
 from src.c2.risk_prediction import ALLOWED_RISK_RECOMMENDATIONS, DefensiveRiskPredictor
+from src.c2.risk_aware_planner import (
+    BLOCKED_CONSTRAINT_PENALTY,
+    RISK_WEIGHT,
+    SAFE_OFFSET_DISTANCE,
+    WARNING_CONSTRAINT_PENALTY,
+    RiskAwarePlanner,
+)
 from src.c2.replay import MissionReplayEngine, MissionReplayResult
 from src.c2.state_store import MissionStateStore
 
@@ -43,6 +50,7 @@ __all__ = [
     "ALLOWED_DEFENSIVE_RISK_CATEGORIES",
     "ALLOWED_RISK_RECOMMENDATIONS",
     "AirspaceConstraint",
+    "BLOCKED_CONSTRAINT_PENALTY",
     "DefensiveRiskPredictor",
     "FleetAsset",
     "FleetManager",
@@ -60,12 +68,16 @@ __all__ = [
     "MissionTaskStatus",
     "PlannedRoute",
     "ReplayFrame",
+    "RISK_WEIGHT",
     "RouteConstraintVerdict",
     "RiskSignal",
+    "RiskAwarePlanner",
+    "SAFE_OFFSET_DISTANCE",
     "SafetyDecision",
     "SafetyDecisionStatus",
     "ThreatAssessment",
     "ThreatRecommendation",
     "UTMAirspaceLayer",
     "UAVState",
+    "WARNING_CONSTRAINT_PENALTY",
 ]
