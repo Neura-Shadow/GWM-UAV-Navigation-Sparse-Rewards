@@ -301,3 +301,7 @@ v2-3A implements the defensive risk predictor core, category validation,
 `RiskSignal` factory, and `ThreatAssessment` factory in
 `src/c2/risk_prediction.py`. Rule-based risk mapping and state-store/replay
 integration remain planned but not implemented.
+
+v2-3B implements deterministic rule-based defensive risk mapping and the
+recommendation policy in `src/c2/risk_prediction.py`. State-store/replay
+integration remains planned but not implemented.
