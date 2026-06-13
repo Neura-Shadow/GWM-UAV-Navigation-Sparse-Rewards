@@ -219,7 +219,7 @@ extension:
 - [ ] v2-3 Defensive threat and risk prediction
   - [x] v2-3 planning spec
   - [x] v2-3A Defensive risk predictor core
-  - [ ] v2-3B Rule-based risk mapping and recommendation policy
+  - [x] v2-3B Rule-based risk mapping and recommendation policy
   - [ ] v2-3C Risk event, state store, and replay metrics integration
 - [ ] v2-4 Risk-aware planning and UTM-style airspace layer
 - [ ] v2-5 Dashboard replay and metrics
