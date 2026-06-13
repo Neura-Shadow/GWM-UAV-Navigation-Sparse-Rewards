@@ -351,3 +351,9 @@ Recommended implementation slices:
 
 v2-4A should be the next implementation slice after this planning spec is
 reviewed.
+
+## 16. Status Update
+
+v2-4A implements the mock-first UTM-style airspace constraint core in
+`src/c2/airspace.py`. Risk-aware route scoring and planner/state-store/replay
+integration remain planned but not implemented.
