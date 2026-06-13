@@ -305,3 +305,8 @@ integration remain planned but not implemented.
 v2-3B implements deterministic rule-based defensive risk mapping and the
 recommendation policy in `src/c2/risk_prediction.py`. State-store/replay
 integration remains planned but not implemented.
+
+v2-3C integrates defensive risk events with `MissionStateStore` and
+`MissionReplayEngine` through `tests/test_c2_risk_prediction_integration.py`.
+With v2-3A, v2-3B, and v2-3C complete, v2-3 provides the mock-first defensive
+threat and risk prediction layer.
