@@ -222,6 +222,10 @@ extension:
   - [x] v2-3B Rule-based risk mapping and recommendation policy
   - [x] v2-3C Risk event, state store, and replay metrics integration
 - [ ] v2-4 Risk-aware planning and UTM-style airspace layer
+  - [x] v2-4 planning spec
+  - [ ] v2-4A UTM-style airspace constraint core
+  - [ ] v2-4B Risk-aware route candidate scoring
+  - [ ] v2-4C Planner, airspace, state-store, and replay integration
 - [ ] v2-5 Dashboard replay and metrics
 - [ ] v2-6 Optional simulator benchmark integration
 
