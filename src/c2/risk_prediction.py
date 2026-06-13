@@ -396,15 +396,55 @@ class DefensiveRiskPredictor:
         assessment.validate()
         return self._make_event("threat.assessment.created", assessment.to_dict())
 
+    def publish_risk_signal(self, signal: RiskSignal) -> MissionEvent:
+        """Emit a risk signal event and apply it to the optional state store."""
+
+        event = self.make_risk_signal_event(signal)
+        published = self.event_bus.publish(event)
+        if self.state_store is not None:
+            self.state_store.apply_event(event)
+        return published
+
+    def publish_threat_assessment(self, assessment: ThreatAssessment) -> MissionEvent:
+        """Emit a threat assessment event and apply it to the optional state store."""
+
+        event = self.make_threat_assessment_event(assessment)
+        published = self.event_bus.publish(event)
+        if self.state_store is not None:
+            self.state_store.apply_event(event)
+        return published
+
     def _make_event(self, event_type: str, payload: Dict[str, object]) -> MissionEvent:
         self._event_counter += 1
+        metadata = self._event_metadata(event_type, payload)
         return MissionEvent(
             event_id=f"risk-event-{self._event_counter:06d}",
             event_type=event_type,
             timestamp=float(payload.get("timestamp", self._event_counter)),
             source="defensive_risk_predictor",
             payload=copy.deepcopy(payload),
+            metadata=metadata,
         )
+
+    @staticmethod
+    def _event_metadata(event_type: str, payload: Dict[str, object]) -> Dict[str, object]:
+        metadata: Dict[str, object] = {"source": "defensive_risk_predictor"}
+        if event_type == "risk.signal.created":
+            category = payload.get("category")
+            if isinstance(category, str):
+                metadata["risk_category"] = category
+        elif event_type == "threat.assessment.created":
+            mission_id = payload.get("mission_id")
+            recommendation = payload.get("recommendation")
+            total_risk = payload.get("total_risk")
+            if isinstance(mission_id, str):
+                metadata["mission_id"] = mission_id
+            if isinstance(recommendation, str):
+                metadata["recommendation"] = recommendation
+            if isinstance(total_risk, (int, float)) and not isinstance(total_risk, bool):
+                metadata["total_risk"] = float(total_risk)
+        ensure_json_safe_dict(metadata, "event.metadata")
+        return metadata
 
     def _state_signal(
         self,
