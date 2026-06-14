@@ -7,7 +7,9 @@ import math
 from typing import Dict, List, Optional, Sequence
 
 from src.c2.airspace import UTMAirspaceLayer
-from src.c2.mission_types import FleetAsset, MissionTask, PlannedRoute, ThreatAssessment
+from src.c2.event_bus import MissionEventBus
+from src.c2.mission_types import FleetAsset, MissionEvent, MissionTask, PlannedRoute, ThreatAssessment
+from src.c2.state_store import MissionStateStore
 
 
 # Mock-first research scoring constants only; these are not certified safety values.
@@ -21,11 +23,23 @@ ALLOWED_ROUTE_VERDICTS = ("valid", "warning", "blocked")
 class RiskAwarePlanner:
     """Deterministic route candidate generator and scorer."""
 
-    def __init__(self, airspace_layer: Optional[UTMAirspaceLayer] = None) -> None:
+    def __init__(
+        self,
+        airspace_layer: Optional[UTMAirspaceLayer] = None,
+        event_bus: Optional[MissionEventBus] = None,
+        state_store: Optional[MissionStateStore] = None,
+    ) -> None:
         if airspace_layer is not None and not isinstance(airspace_layer, UTMAirspaceLayer):
             raise ValueError("airspace_layer must be a UTMAirspaceLayer")
+        if event_bus is not None and not isinstance(event_bus, MissionEventBus):
+            raise ValueError("event_bus must be a MissionEventBus")
+        if state_store is not None and not isinstance(state_store, MissionStateStore):
+            raise ValueError("state_store must be a MissionStateStore")
         self.airspace_layer = airspace_layer
+        self.event_bus = event_bus or MissionEventBus()
+        self.state_store = state_store
         self._route_counter = 0
+        self._event_counter = 0
 
     def generate_candidate_routes(
         self,
@@ -118,7 +132,34 @@ class RiskAwarePlanner:
         unblocked = [route for route in routes if route.constraint_verdict != "blocked"]
         candidates = unblocked if unblocked else routes
         selected = min(candidates, key=lambda route: (float(route.score), route.route_id))
+        selected.metadata = copy.deepcopy(selected.metadata)
+        selected.metadata["selected"] = True
+        selected.metadata["executable"] = False
+        selected.metadata["selection_role"] = "recommendation_only"
+        selected.validate()
         return copy.deepcopy(selected)
+
+    def make_planned_route_event(self, route: PlannedRoute) -> MissionEvent:
+        if not isinstance(route, PlannedRoute):
+            raise ValueError("route must be a PlannedRoute")
+        route.validate()
+        payload = route.to_dict()
+        self._event_counter += 1
+        return MissionEvent(
+            event_id=f"route-event-{self._event_counter:06d}",
+            event_type="route.planned",
+            timestamp=float(self._event_counter),
+            source="risk_aware_planner",
+            payload=payload,
+            metadata=self._route_event_metadata(payload),
+        )
+
+    def publish_planned_route(self, route: PlannedRoute) -> MissionEvent:
+        event = self.make_planned_route_event(route)
+        published = self.event_bus.publish(event)
+        if self.state_store is not None:
+            self.state_store.apply_event(event)
+        return published
 
     def create_planned_route(
         self,
@@ -224,6 +265,24 @@ class RiskAwarePlanner:
             raise ValueError(f"{name} must be a JSON-safe dictionary")
         RiskAwarePlanner._ensure_json_safe(value, name)
         return value
+
+    @staticmethod
+    def _route_event_metadata(payload: Dict[str, object]) -> Dict[str, object]:
+        route_metadata = payload.get("metadata", {})
+        selected = False
+        if isinstance(route_metadata, dict):
+            selected = route_metadata.get("selected") is True
+        metadata = {
+            "source": "risk_aware_planner",
+            "task_id": payload.get("task_id", ""),
+            "route_id": payload.get("route_id", ""),
+            "score": payload.get("score", 0.0),
+            "risk_score": payload.get("risk_score", 0.0),
+            "constraint_verdict": payload.get("constraint_verdict", ""),
+            "selected": selected,
+        }
+        RiskAwarePlanner.ensure_json_safe_dict(metadata, "event.metadata")
+        return metadata
 
     @staticmethod
     def _context_risk_assessment(context: Dict[str, object]) -> Optional[ThreatAssessment]:
