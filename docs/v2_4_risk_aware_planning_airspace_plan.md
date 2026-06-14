@@ -359,5 +359,9 @@ v2-4A implements the mock-first UTM-style airspace constraint core in
 integration remain planned but not implemented.
 
 v2-4B implements deterministic mock route candidate generation and risk-aware
-scoring in `src/c2/risk_aware_planner.py`. Planner/state-store/replay
-integration remains planned but not implemented.
+scoring in `src/c2/risk_aware_planner.py`.
+
+v2-4C integrates planner, airspace, state-store, and replay behavior through
+`tests/test_c2_planner_airspace_integration.py`. With v2-4A, v2-4B, and
+v2-4C complete, v2-4 provides the mock-first risk-aware planning and UTM-style
+airspace layer.
