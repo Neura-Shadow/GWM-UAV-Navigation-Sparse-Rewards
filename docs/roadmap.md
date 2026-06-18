@@ -228,7 +228,7 @@ extension:
   - [x] v2-4C Planner, airspace, state-store, and replay integration
 - [ ] v2-5 Dashboard replay and metrics
   - [x] v2-5 planning spec
-  - [ ] v2-5A Dashboard replay payload core
+  - [x] v2-5A Dashboard replay payload core
   - [ ] v2-5B Metrics exporter and audit report builder
   - [ ] v2-5C Optional no-write-output replay report CLI
 - [ ] v2-6 Optional simulator benchmark integration

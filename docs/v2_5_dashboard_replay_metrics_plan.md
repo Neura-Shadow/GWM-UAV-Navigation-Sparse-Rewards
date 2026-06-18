@@ -380,3 +380,9 @@ Recommended implementation slices:
 
 v2-5A should be the next implementation slice after this planning spec is
 reviewed.
+
+## 16. Status Update
+
+v2-5A implements the mock-first dashboard replay payload core in
+`src/c2/dashboard_replay.py`. Metrics export, audit report building, and
+optional no-write-output CLI remain planned but not implemented.
