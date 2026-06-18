@@ -15,6 +15,9 @@ v2-3 defensive threat and risk prediction planning is tracked in
 v2-4 risk-aware planning and UTM-style airspace layer planning is tracked in
 `docs/v2_4_risk_aware_planning_airspace_plan.md`.
 
+v2-5 dashboard replay and metrics planning is tracked in
+`docs/v2_5_dashboard_replay_metrics_plan.md`.
+
 ## 1. Purpose
 
 `v1.0.0-research-framework-complete` remains the completed archived research
