@@ -383,6 +383,11 @@ reviewed.
 
 ## 16. Status Update
 
-v2-5A implements the mock-first dashboard replay payload core in
-`src/c2/dashboard_replay.py`. Metrics export, audit report building, and
-optional no-write-output CLI remain planned but not implemented.
+v2-5A implemented the mock-first dashboard replay payload core in
+`src/c2/dashboard_replay.py`. At that point, metrics export, audit report
+building, and optional no-write-output CLI remained planned but not
+implemented.
+
+v2-5B implements the mock-first metrics exporter and audit report builder in
+`src/c2/dashboard_replay.py`. Optional no-write-output CLI remains planned but
+not implemented.
