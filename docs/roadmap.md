@@ -229,7 +229,7 @@ extension:
 - [ ] v2-5 Dashboard replay and metrics
   - [x] v2-5 planning spec
   - [x] v2-5A Dashboard replay payload core
-  - [ ] v2-5B Metrics exporter and audit report builder
+  - [x] v2-5B Metrics exporter and audit report builder
   - [ ] v2-5C Optional no-write-output replay report CLI
 - [ ] v2-6 Optional simulator benchmark integration
 
