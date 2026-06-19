@@ -202,8 +202,9 @@ The category vocabulary is:
 `v1.0.0-research-framework-complete` remains the completed archived research
 artifact.
 
-Future work may explore a separate UAV command and mission intelligence
-extension:
+GWM-UAV-C2 v2 is complete in mock-first / readiness-oriented form. The
+completion summary is tracked in
+`docs/v2_gwm_uav_c2_completion_summary.md`.
 
 - [x] v2-0 C2 concept and scope freeze
 - [x] v2-1 Mission data model and event bus
