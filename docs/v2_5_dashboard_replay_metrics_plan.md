@@ -391,3 +391,7 @@ implemented.
 v2-5B implements the mock-first metrics exporter and audit report builder in
 `src/c2/dashboard_replay.py`. Optional no-write-output CLI remains planned but
 not implemented.
+
+v2-5C adds the optional no-write-output replay report CLI in
+`scripts/run_c2_replay_report.py`. With v2-5A, v2-5B, and v2-5C complete,
+v2-5 provides the mock-first dashboard replay and metrics layer.
