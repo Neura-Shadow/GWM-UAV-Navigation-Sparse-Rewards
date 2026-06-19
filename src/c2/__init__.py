@@ -9,6 +9,7 @@ from src.c2.airspace import (
     ALLOWED_CONSTRAINT_VERDICTS,
     UTMAirspaceLayer,
 )
+from src.c2.benchmarking import C2BenchmarkReadinessBuilder, build_c2_benchmark_readiness_report
 from src.c2.dashboard_replay import C2MetricsExporter, C2ReplayReportBuilder, DashboardReplayBuilder
 from src.c2.event_bus import MissionEventBus
 from src.c2.fleet_manager import FleetManager
@@ -52,6 +53,7 @@ __all__ = [
     "ALLOWED_RISK_RECOMMENDATIONS",
     "AirspaceConstraint",
     "BLOCKED_CONSTRAINT_PENALTY",
+    "C2BenchmarkReadinessBuilder",
     "C2MetricsExporter",
     "C2ReplayReportBuilder",
     "DashboardReplayBuilder",
@@ -84,4 +86,5 @@ __all__ = [
     "UTMAirspaceLayer",
     "UAVState",
     "WARNING_CONSTRAINT_PENALTY",
+    "build_c2_benchmark_readiness_report",
 ]

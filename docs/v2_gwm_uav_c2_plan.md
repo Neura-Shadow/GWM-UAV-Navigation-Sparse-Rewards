@@ -318,14 +318,16 @@ autonomous attack-decision logic.
 
 - Goal: Compare schema compatibility and safety-gate behavior across mock,
   Isaac, and Cosys-AirSim-family simulator backends.
-- Files likely touched: future benchmark runner docs, `src/c2/benchmarking.py`,
-  and tests.
+- Files touched: `src/c2/benchmarking.py`,
+  `tests/test_c2_benchmarking.py`, and
+  `docs/v2_6_optional_simulator_benchmark_integration.md`.
 - What not to do: do not launch simulators automatically, claim simulator
   performance parity, run hardware checks, or connect to real vehicles.
-- Verification commands: mock-only benchmark tests and optional-runtime skipped
-  tests behind explicit gates.
+- Verification commands: mock-only benchmark tests, C2 dashboard/replay
+  regression tests, compileall, and safety/non-goal grep.
 - Completion criteria: benchmark reports clearly distinguish mock/default
-  checks from optional gated simulator checks.
+  schema checks from Isaac and Cosys-AirSim-family readiness profiles without
+  runtime probing or simulator parity claims.
 
 ## 8. First Implementation Slice Recommendation
 
