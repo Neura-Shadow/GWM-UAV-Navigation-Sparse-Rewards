@@ -18,6 +18,12 @@ v2-4 risk-aware planning and UTM-style airspace layer planning is tracked in
 v2-5 dashboard replay and metrics planning is tracked in
 `docs/v2_5_dashboard_replay_metrics_plan.md`.
 
+v2-6 optional simulator benchmark integration is tracked in
+`docs/v2_6_optional_simulator_benchmark_integration.md`.
+
+The completed v2 extension summary is tracked in
+`docs/v2_gwm_uav_c2_completion_summary.md`.
+
 ## 1. Purpose
 
 `v1.0.0-research-framework-complete` remains the completed archived research
@@ -354,6 +360,6 @@ any code, runtime path, or dashboard work begins.
 
 ## 10. Relationship to v1.0.0
 
-`v1.0.0` remains the completed archive release. The post-v1 C2 plan is optional
-future work. The `v1.0.0-research-framework-complete` tag and release must not
-be moved.
+`v1.0.0` remains the completed archive release. The post-v1 C2 extension is
+optional and complete in mock-first / readiness-oriented form. The
+`v1.0.0-research-framework-complete` tag and release must not be moved.
