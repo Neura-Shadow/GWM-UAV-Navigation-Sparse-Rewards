@@ -194,3 +194,44 @@ The category vocabulary is:
    inside this project without a separate safety review and scope reset.
 4. Keep normal tests runnable without GPU, Isaac Sim, ROS2, Cosys-AirSim,
    legacy AirSim, MAVSDK, PX4, Nav2, SITL, or real hardware.
+
+---
+
+## Post-v1 Optional Extension: GWM-UAV-C2
+
+`v1.0.0-research-framework-complete` remains the completed archived research
+artifact.
+
+GWM-UAV-C2 v2 is complete in mock-first / readiness-oriented form. The
+completion summary is tracked in
+`docs/v2_gwm_uav_c2_completion_summary.md`.
+
+- [x] v2-0 C2 concept and scope freeze
+- [x] v2-1 Mission data model and event bus
+  - [x] v2-1 planning spec
+  - [x] v2-1A Mission dataclasses and validation
+  - [x] v2-1B Event bus and state store
+  - [x] v2-1C Mock replay and metrics
+- [x] v2-2 Mission dispatcher and fleet manager
+  - [x] v2-2 planning spec
+  - [x] v2-2A Mission dispatcher
+  - [x] v2-2B Fleet manager
+  - [x] v2-2C Dispatcher/Fleet integration and replay validation
+- [x] v2-3 Defensive threat and risk prediction
+  - [x] v2-3 planning spec
+  - [x] v2-3A Defensive risk predictor core
+  - [x] v2-3B Rule-based risk mapping and recommendation policy
+  - [x] v2-3C Risk event, state store, and replay metrics integration
+- [x] v2-4 Risk-aware planning and UTM-style airspace layer
+  - [x] v2-4 planning spec
+  - [x] v2-4A UTM-style airspace constraint core
+  - [x] v2-4B Risk-aware route candidate scoring
+  - [x] v2-4C Planner, airspace, state-store, and replay integration
+- [x] v2-5 Dashboard replay and metrics
+  - [x] v2-5 planning spec
+  - [x] v2-5A Dashboard replay payload core
+  - [x] v2-5B Metrics exporter and audit report builder
+  - [x] v2-5C Optional no-write-output replay report CLI
+- [x] v2-6 Optional simulator benchmark integration
+
+These are optional post-v1 extensions and are not blockers for `v1.0.0`.
