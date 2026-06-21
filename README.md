@@ -36,6 +36,10 @@ Phase 8 completed the roadmap closure, artifact consistency pass, placeholder
 audit, final verification bundle, and archive release documentation. `v1.0.0`
 does not add new runtime features.
 
+The optional post-v1 GWM-UAV-C2 extension is documented separately and is
+complete in mock-first / readiness-oriented form through v2-6. It does not
+reopen, retarget, or modify the archived `v1.0.0` release.
+
 Completed mock-first and guarded-runtime slices:
 
 | Slice | Status | Key capability |
