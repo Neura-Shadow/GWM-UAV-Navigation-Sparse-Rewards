@@ -40,6 +40,13 @@ The optional post-v1 GWM-UAV-C2 extension is documented separately and is
 complete in mock-first / readiness-oriented form through v2-6. It does not
 reopen, retarget, or modify the archived `v1.0.0` release.
 
+GWM-UAV-C2 AgentOps v3 is an optional future extension for a human-supervised,
+proposal-oriented ground operations center layered above the completed v2
+deterministic C2 services. v1 remains the archived baseline, and v2 remains the
+completed deterministic C2 extension. The v3 scope and permissions are frozen
+in documentation before any agent runtime, LLM/API integration, dashboard, or
+external-runtime work begins.
+
 Completed mock-first and guarded-runtime slices:
 
 | Slice | Status | Key capability |
@@ -200,6 +207,8 @@ python scripts/diagnose_airsim.py --help
 - [Phase 6 Isaac / PX4 bridge design](docs/phase6_isaac_px4_bridge.md)
 - [Phase 6 GWM / WAM simulation demo](docs/phase6_gwm_wam_simulation_demo.md)
 - [Phase 7 optional AirSim backend](docs/phase7_multisim_airsim_backend.md)
+- [AgentOps v3 extension plan](docs/v3_agentic_ground_operations_center_plan.md)
+- [AgentOps v3-0 scope and permission freeze](docs/v3_0_agent_scope_permissions_freeze.md)
 - [Roadmap](docs/roadmap.md)
 - [ROS2 integration](docs/ros2_integration.md)
 - [Deployment hardware interface](docs/deployment_hardware_interface.md)
