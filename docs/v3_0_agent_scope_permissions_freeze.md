@@ -225,6 +225,9 @@ handles, or arbitrary Python objects.
 
 ## 12. v3-1 Allowed Implementation Scope
 
+The detailed v3-1 planning specification is tracked in
+`docs/v3_1_typed_agent_contracts_tool_registry_plan.md`.
+
 Future v3-1 may implement only:
 
 - `src/c2/agent_types.py`
