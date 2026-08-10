@@ -602,6 +602,9 @@ simulator performance parity claim is made.
 
 ### v3-1: Typed Agent Contracts and Tool Registry
 
+v3-1 typed agent contracts and tool registry planning is tracked in
+`docs/v3_1_typed_agent_contracts_tool_registry_plan.md`.
+
 - Goal: implement JSON-safe agent contracts, explicit permission manifests,
   an allowlisted mock tool registry, and deterministic audit records.
 - Recommended split: v3-1A typed agent message dataclasses; v3-1B tool registry

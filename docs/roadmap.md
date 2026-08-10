@@ -250,6 +250,10 @@ human approval, and guarded simulator/SITL boundaries.
 
 - [x] v3-0 Agentic C2 scope and permission freeze
 - [ ] v3-1 Typed agent contracts and tool registry
+  - [x] v3-1 planning spec
+  - [ ] v3-1A Typed agent message dataclasses
+  - [ ] v3-1B Tool registry and permission manifests
+  - [ ] v3-1C Mock tool-call validation and audit records
 - [ ] v3-2 Supervisor agent and shared situation memory
 - [ ] v3-3 Mission, fleet, risk, and planning agents
 - [ ] v3-4 Simulation validation agent
