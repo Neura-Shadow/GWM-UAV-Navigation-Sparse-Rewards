@@ -235,3 +235,28 @@ completion summary is tracked in
 - [x] v2-6 Optional simulator benchmark integration
 
 These are optional post-v1 extensions and are not blockers for `v1.0.0`.
+
+---
+
+## Post-v2 Optional Extension: GWM-UAV-C2 AgentOps
+
+The completed GWM-UAV-C2 v2 extension remains the stable deterministic C2
+foundation.
+
+AgentOps is a separate optional v3 extension for a human-supervised multi-agent
+ground operations center. Agents remain proposal-oriented and operate through
+typed messages, allowlisted tools, deterministic v2 authorities, explicit
+human approval, and guarded simulator/SITL boundaries.
+
+- [x] v3-0 Agentic C2 scope and permission freeze
+- [ ] v3-1 Typed agent contracts and tool registry
+- [ ] v3-2 Supervisor agent and shared situation memory
+- [ ] v3-3 Mission, fleet, risk, and planning agents
+- [ ] v3-4 Simulation validation agent
+- [ ] v3-5 Safety review and human approval workflow
+- [ ] v3-6 Ground operations dashboard
+- [ ] v3-7 End-to-end mock and gated simulator demonstration
+
+These are optional post-v2 research extensions and are not blockers for the
+completed v1 or v2 artifacts. AgentOps does not add direct vehicle command,
+real hardware, autonomous real flight, or offensive/weaponized behavior.
