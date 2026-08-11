@@ -6,8 +6,9 @@ from copy import deepcopy
 from dataclasses import MISSING, dataclass, field, fields
 from enum import Enum
 from math import isfinite
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from src.c2.agent_audit import AgentAuditLog
 from src.c2.agent_permissions import AgentPermissionManifest
 from src.c2.agent_types import (
     AgentContractError,
@@ -19,6 +20,8 @@ from src.c2.agent_types import (
     ApprovalRequest,
     SideEffectLevel,
     ToolCallRequest,
+    ToolCallResult,
+    ToolCallStatus,
 )
 
 
@@ -368,7 +371,7 @@ class AgentToolDefinition:
 
 
 class AgentToolRegistry:
-    """Metadata-only registry; authorization never invokes tool behavior."""
+    """Exact registry with deny-by-default authorization and mock-only invocation."""
 
     def __init__(self, known_schema_ids: Optional[Sequence[str]] = None) -> None:
         schema_source = DEFAULT_AGENT_TOOL_SCHEMA_IDS if known_schema_ids is None else known_schema_ids
@@ -574,6 +577,549 @@ class AgentToolRegistry:
             self._validate_approval(request, tool, approval_request, approval_decision)
         self._validate_gates(request, tool, gates)
         return AgentToolDefinition.from_dict(tool.to_dict())
+
+    def validate_request(
+        self,
+        request: ToolCallRequest,
+        tool_definition: Optional[AgentToolDefinition] = None,
+    ) -> ToolCallRequest:
+        """Validate a request against one exact registered input schema."""
+
+        if not isinstance(request, ToolCallRequest):
+            raise _error(
+                "invalid_contract",
+                "validation requires a ToolCallRequest",
+                contract_name="AgentToolRegistry",
+            )
+        request.validate()
+        tool = (
+            self.get(request.tool_name, request.tool_version)
+            if tool_definition is None
+            else tool_definition
+        )
+        if not isinstance(tool, AgentToolDefinition):
+            raise _error(
+                "invalid_contract",
+                "validation requires an AgentToolDefinition",
+                contract_name="AgentToolRegistry",
+            )
+        tool.validate()
+        if tool.tool_name != request.tool_name or tool.tool_version != request.tool_version:
+            raise _error(
+                "input_schema_mismatch",
+                "request and tool identifiers do not match",
+                "tool_name",
+                "AgentToolRegistry",
+            )
+        if tool.input_schema_id not in self._known_schema_ids:
+            raise _error(
+                "input_schema_mismatch",
+                "registered input schema is unknown",
+                "input_schema_id",
+                "AgentToolRegistry",
+            )
+        if not isinstance(request.parameters, dict):
+            raise _error(
+                "input_schema_mismatch",
+                "mock tool parameters must be a dictionary",
+                "parameters",
+                "AgentToolRegistry",
+            )
+        declared_schema = request.metadata.get("input_schema_id")
+        if declared_schema is not None and declared_schema != tool.input_schema_id:
+            raise _error(
+                "input_schema_mismatch",
+                "request input schema does not match the registered tool",
+                "input_schema_id",
+                "AgentToolRegistry",
+            )
+        return ToolCallRequest.from_dict(request.to_dict())
+
+    def validate_result(
+        self,
+        tool_definition: AgentToolDefinition,
+        output: Any,
+    ) -> Dict[str, Any]:
+        """Validate and copy the closed mock-handler output envelope."""
+
+        if not isinstance(tool_definition, AgentToolDefinition):
+            raise _error(
+                "invalid_contract",
+                "result validation requires an AgentToolDefinition",
+                contract_name="AgentToolRegistry",
+            )
+        tool_definition.validate()
+        if not isinstance(output, dict):
+            raise _error(
+                "output_schema_mismatch",
+                "mock tool output must be a dictionary",
+                "output",
+                "AgentToolRegistry",
+            )
+        if any(not isinstance(key, str) for key in output):
+            raise _error(
+                "output_schema_mismatch",
+                "mock tool output keys must be strings",
+                "output",
+                "AgentToolRegistry",
+            )
+        required = {"schema_id", "result_summary"}
+        allowed = required | {"evidence_refs", "metadata"}
+        unknown = sorted(set(output) - allowed)
+        if unknown:
+            raise _error(
+                "output_schema_mismatch",
+                "mock tool output contains unknown fields",
+                unknown[0],
+                "AgentToolRegistry",
+            )
+        missing = sorted(required - set(output))
+        if missing:
+            raise _error(
+                "output_schema_mismatch",
+                "mock tool output is missing required fields",
+                missing[0],
+                "AgentToolRegistry",
+            )
+        if output["schema_id"] != tool_definition.output_schema_id:
+            raise _error(
+                "output_schema_mismatch",
+                "mock tool output schema does not match the registered tool",
+                "schema_id",
+                "AgentToolRegistry",
+            )
+        if not isinstance(output["result_summary"], dict):
+            raise _error(
+                "output_schema_mismatch",
+                "result_summary must be a dictionary",
+                "result_summary",
+                "AgentToolRegistry",
+            )
+        evidence_refs = output.get("evidence_refs", [])
+        if (
+            not isinstance(evidence_refs, list)
+            or any(not isinstance(item, str) or not item for item in evidence_refs)
+            or len(set(evidence_refs)) != len(evidence_refs)
+        ):
+            raise _error(
+                "output_schema_mismatch",
+                "evidence_refs must contain unique non-empty strings",
+                "evidence_refs",
+                "AgentToolRegistry",
+            )
+        metadata = output.get("metadata", {})
+        if not isinstance(metadata, dict):
+            raise _error(
+                "output_schema_mismatch",
+                "metadata must be a dictionary",
+                "metadata",
+                "AgentToolRegistry",
+            )
+        _validate_json_safe(output, "output")
+        return {
+            "schema_id": output["schema_id"],
+            "result_summary": deepcopy(output["result_summary"]),
+            "evidence_refs": deepcopy(evidence_refs),
+            "metadata": deepcopy(metadata),
+        }
+
+    def invoke_mock(
+        self,
+        request: ToolCallRequest,
+        identity: AgentIdentity,
+        permission_manifest: AgentPermissionManifest,
+        *,
+        mock_handler: Callable[[Dict[str, Any]], Any],
+        audit_log: AgentAuditLog,
+        approval_request: Optional[ApprovalRequest] = None,
+        approval_decision: Optional[ApprovalDecision] = None,
+        gates: Optional[Mapping[str, bool]] = None,
+        started_at: float = 0.0,
+        mock_elapsed_sec: float = 0.0,
+    ) -> ToolCallResult:
+        """Run one explicitly injected mock callable after exact authorization."""
+
+        if not isinstance(request, ToolCallRequest):
+            raise _error(
+                "invalid_contract",
+                "mock invocation requires a ToolCallRequest",
+                contract_name="AgentToolRegistry",
+            )
+        request.validate()
+        if not callable(mock_handler):
+            raise _error(
+                "invalid_contract",
+                "mock_handler must be an explicitly injected callable",
+                "mock_handler",
+                "AgentToolRegistry",
+            )
+        if not isinstance(audit_log, AgentAuditLog):
+            raise _error(
+                "invalid_contract",
+                "audit_log must be an AgentAuditLog",
+                "audit_log",
+                "AgentToolRegistry",
+            )
+        workflow_id = self._workflow_id(request)
+
+        try:
+            tool = self.authorize(
+                request,
+                identity,
+                permission_manifest,
+                approval_request=approval_request,
+                approval_decision=approval_decision,
+                gates=gates,
+            )
+        except AgentContractError as exc:
+            level = self._required_level_if_registered(request)
+            approval_state, approval_summary = self._approval_summary(
+                level, approval_request, approval_decision
+            )
+            metadata = self._invocation_metadata(approval_summary, request, gates)
+            errors = [self._safe_error(exc.code, exc.message)]
+            audit_time = self._safe_audit_time(started_at)
+            self._append_audit(
+                audit_log,
+                request=request,
+                workflow_id=workflow_id,
+                event_type="tool_call_denied",
+                timestamp=audit_time,
+                actor_id=self._actor_id(identity, request),
+                errors=errors,
+                decision="denied",
+                approval_state=approval_state,
+                metadata=metadata,
+            )
+            return self._build_result(
+                request,
+                status=ToolCallStatus.DENIED,
+                result_summary={},
+                evidence_refs=[],
+                errors=errors,
+                started_at=audit_time,
+                completed_at=audit_time,
+                metadata=metadata,
+            )
+
+        start = self._validate_mock_time(started_at, "started_at")
+        elapsed = self._validate_mock_time(mock_elapsed_sec, "mock_elapsed_sec")
+        completed = start + elapsed
+        approval_state, approval_summary = self._approval_summary(
+            int(tool.required_approval_level), approval_request, approval_decision
+        )
+        metadata = self._invocation_metadata(approval_summary, request, gates)
+
+        if elapsed > request.timeout_sec or elapsed > tool.timeout_sec:
+            errors = [
+                self._safe_error(
+                    "tool_call_timed_out",
+                    "mock elapsed time exceeds an authorized timeout",
+                )
+            ]
+            self._append_audit(
+                audit_log,
+                request=request,
+                workflow_id=workflow_id,
+                event_type="tool_call_timed_out",
+                timestamp=completed,
+                actor_id=identity.agent_id,
+                validated_parameters_summary=request.parameters,
+                errors=errors,
+                decision="timed_out",
+                approval_state=approval_state,
+                metadata=metadata,
+            )
+            return self._build_result(
+                request,
+                status=ToolCallStatus.TIMED_OUT,
+                result_summary={},
+                evidence_refs=[],
+                errors=errors,
+                started_at=start,
+                completed_at=completed,
+                metadata=metadata,
+            )
+
+        try:
+            validated_request = self.validate_request(request, tool)
+        except AgentContractError as exc:
+            errors = [self._safe_error(exc.code, exc.message)]
+            self._append_audit(
+                audit_log,
+                request=request,
+                workflow_id=workflow_id,
+                event_type="tool_call_failed",
+                timestamp=start,
+                actor_id=identity.agent_id,
+                errors=errors,
+                decision="failed",
+                approval_state=approval_state,
+                metadata=metadata,
+            )
+            return self._build_result(
+                request,
+                status=ToolCallStatus.FAILED,
+                result_summary={},
+                evidence_refs=[],
+                errors=errors,
+                started_at=start,
+                completed_at=start,
+                metadata=metadata,
+            )
+
+        self._append_audit(
+            audit_log,
+            request=validated_request,
+            workflow_id=workflow_id,
+            event_type="tool_call_started",
+            timestamp=start,
+            actor_id=identity.agent_id,
+            validated_parameters_summary=validated_request.parameters,
+            decision="started",
+            approval_state=approval_state,
+            metadata=metadata,
+        )
+        try:
+            raw_output = mock_handler(deepcopy(validated_request.parameters))
+        except Exception:
+            errors = [
+                self._safe_error(
+                    "tool_call_failed",
+                    "explicitly injected mock handler failed",
+                )
+            ]
+            self._append_audit(
+                audit_log,
+                request=validated_request,
+                workflow_id=workflow_id,
+                event_type="tool_call_failed",
+                timestamp=completed,
+                actor_id=identity.agent_id,
+                validated_parameters_summary=validated_request.parameters,
+                errors=errors,
+                decision="failed",
+                approval_state=approval_state,
+                metadata=metadata,
+            )
+            return self._build_result(
+                validated_request,
+                status=ToolCallStatus.FAILED,
+                result_summary={},
+                evidence_refs=[],
+                errors=errors,
+                started_at=start,
+                completed_at=completed,
+                metadata=metadata,
+            )
+
+        try:
+            output = self.validate_result(tool, raw_output)
+        except AgentContractError as exc:
+            errors = [self._safe_error(exc.code, exc.message)]
+            self._append_audit(
+                audit_log,
+                request=validated_request,
+                workflow_id=workflow_id,
+                event_type="tool_result_invalid",
+                timestamp=completed,
+                actor_id=identity.agent_id,
+                validated_parameters_summary=validated_request.parameters,
+                errors=errors,
+                decision="failed",
+                approval_state=approval_state,
+                metadata=metadata,
+            )
+            return self._build_result(
+                validated_request,
+                status=ToolCallStatus.FAILED,
+                result_summary={},
+                evidence_refs=[],
+                errors=errors,
+                started_at=start,
+                completed_at=completed,
+                metadata=metadata,
+            )
+
+        result_metadata = deepcopy(metadata)
+        result_metadata["output_schema_id"] = output["schema_id"]
+        result_metadata["mock_output_metadata"] = output["metadata"]
+        result = self._build_result(
+            validated_request,
+            status=ToolCallStatus.PASSED,
+            result_summary=output["result_summary"],
+            evidence_refs=output["evidence_refs"],
+            errors=[],
+            started_at=start,
+            completed_at=completed,
+            metadata=result_metadata,
+        )
+        self._append_audit(
+            audit_log,
+            request=validated_request,
+            workflow_id=workflow_id,
+            event_type="tool_call_completed",
+            timestamp=completed,
+            actor_id=identity.agent_id,
+            validated_parameters_summary=validated_request.parameters,
+            result_summary=result.result_summary,
+            decision="passed",
+            approval_state=approval_state,
+            metadata=result_metadata,
+        )
+        return ToolCallResult.from_dict(result.to_dict())
+
+    @staticmethod
+    def _validate_mock_time(value: Any, field_name: str) -> float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise _error(
+                "invalid_contract",
+                f"{field_name} must be a finite non-negative number",
+                field_name,
+                "AgentToolRegistry",
+            )
+        parsed = float(value)
+        if not isfinite(parsed) or parsed < 0.0:
+            raise _error(
+                "invalid_contract",
+                f"{field_name} must be a finite non-negative number",
+                field_name,
+                "AgentToolRegistry",
+            )
+        return parsed
+
+    @staticmethod
+    def _safe_audit_time(value: Any) -> float:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return 0.0
+        parsed = float(value)
+        return parsed if isfinite(parsed) and parsed >= 0.0 else 0.0
+
+    @staticmethod
+    def _workflow_id(request: ToolCallRequest) -> str:
+        value = request.metadata.get("workflow_id")
+        return value if isinstance(value, str) and value else "workflow-unscoped"
+
+    @staticmethod
+    def _actor_id(identity: Any, request: ToolCallRequest) -> str:
+        return identity.agent_id if isinstance(identity, AgentIdentity) else request.caller_agent_id
+
+    def _required_level_if_registered(self, request: ToolCallRequest) -> Optional[int]:
+        try:
+            return int(self.get(request.tool_name, request.tool_version).required_approval_level)
+        except AgentContractError:
+            return None
+
+    @staticmethod
+    def _approval_summary(
+        required_level: Optional[int],
+        approval_request: Optional[ApprovalRequest],
+        approval_decision: Optional[ApprovalDecision],
+    ) -> Tuple[str, Dict[str, Any]]:
+        outcome = None
+        if isinstance(approval_decision, ApprovalDecision):
+            outcome = approval_decision.outcome.value
+        human_decision_required = required_level in (3, 4)
+        state = outcome or ("missing" if human_decision_required else "not_required")
+        return state, {
+            "required_level": required_level,
+            "approval_ref_present": approval_request is not None,
+            "decision_present": approval_decision is not None,
+            "outcome": outcome,
+            "human_decision_required": human_decision_required,
+        }
+
+    @staticmethod
+    def _invocation_metadata(
+        approval_summary: Dict[str, Any],
+        request: ToolCallRequest,
+        gates: Optional[Mapping[str, bool]],
+    ) -> Dict[str, Any]:
+        supplied = {}
+        if isinstance(gates, dict) and all(
+            isinstance(name, str) and isinstance(value, bool)
+            for name, value in gates.items()
+        ):
+            supplied = {name: gates[name] for name in sorted(gates)}
+        return {
+            "mock_only": True,
+            "approval_summary": deepcopy(approval_summary),
+            "runtime_gate_summary": {
+                "request_refs": sorted(request.runtime_gate_refs),
+                "supplied": supplied,
+            },
+        }
+
+    @staticmethod
+    def _safe_error(code: str, message: str) -> Dict[str, str]:
+        return {"code": code, "message": message}
+
+    @staticmethod
+    def _build_result(
+        request: ToolCallRequest,
+        *,
+        status: ToolCallStatus,
+        result_summary: Dict[str, Any],
+        evidence_refs: Sequence[str],
+        errors: Sequence[Dict[str, str]],
+        started_at: float,
+        completed_at: float,
+        metadata: Dict[str, Any],
+    ) -> ToolCallResult:
+        return ToolCallResult(
+            request_id=request.request_id,
+            tool_name=request.tool_name,
+            tool_version=request.tool_version,
+            status=status,
+            result_summary=deepcopy(result_summary),
+            evidence_refs=list(evidence_refs),
+            errors=deepcopy(list(errors)),
+            started_at=started_at,
+            completed_at=completed_at,
+            metadata=deepcopy(metadata),
+        )
+
+    @staticmethod
+    def _append_audit(
+        audit_log: AgentAuditLog,
+        *,
+        request: ToolCallRequest,
+        workflow_id: str,
+        event_type: str,
+        timestamp: float,
+        actor_id: str,
+        validated_parameters_summary: Any = None,
+        result_summary: Any = None,
+        errors: Sequence[Dict[str, str]] = (),
+        decision: Optional[str] = None,
+        approval_state: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        refs = []
+        for value in (
+            request.request_id,
+            f"{request.tool_name}@{request.tool_version}",
+            request.caller_agent_id,
+        ):
+            if value not in refs:
+                refs.append(value)
+        audit_log.append(
+            audit_log.build_record(
+                workflow_id=workflow_id,
+                event_type=event_type,
+                actor_id=actor_id,
+                timestamp=timestamp,
+                input_refs=refs,
+                tool_name=request.tool_name,
+                tool_version=request.tool_version,
+                validated_parameters_summary=validated_parameters_summary,
+                result_summary=result_summary,
+                decision=decision,
+                approval_state=approval_state,
+                errors=errors,
+                metadata=metadata,
+            )
+        )
 
     @staticmethod
     def _validate_approval(

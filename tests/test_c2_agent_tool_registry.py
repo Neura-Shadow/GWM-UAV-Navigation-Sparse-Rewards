@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import builtins
+from copy import deepcopy
 import json
 import sys
 
 import pytest
 
 from src.c2 import (
+    AgentAuditLog,
+    AgentAuditRecord,
     AgentContractError,
     AgentIdentity,
     AgentPermissionManifest,
@@ -23,6 +27,7 @@ from src.c2 import (
     build_default_agent_permission_manifests,
     build_default_agent_tool_catalogue,
     build_default_agent_tool_registry,
+    redact_for_audit,
 )
 
 
@@ -701,10 +706,11 @@ def test_default_manifests_reference_registered_exact_tools() -> None:
         assert set(manifest.allowed_tool_ids) <= registered
 
 
-def test_default_tool_registry_has_no_invocation_api() -> None:
+def test_default_tool_registry_has_only_explicit_mock_invocation_api() -> None:
     registry = build_default_agent_tool_registry()
 
-    for method_name in ("invoke", "invoke_mock", "execute", "dispatch", "load_plugin", "discover"):
+    assert hasattr(registry, "invoke_mock")
+    for method_name in ("invoke", "execute", "dispatch", "load_plugin", "discover"):
         assert not hasattr(registry, method_name)
 
 
@@ -722,3 +728,512 @@ def test_agent_tool_registry_imports_without_runtime_dependencies() -> None:
     }
 
     assert runtime_modules.isdisjoint(sys.modules)
+
+
+def _append_audit_record(
+    audit_log: AgentAuditLog,
+    *,
+    workflow_id: str = "wf-1",
+    request_id: str = "request-1",
+    event_type: str = "tool_call_started",
+    timestamp: float = 1.0,
+    result_summary: object | None = None,
+) -> AgentAuditRecord:
+    record = audit_log.build_record(
+        workflow_id=workflow_id,
+        event_type=event_type,
+        actor_id="agent-1",
+        timestamp=timestamp,
+        input_refs=[request_id, "mission.query@1", "agent-1"],
+        tool_name="mission.query",
+        tool_version="1",
+        result_summary={} if result_summary is None else result_summary,
+        approval_state="not_required",
+    )
+    return audit_log.append(record)
+
+
+def test_agent_audit_log_appends_in_order() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log)
+    _append_audit_record(
+        audit_log,
+        request_id="request-2",
+        event_type="tool_call_completed",
+        timestamp=2.0,
+    )
+
+    assert [record.event_type for record in audit_log.list_records()] == [
+        "tool_call_started",
+        "tool_call_completed",
+    ]
+
+
+def test_agent_audit_log_record_ids_are_deterministic() -> None:
+    audit_log = AgentAuditLog()
+
+    assert audit_log.next_record_id() == "audit-000001"
+    first = _append_audit_record(audit_log)
+    second = _append_audit_record(audit_log, request_id="request-2")
+
+    assert first.record_id == "audit-000001"
+    assert second.record_id == "audit-000002"
+
+
+def test_agent_audit_log_returns_defensive_copies() -> None:
+    audit_log = AgentAuditLog()
+    appended = _append_audit_record(audit_log, result_summary={"items": [1]})
+
+    appended.result_summary["items"].append(2)
+    listed = audit_log.list_records()
+    listed[0].result_summary["items"].append(3)
+
+    assert audit_log.list_records()[0].result_summary == {"items": [1]}
+
+
+def test_agent_audit_log_filters_by_workflow() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log, workflow_id="wf-1")
+    _append_audit_record(audit_log, workflow_id="wf-2", request_id="request-2")
+
+    assert [record.workflow_id for record in audit_log.list_records("wf-2")] == ["wf-2"]
+    assert audit_log.list_records("WF-2") == []
+
+
+def test_agent_audit_log_finds_by_request() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log, request_id="request-1")
+    _append_audit_record(audit_log, request_id="request-2")
+
+    assert [record.record_id for record in audit_log.find_by_request("request-2")] == [
+        "audit-000002"
+    ]
+    assert audit_log.find_by_request("Request-2") == []
+
+
+def test_agent_audit_log_snapshot_is_json_safe() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log, result_summary={"ok": True})
+
+    snapshot = audit_log.snapshot()
+
+    assert snapshot["schema_version"] == "agent-audit-log-v1"
+    assert snapshot["record_count"] == 1
+    assert json.loads(json.dumps(snapshot, sort_keys=True)) == snapshot
+
+
+def test_agent_audit_log_snapshot_restore() -> None:
+    source = AgentAuditLog()
+    _append_audit_record(source)
+    _append_audit_record(source, request_id="request-2", event_type="tool_call_completed")
+    restored = AgentAuditLog()
+
+    restored.restore(source.snapshot())
+
+    assert restored.snapshot() == source.snapshot()
+    assert restored.next_record_id() == "audit-000003"
+
+
+def test_agent_audit_log_restore_is_atomic() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log)
+    original = audit_log.snapshot()
+    invalid = deepcopy(original)
+    invalid["records"][0]["event_type"] = "provider_payload"
+
+    with pytest.raises(AgentContractError):
+        audit_log.restore(invalid)
+
+    assert audit_log.snapshot() == original
+
+
+def test_agent_audit_log_redacts_sensitive_nested_keys() -> None:
+    audit_log = AgentAuditLog()
+    record = audit_log.build_record(
+        workflow_id="wf-1",
+        event_type="tool_call_completed",
+        actor_id="agent-1",
+        timestamp=1.0,
+        result_summary={
+            "safe": True,
+            "nested": {"Token": "secret-value", "private_key": "key", "count": 2},
+        },
+    )
+
+    stored = audit_log.append(record)
+
+    assert stored.result_summary == {
+        "safe": True,
+        "nested": {"count": 2, "redacted_fields": ["private_key", "token"]},
+    }
+
+
+def test_agent_audit_log_rejects_private_reasoning() -> None:
+    sanitized = redact_for_audit(
+        {"answer": "hold", "private_chain_of_thought": "never store this"}
+    )
+
+    assert "private_chain_of_thought" not in sanitized
+    assert sanitized["redacted_fields"] == ["private_chain_of_thought"]
+
+
+def test_agent_audit_log_clear_is_test_only_and_deterministic() -> None:
+    audit_log = AgentAuditLog()
+    _append_audit_record(audit_log)
+
+    audit_log.clear()
+
+    assert audit_log.list_records() == []
+    assert audit_log.next_record_id() == "audit-000001"
+
+
+def test_agent_audit_imports_without_runtime_dependencies() -> None:
+    runtime_modules = {
+        "airsim",
+        "cosysairsim",
+        "isaacsim",
+        "mavsdk",
+        "message_filters",
+        "omni",
+        "openai",
+        "pxr",
+        "rclpy",
+    }
+
+    assert runtime_modules.isdisjoint(sys.modules)
+
+
+def _valid_mock_output(**overrides: object) -> dict:
+    output = {
+        "schema_id": "mission_snapshot_v1",
+        "result_summary": {"mission_id": "mission-1", "status": "ready"},
+        "evidence_refs": ["mission-1"],
+        "metadata": {"fixture": "mock"},
+    }
+    output.update(overrides)
+    return output
+
+
+def _invoke_query(
+    handler,
+    *,
+    request: ToolCallRequest | None = None,
+    identity: AgentIdentity | None = None,
+    manifest: AgentPermissionManifest | None = None,
+    audit_log: AgentAuditLog | None = None,
+    elapsed: float = 0.5,
+):
+    log = audit_log or AgentAuditLog()
+    result = _registry_with_query().invoke_mock(
+        request or _request(metadata={"workflow_id": "workflow-1"}),
+        identity or _identity(),
+        manifest or _manifest(),
+        mock_handler=handler,
+        audit_log=log,
+        started_at=10.0,
+        mock_elapsed_sec=elapsed,
+    )
+    return result, log
+
+
+def test_mock_tool_call_validates_input() -> None:
+    called = False
+
+    def handler(parameters: dict) -> dict:
+        nonlocal called
+        called = True
+        return _valid_mock_output()
+
+    result, audit_log = _invoke_query(
+        handler,
+        request=_request(
+            metadata={"workflow_id": "workflow-1", "input_schema_id": "wrong_v1"}
+        ),
+    )
+
+    assert result.status.value == "failed"
+    assert result.errors[0]["code"] == "input_schema_mismatch"
+    assert called is False
+    assert audit_log.list_records()[0].event_type == "tool_call_failed"
+
+
+def test_mock_tool_call_calls_explicit_handler_once() -> None:
+    calls = []
+
+    def handler(parameters: dict) -> dict:
+        calls.append(parameters)
+        return _valid_mock_output()
+
+    result, _ = _invoke_query(handler)
+
+    assert result.status.value == "passed"
+    assert len(calls) == 1
+
+
+def test_mock_tool_call_passes_defensive_parameter_copy() -> None:
+    request = _request(
+        parameters={"mission_id": "mission-1", "nested": {"items": [1]}},
+        metadata={"workflow_id": "workflow-1"},
+    )
+
+    def handler(parameters: dict) -> dict:
+        parameters["nested"]["items"].append(2)
+        return _valid_mock_output()
+
+    result, _ = _invoke_query(handler, request=request)
+
+    assert result.status.value == "passed"
+    assert request.parameters["nested"]["items"] == [1]
+
+
+def test_mock_tool_call_denies_unlisted_agent() -> None:
+    called = False
+
+    def handler(parameters: dict) -> dict:
+        nonlocal called
+        called = True
+        return _valid_mock_output()
+
+    result, audit_log = _invoke_query(
+        handler,
+        manifest=_manifest(allowed_tool_ids=[]),
+    )
+
+    assert result.status.value == "denied"
+    assert result.errors[0]["code"] == "permission_denied"
+    assert called is False
+    assert [record.event_type for record in audit_log.list_records()] == [
+        "tool_call_denied"
+    ]
+
+
+def test_mock_tool_call_denies_side_effect_escalation() -> None:
+    result, _ = _invoke_query(
+        lambda parameters: _valid_mock_output(),
+        manifest=_manifest(allowed_side_effect_levels=["STATE_PROPOSAL"]),
+    )
+
+    assert result.status.value == "denied"
+    assert result.errors[0]["code"] == "side_effect_not_allowed"
+
+
+def test_mock_tool_call_denial_never_calls_handler() -> None:
+    calls = []
+
+    result, _ = _invoke_query(
+        lambda parameters: calls.append(parameters),
+        manifest=_manifest(allowed_tool_ids=[]),
+    )
+
+    assert result.status.value == "denied"
+    assert calls == []
+
+
+def _invoke_gated(
+    handler,
+    *,
+    approval: bool,
+    gates: dict[str, bool] | None,
+):
+    registry, request, identity, manifest = _gated_authorization_values()
+    approval_request = approval_decision = None
+    if approval:
+        approval_request, approval_decision = _approval_pair()
+    return registry.invoke_mock(
+        request,
+        identity,
+        manifest,
+        mock_handler=handler,
+        audit_log=AgentAuditLog(),
+        approval_request=approval_request,
+        approval_decision=approval_decision,
+        gates=gates,
+        started_at=1.0,
+        mock_elapsed_sec=0.1,
+    )
+
+
+def test_mock_tool_call_requires_level_three_approval() -> None:
+    calls = []
+    result = _invoke_gated(
+        lambda parameters: calls.append(parameters),
+        approval=False,
+        gates={"GWM_ALLOW_OPTIONAL_RUNTIME": True},
+    )
+
+    assert result.status.value == "denied"
+    assert result.errors[0]["code"] == "approval_required"
+    assert calls == []
+
+
+def test_mock_tool_call_requires_runtime_gate_metadata() -> None:
+    result = _invoke_gated(
+        lambda parameters: {
+            "schema_id": "benchmark_readiness_result_v1",
+            "result_summary": {"ready": True},
+        },
+        approval=True,
+        gates=None,
+    )
+
+    assert result.status.value == "denied"
+    assert result.errors[0]["code"] == "runtime_gate_required"
+
+
+def test_mock_tool_call_never_reads_environment_gates(monkeypatch) -> None:
+    monkeypatch.setenv("GWM_ALLOW_OPTIONAL_RUNTIME", "1")
+
+    result = _invoke_gated(
+        lambda parameters: {},
+        approval=True,
+        gates=None,
+    )
+
+    assert result.status.value == "denied"
+    assert result.errors[0]["code"] == "runtime_gate_required"
+
+
+def test_mock_tool_call_never_invokes_real_runtime(monkeypatch) -> None:
+    real_import = builtins.__import__
+    forbidden = {"airsim", "cosysairsim", "isaacsim", "mavsdk", "rclpy"}
+
+    def guarded_import(name, *args, **kwargs):
+        if name.split(".", 1)[0] in forbidden:
+            raise AssertionError("real runtime must not be imported")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", guarded_import)
+    result, _ = _invoke_query(
+        lambda parameters: _valid_mock_output(
+            result_summary={"runtime_available": False}
+        )
+    )
+
+    assert result.status.value == "passed"
+
+
+def test_mock_tool_call_validates_output_schema() -> None:
+    result, audit_log = _invoke_query(
+        lambda parameters: _valid_mock_output(schema_id="wrong_v1")
+    )
+
+    assert result.status.value == "failed"
+    assert result.errors[0]["code"] == "output_schema_mismatch"
+    assert audit_log.list_records()[-1].event_type == "tool_result_invalid"
+
+
+def test_mock_tool_call_rejects_unknown_output_field() -> None:
+    result, _ = _invoke_query(
+        lambda parameters: _valid_mock_output(unexpected=True)
+    )
+
+    assert result.status.value == "failed"
+    assert result.errors[0]["code"] == "output_schema_mismatch"
+
+
+def test_mock_tool_call_rejects_non_dict_output() -> None:
+    result, _ = _invoke_query(lambda parameters: None)
+
+    assert result.status.value == "failed"
+    assert result.errors[0]["code"] == "output_schema_mismatch"
+
+
+def test_mock_tool_call_writes_start_and_result_audit_records() -> None:
+    result, audit_log = _invoke_query(lambda parameters: _valid_mock_output())
+
+    records = audit_log.find_by_request(result.request_id)
+    assert [record.event_type for record in records] == [
+        "tool_call_started",
+        "tool_call_completed",
+    ]
+    assert records[0].validated_parameters_summary == {"mission_id": "mission-1"}
+    assert records[1].result_summary == result.result_summary
+
+
+def test_mock_tool_call_writes_redacted_audit_record() -> None:
+    audit_log = AgentAuditLog()
+    record = audit_log.build_record(
+        workflow_id="wf-1",
+        event_type="tool_call_failed",
+        actor_id="agent-1",
+        timestamp=1.0,
+        metadata={"safe": True, "Provider_Response": "private"},
+    )
+
+    stored = audit_log.append(record)
+
+    assert stored.metadata == {
+        "safe": True,
+        "redacted_fields": ["provider_response"],
+    }
+
+
+def test_mock_tool_call_failure_is_audited() -> None:
+    def handler(parameters: dict) -> dict:
+        raise RuntimeError("private failure")
+
+    result, audit_log = _invoke_query(handler)
+
+    assert result.status.value == "failed"
+    assert [record.event_type for record in audit_log.list_records()] == [
+        "tool_call_started",
+        "tool_call_failed",
+    ]
+
+
+def test_mock_tool_call_failure_hides_raw_exception() -> None:
+    secret = "internal-provider-trace"
+
+    def handler(parameters: dict) -> dict:
+        raise RuntimeError(secret)
+
+    result, audit_log = _invoke_query(handler)
+    encoded = json.dumps(result.to_dict()) + json.dumps(audit_log.snapshot())
+
+    assert result.errors == [
+        {
+            "code": "tool_call_failed",
+            "message": "explicitly injected mock handler failed",
+        }
+    ]
+    assert secret not in encoded
+
+
+def test_mock_tool_timeout_is_deterministic() -> None:
+    result, _ = _invoke_query(lambda parameters: _valid_mock_output(), elapsed=5.1)
+
+    assert result.status.value == "timed_out"
+    assert result.started_at == 10.0
+    assert result.completed_at == 15.1
+    assert result.errors[0]["code"] == "tool_call_timed_out"
+
+
+def test_mock_tool_timeout_does_not_call_handler() -> None:
+    calls = []
+
+    result, audit_log = _invoke_query(
+        lambda parameters: calls.append(parameters),
+        elapsed=5.1,
+    )
+
+    assert result.status.value == "timed_out"
+    assert calls == []
+    assert [record.event_type for record in audit_log.list_records()] == [
+        "tool_call_timed_out"
+    ]
+
+
+def test_mock_tool_result_is_json_safe() -> None:
+    result, audit_log = _invoke_query(lambda parameters: _valid_mock_output())
+
+    assert json.loads(json.dumps(result.to_dict(), sort_keys=True)) == result.to_dict()
+    assert json.loads(json.dumps(audit_log.snapshot(), sort_keys=True)) == audit_log.snapshot()
+
+
+def test_mock_tool_result_is_defensive_copy() -> None:
+    output = _valid_mock_output()
+    result, audit_log = _invoke_query(lambda parameters: output)
+    output["result_summary"]["status"] = "mutated"
+    result.result_summary["status"] = "caller-mutated"
+
+    assert audit_log.list_records()[-1].result_summary["status"] == "ready"
