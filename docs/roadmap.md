@@ -252,7 +252,7 @@ human approval, and guarded simulator/SITL boundaries.
 - [ ] v3-1 Typed agent contracts and tool registry
   - [x] v3-1 planning spec
   - [x] v3-1A Typed agent message dataclasses
-  - [ ] v3-1B Tool registry and permission manifests
+  - [x] v3-1B Tool registry and permission manifests
   - [ ] v3-1C Mock tool-call validation and audit records
 - [ ] v3-2 Supervisor agent and shared situation memory
 - [ ] v3-3 Mission, fleet, risk, and planning agents
