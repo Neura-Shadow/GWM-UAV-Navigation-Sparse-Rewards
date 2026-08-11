@@ -34,6 +34,18 @@ from src.c2.agent_types import (
     ToolCallResult,
     ToolCallStatus,
 )
+from src.c2.agent_permissions import (
+    AgentPermissionManifest,
+    build_default_agent_permission_manifests,
+)
+from src.c2.agent_tool_registry import (
+    DEFAULT_AGENT_TOOL_NAMES,
+    DEFAULT_AGENT_TOOL_SCHEMA_IDS,
+    AgentToolDefinition,
+    AgentToolRegistry,
+    build_default_agent_tool_catalogue,
+    build_default_agent_tool_registry,
+)
 from src.c2.benchmarking import C2BenchmarkReadinessBuilder, build_c2_benchmark_readiness_report
 from src.c2.dashboard_replay import C2MetricsExporter, C2ReplayReportBuilder, DashboardReplayBuilder
 from src.c2.event_bus import MissionEventBus
@@ -76,6 +88,8 @@ __all__ = [
     "ALLOWED_CONSTRAINT_VERDICTS",
     "ALLOWED_DEFENSIVE_RISK_CATEGORIES",
     "ALLOWED_RISK_RECOMMENDATIONS",
+    "DEFAULT_AGENT_TOOL_NAMES",
+    "DEFAULT_AGENT_TOOL_SCHEMA_IDS",
     "AirspaceConstraint",
     "AgentCapability",
     "AgentAuditRecord",
@@ -86,10 +100,13 @@ __all__ = [
     "AgentDecisionType",
     "AgentIdentity",
     "AgentObservation",
+    "AgentPermissionManifest",
     "AgentProposal",
     "AgentRole",
     "AgentTask",
     "AgentTaskStatus",
+    "AgentToolDefinition",
+    "AgentToolRegistry",
     "AgentWorkflowState",
     "AgentWorkflowStatus",
     "ApprovalLevel",
@@ -135,4 +152,7 @@ __all__ = [
     "UAVState",
     "WARNING_CONSTRAINT_PENALTY",
     "build_c2_benchmark_readiness_report",
+    "build_default_agent_permission_manifests",
+    "build_default_agent_tool_catalogue",
+    "build_default_agent_tool_registry",
 ]

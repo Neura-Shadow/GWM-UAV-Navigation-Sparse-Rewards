@@ -17,9 +17,16 @@ vehicle command behavior.
 
 Status: v3-1A implements the provider-independent typed AgentOps contracts,
 deterministic validation, JSON round-trip support, and sensitive-value
-rejection in `src/c2/agent_types.py`. Permission manifests, tool-registry
-authorization, mock invocation, and audit log behavior remain planned for
-v3-1B and v3-1C.
+rejection in `src/c2/agent_types.py`. At that checkpoint, permission manifests,
+tool-registry authorization, mock invocation, and audit log behavior remained
+planned for v3-1B and v3-1C.
+
+v3-1B implements deny-by-default `AgentPermissionManifest` contracts,
+metadata-only `AgentToolDefinition` records, the exact-match
+`AgentToolRegistry`, the frozen initial tool catalogue, and the nine default
+role manifests. The registry performs deterministic metadata authorization
+only. Mock handler invocation and append-only redacted audit behavior remain
+planned for v3-1C.
 
 ## 2. Relationship to v3-0
 
