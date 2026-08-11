@@ -15,6 +15,12 @@ This document is planning-only. It does not implement an agent runtime, LLM
 integration, external tool execution, simulator access, SITL access, or
 vehicle command behavior.
 
+Status: v3-1A implements the provider-independent typed AgentOps contracts,
+deterministic validation, JSON round-trip support, and sensitive-value
+rejection in `src/c2/agent_types.py`. Permission manifests, tool-registry
+authorization, mock invocation, and audit log behavior remain planned for
+v3-1B and v3-1C.
+
 ## 2. Relationship to v3-0
 
 The authoritative v3-0 documents are:
