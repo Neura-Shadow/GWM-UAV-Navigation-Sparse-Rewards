@@ -38,6 +38,7 @@ from src.c2.agent_permissions import (
     AgentPermissionManifest,
     build_default_agent_permission_manifests,
 )
+from src.c2.agent_audit import AgentAuditLog, redact_for_audit
 from src.c2.agent_tool_registry import (
     DEFAULT_AGENT_TOOL_NAMES,
     DEFAULT_AGENT_TOOL_SCHEMA_IDS,
@@ -93,6 +94,7 @@ __all__ = [
     "AirspaceConstraint",
     "AgentCapability",
     "AgentAuditRecord",
+    "AgentAuditLog",
     "AgentConflict",
     "AgentContext",
     "AgentContractError",
@@ -155,4 +157,5 @@ __all__ = [
     "build_default_agent_permission_manifests",
     "build_default_agent_tool_catalogue",
     "build_default_agent_tool_registry",
+    "redact_for_audit",
 ]

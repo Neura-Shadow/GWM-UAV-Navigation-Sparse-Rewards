@@ -28,6 +28,13 @@ role manifests. The registry performs deterministic metadata authorization
 only. Mock handler invocation and append-only redacted audit behavior remain
 planned for v3-1C.
 
+v3-1C implements deterministic, explicitly injected mock tool-call validation
+and an in-memory redacted `AgentAuditLog`. No provider, network, simulator,
+SITL, vehicle, hardware, shell, or real-tool access is introduced. With
+v3-1A, v3-1B, and v3-1C complete, v3-1 now provides typed contracts,
+deny-by-default exact-match permissions, a metadata-only allowlisted registry,
+mock-only invocation validation, and deterministic redacted audit records.
+
 ## 2. Relationship to v3-0
 
 The authoritative v3-0 documents are:
