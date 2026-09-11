@@ -39,10 +39,18 @@ success, compilation, readiness metadata, and skipped checks cannot establish
 flight success. Twenty consecutive measured successes remain a separate P1
 acceptance requirement. Failures and interrupted runs must be retained.
 
-P2 ROS 2 control and ACK/coordinate checks, P3 depth sensing, P4 non-learning
-avoidance, P5 fixed-weight inference, P6 failure validation, and P7 batch
-evaluation remain unimplemented. Micro XRCE-DDS Agent is middleware, not an
-AgentOps reasoning agent.
+The operator's subsequent P2 request authorizes one isolated ROS 2 control
+owner through Micro XRCE-DDS, a Gazebo-to-ROS clock bridge, recording, and a
+bounded position-Offboard takeoff, hover, east/north/yaw test, return and land
+procedure. The existing four gates remain required for flight. A read-only
+DDS connection stage precedes control. Console access is inspection only;
+QGC retains monitoring/heartbeat only. P2 has its own initial flight and
+20-consecutive-flight acceptance records, separate from P1. Failures remain
+in the history. This is simulation-side control, not AgentOps flight authority.
+
+P3 depth sensing, P4 non-learning avoidance, P5 fixed-weight inference, P6
+failure validation, and P7 batch evaluation remain unimplemented. Micro
+XRCE-DDS Agent is middleware, not an AgentOps reasoning agent.
 
 ## Workspace and sources
 

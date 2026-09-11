@@ -264,14 +264,16 @@ human approval, and guarded simulator/SITL boundaries.
 ### Immediate implementation priority: v3-SIM
 
 The operator-directed [simulation amendment](v3_simulation_scope_amendment.md)
-places P0/P1 before v3-2 without changing AgentOps permissions or phase numbers.
-See [measured validation status](v3_sim_p0_p1_validation.md).
+places P0/P1 and then P2 before v3-2 without changing AgentOps permissions or phase numbers.
+See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2_validation.md).
 
 - [x] P0 Version pinning and environment build
 - [x] P1 PX4/Gazebo simulator boot
 - [x] P1 Initial measured non-AI flight smoke
 - [x] P1 Repeated-flight acceptance: 20 consecutive trials
-- [ ] P2 ROS 2 control, ACK verification, and coordinate tests
+- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: implementation and
+  read-only connection complete; initial ROS flight failed on the pinned
+  estimator's in-flight heading reset; repeated acceptance not run (0/20)
 - [ ] P3 Depth sensing
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
