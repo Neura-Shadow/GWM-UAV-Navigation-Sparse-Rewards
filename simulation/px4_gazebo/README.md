@@ -1,4 +1,4 @@
-# PX4 / Gazebo P0 and P1 operator lane
+# PX4 / Gazebo operator simulation lane
 
 This directory implements the [operator-directed simulation amendment](../../docs/v3_simulation_scope_amendment.md).
 It does not add a handler or capability to AgentOps. All project documentation
@@ -9,7 +9,7 @@ checkouts, builds, and Python environments remain in the Linux filesystem.
 
 `configs/versions.lock.yaml` pins Ubuntu 24.04, ROS 2 Jazzy, Gazebo Harmonic,
 PX4 v1.17.0, px4_msgs release/1.17 at a fixed commit, and DDS Agent v2.4.3.
-Both configuration files use the JSON subset of YAML 1.2 to support a
+The version and flight configuration files use the JSON subset of YAML 1.2 to support a
 standard-library-only preinstallation parser. Actual versions and hashes are
 collected after a successful build; unresolved fields are never evidence of
 an installed or built component. A recorded manifest does not prove a clean
@@ -177,5 +177,82 @@ are identifiers, not a reliable ordering clock when WSL adjusts wall time.
 `tests/test_px4_gazebo_contract.py` covers pure gates/config/measurement logic
 and import safety without Linux, ROS, Gazebo, or PX4. Bash syntax/shellcheck
 and ordinary project regression are separate from P0 build logs and P1
-observed flight evidence. P2 through P7, AI navigation, obstacle avoidance,
-multi-UAV orchestration, and hardware integration are outside this slice.
+observed flight evidence. P0/P1 historical evidence remains unchanged.
+
+## P2 ROS 2 control procedure and current blocker
+
+P2 adds `ros2_ws/src/gwm_px4_control`, with pure frame, wire-field, ACK,
+state-machine, freshness and acceptance modules and a thin ROS adapter.
+The actual read-only connection passed. The first ROS flight entered Offboard,
+armed normally and climbed, then correctly aborted on an estimator reference
+reset. Full P2 flight acceptance is **failed**, and repeated acceptance is
+**not_run (0/20)**. See [P2 validation](../../docs/v3_sim_p2_validation.md) and
+[sanitized evidence](../../docs/evidence/v3_sim_p2_summary.json).
+
+The pinned default magnetometer configuration deliberately resets heading
+above approximately 1.5 m HAGL. This conflicts with the requested 2 m mission
+and strict reset-invalidates-trial rule. Do not repeatedly run the unchanged
+flight expecting a streak. Resolving the estimator/reference contract is the
+next implementation decision; no reset exemption, magnetometer-fusion change,
+height reduction or threshold relaxation was applied to produce a pass.
+
+From the Windows checkout mounted in a WSL shell, build the one-way,
+hash-verified package mirror with Linux system Python and sourced Jazzy:
+
+```bash
+bash simulation/px4_gazebo/scripts/build_p2.sh --build
+```
+
+Build/install/log directories remain under `$HOME/uav_autonomy/p2_ws/<hash>`.
+The launcher rejects changed source mirrors and requires a passed read-only
+receipt for the exact controller/config/launcher/dependency identity:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 \
+bash simulation/px4_gazebo/scripts/run_p2_control.sh --run --observe
+```
+
+The explicit flight entrypoint below documents the bounded workflow. Its
+current configuration is known to abort at the heading reset described above:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
+bash simulation/px4_gazebo/scripts/run_p2_control.sh --run --allow-simulated-flight
+```
+
+QGC monitoring/heartbeat is always included. All processes share a private
+loopback-only network/PID namespace and the existing exclusive P1/P2 lock.
+Only ROS publishes the three PX4 input topics in a flight. Console inspection
+does not issue flight commands. Default calls and missing gates start no
+simulator or ROS node. `--headless` selects headless physics/offscreen QGC;
+the recorded P2 attempts used the normal GUI-requested mode.
+
+After a run, read bags offline; never play command topics into live endpoints:
+
+```bash
+bash simulation/px4_gazebo/scripts/verify_p2_evidence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_P2_RUN_ID"
+```
+
+This verifies artifact hashes, SQLite/CDR readability, complete event-ledger
+agreement, actual wire NaNs/rates/ramps, ACK identity/timing, matched ROS/ULog
+positions and phase-specific state. It records a failed flight as failed even
+when the recording and abort recovery are sound. Existing offline results
+are preserved and cannot be overwritten by this entrypoint.
+
+Only after an initial full flight and its independent evaluator both pass:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
+/usr/bin/python3 simulation/px4_gazebo/scripts/run_p2_repeated.py \
+  --run-repeat --allow-simulated-flight \
+  --smoke-run "$HOME/uav_autonomy/runs/ACTUAL_PASSED_P2_SMOKE_ID"
+```
+
+The runner freezes inputs, independently verifies each new trial and stops
+at the first failure, interruption or input change. P1's previous 20 passes
+never count as P2 evidence. P3-P7, model decisions, obstacle avoidance,
+multi-UAV orchestration and hardware integration remain outside this slice.

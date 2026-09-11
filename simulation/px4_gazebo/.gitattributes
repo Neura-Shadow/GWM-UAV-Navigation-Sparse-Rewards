@@ -1,3 +1,4 @@
 *.sh text eol=lf
 *.py text eol=lf
 *.yaml text eol=lf
+ros2_ws/src/gwm_px4_control/** text eol=lf
