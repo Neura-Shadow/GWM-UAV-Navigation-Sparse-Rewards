@@ -133,6 +133,12 @@ implicit approval.
 
 ## 8. Simulator and SITL Gate Boundary
 
+The subsequent [v3-SIM scope amendment](v3_simulation_scope_amendment.md)
+authorizes operator-directed development setup and bounded local software
+simulation outside application-agent tool invocation. The agent restrictions
+below remain unchanged. This exception does not implement an approval service
+or permit an agent to enable runtime gates or directly control a vehicle.
+
 Normal tests remain mock-first and runtime-free. No simulator, ROS2, MAVSDK,
 PX4 SITL, Nav2, or hardware process is started by default.
 

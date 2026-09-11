@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "model": "x500",
+  "world": "default",
+  "control_owner": "local_px4_console",
+  "target_height_m": 2.0,
+  "hover_duration_sim_s": 10.0,
+  "height_tolerance_m": 0.3,
+  "horizontal_displacement_m": 0.5,
+  "max_sample_gap_sim_s": 0.5,
+  "simulation_deadline_s": 120.0,
+  "wall_deadline_s": 240.0,
+  "reference_frame": "PX4 local NED; height = initial local z minus current z",
+  "repeated_acceptance_count": 20
+}

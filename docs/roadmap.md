@@ -261,6 +261,26 @@ human approval, and guarded simulator/SITL boundaries.
 - [ ] v3-6 Ground operations dashboard
 - [ ] v3-7 End-to-end mock and gated simulator demonstration
 
+### Immediate implementation priority: v3-SIM
+
+The operator-directed [simulation amendment](v3_simulation_scope_amendment.md)
+places P0/P1 before v3-2 without changing AgentOps permissions or phase numbers.
+See [measured validation status](v3_sim_p0_p1_validation.md).
+
+- [x] P0 Version pinning and environment build
+- [x] P1 PX4/Gazebo simulator boot
+- [x] P1 Initial measured non-AI flight smoke
+- [x] P1 Repeated-flight acceptance: 20 consecutive trials
+- [ ] P2 ROS 2 control, ACK verification, and coordinate tests
+- [ ] P3 Depth sensing
+- [ ] P4 Non-learning obstacle avoidance
+- [ ] P5 Fixed-weight policy substitution
+- [ ] P6 Failure validation
+- [ ] P7 Batch evaluation
+
+Runtime-free tests and actual simulated-flight evidence are separate categories.
+The existing Isaac and Cosys-AirSim integration paths retain their own status.
+
 These are optional post-v2 research extensions and are not blockers for the
 completed v1 or v2 artifacts. AgentOps does not add direct vehicle command,
 real hardware, autonomous real flight, or offensive/weaponized behavior.
