@@ -621,6 +621,20 @@ v3-1 typed agent contracts and tool registry planning is tracked in
 - Completion criteria: contracts round-trip through JSON, permissions deny by
   default, only allowlisted mock tools execute, and audit output is redacted.
 
+### Immediate priority amendment: v3-SIM P0/P1
+
+After completed v3-1C, the next implementation lane is operator-directed
+Gazebo/PX4 environment setup and initial non-AI simulated flight, as authorized
+by [the simulation amendment](v3_simulation_scope_amendment.md). It is separate
+from AgentOps application-agent execution. The 13-tool catalogue and mock-only
+invocation boundary remain unchanged. v3-2 is deferred until this immediate
+slice is handled; v3-2 through v3-7 retain their identifiers and open status.
+
+Track actual builds, simulator boot, measured initial flight, and 20-trial
+acceptance separately in [validation](v3_sim_p0_p1_validation.md). P2 through P7
+of the simulation roadmap remain future work. Existing Isaac/Cosys-AirSim
+paths are not validated by a Gazebo result.
+
 ### v3-2: Supervisor Agent and Shared Situation Memory
 
 - Goal: add a deterministic, provider-independent supervisor workflow and a
