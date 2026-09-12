@@ -34,7 +34,7 @@ def current_inputs(sim):
                       [*sorted((sim/"configs").glob("p2*.yaml")), sim/"configs/versions.lock.yaml", sim/"configs/qgc-monitor.ini",
                        *(sim/"scripts"/name for name in ("run_p2_repeated.py", "run_p2_control.sh", "p2_runner.py",
                                                         "p2_build.py", "p1_runner.py", "p1_contract.py", "common.sh", "verify_p2_evidence.sh")),
-                       sim/"validation/collect_p2_evidence.py"]}}
+                       sim/"validation/collect_p2_evidence.py", sim/"validation/reference_evidence.py"]}}
 
 
 def execute(command, output, deadline=600):
@@ -78,6 +78,8 @@ def main(args):
         smoke = json.loads((args.smoke_run/"summary.json").read_text())
         offline = json.loads((args.smoke_run/"p2-offline-evaluation.json").read_text())
         check_smoke(smoke, offline, digest(sim/"validation/collect_p2_evidence.py"))
+        if offline.get("reference_evaluator_sha256") != digest(sim/"validation/reference_evidence.py"):
+            raise ValueError("Reference evaluator changed since initial smoke")
         if smoke["identity"]["package_hash"] != report["frozen_inputs"]["package_hash"]:
             raise ValueError("Controller changed since initial smoke")
         for key, name in (("config_sha256", "p2_control.yaml"), ("clock_bridge_sha256", "p2_clock_bridge.yaml"),

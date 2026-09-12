@@ -15,7 +15,11 @@ from gwm_px4_control import acceptance, contracts, frames, mission, protocol, ti
 
 @pytest.fixture
 def config():
-    return contracts.load_config(PACKAGE.parents[2]/"configs/p2_control.yaml")
+    config = contracts.load_config(PACKAGE.parents[2]/"configs/p2_control.yaml")
+    # Preserve the original strict-v1 contract suite; v2 has additional tests.
+    config.pop("reference_policy", None)
+    config.pop("reference_settings", None)
+    return config
 
 
 @pytest.mark.parametrize("enu,ned", [((1,0,0),(0,1,0)), ((0,1,0),(1,0,0)), ((0,0,1),(0,0,-1)),

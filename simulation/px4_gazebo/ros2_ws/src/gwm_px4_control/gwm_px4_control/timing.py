@@ -16,6 +16,7 @@ class StateCache:
         self.sim = None
         self.clock_wall = None
         self.frozen_reference = None
+        self.reference_manager = None
 
     def clock(self, sim, wall):
         finite([sim, wall], 2)
@@ -53,7 +54,7 @@ class StateCache:
         return tuple(p[k] for k in ("xy_reset_counter", "z_reset_counter", "heading_reset_counter",
                                     "vxy_reset_counter", "vz_reset_counter", "ref_timestamp")) + (a["quat_reset_counter"],)
 
-    def validate(self, sim, wall):
+    def validate(self, sim, wall, terminal_landed=False):
         c = self.config
         if self.clock_wall is None or wall-self.clock_wall > c["clock_stall_wall_s"]:
             raise ValueError("clock_stalled")
@@ -83,12 +84,19 @@ class StateCache:
         if any(f.get(k) is not False for k in ("local_position_invalid", "local_altitude_invalid",
                                                "attitude_invalid", "angular_velocity_invalid")):
             raise ValueError("estimator_failsafe_flags")
-        if s.get("failsafe") is not False or s.get("pre_flight_checks_pass") is not True:
+        # Commander publishes canArm(current nav_state), not general health.
+        # After confirmed LAND/disarm it restores the previous mode intention;
+        # Offboard can no longer arm after the intentional stream handover.
+        terminal = (terminal_landed and s.get("arming_state") == 1
+                    and self.data["vehicle_land_detected"].get("landed") is True)
+        if s.get("failsafe") is not False or (not terminal and s.get("pre_flight_checks_pass") is not True):
             raise ValueError("vehicle_health_invalid")
         if s.get("system_id") != c["vehicle_system"] or s.get("component_id") != c["vehicle_component"]:
             raise ValueError("vehicle_identity_mismatch")
         if self.frozen_reference is not None and self.reference() != self.frozen_reference:
             raise ValueError("estimator_reference_reset")
+        if self.reference_manager is not None and self.reference_manager.rejected:
+            raise ValueError("estimator_reference_reset:"+self.reference_manager.rejected)
         position = finite([p[k] for k in ("x", "y", "z")], 3)
         velocity = finite([p[k] for k in ("vx", "vy", "vz")], 3)
         yaw = yaw_from_quaternion(a["q"])
