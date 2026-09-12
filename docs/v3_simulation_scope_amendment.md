@@ -68,9 +68,22 @@ its one passed trial remain historical and contribute no R2 credit. All
 original numeric flight limits, dependency pins and control ownership remain
 unchanged; this authorization does not extend to P3 or AgentOps work.
 
-P3 depth sensing, P4 non-learning avoidance, P5 fixed-weight inference, P6
-failure validation, and P7 batch evaluation remain unimplemented. Micro
-XRCE-DDS Agent is middleware, not an AgentOps reasoning agent.
+The subsequent P3 request authorizes the pinned x500_depth camera, one-way
+Image/CameraInfo bridging, a separate bounded observation/recording process,
+independent ground calibration and one camera-equipped P2-profile smoke.
+Three fixed consecutive coexistence flights are gated on that smoke passing
+both independent control and sensor evaluation; qualification stops on its
+first failure. It preserves the R2 yaw and R3 controller-only UDPv4 policies,
+all original flight/timing limits and the historical x500 P2 acceptance.
+This slice installs or upgrades no dependencies and adds no AgentOps authority.
+
+[P3 implementation and ground validation](v3_sim_p3_validation.md) are recorded,
+but its camera-equipped smoke failed strict timestamp-window checks and
+qualification remains unrun, so P3 is incomplete. P4 non-learning avoidance,
+P5 fixed-weight inference, P6 failure validation, P7 batch evaluation and
+v3-2 onward remain unimplemented. Micro XRCE-DDS Agent is middleware, not an
+AgentOps reasoning agent. P4 is not the recommended next execution step until
+the declared P3 acceptance passes.
 
 ## Workspace and sources
 

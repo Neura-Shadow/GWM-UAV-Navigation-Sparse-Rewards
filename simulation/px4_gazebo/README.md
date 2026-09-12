@@ -318,3 +318,100 @@ An overflow, missing recording, stale action or over-limit consumed sample
 gap invalidates acceptance. The repeated runner freezes the timing evaluator,
 instrumentation, transport configuration and measured middleware binaries.
 No older R2 pass carries into the new R3 streak.
+
+### P3 depth sensing and observation validation
+
+P3 adds the pinned native x500_depth camera, GZ_TO_ROS Image/CameraInfo bridge,
+a separate bounded sensor adapter/recorder and independent calibration tools.
+See the [sensor contract](../../docs/v3_sim_p3_sensor_contract.md),
+[actual validation and retained failures](../../docs/v3_sim_p3_validation.md)
+and [schema-1 evidence](../../docs/evidence/v3_sim_p3_summary.json).
+No camera input enters P2 control decisions, PX4 fusion or AgentOps.
+
+Actual rendering/bridge/ground checks passed. The one new depth-equipped smoke
+landed normally but failed independent strict timestamp-window acceptance.
+The three-flight qualification was not started (0/3). The commands below
+document the guarded procedure; the recorded failed smoke cannot authorize
+qualification. Further flight work requires a separately authorized repair
+and fresh acceptance, without discarding this failure.
+
+From the Windows checkout in a clean WSL shell, build the content-addressed
+Linux mirrors using already installed Jazzy dependencies:
+
+```bash
+bash simulation/px4_gazebo/scripts/build_p2.sh --build
+bash simulation/px4_gazebo/scripts/build_p3.sh --build
+```
+
+The P3 mirror stays under `$HOME/uav_autonomy/p3_ws/<hash>`. No default script
+call launches runtime. A ground-only start requires the existing three
+runtime gates; it creates no PX4 process or flight-control publisher:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 \
+bash simulation/px4_gazebo/scripts/run_p3_sensing.sh --run --case plane2
+
+/usr/bin/python3 simulation/px4_gazebo/validation/collect_p3_evidence.py \
+  "$HOME/uav_autonomy/runs/ACTUAL_PLANE2_RUN_ID"
+```
+
+Wait for the launcher to exit and finish its artifact manifest before offline
+evaluation. Existing results are exclusive-create. With an independently
+passed plane2 under the declared profile, the ground wrapper fixes the six
+remaining cases, one each, and retains every outcome:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 \
+/usr/bin/python3 simulation/px4_gazebo/scripts/run_p3_ground_matrix.py \
+  --run-matrix --plane2-run "$HOME/uav_autonomy/runs/ACTUAL_PASSED_PLANE2_ID"
+```
+
+It covers plane4, plane6, oblique, asymmetry, out-of-range and a ground-only
+bridge interruption. Truth, fixture coordinates and source-header probes
+stay evaluator-only. The interruption's expected failure is separate from
+nominal depth measurements. Native depth remains 640x480/30 Hz; the selected
+sensor-only middleware XML allocates 64 MiB SHM. P2's controller-only UDPv4
+transport and all numerical limits stay unchanged.
+
+A complete passed ground matrix is required for the read-only depth/PX4
+connection. The selected mode uses actual Ogre2 server rendering through WSLg
+and QGC offscreen monitoring, with an exclusive private namespace and lock:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 \
+bash simulation/px4_gazebo/scripts/run_p3_coexistence.sh --run --observe \
+  --ground-matrix "$HOME/uav_autonomy/runs/ACTUAL_PASSED_GROUND_MATRIX_ID"
+
+bash simulation/px4_gazebo/scripts/verify_p2_evidence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_DEPTH_OBSERVE_ID"
+bash simulation/px4_gazebo/scripts/verify_p3_coexistence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_DEPTH_OBSERVE_ID"
+```
+
+Run those evaluators sequentially **after launcher completion**. The sensor
+evaluator consumes the completed P2 result. A flight start uses the same
+entrypoint with `--allow-simulated-flight` instead of `--observe` and additionally
+requires `GWM_ALLOW_SITL_COMMANDS=1`. It checks exact build/configuration/
+launcher identity and the two independent connection results. The controller
+retains exclusive command ownership and its original bounded mission.
+
+For a future independently passed new depth smoke, the fixed qualification
+entrypoint is:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
+/usr/bin/python3 simulation/px4_gazebo/scripts/run_p3_qualification.py \
+  --run-qualification --allow-simulated-flight \
+  --smoke-run "$HOME/uav_autonomy/runs/ACTUAL_PASSED_DEPTH_SMOKE_ID"
+```
+
+It freezes inputs, runs exactly three consecutive trials, evaluates both
+control and sensing after each, and stops on the first failure. Historical
+x500 P2 20/20 results cannot serve as depth-model acceptance. Raw depth binary,
+indices, calibration/events, control traces, bags and ULogs remain in the Linux
+run directories. Do not replay command bags into a live graph. P4/P5 and
+AgentOps v3-2 onward remain outside the implemented scope.

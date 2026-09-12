@@ -31,10 +31,15 @@ def gates(env, flight=False):
 
 def load_config(path):
     config = json.loads(Path(path).read_text())
+    profiles = {None: ("default", "x500_71"),
+                "p3-depth-coexistence-v1": ("gwm_p3_flight", "x500_depth_71")}
+    if config.get("simulation_profile") not in profiles:
+        raise ValueError("Unsupported simulation profile")
+    world, model = profiles[config.get("simulation_profile")]
     for key, expected in {"schema_version": 1, "instance": 71, "vehicle_system": 72,
                           "vehicle_component": 1, "source_system": 201, "source_component": 191,
                           "dds_domain": 71, "dds_key": 72, "dds_port": 8888,
-                          "ros_prefix": "/px4_71", "world": "default", "model": "x500_71",
+                          "ros_prefix": "/px4_71", "world": world, "model": model,
                           "control_owner": "gwm_px4_control", "max_command_attempts": 1,
                           "repeat_count": 20}.items():
         if config.get(key) != expected or isinstance(config.get(key), bool):

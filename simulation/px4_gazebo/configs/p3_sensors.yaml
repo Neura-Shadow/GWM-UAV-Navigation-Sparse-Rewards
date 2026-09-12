@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "profile": "p3-x500-depth-native-shm64-v1",
+  "model": "x500_depth_71",
+  "world": "gwm_p3_ground",
+  "width": 640, "height": 480, "sensor_hz": 30, "processing_hz": 10,
+  "near_m": 0.2, "far_m": 19.1, "horizontal_fov_rad": 1.274,
+  "encoding": "32FC1", "raw_frame": "camera_link",
+  "optical_frame": "gwm_front_depth_optical",
+  "origin_model_m": [0.13233, 0, 0.26078],
+  "origin_base_flu_m": [0.13233, 0, 0.02078],
+  "native_rgb": "retained_1920x1080_30Hz_no_RGB_bridge",
+  "image_topic": "/gwm/sensors/front_depth/image_raw",
+  "info_topic": "/gwm/sensors/front_depth/camera_info",
+  "observation_topic": "/gwm/sensors/front_depth/observation",
+  "health_topic": "/gwm/sensors/front_depth/health",
+  "source_age_sim_s": 0.25, "stall_wall_s": 1.0,
+  "recorder_capacity": 8, "state_capacity": 300, "state_mismatch_s": 0.05,
+  "require_px4_state": false
+}

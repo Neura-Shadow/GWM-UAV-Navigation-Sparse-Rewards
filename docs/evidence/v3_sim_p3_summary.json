@@ -1,0 +1,3100 @@
+{
+  "schema_version": 1,
+  "phase": "v3-SIM P3",
+  "status": "incomplete",
+  "clean_rebuild_proven": false,
+  "repository": {
+    "branch": "v3/gwm-uav-c2-agentops-planning",
+    "implementation_base_commit": "6204fedb9ac8a2b554ff825c93159a509a1b91ad",
+    "archive_tag": "v1.0.0-research-framework-complete",
+    "archive_commit": "cb304c7a64b2edd57673a3323c0ed2e7d2923453",
+    "unrelated_untracked_preserved": [
+      ".codegraph/"
+    ],
+    "raw_root": "/home/joker0625/uav_autonomy/runs"
+  },
+  "p2_history": {
+    "manifest": "docs/evidence/v3_sim_p2_summary.json",
+    "schema_version": 4,
+    "sha256": "0a0f48716c75b066ddcc3a25f36993ba9e3ad526847bb2dfb84eefe32923b521",
+    "unchanged_from_base": true,
+    "model": "x500_71",
+    "accepted_smoke": "20260912T034917Z-p2-flight-c74f35ba",
+    "accepted_batch": "20260912T035329Z-p2-repeat-84bb288d",
+    "consecutive_passes": 20,
+    "transferred_to_depth_model": false
+  },
+  "dependencies": {
+    "pins": {
+      "px4": {
+        "url": "https://github.com/PX4/PX4-Autopilot.git",
+        "requested_ref": "v1.17.0",
+        "commit": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4"
+      },
+      "px4_msgs": {
+        "url": "https://github.com/PX4/px4_msgs.git",
+        "requested_ref": "release/1.17",
+        "commit": "86d8239e962f6939e05c3737784f60c02fa884db"
+      },
+      "dds_agent": {
+        "url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git",
+        "requested_ref": "v2.4.3",
+        "commit": "73622810d984349b80bbac0ef55fc0b694d62222"
+      }
+    },
+    "gazebo_models_commit": "b6127f4ec20de867e215fb5f78ae88b80f371909",
+    "qgc": {
+      "requested_ref": "v5.1.4",
+      "source_commit": "4568b585648e8c6065cca6c650b52731c1d3baa3",
+      "url": "https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.4/QGroundControl-x86_64.AppImage",
+      "sha256": "1c4ac089abfaac6c6fcd75c7b477ea18da1bc3592cddca5ab1a19c1a13410e65",
+      "role": "optional real local GCS monitoring; no flight control interaction"
+    },
+    "installed": {
+      "ros": "jazzy",
+      "gz_sim": "8.15.0",
+      "gz_sensors": "8.2.2",
+      "gz_rendering": "8.2.3",
+      "ros_gz_bridge": "1.0.24",
+      "fastdds": "2.14.6",
+      "numpy_linux": "1.26.4"
+    },
+    "installed_or_upgraded": false
+  },
+  "sensor": {
+    "config": {
+      "schema_version": 1,
+      "profile": "p3-x500-depth-native-shm64-v1",
+      "model": "x500_depth_71",
+      "world": "gwm_p3_ground",
+      "width": 640,
+      "height": 480,
+      "sensor_hz": 30,
+      "processing_hz": 10,
+      "near_m": 0.2,
+      "far_m": 19.1,
+      "horizontal_fov_rad": 1.274,
+      "encoding": "32FC1",
+      "raw_frame": "camera_link",
+      "optical_frame": "gwm_front_depth_optical",
+      "origin_model_m": [
+        0.13233,
+        0,
+        0.26078
+      ],
+      "origin_base_flu_m": [
+        0.13233,
+        0,
+        0.02078
+      ],
+      "native_rgb": "retained_1920x1080_30Hz_no_RGB_bridge",
+      "image_topic": "/gwm/sensors/front_depth/image_raw",
+      "info_topic": "/gwm/sensors/front_depth/camera_info",
+      "observation_topic": "/gwm/sensors/front_depth/observation",
+      "health_topic": "/gwm/sensors/front_depth/health",
+      "source_age_sim_s": 0.25,
+      "stall_wall_s": 1.0,
+      "recorder_capacity": 8,
+      "state_capacity": 300,
+      "state_mismatch_s": 0.05,
+      "require_px4_state": false
+    },
+    "actual_layout": {
+      "encoding": "32FC1",
+      "is_bigendian": 0,
+      "width": 640,
+      "height": 480,
+      "step": 2560,
+      "bytes_per_frame": 1228800
+    },
+    "calibration": {
+      "kind": "calibration",
+      "info": {
+        "height": 480,
+        "width": 640,
+        "distortion_model": "plumb_bob",
+        "d": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "k": [
+          432.496042035043,
+          0.0,
+          320.0,
+          0.0,
+          432.496042035043,
+          240.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "r": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "p": [
+          432.496042035043,
+          0.0,
+          320.0,
+          -0.0,
+          0.0,
+          432.496042035043,
+          240.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "binning_x": 0,
+        "binning_y": 0,
+        "roi": {
+          "x_offset": 0,
+          "y_offset": 0,
+          "height": 0,
+          "width": 0,
+          "do_rectify": false
+        },
+        "frame_id": "camera_link"
+      },
+      "raw_header": {
+        "stamp": {
+          "sec": 0,
+          "nanosec": 8000000
+        },
+        "frame_id": "camera_link"
+      },
+      "identity": "9f0816e89913bd9e8785cb403ce3f13b3f216cf9cc5cee28f9aa01c5538d7e6d",
+      "validity": "static_within_owned_run_until_identity_change",
+      "receipt_wall_s": 2713.094462726
+    },
+    "asset_hashes": {
+      "Tools/simulation/gz/models/x500_depth/model.config": "5173bfff248fe05ca4c3f275bf55bfa5b643374e025e292cf382db0da27ea7ab",
+      "Tools/simulation/gz/models/x500_depth/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/x500_depth/model.sdf": "84d05a5072b49e87ca164ec9be8bda2e58201baf624d6d10f7117a5e6d6bbb5f",
+      "Tools/simulation/gz/models/x500_depth/thumbnails/5.png": "90878d162403fd076b0c475b097820b6b65fa0467c499024f956dc8f792ae86d",
+      "Tools/simulation/gz/models/x500_depth/thumbnails/3.png": "009aaccf7f28281f4212443cc87e25ffd8a54b5cb4b21932529644db8c9fccd5",
+      "Tools/simulation/gz/models/x500_depth/thumbnails/1.png": "0ae4b707e6058db7763866b8602ab0f144b13c78e87b53a937baa2e1350de915",
+      "Tools/simulation/gz/models/x500_depth/thumbnails/2.png": "16111786fbb9f96c9288231a9878e247461100edfe4d6a6639a3b72f01668624",
+      "Tools/simulation/gz/models/x500_depth/thumbnails/4.png": "8f707f7397295ac438604fbbaa2149d950aa59a09d72d74bbe43929a5d8adf33",
+      "Tools/simulation/gz/models/OakD-Lite/model.config": "6dcd3f701650e543d1021713147c48474c658459adc80532a2f8dd481a8fec51",
+      "Tools/simulation/gz/models/OakD-Lite/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/OakD-Lite/model.sdf": "f8a78a93c19eb3902ec751fc56bf22b389c7528b38f4d5e3a6c177f3548ee070",
+      "Tools/simulation/gz/models/OakD-Lite/meshes/OakDLite.dae": "b7a65f0ab5604764e5a9d6426b9f46f9da2d5a2462cd6cff927fa0e5ae08990b",
+      "Tools/simulation/gz/models/OakD-Lite/thumbnails/5.png": "66f84937991e1036274553110b9aa483e34f08f17aad0e0fe13c459c551350d1",
+      "Tools/simulation/gz/models/OakD-Lite/thumbnails/3.png": "a598af779ff4067bd8e04f25a6c3daa7dbabd2b23427493e02c2dfc608fcc36a",
+      "Tools/simulation/gz/models/OakD-Lite/thumbnails/1.png": "8f19fd59b25f63c145d2a1459ec7c2168a0453d2c416d7c9b831fd9a33abeda2",
+      "Tools/simulation/gz/models/OakD-Lite/thumbnails/2.png": "1fe34cc7a748990cb43cefc3373da59c26000bfc2f3437ea617183bec146a850",
+      "Tools/simulation/gz/models/OakD-Lite/thumbnails/4.png": "0738bc0eb23e710835c88ddfd16f588b7974200085a9d08515365d0efb1ca4a4",
+      "Tools/simulation/gz/models/x500/model.config": "52fdda8e66faa5095434d54e4dcaad5a6a8833cd014e0a5b439349ed8b4a1b67",
+      "Tools/simulation/gz/models/x500/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/x500/model.sdf": "cfe92f98360967faa895b77aa8a6fff3fc9b290286e94e45297c4bdd7b62fbf9",
+      "Tools/simulation/gz/models/x500/thumbnails/5.png": "b76053e95f7aff65c6f83533fb5635554292acb26fe51376c2d62e437e350e75",
+      "Tools/simulation/gz/models/x500/thumbnails/3.png": "848f431c64b34df15c59ad874e6211695ac53ee932ad3509ebb7c6372fc67375",
+      "Tools/simulation/gz/models/x500/thumbnails/1.png": "54d00187e5a03766d5e7b73311bc6bfa22f51cd98b823a287b2da8c551c3175e",
+      "Tools/simulation/gz/models/x500/thumbnails/2.png": "cb6040c119b2a382030165a2a98ab9e9cf816557808a4549c323f2a3792cb8b4",
+      "Tools/simulation/gz/models/x500/thumbnails/4.png": "86e1b7f31a49894caeef210f43248587d6454eba467a492f9bc147bf732ae666",
+      "Tools/simulation/gz/models/x500_base/model.config": "4856afbdeb52f19468f56ddaf4be57c04688f347b8cef2f609daacd2d014d437",
+      "Tools/simulation/gz/models/x500_base/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/x500_base/model.sdf": "e807dca3406f7cd5cb3d545898601c3ec17e0e5242e25cf467a69df1812cf436",
+      "Tools/simulation/gz/models/x500_base/meshes/5010Base.dae": "798396a1945c7ff55a0840b77869e27affdd35fed0d784fff96b68f50f160ea0",
+      "Tools/simulation/gz/models/x500_base/meshes/1345_prop_cw.stl": "7aa4b61c1ddc5304c9c1f5602eacf5e2ec5eafb95dd1f2a3368342f256122fc0",
+      "Tools/simulation/gz/models/x500_base/meshes/1345_prop_ccw.stl": "ba197e0961117a3462b555d65edf3433ba8ff5691624100a185242cb5f456244",
+      "Tools/simulation/gz/models/x500_base/meshes/NXP-HGD-CF.dae": "7321861b113866996dfa79b403def5666d4b796810840d2c057c7b51fc315b0a",
+      "Tools/simulation/gz/models/x500_base/meshes/CF.png": "3a56ec48eeaaf7774e8d3e8e5e88f6973bfa5652c610974c3eb2dbec6ec85944",
+      "Tools/simulation/gz/models/x500_base/meshes/5010Bell.dae": "b90a1b2dd63a8ebbe1f3339ed18cef23673e0d8f03314fd9b9533a68b6b66668",
+      "Tools/simulation/gz/models/x500_base/thumbnails/5.png": "b76053e95f7aff65c6f83533fb5635554292acb26fe51376c2d62e437e350e75",
+      "Tools/simulation/gz/models/x500_base/thumbnails/3.png": "848f431c64b34df15c59ad874e6211695ac53ee932ad3509ebb7c6372fc67375",
+      "Tools/simulation/gz/models/x500_base/thumbnails/1.png": "54d00187e5a03766d5e7b73311bc6bfa22f51cd98b823a287b2da8c551c3175e",
+      "Tools/simulation/gz/models/x500_base/thumbnails/2.png": "cb6040c119b2a382030165a2a98ab9e9cf816557808a4549c323f2a3792cb8b4",
+      "Tools/simulation/gz/models/x500_base/thumbnails/4.png": "86e1b7f31a49894caeef210f43248587d6454eba467a492f9bc147bf732ae666",
+      "Tools/simulation/gz/models/x500_base/materials/textures/rd.png": "9d8851c37dc612c336b46e41744c17fb8333a0af33ac4be93f7147f7549a8e25",
+      "Tools/simulation/gz/models/x500_base/materials/textures/nxp.png": "6c2262c84e0f5f55dbe38e712e6508d654fb6e7c427d1a19cdd62231bc2d52b1",
+      "Tools/simulation/gz/models/x500_base/materials/textures/CF.png": "3a56ec48eeaaf7774e8d3e8e5e88f6973bfa5652c610974c3eb2dbec6ec85944"
+    },
+    "vehicle": {
+      "world_sha256": "58d23e7a3e6437fdb113f747b214fbf6c52f8df3a7f783ee61dfd599e3e1b059",
+      "model": "x500_depth_71",
+      "px4_airframe": "4002_gz_x500_depth sources 4001_gz_x500",
+      "rendering_profile": "p3-ogre2-server-WSLg-v1",
+      "native_sensor_workload_unchanged": true,
+      "native_camera_mass_kg": 0.061,
+      "base_vehicle_mass_kg": 2.0643076923076924,
+      "vehicle_with_camera_mass_kg": 2.1253076923076923,
+      "horizontal_center_radius_m": 2,
+      "rotor_enclosing_radius_m": 0.4,
+      "minimum_fixture_margin_m": 7.6,
+      "controller_parameter_changes": false,
+      "sensor_driven_control": false
+    },
+    "rendering": {
+      "engine": "ogre2",
+      "renderer": "Mesa llvmpipe LLVM 20.1.2 OpenGL 4.5",
+      "ground": "server-only WSLg",
+      "flight": "p3-ogre2-server-WSLg-v1",
+      "changed_depth_observed": true,
+      "rgb": "native sensor retained, no RGB bridge",
+      "gst_camera_plugin": "load failure retained; depth independently observed"
+    },
+    "bridge": {
+      "gz_image": "/depth_camera",
+      "gz_camera_info": "/camera_info",
+      "direction": "GZ_TO_ROS",
+      "qos": "BEST_EFFORT VOLATILE SENSOR_DATA",
+      "configured_queue_depth": 8,
+      "sensor_only_transport": "UDPv4 discovery plus SHM 67108864 bytes, port capacity 64",
+      "controller_transport_unchanged": true
+    }
+  },
+  "final_source_sha256": {
+    "simulation/px4_gazebo/configs/p1_smoke.yaml": "44a01bb187e29b72925b02050c39f1eeb3c6a17020e5350cb917223c9b9017e3",
+    "simulation/px4_gazebo/configs/p2_clock_bridge.yaml": "452de2f2cc4da4945814c1bc73ff1dbb9a8c089f9384fb55c9600af0762b9f78",
+    "simulation/px4_gazebo/configs/p2_control.yaml": "e50f824ac01674513c10aeaf6fb4ac7817c4d2319e28be08de9d371a8e997a4d",
+    "simulation/px4_gazebo/configs/p2_timing.yaml": "d0b8927f3ba29a18def5d0d5cb90a9674d4388a42f6f46fb667f08d225d64d33",
+    "simulation/px4_gazebo/configs/p3_clock_bridge.yaml": "460dea6a84b868f20892f1e8a444316a66afb9c0497cbd7e2c6aac4426a88a8c",
+    "simulation/px4_gazebo/configs/p3_control.yaml": "37cb863a728ff048dcf0349d802ce0ccd855e219802189df68389f563688568e",
+    "simulation/px4_gazebo/configs/p3_fastdds.xml": "09a275ff566f8252134a93acefdffa4ff5857df0751b8dc245ceb3b1106059fc",
+    "simulation/px4_gazebo/configs/p3_sensors.yaml": "9049faebbf4b55964b9277f91a8b9ff5055350268221cededc014fc94f27dfdc",
+    "simulation/px4_gazebo/configs/p3_sensor_bridge.yaml": "02455c17bd422e269d2e002b70c9b264bc36e4277be6a7a4c505377f89815e33",
+    "simulation/px4_gazebo/configs/p3_validation.yaml": "6d83330207060b9301fcdbc4268a11e50cd97e4ec8170732c58a8d4b632b300c",
+    "simulation/px4_gazebo/configs/qgc-monitor.ini": "0d3d50a80c85c71e5dad8a49ca4514582a36413e1d64252003683c4769e464f4",
+    "simulation/px4_gazebo/configs/versions.lock.yaml": "9a37285d5aa8b9f498dd000c8405092d7bbd07f6a213a84a79ddb6cdca31bde9",
+    "simulation/px4_gazebo/scripts/build_baseline.sh": "326a7036bc961227a9715137e3c6979f0111368c2f9676c8d0e7c1b4ea31f0a8",
+    "simulation/px4_gazebo/scripts/build_p2.sh": "298520117e1e0dc73de2d288818dae43e2ff164dbd874f79c5df0fd59135f4a8",
+    "simulation/px4_gazebo/scripts/build_p3.sh": "edd5457fe508480f1db91714932ea6b859f1bb8d89a1bec8f1c76af0555d6525",
+    "simulation/px4_gazebo/scripts/check_environment.sh": "99b3f7317cbc21ce4bf255267c8c7eae9b603bf2df4c7ef367e80f01955c4037",
+    "simulation/px4_gazebo/scripts/common.sh": "f84399b6b3938327b4ca817fd2d08dab340dd09a4ff57368a2041a63035622cb",
+    "simulation/px4_gazebo/scripts/p1_contract.py": "daf348b6af40bf430166aa8f24936bd56396e4fc1312cd36828e99ce811222c8",
+    "simulation/px4_gazebo/scripts/p1_runner.py": "7db73916c05f6848094c5f0ea98892d8e794cab0bad20be35398b7aa1f54c1c8",
+    "simulation/px4_gazebo/scripts/p2_build.py": "b3f6929f7bb7c7a3bc11f1c0818935b7621fb2eb062d760615568d0ff0b13a81",
+    "simulation/px4_gazebo/scripts/p2_runner.py": "bed320e66b9b688a0ff0903b3c193c8b1a4de5055b757787bb33984cd92b6f37",
+    "simulation/px4_gazebo/scripts/p3_build.py": "a438dfe59a2f5b7135aa26bb6348a88ad2c5ece04abd275ce125bf58aac51bce",
+    "simulation/px4_gazebo/scripts/p3_coexistence.py": "b9b6059108e21499bc2a689f7a9c32224ae60d47ab944509aedd84d1bbcb0cd6",
+    "simulation/px4_gazebo/scripts/p3_runner.py": "2786497f8050a2202c9d2e6643e5cde5775bae6c3f8a6a32ad9e8f223036afb6",
+    "simulation/px4_gazebo/scripts/record_versions.py": "6e1451dd9e37fa4963a794e637d961fada006456cf6a3e2ffbec3163e3dadf2a",
+    "simulation/px4_gazebo/scripts/run_p1_baseline.sh": "e630e8f0b0ffb736bbcb1900501729e68268b29143635f7579a634670ce9589c",
+    "simulation/px4_gazebo/scripts/run_p1_repeated.py": "4765892d6eab71faad01d74743e564cbfd7c7a7f18a1ca8cfe99d4612ac9661a",
+    "simulation/px4_gazebo/scripts/run_p2_control.sh": "940e17ee963806b737131e843a10cd83f213f6dda5775cf2498681ec7e2c123c",
+    "simulation/px4_gazebo/scripts/run_p2_repeated.py": "653eb799cb4a2dd0ce7075288d22f335695b78415714b391aae20d7bc102f4ec",
+    "simulation/px4_gazebo/scripts/run_p3_coexistence.sh": "819ad6ba575f9b4bf8b8b6e729e1efa46e1b4acaab4ee9f21aa4b47f2cc4ad02",
+    "simulation/px4_gazebo/scripts/run_p3_ground_matrix.py": "0829b8c96e5eca7522a50216b4eb970ddf456364782a535f3cbf7126da5becf9",
+    "simulation/px4_gazebo/scripts/run_p3_qualification.py": "5b0ae6cd05a9b363775727fe598929a6d759152efa7228c46df0938d01449b64",
+    "simulation/px4_gazebo/scripts/run_p3_sensing.sh": "d97b1d0c255394004d857ad12b4195d311b5494f49da0a515987adaa9f48b288",
+    "simulation/px4_gazebo/scripts/setup_environment.sh": "e566eb7eabdffe9580bbcf8553a65897fee78baeab0300da6efafce6415ed147",
+    "simulation/px4_gazebo/scripts/setup_qgc_monitor.sh": "a0c1d99a4a2a334ffee40a5508dbc31461d4d778d2f1b80102bfdb2fd7775882",
+    "simulation/px4_gazebo/scripts/verify_p2_evidence.sh": "fd532cdcc63f007d675cf49d0dee6f079d1b3c86d3f45b71221242907911c13e",
+    "simulation/px4_gazebo/scripts/verify_p3_coexistence.sh": "6604b77efb574b141355399708aa631f3808c7187de391e662ce5a0c57038f13",
+    "simulation/px4_gazebo/validation/collect_evidence.py": "16666918de585e1fd09363f85be8734c49fcf1a141ccd339fa7f4b5bd8173aba",
+    "simulation/px4_gazebo/validation/collect_p2_evidence.py": "a6acfd2da9e7a07a8f75d1b294f3382b3abd669842fe77d655d8a63b33e18cbf",
+    "simulation/px4_gazebo/validation/collect_p3_coexistence.py": "236cb10ad0457d429f8e035b7691ce6646a7b952fa67413c7d20a1eb95f909e3",
+    "simulation/px4_gazebo/validation/collect_p3_evidence.py": "c3906c29dae940e3bd4db4d60efbe2d83c356032dc21c8908821db4285e70cb8",
+    "simulation/px4_gazebo/validation/p3_source_probe.py": "97317b7234d236c6c209a2af6cdf2125b20763294672a32f346e7bc7dc033f31",
+    "simulation/px4_gazebo/validation/publish_wait_probe.c": "a6249188ff94516ab03a69b46699f92c9327e0bbc7675e73b89b24cffd3f51ad",
+    "simulation/px4_gazebo/validation/reference_evidence.py": "7655e60dd7369c1fc03a3fbd3edcba81f91e54763ecfb9dacc175cb9910ead1d",
+    "simulation/px4_gazebo/validation/timing_evidence.py": "a5832a89f8ba5e110d2b55e043a79344d16bfbb98dfef61b4e1a0f46bf8fe276",
+    "simulation/px4_gazebo/validation/verify_ulog.py": "e35a29acbf6ca3becd0ef8b497c1cb1b4280cde7945c13c1c2d19e08f7c1a8c4",
+    "simulation/px4_gazebo/validation/yaw_evidence.py": "848ed08c8675e06e787e2da61e277dd327f17e731414917f32037e4c3d5d2fe3",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/package.xml": "a76653f98d9d9e44d557d17c579cb7707a91a67c1afa28cf46eee2554cf24249",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/setup.cfg": "135c27299f7f2dfd4151724bc780b427881af54ca869e5b6fb6cd1e3a38e6039",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/setup.py": "9a3f71eadd86f3c80cca9a93c97d3c7226328dcde4f506814b681975d69f5bcf",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/contracts.py": "738ee2c9eb7f4060d61ee36b304ea03f306ad5bb45ee44df940f5caf191d53e9",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/depth.py": "ace03f168254fb5b1623cc7c2c50ef035976a52ef5e32778d655952b95ade453",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/geometry.py": "5ca25c9178151069f0f4803d78f28c3c931a034992784b86137634f58886e244",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/node.py": "b2553c5628a33cd805aae99d7c20c5674793c906f1dc832b77cc6c68701db06d",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/recording.py": "88dc23f4774537ee6c40f319ec8598781ccc0a4f867a3eda7cdfe3c74efa037e",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/state.py": "b48459f19064140ed5cda3d7f15959f28705166118698e7bdd30415762fe6152",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/__init__.py": "7a108227e35c9c3ce8bef3b5a297f60c70260fa4c9f25bfff6cb512efbae17ca",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/resource/gwm_sensor_adapter": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_sensor_adapter/test/test_installed.py": "ec65eda0b6545646eaaed02b0f8860f87bf5c517832fc6085bc66fd661bd6503",
+    "simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control/contracts.py": "411e698a4189102ab1c902949df884d557e375fc1143c614d099b3e2f6dd6720",
+    "tests/test_px4_gazebo_p3_contract.py": "5a86ca862a3b03e5dba9838e9ce74f7e6fe8de3110e0f3045ac2b7e38eb24c5c"
+  },
+  "source_versions": {
+    "ground_sensor_package": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+    "smoke_sensor_package": "dad7d3a750d46ffbde787c3b453e24f69601d8be094ac78777f8be0235276db8",
+    "final_sensor_build": "096bf8e94a58478845b32a4e206713f48930ccf0e2361899273e87bbfe81a3d2",
+    "controller_package": "235b366dfed5d45f901bb028b6a14688cd7b9792791ff42d64e12c93da3ce8e8",
+    "final_run_id_fix": "Unit/build verified after smoke; runtime unproven. Historical nested sensor run_id fields remain sensors.",
+    "final_evaluator_change": "Equivalent three-component contraction without BLAS; original ground outcomes retained, arithmetic parity recorded."
+  },
+  "frozen_validation": {
+    "schema_version": 1,
+    "profile": "p3-x500-depth-native-shm64-v1",
+    "ground_window_sim_s": 30,
+    "settle_sim_s": 5,
+    "startup_wall_s": 90,
+    "ground_wall_deadline_s": 240,
+    "plane_roi_uv": [
+      160,
+      80,
+      480,
+      200
+    ],
+    "valid_fraction_min": 0.95,
+    "median_error_m": 0.05,
+    "median_error_fraction": 0.01,
+    "p95_error_m": 0.1,
+    "p95_error_fraction": 0.02,
+    "source_gap_sim_s": 0.12,
+    "delivered_hz_min": 25,
+    "processed_hz_min": 8,
+    "observation_age_sim_s": 0.25,
+    "state_mismatch_s": 0.05,
+    "health_poll_wall_s": 0.1,
+    "stall_wall_s": 1.0,
+    "interruption_detect_wall_s": 1.2,
+    "recorded_fraction_required": 1.0,
+    "recorder_overflow_allowed": 0,
+    "disk_reserve_bytes": 21474836480,
+    "recorder_capacity": 8,
+    "geometry_pose_translation_drift_m": 0.005,
+    "geometry_pose_rotation_drift_rad": 0.005,
+    "qualification_flights": 3,
+    "stop_first_failure": true,
+    "fixtures": {
+      "plane2": {
+        "distance_m": 2,
+        "yaw_rad": 0
+      },
+      "plane4": {
+        "distance_m": 4,
+        "yaw_rad": 0
+      },
+      "plane6": {
+        "distance_m": 6,
+        "yaw_rad": 0
+      },
+      "oblique": {
+        "distance_m": 4,
+        "yaw_rad": 0.35
+      },
+      "asymmetric": {
+        "distance_m": 4,
+        "yaw_rad": 0
+      },
+      "out_of_range": {
+        "distance_m": 25,
+        "yaw_rad": 0
+      }
+    }
+  },
+  "ground_matrix": {
+    "summary": {
+      "path": "/home/joker0625/uav_autonomy/runs/20260912T111718Z-p3-ground-matrix-2c5c064c/summary.json",
+      "bytes": 30524,
+      "sha256": "4ca5b2da6e122721a95db2c28b25802b306f1137e78853fb2b016c6067f3ee71"
+    },
+    "original_status": "passed",
+    "cases": [
+      {
+        "run_id": "20260912T111501Z-p3-plane2-707b5913",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 909,
+          "delivered_hz": 30.303030303030297,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 9.5999464811346,
+          "observations": 288,
+          "observation_age_max_sim_s": 0.05599999999999916,
+          "processing_max_wall_s": 0.007596498000111751
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 1.0,
+          "expected_median_m": 1.9999999961743946,
+          "measured_median_m": 2.000000238418579,
+          "median_absolute_error_max_m": 2.425799532357331e-07,
+          "p95_absolute_error_max_m": 4.819946454626132e-07,
+          "euclidean_range_hypothesis_median_error_m": 0.1005296416040542,
+          "coordinate_samples": 10080,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 0,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 909,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "267"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1175"
+            ]
+          }
+        },
+        "recording": {
+          "received": 1183,
+          "processed": 372,
+          "repeated": 0,
+          "overwritten_processing_frames": 810,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1183,
+            "written": 1183,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1453670400,
+        "received_frames": 1183,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111501Z-p3-plane2-707b5913/summary.json",
+          "bytes": 18954,
+          "sha256": "1ff4d802b93736b3112c1d14e1cf9fb4e5aa65bdde8a5fb21cccf29f661a4ec4"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111501Z-p3-plane2-707b5913/p3-evaluation.json",
+          "bytes": 3572,
+          "sha256": "7630fdc1d39be3bac7fe5a1a29c2a9646b7db2c28d7014e7364b16e2efea876a"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "e44c2fa85147123620d972a7aba2be2f289668f6fe7401dcdbab286e21c7c616",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                2.18233,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                2.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 949794238464,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1453670400,
+            "sha256": "794229d9c5e9da2b92868bad22d97c4860330f8d61660b77bdc3430ba803afbd"
+          },
+          "depth-index.jsonl": {
+            "bytes": 480574,
+            "sha256": "3ad48f6b5df952ac924d0a579598f95d0f492991023da0b14b9d15ac0fb6195d"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 4133904,
+            "sha256": "90806beea8a8fa1db69b0ea5581d3ffcb17b16c7bb174297ca7940880ae39b69"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 228417,
+            "sha256": "16b622013ac43527423221c0c99b68b8482abeb3ce9f6c9fa8ccc74907fff6d0"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1299,
+            "sha256": "338d95d4de3c8d22f0641b8397816b76e49af4999f35c49dd60255e52f60fcfa"
+          },
+          "truth-end.json": {
+            "bytes": 1299,
+            "sha256": "7831d8ee28e87542a0743ef62d6740923b5cd0b65bd73454329eda9f701282c2"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "ad3bef3cab6740a6c60c6038b0094fe4ffec44596fc297f6e7d02c184d570ffe"
+          }
+        }
+      },
+      {
+        "run_id": "20260912T111721Z-p3-plane4-83a5b7a8",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 909,
+          "delivered_hz": 30.303030303030305,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 9.83277591973244,
+          "observations": 295,
+          "observation_age_max_sim_s": 0.0600000000000005,
+          "processing_max_wall_s": 0.014606594999804656
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 1.0,
+          "expected_median_m": 3.999999993674784,
+          "measured_median_m": 4.000000953674316,
+          "median_absolute_error_max_m": 9.57089538289324e-07,
+          "p95_absolute_error_max_m": 9.625140660496354e-07,
+          "euclidean_range_hypothesis_median_error_m": 0.2010590472531737,
+          "coordinate_samples": 10325,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 0,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 909,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "266"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1174"
+            ]
+          }
+        },
+        "render_challenge": {
+          "after_expected_m": 5,
+          "after_median_m": 5.000000953674316,
+          "observations": 14,
+          "excluded_from_measurement_window": true
+        },
+        "recording": {
+          "received": 1253,
+          "processed": 406,
+          "repeated": 0,
+          "overwritten_processing_frames": 847,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1253,
+            "written": 1253,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1539686400,
+        "received_frames": 1253,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111721Z-p3-plane4-83a5b7a8/summary.json",
+          "bytes": 19165,
+          "sha256": "111f1a3dccd17e030ebaa0f41657572030c15e46262a653c363f4c39769ef0c8"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111721Z-p3-plane4-83a5b7a8/p3-evaluation.json",
+          "bytes": 3736,
+          "sha256": "e0ea32096ad9a144d793cc3687315a8d3c1ad4ea16696d7098263f8941420a3c"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "c195fc8d5c874cf926943931dc25190e8a0e59147bff22bb11a47a397cde1b5d",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                4.182329999999999,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                4.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 948335489024,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1539686400,
+            "sha256": "c1969fffedb5f319570ae87ad9bc7fdb7247c6803d868556f75ae4d1bfa8239f"
+          },
+          "depth-index.jsonl": {
+            "bytes": 509120,
+            "sha256": "8c4e5b8a0e228231046472031b535069736ed9060ad0bb07bb2af5b8829c341e"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 4563798,
+            "sha256": "d89dfb14670878dbc1c2ab86fd1d91254be604c47b602ab825142510aec59558"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 241963,
+            "sha256": "21aa0bf28b1617a93767acf2be74b97d906600b17bd2540d635abead4bf6e74f"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1299,
+            "sha256": "b076a592b38630f9a39f47bacc155c479502052b10638731d8185a57fa8d96e2"
+          },
+          "truth-end.json": {
+            "bytes": 1299,
+            "sha256": "4170357c13b2b13a426acbfa1a03f0226c43356cd78235464abff798513efa11"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "2a361163b6dfc32e6f0a43bbf0b1d18aa51afac7a77ea70b764d42ddd034cb4c"
+          }
+        }
+      },
+      {
+        "run_id": "20260912T111820Z-p3-plane6-22a4ed22",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 909,
+          "delivered_hz": 30.3030303030303,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 9.385894341646553,
+          "observations": 281,
+          "observation_age_max_sim_s": 0.07600000000000051,
+          "processing_max_wall_s": 0.011898757999915688
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 1.0,
+          "expected_median_m": 5.999999991175175,
+          "measured_median_m": 6.000001430511475,
+          "median_absolute_error_max_m": 1.4376574579699763e-06,
+          "p95_absolute_error_max_m": 1.4433282151671278e-06,
+          "euclidean_range_hypothesis_median_error_m": 0.30158821571144534,
+          "coordinate_samples": 9835,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 0,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 909,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "271"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1179"
+            ]
+          }
+        },
+        "recording": {
+          "received": 1189,
+          "processed": 369,
+          "repeated": 0,
+          "overwritten_processing_frames": 819,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1189,
+            "written": 1189,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1461043200,
+        "received_frames": 1189,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111820Z-p3-plane6-22a4ed22/summary.json",
+          "bytes": 19071,
+          "sha256": "8805449e93ff8f29f16b93d6faf9dd9086c0eb419d24a37f31298db2a7f62363"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111820Z-p3-plane6-22a4ed22/p3-evaluation.json",
+          "bytes": 3573,
+          "sha256": "b8bf3c2c6d83d76710966003e024debba76346a6e44675f02b9d6cbe70d5ae54"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "411fd9fb136519ee569a48e400c623f36c4ecefc97c0c013c4aa642b3a152e31",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                6.182329999999999,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                6.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 946790248448,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1461043200,
+            "sha256": "ad3f74701db2ed574e7d509fa50f74536255e77e347d2e2eb66d479f6d40ceeb"
+          },
+          "depth-index.jsonl": {
+            "bytes": 483033,
+            "sha256": "e0e8244b1ecad818c46cbc756054e513b1d496827f302fc7161e0057ce5435e1"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 4141304,
+            "sha256": "e5ca7c3437bb4146853aba1f4523acd9fb8dc859db93817fbe6c6528a7e9e94d"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 230152,
+            "sha256": "09b779fb0842a832c2e99987650edbd5a30a37a2f59d3232cde38bd2369c1e2c"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1299,
+            "sha256": "ddd8edcd98f1c7ebe3825e45e3376ba9c6eef61633f417e31e640008be7f943d"
+          },
+          "truth-end.json": {
+            "bytes": 1300,
+            "sha256": "7103ba5929ba266cb339f66c9fe6bb0549c91ebb5521dce23a716eacc4a7ef33"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "3c6a570828d16248d21138593d9242c10832d9c8c0a586ed99cfcafdeda2a079"
+          }
+        }
+      },
+      {
+        "run_id": "20260912T111919Z-p3-oblique-eed68041",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 909,
+          "delivered_hz": 30.303030303030305,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 8.748994368463395,
+          "observations": 262,
+          "observation_age_max_sim_s": 0.07600000000000051,
+          "processing_max_wall_s": 0.00927838999996311
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 1.0,
+          "expected_median_m": 3.9983134086747025,
+          "measured_median_m": 4.000000953674316,
+          "median_absolute_error_max_m": 0.001687306576045211,
+          "p95_absolute_error_max_m": 0.002185245354577943,
+          "euclidean_range_hypothesis_median_error_m": 0.19868763632604258,
+          "coordinate_samples": 9170,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 0,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 909,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "275"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1183"
+            ]
+          }
+        },
+        "recording": {
+          "received": 1194,
+          "processed": 355,
+          "repeated": 0,
+          "overwritten_processing_frames": 839,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1194,
+            "written": 1194,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1467187200,
+        "received_frames": 1194,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111919Z-p3-oblique-eed68041/summary.json",
+          "bytes": 19100,
+          "sha256": "2046876614eba922b2e5250929e7ffae6f71a82ffb6903a637c5a9d402f429dd"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T111919Z-p3-oblique-eed68041/p3-evaluation.json",
+          "bytes": 3572,
+          "sha256": "013b008990e8cbe0b9eaecb8b81b06c0081e3ce223f08d23339a928320c9d81a"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "c26159df5cf039a9514815780806fbd4ee931e7cadd59ef3a1365d19c5e21e03",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                4.179298635642368,
+                0.01714489037277257,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0.35,
+              "front": [
+                4.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 945324113920,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1467187200,
+            "sha256": "b8682021af29462c99be86f5fd5b4d6f00afbd6eabeeb07981cb5d82ad664eb7"
+          },
+          "depth-index.jsonl": {
+            "bytes": 485036,
+            "sha256": "29a1b9ad77411c89ae4e6e4cfbbb181a1cdb14472bdba19413782fa35bd39390"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 3999686,
+            "sha256": "95a56266bb582b1becaf24f18d9accf4004ee92773425e7e97e107aca5f35b97"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 231520,
+            "sha256": "e2cf56407428733249a4343b8f322f6329cbefaab8304a63213d3b3f19401a38"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1298,
+            "sha256": "6edbe19e9aec54ae2af7d03cf0e2d23e885f7ef55db72312322ef3d0062b7b63"
+          },
+          "truth-end.json": {
+            "bytes": 1300,
+            "sha256": "f9d1f40633604a272710ae8d07115a0ad4db5a955bc023884291e902dc5b7692"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "bf9bf4e0c04a587df3290a34037212a05064b8885c4d7793d96ec58dcf8870cf"
+          }
+        }
+      },
+      {
+        "run_id": "20260912T112015Z-p3-asymmetric-477a3ec5",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 910,
+          "delivered_hz": 30.3,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 9.432700026759433,
+          "observations": 283,
+          "observation_age_max_sim_s": 0.06400000000000006,
+          "processing_max_wall_s": 0.019402376000016375
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 1.0,
+          "expected_median_m": 3.999999993251964,
+          "measured_median_m": 4.000000476837158,
+          "median_absolute_error_max_m": 7.22215182324959e-07,
+          "p95_absolute_error_max_m": 9.62760296374654e-07,
+          "euclidean_range_hypothesis_median_error_m": 0.16795819176053972,
+          "coordinate_samples": 9905,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 0,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 910,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "279"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1188"
+            ]
+          }
+        },
+        "asymmetric": {
+          "left_high_m": 3.0000007152557373,
+          "right_low_m": 2.000000238418579,
+          "left_high_roi_uv": [
+            195,
+            55,
+            205,
+            65
+          ],
+          "right_low_roi_uv": [
+            455,
+            115,
+            465,
+            125
+          ],
+          "verified_axes": "image_right_to_body_negative_Y; image_up_to_body_positive_Z; positive_forward_X",
+          "optical_to_base_translation_m": [
+            0.13233,
+            0,
+            0.02078
+          ]
+        },
+        "recording": {
+          "received": 1202,
+          "processed": 377,
+          "repeated": 0,
+          "overwritten_processing_frames": 825,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1202,
+            "written": 1202,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1477017600,
+        "received_frames": 1202,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112015Z-p3-asymmetric-477a3ec5/summary.json",
+          "bytes": 19709,
+          "sha256": "b6f23c80d2394fa49317243f38f4416f5579612cd7c3b581d4f91f5cf582a522"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112015Z-p3-asymmetric-477a3ec5/p3-evaluation.json",
+          "bytes": 3998,
+          "sha256": "3d530ae9bdec31cddf54551380282547a42623febb42647b4507666da6777bfb"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "624e1ae067d997c0edfd3e587eb9e2ab78ae5513e126b0fd70536403cac185aa",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                4.182329999999999,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                4.13233,
+                0,
+                4
+              ]
+            },
+            {
+              "name": "right_low",
+              "center": [
+                2.18233,
+                -0.65,
+                0.8
+              ],
+              "size": [
+                0.1,
+                0.5,
+                0.4
+              ],
+              "yaw_rad": 0,
+              "front": [
+                2.13233,
+                -0.65,
+                0.8
+              ]
+            },
+            {
+              "name": "left_high",
+              "center": [
+                3.18233,
+                0.85,
+                1.5
+              ],
+              "size": [
+                0.1,
+                0.5,
+                0.6
+              ],
+              "yaw_rad": 0,
+              "front": [
+                3.13233,
+                0.85,
+                1.5
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 943851974656,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1477017600,
+            "sha256": "ca688c93671510dc5947e0a1df34864e9a3842731d1c018d2f93806c29c25107"
+          },
+          "depth-index.jsonl": {
+            "bytes": 488311,
+            "sha256": "da1c2e33fcd26a4a58c210519ca8fcaaf8f8089bc29eef47f68a1e04a31e4a49"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 4241640,
+            "sha256": "a45395c1e3624d4256a6c38042f6076ad039ca4bee16cda508d5ee7c83532f33"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 233067,
+            "sha256": "5ad9096e2965ab23b497f603d686c445fa5c108584cd4c239ff4efa18d925f0a"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1299,
+            "sha256": "2ac720b11862f07ca2f44f0f9ad0b81bf632603497735cc28c80441f8ecbcad1"
+          },
+          "truth-end.json": {
+            "bytes": 1300,
+            "sha256": "02764325237f3d6c34c3752bdbbd1337bd23cf8b70c2bf50313ee2ada84da876"
+          },
+          "ogre2.log": {
+            "bytes": 32365,
+            "sha256": "66ea5ebc068ebb01345b41fdb6197dbd6e631d0eb8eb2d999a3ec4280f7008cc"
+          }
+        }
+      },
+      {
+        "run_id": "20260912T112115Z-p3-out_of_range-aefba15e",
+        "status": "passed",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "timing": {
+          "window_sim_s": 30.0,
+          "frames": 909,
+          "delivered_hz": 30.303030303030305,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "processed_hz": 9.620541700187717,
+          "observations": 288,
+          "observation_age_max_sim_s": 0.07600000000000051,
+          "processing_max_wall_s": 0.02818436699999438
+        },
+        "pose": {
+          "model_world_m": [
+            -7.660121611082028e-11,
+            -8.22615308795871e-18,
+            -0.013000186169129041
+          ],
+          "optical_world_m": [
+            0.13233000132599507,
+            -6.278225917399775e-18,
+            0.24777981311913863
+          ],
+          "translation_drift_m": 0.0,
+          "rotation_drift_rad": 0.0
+        },
+        "geometry": {
+          "roi_uv": [
+            160,
+            80,
+            480,
+            200
+          ],
+          "pixels_per_frame": 38400,
+          "valid_fraction_min": 0.0,
+          "expected_median_m": 24.999999967428874,
+          "measured_median_m": null,
+          "median_absolute_error_max_m": 0.0,
+          "p95_absolute_error_max_m": 0.0,
+          "euclidean_range_hypothesis_median_error_m": null,
+          "coordinate_samples": 4032,
+          "coordinate_error_max_m": 0.0,
+          "unique_raw_frames": 1,
+          "invalid_counts": {
+            "nan": 0,
+            "positive_infinity": 143234766,
+            "negative_infinity": 0,
+            "finite_below_range": 0,
+            "finite_above_range": 0
+          }
+        },
+        "source_probe": {
+          "frames": 909,
+          "source_gap_max_sim_s": 0.036000000000001364,
+          "gazebo_frames_missing_in_ros": 0,
+          "source_sequence_first": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "275"
+            ]
+          },
+          "source_sequence_last": {
+            "frame_id": [
+              "camera_link"
+            ],
+            "seq": [
+              "1183"
+            ]
+          }
+        },
+        "recording": {
+          "received": 1195,
+          "processed": 377,
+          "repeated": 0,
+          "overwritten_processing_frames": 818,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 1195,
+            "written": 1195,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 1468416000,
+        "received_frames": 1195,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112115Z-p3-out_of_range-aefba15e/summary.json",
+          "bytes": 19129,
+          "sha256": "d224ff9bc30ac1ca5fe2972daacf702acc63599c22e577f255fd9308cddb62d3"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112115Z-p3-out_of_range-aefba15e/p3-evaluation.json",
+          "bytes": 3523,
+          "sha256": "e4b153d7d42694f40311ce8ee8862264a40167d4a14aa6ef68cd62ba50005fbd"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "3013b94fa64a88121a573af50588fb1a165e113c979e8a2b18c9eec7004a0bdb",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                25.18233,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                25.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 942369759232,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 1468416000,
+            "sha256": "8435a4d4da569ffeab33652248c130fabce8ccf13fc1af7d315bce9790fd8bb1"
+          },
+          "depth-index.jsonl": {
+            "bytes": 485473,
+            "sha256": "6127dfeaa8f111aecb1b232dc4a84d3e4b4e4e6b2532beb850b70f8db44a8741"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 2994901,
+            "sha256": "bb4284dba7b9ceeccefc9bc6c883a8a8783b90f1e0cd4287af0cc49c0c555c31"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 231718,
+            "sha256": "ab20ebcc8833dd220778e60f25ca233b90c84db496cc5a94ee51d6230d0be041"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1298,
+            "sha256": "c66f8267569c437b362bbeadd2b11e5a7ad0f1ac9c41e05359e354ccdbc7d5c8"
+          },
+          "truth-end.json": {
+            "bytes": 1300,
+            "sha256": "0fdaf2973970dd6ce69d3deb62029fce87a262e9218e770c0997eca689302a96"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "8dcb4339269446a5828a5d3fa86b2328ff7257211a1074739f949d33f6651575"
+          }
+        },
+        "error_interpretation": "No finite ROI measurement. Original zero error accumulators are not distance accuracy evidence."
+      },
+      {
+        "run_id": "20260912T112212Z-p3-interruption-f2fd78a7",
+        "status": "passed_expected_failure_diagnostic",
+        "failures": [],
+        "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee",
+        "detection_wall_s": 0.24489471800006868,
+        "recording": {
+          "received": 272,
+          "processed": 88,
+          "repeated": 0,
+          "overwritten_processing_frames": 184,
+          "errors": {},
+          "status": "complete",
+          "recorder": {
+            "accepted": 272,
+            "written": 272,
+            "overflow": 0,
+            "peak": 1,
+            "capacity": 8,
+            "fsync_completed": true
+          }
+        },
+        "raw_bytes": 334233600,
+        "received_frames": 272,
+        "summary": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112212Z-p3-interruption-f2fd78a7/summary.json",
+          "bytes": 19602,
+          "sha256": "ac8b8249992f126b24fc9690f4306160e3cc8251e398d03b48672f1d63cd377b"
+        },
+        "evaluation": {
+          "path": "/home/joker0625/uav_autonomy/runs/20260912T112212Z-p3-interruption-f2fd78a7/p3-evaluation.json",
+          "bytes": 1946,
+          "sha256": "b80b0be0fd72da2cbadf2b7a13462650bc1cbda33ab14c82f85ab74665d4f7ca"
+        },
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "fixture": {
+          "source_world_sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2",
+          "generated_world_sha256": "c195fc8d5c874cf926943931dc25190e8a0e59147bff22bb11a47a397cde1b5d",
+          "boxes": [
+            {
+              "name": "front_plane",
+              "center": [
+                4.182329999999999,
+                0.0,
+                4
+              ],
+              "size": [
+                0.1,
+                20,
+                20
+              ],
+              "yaw_rad": 0,
+              "front": [
+                4.13233,
+                0,
+                4
+              ]
+            }
+          ],
+          "ground_plane_z": 0,
+          "world": "gwm_p3_ground",
+          "model": "x500_depth_71",
+          "optical_origin_model_m": [
+            0.13233,
+            0,
+            0.26078
+          ],
+          "base_origin_model_m": [
+            0,
+            0,
+            0.24
+          ]
+        },
+        "resolved_model_sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256",
+        "disk_free_before_bytes": 940897398784,
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "raw_artifacts": {
+          "depth.bin": {
+            "bytes": 334233600,
+            "sha256": "a9769fa45f4cba454cc425d783a412c0a5ed7babf55418da967a72c32ccc8f08"
+          },
+          "depth-index.jsonl": {
+            "bytes": 109942,
+            "sha256": "a8e70d72d22a262d354ecea8a1b47809e9bdc28823703941da9a920c879b3ea2"
+          },
+          "sensor-events.jsonl": {
+            "bytes": 996949,
+            "sha256": "502f7aad2d2a44356ded9fdcbc8f3364fc8be24f594ff01fa9bb162a132fcf93"
+          },
+          "gazebo-source-headers.jsonl": {
+            "bytes": 72523,
+            "sha256": "0d6f4cc98ba06b87b2c0358f247eb90becac5a223878eab1292ea06e9e55e640"
+          },
+          "resolved-model.sdf": {
+            "bytes": 25124,
+            "sha256": "dc6f7ff37d4297602324588432e6c848bca2d0fb477db3d42f6cb6f32dc5b256"
+          },
+          "truth-start.json": {
+            "bytes": 1299,
+            "sha256": "c3d504079de6ef5b0f7dfc375faae2104cad411cc20f7ab7a643106053600c18"
+          },
+          "truth-end.json": {
+            "bytes": 1300,
+            "sha256": "e0626c34d95cac68818b521a89a4e4709bf95809f8da5188d494cd63ed18c005"
+          },
+          "ogre2.log": {
+            "bytes": 32069,
+            "sha256": "e11ff9267dfbfe074f4ff0634944711fd08b70e2b3401b1462af69032a583417"
+          }
+        }
+      }
+    ]
+  },
+  "flight_coexistence": {
+    "read_only_run": "20260912T113246Z-p3-observe-6d982d6b",
+    "smoke_run": "20260912T113430Z-p3-flight-0dc41a18",
+    "launcher_status": "passed",
+    "independent_control": {
+      "recording_integrity": "passed",
+      "flight_acceptance": "failed",
+      "command_ids": [
+        176,
+        400,
+        21
+      ],
+      "acks": [
+        {
+          "command": 176,
+          "latency_sim_s": 0.016,
+          "target_system": 201,
+          "target_component": 191,
+          "ulog_match": true
+        },
+        {
+          "command": 400,
+          "latency_sim_s": 0.012,
+          "target_system": 201,
+          "target_component": 191,
+          "ulog_match": true
+        },
+        {
+          "command": 21,
+          "latency_sim_s": 0.008,
+          "target_system": 201,
+          "target_component": 191,
+          "ulog_match": true
+        }
+      ],
+      "prestream_sim_s": 2.0,
+      "final_disarmed": true,
+      "final_landed": true,
+      "failsafe_observed": false,
+      "estimator_correlation": {
+        "exact_timestamp_pairs": 4943,
+        "max_position_difference_m": 0.0
+      },
+      "reference_ulog": {
+        "status": "passed",
+        "instance_ids": [
+          0
+        ],
+        "devices": {
+          "accel_device_id": 1310988,
+          "gyro_device_id": 1310988,
+          "mag_device_id": 197388,
+          "baro_device_id": 6619404
+        },
+        "reset_events": [
+          {
+            "ulog_reset_sim_s": 28.984,
+            "delta_heading": 0.007018343545496464,
+            "internal_yaw_samples": 4,
+            "internal_yaw_max_error_rad": 0.001347661018371582
+          }
+        ],
+        "position_velocity_origin_unchanged": true,
+        "compensation_ownership": "mode-specific yaw evaluation required"
+      },
+      "yaw_ownership": {
+        "status": "passed",
+        "initialization_wire_samples": 315,
+        "handover_start_sim_s": 35.088,
+        "handover_complete_sim_s": 35.212,
+        "first_finite_yaw": 1.6754997968673706,
+        "fresh_aligned_heading": 1.6754997968673706,
+        "corrected_mission_anchor": 1.6793607401906705,
+        "max_initialization_drift_deg": {
+          "heading": 0.28126167644052924,
+          "attitude": 0.2812619339569888
+        },
+        "matched_internal_samples": 135,
+        "max_resolved_yaw_error_rad": 0.0,
+        "max_match_age_s": 0.0,
+        "internal_max_sample_gap_s": 0.10400000000000631,
+        "coverage_limit": "Internal output sampled about 10 Hz; intervals and downstream scheduling are not proven at every update."
+      },
+      "ros_controller_samples": {
+        "status": "failed",
+        "windows": {
+          "INITIAL_HOVER": {
+            "status": "passed",
+            "duration_sim_s": 10.036000000000001,
+            "samples": 225,
+            "max_gap_sim_s": 0.06400000000000006,
+            "max_horizontal_error_m": 0.04495327609580817,
+            "max_height_error_m": 0.013784050941467285,
+            "max_yaw_error_deg": 0.25086299163964476
+          },
+          "EAST_TEST": {
+            "status": "passed",
+            "duration_sim_s": 5.0,
+            "samples": 106,
+            "max_gap_sim_s": 0.06400000000000006,
+            "max_horizontal_error_m": 0.038905288877177556,
+            "max_height_error_m": 0.006012558937072754,
+            "max_yaw_error_deg": 0.22358880830112948
+          },
+          "RETURN_AFTER_EAST": {
+            "status": "passed",
+            "duration_sim_s": 5.024000000000001,
+            "samples": 107,
+            "max_gap_sim_s": 0.06400000000000716,
+            "max_horizontal_error_m": 0.03966203690276253,
+            "max_height_error_m": 0.018111348152160645,
+            "max_yaw_error_deg": 0.25933961069905875
+          },
+          "NORTH_TEST": {
+            "status": "passed",
+            "duration_sim_s": 5.036000000000001,
+            "samples": 109,
+            "max_gap_sim_s": 0.06400000000000716,
+            "max_horizontal_error_m": 0.04035948647657184,
+            "max_height_error_m": 0.010647416114807129,
+            "max_yaw_error_deg": 0.26628444056433753
+          },
+          "RETURN_AFTER_NORTH": {
+            "status": "passed",
+            "duration_sim_s": 5.040000000000006,
+            "samples": 113,
+            "max_gap_sim_s": 0.06400000000000716,
+            "max_horizontal_error_m": 0.05599797277263122,
+            "max_height_error_m": 0.016564488410949707,
+            "max_yaw_error_deg": 0.13551900965294075
+          },
+          "YAW_TEST": {
+            "status": "passed",
+            "duration_sim_s": 5.007999999999996,
+            "samples": 118,
+            "max_gap_sim_s": 0.06400000000000716,
+            "max_horizontal_error_m": 0.03998031476280944,
+            "max_height_error_m": 0.012099623680114746,
+            "max_yaw_error_deg": 3.812376124969105
+          },
+          "RESTORE_INITIAL_YAW": {
+            "status": "passed",
+            "duration_sim_s": 5.0,
+            "samples": 112,
+            "max_gap_sim_s": 0.06799999999999784,
+            "max_horizontal_error_m": 0.030856648415141876,
+            "max_height_error_m": 0.014314055442810059,
+            "max_yaw_error_deg": 3.892404566382022
+          },
+          "FINAL_HOVER": {
+            "status": "failed",
+            "duration_sim_s": 5.02000000000001,
+            "samples": 165,
+            "max_gap_sim_s": 0.06400000000000716,
+            "max_horizontal_error_m": 0.03582426289015338,
+            "max_height_error_m": 0.009234070777893066,
+            "max_yaw_error_deg": 0.020802837962207686
+          }
+        },
+        "expected_ned_fixture": {
+          "INITIAL_HOVER": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "EAST_TEST": {
+            "position": [
+              -0.01873779296875,
+              0.9673626348376274,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "RETURN_AFTER_EAST": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "NORTH_TEST": {
+            "position": [
+              0.98126220703125,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "RETURN_AFTER_NORTH": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "YAW_TEST": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.1557619645923718
+          },
+          "RESTORE_INITIAL_YAW": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          },
+          "FINAL_HOVER": {
+            "position": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "yaw": 1.6793607401906705
+          }
+        }
+      },
+      "independent_windows": {
+        "INITIAL_HOVER": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 10.036000000000001,
+            "samples": 503,
+            "max_gap_sim_s": 0.028000000000005798,
+            "max_horizontal_error_m": 0.04497125252165519,
+            "max_height_error_m": 0.013828873634338379,
+            "max_yaw_error_deg": 0.2508558439179916
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 10.036000000000001,
+            "samples": 1255,
+            "max_gap_sim_s": 0.012000000000000455,
+            "max_horizontal_error_m": 0.0449783868481227,
+            "max_height_error_m": 0.013828873634338379,
+            "max_yaw_error_deg": 0.25134776546929116
+          }
+        },
+        "EAST_TEST": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.0,
+            "samples": 251,
+            "max_gap_sim_s": 0.02400000000000091,
+            "max_horizontal_error_m": 0.03892535869227396,
+            "max_height_error_m": 0.006027817726135254,
+            "max_yaw_error_deg": 0.22358338102616984
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.0,
+            "samples": 626,
+            "max_gap_sim_s": 0.012000000000000455,
+            "max_horizontal_error_m": 0.038925911319979536,
+            "max_height_error_m": 0.006030440330505371,
+            "max_yaw_error_deg": 0.22358338102616984
+          }
+        },
+        "RETURN_AFTER_EAST": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.024000000000001,
+            "samples": 252,
+            "max_gap_sim_s": 0.028000000000005798,
+            "max_horizontal_error_m": 0.039667208505235446,
+            "max_height_error_m": 0.018111824989318848,
+            "max_yaw_error_deg": 0.2593357864946867
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.024000000000001,
+            "samples": 629,
+            "max_gap_sim_s": 0.012000000000000455,
+            "max_horizontal_error_m": 0.03967180874638768,
+            "max_height_error_m": 0.018114209175109863,
+            "max_yaw_error_deg": 0.25949461450283895
+          }
+        },
+        "NORTH_TEST": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.036000000000001,
+            "samples": 253,
+            "max_gap_sim_s": 0.028000000000005798,
+            "max_horizontal_error_m": 0.04037207028297927,
+            "max_height_error_m": 0.010647416114807129,
+            "max_yaw_error_deg": 0.2662847451831326
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.036000000000001,
+            "samples": 630,
+            "max_gap_sim_s": 0.016000000000005343,
+            "max_horizontal_error_m": 0.04037377216010261,
+            "max_height_error_m": 0.010647416114807129,
+            "max_yaw_error_deg": 0.26677794433169666
+          }
+        },
+        "RETURN_AFTER_NORTH": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.040000000000006,
+            "samples": 253,
+            "max_gap_sim_s": 0.028000000000005798,
+            "max_horizontal_error_m": 0.05599797277263122,
+            "max_height_error_m": 0.016564488410949707,
+            "max_yaw_error_deg": 0.13556093687106188
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.040000000000006,
+            "samples": 631,
+            "max_gap_sim_s": 0.012000000000000455,
+            "max_horizontal_error_m": 0.05599869285790503,
+            "max_height_error_m": 0.016564488410949707,
+            "max_yaw_error_deg": 0.13556093687106188
+          }
+        },
+        "YAW_TEST": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.007999999999996,
+            "samples": 251,
+            "max_gap_sim_s": 0.028000000000005798,
+            "max_horizontal_error_m": 0.04000347328047885,
+            "max_height_error_m": 0.012112021446228027,
+            "max_yaw_error_deg": 3.8935361656178675
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.007999999999996,
+            "samples": 627,
+            "max_gap_sim_s": 0.012000000000000455,
+            "max_horizontal_error_m": 0.04000347328047885,
+            "max_height_error_m": 0.012112021446228027,
+            "max_yaw_error_deg": 3.8529804602348032
+          }
+        },
+        "RESTORE_INITIAL_YAW": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.0,
+            "samples": 251,
+            "max_gap_sim_s": 0.027999999999991587,
+            "max_horizontal_error_m": 0.03087610375946078,
+            "max_height_error_m": 0.014314055442810059,
+            "max_yaw_error_deg": 4.014969045648183
+          },
+          "ulog": {
+            "status": "failed",
+            "duration_sim_s": 5.0,
+            "samples": 625,
+            "max_gap_sim_s": 0.016000000000005343,
+            "max_horizontal_error_m": 0.03087610375946078,
+            "max_height_error_m": 0.014321684837341309,
+            "max_yaw_error_deg": 3.933059945531383
+          }
+        },
+        "FINAL_HOVER": {
+          "rosbag": {
+            "status": "passed",
+            "duration_sim_s": 5.02000000000001,
+            "samples": 252,
+            "max_gap_sim_s": 0.031999999999996476,
+            "max_horizontal_error_m": 0.03583104131167529,
+            "max_height_error_m": 0.009234070777893066,
+            "max_yaw_error_deg": 0.02090948213988233
+          },
+          "ulog": {
+            "status": "passed",
+            "duration_sim_s": 5.02000000000001,
+            "samples": 628,
+            "max_gap_sim_s": 0.016000000000005343,
+            "max_horizontal_error_m": 0.03583152347380827,
+            "max_height_error_m": 0.009235501289367676,
+            "max_yaw_error_deg": 0.021052950592795012
+          }
+        }
+      }
+    },
+    "timing": {
+      "contract": "p2-timing-v1",
+      "status": "passed",
+      "control_consumed_sample_gap_sim_s": 0.06799999999999784,
+      "source_sample_gap_sim_s": 0.03200000000000358,
+      "source_age_at_control_sim_s": 0.031999999999996476,
+      "source_age_at_dispatch_sim_s": 0.031999999999996476,
+      "callback_entry_gap_wall_s": 0.0719068469998092,
+      "actual_prestream_publication_sim_s": 2.0,
+      "prestream_publish_gaps_sim_s": {
+        "offboard_control_mode": 0.052000000000003155,
+        "trajectory_setpoint": 0.052000000000003155
+      },
+      "heartbeat_publish_gap_sim_s": 0.060000000000002274,
+      "trajectory_publish_gap_sim_s": 0.060000000000002274,
+      "control_callback_duration_wall_s": 0.014113425000232382,
+      "publish_call_duration_wall_s": 0.001955095000084839,
+      "evidence_enqueue_duration_wall_s": null,
+      "evidence_persist_delay_wall_s": 0.007083807000071829,
+      "graph_check_duration_wall_s": 0.009266862999993464,
+      "publication_bag_event_identity_verified": true,
+      "limitations": [
+        "Application callback entry is not DDS arrival; the same-process bag is not independent middleware arrival.",
+        "Persistence delay brackets callback acquisition through synchronous serialization, write return and text flush; no fsync durability or physical-disk latency claim.",
+        "No evidence queue is used; enqueue latency is unavailable. A guard detects but cannot preempt a blocking middleware or disk call."
+      ],
+      "control_callback_rate_wall_hz": 19.999740767590687,
+      "control_callback_entry_gap_wall_s": 0.06223368900009518,
+      "observed_sim_seconds_per_wall_second": 0.8970923212393288,
+      "trace_sha256": "07f7f020d133bbb548431abec557aa08877e824f20e4029b497c8d1ab3f53b0d",
+      "evaluator_sha256": "a5832a89f8ba5e110d2b55e043a79344d16bfbb98dfef61b4e1a0f46bf8fe276",
+      "trace": {
+        "capacity": 500000,
+        "records": 226006,
+        "overflow": 0,
+        "complete": true
+      }
+    },
+    "sensor_checks": {
+      "schema_version": 1,
+      "status": "failed",
+      "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+      "failures": [
+        "control_acceptance"
+      ],
+      "evaluator_sha256": "236cb10ad0457d429f8e035b7691ce6646a7b952fa67413c7d20a1eb95f909e3",
+      "window_sim_s": [
+        13.504,
+        112.34
+      ],
+      "raw_frames": 3282,
+      "window_frames": 2995,
+      "raw_bytes": 4032921600,
+      "source_missing": 0,
+      "delivered_hz": 30.30241690619813,
+      "source_gap_max_sim_s": 0.036000000000001364,
+      "processed_hz": 10.002834811485037,
+      "observations": 989,
+      "observation_age_max_sim_s": 0.07600000000000762,
+      "state_mismatch_max_s": 0.012000000000000455,
+      "matched_px4_observations": 989,
+      "recorder": {
+        "received": 3282,
+        "processed": 1083,
+        "repeated": 0,
+        "overwritten_processing_frames": 2198,
+        "errors": {},
+        "status": "complete",
+        "camera_info_received": 3282,
+        "camera_info_first_sim_s": 7.5280000000000005,
+        "camera_info_last_sim_s": 115.8,
+        "recorder": {
+          "accepted": 3282,
+          "written": 3282,
+          "overflow": 0,
+          "peak": 1,
+          "capacity": 8,
+          "fsync_completed": true
+        }
+      },
+      "control_acceptance": "failed",
+      "sensor_errors": []
+    },
+    "diagnostic": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-smoke-window-diagnostic.json",
+        "bytes": 9041,
+        "sha256": "79c20455bd3f5f6e2f0f7486b7f9c3b9e77938ef4d86bf515b4e584523d44cb8"
+      },
+      "windows": {
+        "FINAL_HOVER": {
+          "controller_window": {
+            "start_sim_s": 100.74,
+            "end_sim_s": 105.76,
+            "count": 162,
+            "goal_ned": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "goal_yaw_ned": 1.6793607401906705,
+            "offset_enu": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          },
+          "controller_selected_count": 165,
+          "controller_repeated_stamps_s": [
+            102.516,
+            104.464,
+            104.936
+          ],
+          "ulog_selected_count": 628,
+          "ulog_nonpositive_pairs": []
+        },
+        "RESTORE_INITIAL_YAW": {
+          "controller_window": {
+            "start_sim_s": 95.7,
+            "end_sim_s": 100.7,
+            "count": 112,
+            "goal_ned": [
+              -0.01873779296875,
+              -0.03263736516237259,
+              -2.0166701078414917
+            ],
+            "goal_yaw_ned": 1.6793607401906705,
+            "offset_enu": [
+              0.0,
+              0.0,
+              2.0
+            ]
+          },
+          "controller_selected_count": 112,
+          "controller_repeated_stamps_s": [],
+          "ulog_selected_count": 625,
+          "ulog_nonpositive_pairs": [
+            {
+              "indices": [
+                11687,
+                11688
+              ],
+              "gap_us": 0,
+              "a": {
+                "timestamp": 97568000,
+                "timestamp_sample": 97552000,
+                "x": -0.04354650154709816,
+                "y": -0.024196282029151917,
+                "z": -2.021538019180298,
+                "heading": 1.6710602045059204,
+                "xy_reset_counter": 5,
+                "z_reset_counter": 2,
+                "heading_reset_counter": 2
+              },
+              "b": {
+                "timestamp": 97568000,
+                "timestamp_sample": 97560000,
+                "x": -0.04381873086094856,
+                "y": -0.02429799921810627,
+                "z": -2.0214881896972656,
+                "heading": 1.6711183786392212,
+                "xy_reset_counter": 5,
+                "z_reset_counter": 2,
+                "heading_reset_counter": 2
+              }
+            }
+          ]
+        }
+      },
+      "conclusion": "Original strict min(gaps)>0 gate failed. No timing-budget relaxation, replay, or qualification is performed."
+    },
+    "cleanup": "owned groups stopped; namespace init exit terminates remaining descendants",
+    "process_exit_codes": {
+      "qgc-monitor": -9,
+      "dds-agent": -15,
+      "px4": 0,
+      "clock-bridge": -15,
+      "sensor-bridge": -15,
+      "sensor-source-probe": 0,
+      "sensor-adapter": 0,
+      "ros-controller": 0
+    },
+    "qualification": {
+      "status": "incomplete",
+      "execution": "not_run",
+      "required_consecutive": 3,
+      "started": 0,
+      "passed": 0,
+      "reason": "Independent smoke failed. No favorable replay or additional flight."
+    },
+    "numeric_control_limits_changed": false
+  },
+  "history": [
+    {
+      "run_id": "20260912T110418Z-p3-plane2-c28c38a7",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T110418Z-p3-plane2-c28c38a7/summary.json",
+        "bytes": 17284,
+        "sha256": "9582075f533f8467de85dfc3948cbccd5d9119a6b3124cb279cf00f41639e844"
+      },
+      "original": {
+        "case": "plane2",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-v1",
+        "package_hash": "b1b284c136ec5266f1b5bf4aeba69331283a7938a68a572ac0368ccc79d4f884",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 47.517014029000165
+      },
+      "note": "Default middleware: source gap .132s; initial unique-static-frame assertion unsuitable; no source probe coverage proof.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T110418Z-p3-plane2-c28c38a7/p3-evaluation.json",
+            "bytes": 3242,
+            "sha256": "6a49d7530b5a2d352876c0601222af26f1f0b7b391701dc07e23c344d849be2c"
+          },
+          "original": {
+            "status": "failed",
+            "failures": [
+              "source_gaps",
+              "unchanging_rendered_bytes"
+            ],
+            "evaluator_sha256": "52bcec5672512ef5424f13650f9c7e70924c9caec6bf7c71065beaecf00e9175"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T110851Z-p3-plane4-495e0dc5",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T110851Z-p3-plane4-495e0dc5/summary.json",
+        "bytes": 18027,
+        "sha256": "b536c5c6a077a6827eb3a4203ee2755e97a9fb42fa5cff5dd750d82c93f26f47"
+      },
+      "original": {
+        "case": "plane4",
+        "status": "failed",
+        "failure": "Expecting ',' delimiter: line 1 column 9568 (char 9567)",
+        "profile": "p3-x500-depth-native-v1",
+        "package_hash": "b1b284c136ec5266f1b5bf4aeba69331283a7938a68a572ac0368ccc79d4f884",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 22.583636074000424
+      },
+      "note": "Supervisor attempted to parse a partial JSONL line; bounded ground failure retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T110851Z-p3-plane4-495e0dc5/p3-evaluation.json",
+            "bytes": 234,
+            "sha256": "38cce198e788506cc65952d2121d446233f10291b2b40e5193a5403b5552e291"
+          },
+          "original": {
+            "status": "failed",
+            "failures": [
+              "run_not_collected"
+            ],
+            "evaluator_sha256": "d16c681b93d0d3fa31a835bd4474badab39be62ed856d64712076c67a5eb605f"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T111048Z-p3-plane4-ccdc6885",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111048Z-p3-plane4-ccdc6885/summary.json",
+        "bytes": 18338,
+        "sha256": "b803aedf49dfc4069e5b4d339e3ed5617cb0b72764e7085175d92749ed28c82e"
+      },
+      "original": {
+        "case": "plane4",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-v1",
+        "package_hash": "b1b284c136ec5266f1b5bf4aeba69331283a7938a68a572ac0368ccc79d4f884",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 46.134610166999664
+      },
+      "note": "Original evaluator passed, but its own later-audited source data shows 96 of 909 Gazebo frames missing in ROS. No recording acceptance credit.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T111048Z-p3-plane4-ccdc6885/p3-evaluation.json",
+            "bytes": 3738,
+            "sha256": "3ceb3a8b8f77d8e19b379c6054311b162655197063fd555ed0441ab448a52802"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "d16c681b93d0d3fa31a835bd4474badab39be62ed856d64712076c67a5eb605f"
+          }
+        }
+      },
+      "recording_acceptance_credit": false
+    },
+    {
+      "run_id": "20260912T111419Z-p3-plane2-fc52d25e",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111419Z-p3-plane2-fc52d25e/summary.json",
+        "bytes": 17670,
+        "sha256": "518ad72aace7f4a78517d0fb92844cb2577e6c4e79b43de16e9b6da4c7e776c9"
+      },
+      "original": {
+        "case": "plane2",
+        "status": "failed",
+        "failure": "owned_process_exited:sensor-adapter",
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "c04cbc6851743077bb9b84b0156923955e3922683e86b063366d32be704bdb96",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 5.610786683000242
+      },
+      "note": "Initial SHM64 adapter failed namespace guard because host sysfs was used. Repaired interface inventory with socket.if_nameindex.",
+      "evaluations": {}
+    },
+    {
+      "run_id": "20260912T111501Z-p3-plane2-707b5913",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111501Z-p3-plane2-707b5913/summary.json",
+        "bytes": 18954,
+        "sha256": "1ff4d802b93736b3112c1d14e1cf9fb4e5aa65bdde8a5fb21cccf29f661a4ec4"
+      },
+      "original": {
+        "case": "plane2",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 43.317466651999894
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T111501Z-p3-plane2-707b5913/p3-evaluation.json",
+            "bytes": 3572,
+            "sha256": "7630fdc1d39be3bac7fe5a1a29c2a9646b7db2c28d7014e7364b16e2efea876a"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T111718Z-p3-ground-matrix-2c5c064c",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111718Z-p3-ground-matrix-2c5c064c/summary.json",
+        "bytes": 30524,
+        "sha256": "4ca5b2da6e122721a95db2c28b25802b306f1137e78853fb2b016c6067f3ee71"
+      },
+      "original": {
+        "status": "passed"
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {}
+    },
+    {
+      "run_id": "20260912T111721Z-p3-plane4-83a5b7a8",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111721Z-p3-plane4-83a5b7a8/summary.json",
+        "bytes": 19165,
+        "sha256": "111f1a3dccd17e030ebaa0f41657572030c15e46262a653c363f4c39769ef0c8"
+      },
+      "original": {
+        "case": "plane4",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 45.554546381000364
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T111721Z-p3-plane4-83a5b7a8/p3-evaluation.json",
+            "bytes": 3736,
+            "sha256": "e0ea32096ad9a144d793cc3687315a8d3c1ad4ea16696d7098263f8941420a3c"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T111820Z-p3-plane6-22a4ed22",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111820Z-p3-plane6-22a4ed22/summary.json",
+        "bytes": 19071,
+        "sha256": "8805449e93ff8f29f16b93d6faf9dd9086c0eb419d24a37f31298db2a7f62363"
+      },
+      "original": {
+        "case": "plane6",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 43.857966041000054
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T111820Z-p3-plane6-22a4ed22/p3-evaluation.json",
+            "bytes": 3573,
+            "sha256": "b8bf3c2c6d83d76710966003e024debba76346a6e44675f02b9d6cbe70d5ae54"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T111919Z-p3-oblique-eed68041",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111919Z-p3-oblique-eed68041/summary.json",
+        "bytes": 19100,
+        "sha256": "2046876614eba922b2e5250929e7ffae6f71a82ffb6903a637c5a9d402f429dd"
+      },
+      "original": {
+        "case": "oblique",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 44.27751468500037
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T111919Z-p3-oblique-eed68041/p3-evaluation.json",
+            "bytes": 3572,
+            "sha256": "013b008990e8cbe0b9eaecb8b81b06c0081e3ce223f08d23339a928320c9d81a"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T112015Z-p3-asymmetric-477a3ec5",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112015Z-p3-asymmetric-477a3ec5/summary.json",
+        "bytes": 19709,
+        "sha256": "b6f23c80d2394fa49317243f38f4416f5579612cd7c3b581d4f91f5cf582a522"
+      },
+      "original": {
+        "case": "asymmetric",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 43.860906935
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112015Z-p3-asymmetric-477a3ec5/p3-evaluation.json",
+            "bytes": 3998,
+            "sha256": "3d530ae9bdec31cddf54551380282547a42623febb42647b4507666da6777bfb"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T112115Z-p3-out_of_range-aefba15e",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112115Z-p3-out_of_range-aefba15e/summary.json",
+        "bytes": 19129,
+        "sha256": "d224ff9bc30ac1ca5fe2972daacf702acc63599c22e577f255fd9308cddb62d3"
+      },
+      "original": {
+        "case": "out_of_range",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "ground_calibration",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 44.171216964999985
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112115Z-p3-out_of_range-aefba15e/p3-evaluation.json",
+            "bytes": 3523,
+            "sha256": "e4b153d7d42694f40311ce8ee8862264a40167d4a14aa6ef68cd62ba50005fbd"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T112212Z-p3-interruption-f2fd78a7",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112212Z-p3-interruption-f2fd78a7/summary.json",
+        "bytes": 19602,
+        "sha256": "ac8b8249992f126b24fc9690f4306160e3cc8251e398d03b48672f1d63cd377b"
+      },
+      "original": {
+        "case": "interruption",
+        "status": "collected",
+        "failure": null,
+        "profile": "p3-x500-depth-native-shm64-v1",
+        "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3",
+        "purpose": "expected_failure_ground_interruption",
+        "rendering": "ogre2_server_only_WSLg_display_native_sensors",
+        "cleanup": "owned groups stopped; PID namespace exit reaps remaining descendants",
+        "wall_duration_s": 16.393067490999783
+      },
+      "note": "Fixed ground matrix case; original result retained.",
+      "evaluations": {
+        "p3-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112212Z-p3-interruption-f2fd78a7/p3-evaluation.json",
+            "bytes": 1946,
+            "sha256": "b80b0be0fd72da2cbadf2b7a13462650bc1cbda33ab14c82f85ab74665d4f7ca"
+          },
+          "original": {
+            "status": "passed_expected_failure_diagnostic",
+            "failures": [],
+            "evaluator_sha256": "07346e52004d8a80b10229487624303b6bf319586a52d23d816968b3873267ee"
+          }
+        }
+      }
+    },
+    {
+      "run_id": "20260912T112516Z-p3-observe-0eb41cf2",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112516Z-p3-observe-0eb41cf2/summary.json",
+        "bytes": 28174,
+        "sha256": "aa72bb12b1a23dc0ab7df62c5c1578049f34d921d71c7f2099a4121de849efe3"
+      },
+      "original": {
+        "kind": "observe",
+        "status": "passed",
+        "failure": null,
+        "purpose": "connectivity",
+        "mode": "gui_requested",
+        "cleanup": "owned groups stopped; namespace init exit terminates remaining descendants",
+        "wall_duration_s": 52.36133195299999
+      },
+      "note": "P2 read-only passed; P3 processing 6.3283Hz failed. Simulation-time phase accumulator repaired the wall-poll decimation.",
+      "evaluations": {
+        "p2-offline-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112516Z-p3-observe-0eb41cf2/p2-offline-evaluation.json",
+            "bytes": 20550,
+            "sha256": "8d0f85e65bcd0cc09a5bc41fc863d0662d76367c0b6a8c7ee44a730f7a67fb6a"
+          },
+          "original": {
+            "recording_integrity": "passed",
+            "flight_acceptance": "not_run",
+            "evaluator_sha256": "a6acfd2da9e7a07a8f75d1b294f3382b3abd669842fe77d655d8a63b33e18cbf"
+          }
+        },
+        "p3-coexistence-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112516Z-p3-observe-0eb41cf2/p3-coexistence-evaluation.json",
+            "bytes": 19917,
+            "sha256": "c3975df1ae3db4a732f0353d63dbbde3c78b4f93e9075a7051399994536f3a41"
+          },
+          "original": {
+            "status": "failed",
+            "failures": [
+              "processed_rate"
+            ],
+            "evaluator_sha256": "236cb10ad0457d429f8e035b7691ce6646a7b952fa67413c7d20a1eb95f909e3"
+          }
+        }
+      },
+      "sensor-artifacts.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112516Z-p3-observe-0eb41cf2/sensor-artifacts.json",
+        "bytes": 1315,
+        "sha256": "2149ec2947d1a7bc1284c350d2366059a92074d88a56edfd5342cd77ff4b593b"
+      }
+    },
+    {
+      "run_id": "20260912T112834Z-p3-observe-e29ce760",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/summary.json",
+        "bytes": 28515,
+        "sha256": "77c552e440e1147c11fd91b1c4925a16a1d2a48b83fb6c33a08cf4b97cb7cb5c"
+      },
+      "original": {
+        "kind": "observe",
+        "status": "failed",
+        "failure": "controller_failed; inspect controller result and log",
+        "purpose": "connectivity",
+        "mode": "gui_requested",
+        "cleanup": "owned groups stopped; namespace init exit terminates remaining descendants",
+        "wall_duration_s": 127.40675689299997
+      },
+      "note": "GUI startup connection timeout; stayed grounded/disarmed. P2/P3 offline calls made before supervisor completion also failed prerequisites and remain unchanged.",
+      "evaluations": {
+        "p2-offline-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/p2-offline-evaluation.json",
+            "bytes": 224,
+            "sha256": "733ceef368b915fec0db32c7af369d2daec2f0f1cfe2d6d17e1c590a776787c4"
+          },
+          "original": {
+            "error": "Controller never initialized complete recording",
+            "recording_integrity": "failed",
+            "flight_acceptance": "unknown",
+            "evaluator_sha256": "a6acfd2da9e7a07a8f75d1b294f3382b3abd669842fe77d655d8a63b33e18cbf"
+          }
+        },
+        "p3-coexistence-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/p3-coexistence-evaluation.json",
+            "bytes": 196,
+            "sha256": "7963cd27996237539d94ce3f5fe4c2f452972db872c0f0c53958f5cf7243a283"
+          },
+          "original": {
+            "status": "failed",
+            "failure": "[Errno 2] No such file or directory: '/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/sensor-artifacts.json'"
+          }
+        }
+      },
+      "postrun-state-diagnostic.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/postrun-state-diagnostic.json",
+        "bytes": 8405,
+        "sha256": "b4ed17f80d9d07c885b6687b1aee6daf91517e956ed3024337735d33d6e67737"
+      },
+      "sensor-artifacts.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112834Z-p3-observe-e29ce760/sensor-artifacts.json",
+        "bytes": 1316,
+        "sha256": "a19a12e96933ecae79239f3ef8580ca44b6aab28241c7a0f712ef86d99d4bc86"
+      }
+    },
+    {
+      "run_id": "20260912T113246Z-p3-observe-6d982d6b",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113246Z-p3-observe-6d982d6b/summary.json",
+        "bytes": 28516,
+        "sha256": "634366ae884f3457af9dbda4b8ecffd5ec21d22aa83d0b8ddc5a08aa6534f97b"
+      },
+      "original": {
+        "kind": "observe",
+        "status": "passed",
+        "failure": null,
+        "purpose": "connectivity",
+        "mode": "headless_sensor_rendering",
+        "cleanup": "owned groups stopped; namespace init exit terminates remaining descendants",
+        "wall_duration_s": 47.72241433799991
+      },
+      "note": "Final server-only WSLg read-only connection passed independent control recording and sensor/state checks.",
+      "evaluations": {
+        "p2-offline-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T113246Z-p3-observe-6d982d6b/p2-offline-evaluation.json",
+            "bytes": 20548,
+            "sha256": "8ff11a4fc7420910413891b446c2657d706264248d39fd7b4c2cb3852e2b8d83"
+          },
+          "original": {
+            "recording_integrity": "passed",
+            "flight_acceptance": "not_run",
+            "evaluator_sha256": "a6acfd2da9e7a07a8f75d1b294f3382b3abd669842fe77d655d8a63b33e18cbf"
+          }
+        },
+        "p3-coexistence-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T113246Z-p3-observe-6d982d6b/p3-coexistence-evaluation.json",
+            "bytes": 19998,
+            "sha256": "28621bd41412534b55e086c0b6656d2398f4d4334d1825c43e81462e65a58117"
+          },
+          "original": {
+            "status": "passed",
+            "failures": [],
+            "evaluator_sha256": "236cb10ad0457d429f8e035b7691ce6646a7b952fa67413c7d20a1eb95f909e3"
+          }
+        }
+      },
+      "sensor-artifacts.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113246Z-p3-observe-6d982d6b/sensor-artifacts.json",
+        "bytes": 1315,
+        "sha256": "90b82b439ef703bc24d819b10c8ea45cfb2caba7e1dd8278a1f7cc29fa3ebdab"
+      }
+    },
+    {
+      "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+      "summary": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/summary.json",
+        "bytes": 42448,
+        "sha256": "7d217b0ed346788c9b9937c210717536e8c917425910ad34d711b78859710983"
+      },
+      "original": {
+        "kind": "flight",
+        "status": "passed",
+        "failure": null,
+        "purpose": "nominal",
+        "mode": "headless_sensor_rendering",
+        "cleanup": "owned groups stopped; namespace init exit terminates remaining descendants",
+        "wall_duration_s": 162.0861212650002
+      },
+      "note": "One smoke completed and landed, but original strict nonpositive timestamp-gap checks failed. No qualification launched.",
+      "evaluations": {
+        "p2-offline-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p2-offline-evaluation.json",
+            "bytes": 41908,
+            "sha256": "f5e018fdefed0d8da8279010fda1766de3ed7568fc02e7dbe3b09cda66e82ac5"
+          },
+          "original": {
+            "recording_integrity": "passed",
+            "flight_acceptance": "failed",
+            "evaluator_sha256": "a6acfd2da9e7a07a8f75d1b294f3382b3abd669842fe77d655d8a63b33e18cbf"
+          }
+        },
+        "p3-coexistence-evaluation.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-coexistence-evaluation.json",
+            "bytes": 26266,
+            "sha256": "4d489789058aa791a0abb000903b65063c17f40d4f6ff8a2b44058928b14c031"
+          },
+          "original": {
+            "status": "failed",
+            "failures": [
+              "control_acceptance"
+            ],
+            "evaluator_sha256": "236cb10ad0457d429f8e035b7691ce6646a7b952fa67413c7d20a1eb95f909e3"
+          }
+        },
+        "p3-coexistence-prerequisite-failure.json": {
+          "artifact": {
+            "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-coexistence-prerequisite-failure.json",
+            "bytes": 200,
+            "sha256": "dbbfa9d18ceddf9c6259e54c06000cd39a58f253310050b41eb3e8291160ea87"
+          },
+          "original": {
+            "status": "failed",
+            "failure": "[Errno 2] No such file or directory: '/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p2-offline-evaluation.json'"
+          }
+        }
+      },
+      "p3-smoke-window-diagnostic.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-smoke-window-diagnostic.json",
+        "bytes": 9041,
+        "sha256": "79c20455bd3f5f6e2f0f7486b7f9c3b9e77938ef4d86bf515b4e584523d44cb8"
+      },
+      "sensor-artifacts.json": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/sensor-artifacts.json",
+        "bytes": 1318,
+        "sha256": "34834a00b52410c83c8da1aa4267fbe13bb03c354940f4db502e6d1c3ba5c153"
+      }
+    }
+  ],
+  "builds": [
+    {
+      "run_id": "20260912T110200Z-p3-build-Ffx0N8",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T110200Z-p3-build-Ffx0N8/console.log",
+        "bytes": 1373,
+        "sha256": "ddc513f44fe88af2af509bbc3dff8625eab863012881ea4e2f2b79b57c8db44f"
+      },
+      "exit_code": 0,
+      "package_hash": "b1b284c136ec5266f1b5bf4aeba69331283a7938a68a572ac0368ccc79d4f884"
+    },
+    {
+      "run_id": "20260912T111354Z-p3-build-ZkXYHn",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111354Z-p3-build-ZkXYHn/console.log",
+        "bytes": 1373,
+        "sha256": "1118360617628e5d62244c16f12ecf48972051700743a59adef44a0a433b72ff"
+      },
+      "exit_code": 0,
+      "package_hash": "c04cbc6851743077bb9b84b0156923955e3922683e86b063366d32be704bdb96"
+    },
+    {
+      "run_id": "20260912T111454Z-p3-build-MV2sNY",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T111454Z-p3-build-MV2sNY/console.log",
+        "bytes": 1373,
+        "sha256": "a855adb0e068f68784cf195284fbafbfb0c99b5af943d3189b37c656f0da2324"
+      },
+      "exit_code": 0,
+      "package_hash": "9218163a37487797945d8a66581201798158561b1a73d32a06316e7fe29b7ca3"
+    },
+    {
+      "run_id": "20260912T112419Z-p2-build-AYxuLs",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112419Z-p2-build-AYxuLs/console.log",
+        "bytes": 1363,
+        "sha256": "5d91f2c95657d8cff900a00cf144257ef2fd99534fa68af89cd9913b119253b8"
+      },
+      "exit_code": 0,
+      "package_hash": null
+    },
+    {
+      "run_id": "20260912T112425Z-p3-build-xRSt2B",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112425Z-p3-build-xRSt2B/console.log",
+        "bytes": 1373,
+        "sha256": "4a5f2910f4b4e1116e6c3c4098bd7040c648c0b1f692549369b5d503b0e3a0d1"
+      },
+      "exit_code": 0,
+      "package_hash": "0fef32937635a05757c142aec0daec7497f8f7f640daa084230616e47d2739e1"
+    },
+    {
+      "run_id": "20260912T112754Z-p3-build-XYzk3y",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T112754Z-p3-build-XYzk3y/console.log",
+        "bytes": 1373,
+        "sha256": "763dd20e388e42ffdc8a4f872472549ae97bebafccb4f08d13150a4219f97a3a"
+      },
+      "exit_code": 0,
+      "package_hash": "4cece97f991fe57b50334a5ca44711f33800ccb5a61fab6803c19ee4d0a44424"
+    },
+    {
+      "run_id": "20260912T113237Z-p3-build-Mwx7J1",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113237Z-p3-build-Mwx7J1/console.log",
+        "bytes": 1373,
+        "sha256": "3c427ebbd025c8604c49e27ebbdd7b01abfd8be9dc25262a9b6ae73da2bbd39d"
+      },
+      "exit_code": 0,
+      "package_hash": "dad7d3a750d46ffbde787c3b453e24f69601d8be094ac78777f8be0235276db8"
+    },
+    {
+      "run_id": "20260912T114712Z-p3-build-x8mj6t",
+      "console": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T114712Z-p3-build-x8mj6t/console.log",
+        "bytes": 1373,
+        "sha256": "348bfc41be032b1fd1468cab1da9a35e7629c1afa5995eaee51ba87c47457fb0"
+      },
+      "exit_code": 0,
+      "package_hash": "096bf8e94a58478845b32a4e206713f48930ccf0e2361899273e87bbfe81a3d2"
+    }
+  ],
+  "regression": {
+    "focused": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-focused-pytest.txt",
+        "bytes": 264,
+        "sha256": "b973cd0d86bd40fe2e5bcf971dc513bdd775499f00412ac51d36c5a312a51c75"
+      },
+      "status": "passed",
+      "passed": 210,
+      "skipped": 0,
+      "seconds": 5.26
+    },
+    "c2_agentops": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-c2-pytest.txt",
+        "bytes": 508,
+        "sha256": "f991c430e780f09dd1b8c31f085770b2d2192cf2a3b64ef0e2a80d671efdd0b9"
+      },
+      "status": "passed",
+      "passed": 398,
+      "skipped": 0,
+      "seconds": 22.34
+    },
+    "pytorch_initialized_p3": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-numerical-runtime-pytest.txt",
+        "bytes": 101,
+        "sha256": "9b3c6c941cd2e58139190d74e99b2f8ccc7d85eb44afb0d063e01eb1f9d74298"
+      },
+      "status": "passed",
+      "passed": 33,
+      "skipped": 0,
+      "seconds": 0.28
+    },
+    "full_final": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-full-pytest-final.txt",
+        "bytes": 1261,
+        "sha256": "b1afe20a5eee84c999083a1e86efe71c2c1e21dfa9c9d7d91e428f58b5d2a1b4"
+      },
+      "status": "passed",
+      "passed": 1045,
+      "skipped": 12,
+      "seconds": 118.48
+    },
+    "full_initial": {
+      "status": "aborted",
+      "exit_code": 3,
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-full-pytest.txt",
+        "bytes": 4971,
+        "sha256": "21b780d4eddcd426003cc6edf4c7b07a27bffe92b95f9237dfcdffaf59706c7a"
+      },
+      "cause": "Minimal reproduction: OMP Error 15, duplicate libiomp5md.dll on PyTorch then NumPy BLAS. No unsafe environment override used."
+    },
+    "git_diff_check": "passed",
+    "python_compilation": "passed: Windows Anaconda compileall simulation/px4_gazebo and P3 pure tests",
+    "shell": {
+      "status": "passed",
+      "scripts": 13,
+      "checks": 26,
+      "shellcheck_exclusions": [
+        "SC1091: dynamically sourced installed ROS setup files"
+      ],
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-static-checks.json",
+        "bytes": 5785,
+        "sha256": "4dd23a74aa1506630b2ba6ac6048dfdb902607944d0e8af1e441c7b2f97a1334"
+      }
+    },
+    "linux_installed_tests": {
+      "controller": 2,
+      "sensor": 1,
+      "status": "passed",
+      "controller_build": "20260912T112419Z-p2-build-AYxuLs",
+      "sensor_build": "20260912T114712Z-p3-build-x8mj6t"
+    },
+    "evaluator_arithmetic_parity": {
+      "artifact": {
+        "path": "/home/joker0625/uav_autonomy/state/p3-evaluator-arithmetic-parity.json",
+        "bytes": 1437,
+        "sha256": "81bcf429c4266c8ec8102afc3d3cfb01da5eb87fc74c862e53f8f36766f03459"
+      },
+      "result": {
+        "method": "Offline arithmetic parity on fixed recorded fixture poses and all declared ROI rays; not a replacement acceptance evaluation",
+        "evaluator_sha256": "c3906c29dae940e3bd4db4d60efbe2d83c356032dc21c8908821db4285e70cb8",
+        "cases": [
+          {
+            "run_id": "20260912T111501Z-p3-plane2-707b5913",
+            "rays": 38400,
+            "max_depth_difference_m": 0.0,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          },
+          {
+            "run_id": "20260912T111721Z-p3-plane4-83a5b7a8",
+            "rays": 38400,
+            "max_depth_difference_m": 0.0,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          },
+          {
+            "run_id": "20260912T111820Z-p3-plane6-22a4ed22",
+            "rays": 38400,
+            "max_depth_difference_m": 0.0,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          },
+          {
+            "run_id": "20260912T111919Z-p3-oblique-eed68041",
+            "rays": 38400,
+            "max_depth_difference_m": 8.881784197001252e-16,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          },
+          {
+            "run_id": "20260912T112015Z-p3-asymmetric-477a3ec5",
+            "rays": 38400,
+            "max_depth_difference_m": 0.0,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          },
+          {
+            "run_id": "20260912T112115Z-p3-out_of_range-aefba15e",
+            "rays": 38400,
+            "max_depth_difference_m": 0.0,
+            "max_ray_factor_difference": 0.0,
+            "labels_equal": true
+          }
+        ]
+      }
+    }
+  },
+  "final_environment": {
+    "repositories": {
+      "px4": {
+        "head": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+        "status": ""
+      },
+      "models": {
+        "head": "b6127f4ec20de867e215fb5f78ae88b80f371909",
+        "status": ""
+      },
+      "px4_msgs": {
+        "head": "86d8239e962f6939e05c3737784f60c02fa884db",
+        "status": ""
+      },
+      "dds_agent": {
+        "head": "73622810d984349b80bbac0ef55fc0b694d62222",
+        "status": ""
+      }
+    },
+    "exclusive_runtime_lock_available": true,
+    "active_p3_run_processes": [],
+    "disk_free_bytes": 933012516864
+  },
+  "status_by_requirement": {
+    "p3_sensor_rendering": "passed",
+    "p3_bridge": "passed",
+    "p3_depth_geometry": "passed",
+    "p3_observation_health_contract": "passed",
+    "p3_camera_equipped_smoke": "failed",
+    "p3_coexistence_qualification": "incomplete",
+    "p4_avoidance": "not_implemented",
+    "p5_model_inference": "not_implemented",
+    "clean_rebuild": "not_proven"
+  },
+  "limitations": [
+    "Component passes do not establish final-source P3 completion.",
+    "The final metadata correction has no fresh runtime acceptance.",
+    "Timestamp failure cause is measured; a unique renderer or scheduler root cause is not established.",
+    "No avoidance, sensor-driven flight, inference, estimator fusion, AgentOps v3-2, or hardware readiness.",
+    "No claim of live 16UC1, NaN or negative-infinity validation.",
+    "No whole-process CPU/GPU/memory or hard-real-time certification."
+  ]
+}

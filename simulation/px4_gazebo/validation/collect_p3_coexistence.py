@@ -1,0 +1,95 @@
+"""Independent sensor recording and PX4 state association during P2 activity."""
+import argparse
+import json
+from pathlib import Path
+import numpy as np
+from collect_p3_evidence import digest
+from collect_p2_evidence import read_bag
+
+
+def evaluate(run):
+    out=dict(schema_version=1,status='failed',run_id=run.name,failures=[],evaluator_sha256=digest(Path(__file__)))
+    def check(value,reason):
+        if not value: out['failures'].append(reason)
+    summary=json.loads((run/'summary.json').read_text())
+    control=json.loads((run/'p2-offline-evaluation.json').read_text())
+    check(summary['status']=='passed' and control['recording_integrity']=='passed','control_recording')
+    check(control['flight_acceptance']==('passed' if summary['kind']=='flight' else 'not_run'),'control_acceptance')
+    sensor=run/'sensors'
+    artifacts=json.loads((run/'sensor-artifacts.json').read_text())
+    for name,item in artifacts.items(): check(digest(sensor/name)==item['sha256'],'sensor_artifact:'+name)
+    result=json.loads((sensor/'sensor-result.json').read_text())
+    rows=[json.loads(l) for l in (sensor/'depth-index.jsonl').read_text().splitlines()]
+    events=[json.loads(l) for l in (sensor/'sensor-events.jsonl').read_text().splitlines()]
+    source=[json.loads(l) for l in (sensor/'gazebo-source-headers.jsonl').read_text().splitlines()]
+    streams,_,control_events=read_bag(run)
+    positions=streams['vehicle_local_position']
+    begin,end=positions[0]['timestamp']/1e6,positions[-1]['timestamp']/1e6
+    check(end>begin,'empty_control_window')
+    selected=[r for r in rows if begin<=r['acquisition_sim_s']<=end]
+    observations=[e for e in events if e['kind']=='observation' and begin<=e['image']['acquisition_sim_s']<=end]
+    source=[s for s in source if begin<=s['acquisition_sim_s']<=end]
+    health=[h for h in events if h['kind']=='health' and begin<=h['sim_s']<=end]
+    check(result['status']=='complete' and result['recorder']['overflow']==0,'recorder_failed')
+    check(result['received']==result['recorder']['written']==len(rows),'raw_coverage')
+    offset=0
+    with (sensor/'depth.bin').open('rb') as raw:
+        import hashlib
+        for index,row in enumerate(rows):
+            check(row['id']==index+1 and row['offset']==offset,'index_continuity')
+            data=raw.read(row['bytes']); offset+=len(data)
+            check(hashlib.sha256(data).hexdigest()==row['sha256'],'frame_integrity')
+        check(raw.read(1)==b'','trailing_raw_data')
+    check(len(selected)>1 and len(observations)>1 and len(source)>1,'missing_sensor_window')
+    if len(selected)<2 or len(observations)<2 or len(source)<2: return out
+    stamps=np.array([r['acquisition_sim_s'] for r in selected]); source_stamps={s['acquisition_sim_s'] for s in source}
+    missing=len(source_stamps-set(stamps))
+    check(missing==0,'source_to_recording_loss')
+    sequence=[int(s['header_data']['seq'][0]) for s in source]
+    check(all(b-a==1 for a,b in zip(sequence,sequence[1:])),'source_probe_incomplete')
+    gaps=np.diff(stamps); rate=(len(stamps)-1)/(stamps[-1]-stamps[0])
+    check(np.all(gaps>0) and gaps.max()<=.12 and rate>=25,'source_timing')
+    check(stamps[0]-begin<=.12 and end-stamps[-1]<=.12,'sensor_window_coverage')
+    age=max(o['processing_return_sim_s']-o['image']['acquisition_sim_s'] for o in observations)
+    check(age<=.25,'processed_source_age')
+    obs_times=[o['image']['acquisition_sim_s'] for o in observations]
+    obs_rate=(len(obs_times)-1)/(obs_times[-1]-obs_times[0])
+    check(obs_rate>=8,'processed_rate')
+    check(health and all(h['status']=='fresh' for h in health),'sensor_health')
+    errors=[e for e in events if e['kind']=='error' and begin<=e['sim_s']<=end]
+    check(not errors,'sensor_errors_during_control')
+    # Match against independently recorded PX4 messages, not latest-at-processing.
+    by_stamp={p['timestamp']:p for p in positions}
+    matched=0; mismatch=0.
+    for observation in observations:
+        associated=observation['state_association']
+        check(associated is not None,'missing_state_association')
+        if associated is None: continue
+        state=associated['state']; stamp=state['timestamp_us']
+        mismatch=max(mismatch,abs(stamp/1e6-observation['image']['acquisition_sim_s']))
+        check(mismatch<=.05,'state_time_mismatch')
+        if stamp in by_stamp:
+            p=by_stamp[stamp]
+            check(all(abs(p[k]-state[k])<1e-9 for k in ('x','y','z','heading')),'state_record_mismatch')
+            check(associated['epoch']==[p[k] for k in ('xy_reset_counter','z_reset_counter','heading_reset_counter','vxy_reset_counter','vz_reset_counter')],'state_epoch_mismatch')
+            matched+=1
+        else:
+            # One selected state may bracket the controller recorder's endpoints.
+            check(stamp<positions[0]['timestamp'] or stamp>positions[-1]['timestamp'],'state_not_in_independent_recording')
+    check(matched>=len(observations)-2,'state_recording_coverage')
+    out.update(window_sim_s=[begin,end],raw_frames=len(rows),window_frames=len(selected),raw_bytes=offset,
+        source_missing=missing,delivered_hz=rate,source_gap_max_sim_s=float(gaps.max()),processed_hz=obs_rate,
+        observations=len(observations),observation_age_max_sim_s=age,state_mismatch_max_s=mismatch,
+        matched_px4_observations=matched,recorder=result,control_acceptance=control['flight_acceptance'],
+        control_timing=control.get('timing'),sensor_errors=errors,
+        status='passed' if not out['failures'] else 'failed')
+    return out
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser(); p.add_argument('run',type=Path); args=p.parse_args()
+    try: result=evaluate(args.run)
+    except Exception as exc: result=dict(schema_version=1,status='failed',failure=str(exc))
+    with (args.run/'p3-coexistence-evaluation.json').open('x') as stream: stream.write(json.dumps(result,indent=2,allow_nan=False)+'\n')
+    print(json.dumps({k:v for k,v in result.items() if k not in ('control_timing','recorder')},indent=2,allow_nan=False))
+    raise SystemExit(0 if result['status']=='passed' else 1)

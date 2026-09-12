@@ -264,8 +264,10 @@ human approval, and guarded simulator/SITL boundaries.
 ### Immediate implementation priority: v3-SIM
 
 The operator-directed [simulation amendment](v3_simulation_scope_amendment.md)
-places P0/P1 and then P2 before v3-2 without changing AgentOps permissions or phase numbers.
-See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2_validation.md).
+places P0/P1, P2 and the narrowly authorized P3 sensing work before v3-2,
+without changing AgentOps permissions or phase numbers. See
+[P0/P1 validation](v3_sim_p0_p1_validation.md), [P2 validation](v3_sim_p2_validation.md)
+and [P3 validation](v3_sim_p3_validation.md).
 
 - [x] P0 Version pinning and environment build
 - [x] P1 PX4/Gazebo simulator boot
@@ -277,7 +279,11 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   **20/20** consecutive batch passed, including independent timing, reference,
   motion and LAND checks. R2 yaw policy and all original limits are unchanged.
   Strict-v1, R1 and R2 failures remain preserved. P3 is eligible as the next slice.
-- [ ] P3 Depth sensing
+- [ ] P3 Depth sensing: implemented; actual rendering, bridge, fixed ground
+  geometry and interruption checks passed. The one new x500_depth smoke landed
+  normally but failed independent strict timestamp-window acceptance. The
+  three-flight coexistence qualification was not started (0/3); P3 acceptance
+  remains incomplete. Original x500 P2 evidence is unchanged.
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation

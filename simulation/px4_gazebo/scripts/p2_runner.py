@@ -15,7 +15,7 @@ from p1_runner import Console, digest
 from p2_build import package_hash, package_manifest
 
 
-def trial(args):
+def trial(args, sensor_session=None):
     require_gates(os.environ, args.allow_simulated_flight or args.ground_diagnostic)
     if sum((args.observe,args.allow_simulated_flight,args.ground_diagnostic)) != 1:
         raise ValueError("Select one runtime purpose")
@@ -26,7 +26,10 @@ def trial(args):
         raise ValueError("Owned private PID/network namespace required")
     sim = Path(__file__).resolve().parents[1]
     root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home()/"uav_autonomy")))
-    config = json.loads((sim/"configs/p2_control.yaml").read_text())
+    config_path = sensor_session.controller_config(sim) if sensor_session else sim/"configs/p2_control.yaml"
+    config = json.loads(config_path.read_text())
+    clock_path = sim/"configs"/("p3_clock_bridge.yaml" if sensor_session else "p2_clock_bridge.yaml")
+    connection_path = root/"state"/("p3-connection.json" if sensor_session else "p2-connection.json")
     timing_config = json.loads((sim/"configs/p2_timing.yaml").read_text())
     receipt = json.loads((root/"state/p2-built.json").read_text())
     if package_hash(package_manifest(sim)) != receipt["package_hash"]:
@@ -45,26 +48,28 @@ def trial(args):
     for name, expected in baseline["measured"]["asset_hashes"].items():
         if digest(px4/name) != expected:
             raise ValueError("Pinned model/world changed: "+name)
-    identity = {"package_hash": receipt["package_hash"], "config_sha256": digest(sim/"configs/p2_control.yaml"),
+    identity = {"package_hash": receipt["package_hash"], "config_sha256": digest(config_path),
                 "timing_config_sha256": digest(sim/"configs/p2_timing.yaml"),
                 "native_probe_source_sha256": digest(sim/"validation/publish_wait_probe.c"),
                 "ros_runtime_sha256": {str(p):digest(p) for p in [Path("/opt/ros/jazzy/lib/libfastrtps.so.2.14"),
                     Path("/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so"),
                     Path("/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py")]},
-                "clock_bridge_sha256": digest(sim/"configs/p2_clock_bridge.yaml"),
+                "clock_bridge_sha256": digest(clock_path),
                 "qgc_profile_sha256": digest(sim/"configs/qgc-monitor.ini"),
                 "lock_sha256": digest(sim/"configs/versions.lock.yaml"), "binary_sha256": digest(binary),
                 "topic_contract": receipt["topic_contract"],
                 "launcher_sha256": {name: digest(sim/"scripts"/name) for name in
                     ("p2_runner.py", "run_p2_control.sh", "p2_build.py", "common.sh", "p1_runner.py", "p1_contract.py")}}
+    if sensor_session:
+        identity['p3'] = sensor_session.identity(sim, root)
     if args.allow_simulated_flight or args.ground_diagnostic:
-        observation = json.loads((root/"state/p2-connection.json").read_text())
+        observation = json.loads(connection_path.read_text())
         if observation["identity"] != identity or observation["status"] != "passed":
             raise ValueError("Read-only connection stage must pass for these exact inputs")
     kind = "ground" if args.ground_diagnostic else "flight" if args.allow_simulated_flight else "observe"
     if args.diagnostic and not args.allow_simulated_flight:
         raise ValueError("Diagnostic requires explicit flight authorization")
-    run = root/"runs"/(time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())+"-p2-"+kind+"-"+uuid.uuid4().hex[:8])
+    run = root/"runs"/(time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())+("-p3-" if sensor_session else "-p2-")+kind+"-"+uuid.uuid4().hex[:8])
     run.mkdir(parents=True)
     for folder in ("rootfs", "tmp", "qgc-config/QGroundControl"):
         (run/folder).mkdir(parents=True)
@@ -72,6 +77,10 @@ def trial(args):
     (work/"gz_env.sh").write_bytes((build/"rootfs/gz_env.sh").read_bytes())
     for name in ("p2_control.yaml", "p2_timing.yaml", "p2_clock_bridge.yaml", "versions.lock.yaml"):
         (run/name).write_bytes((sim/"configs"/name).read_bytes())
+    (run/'p2_control.yaml').write_bytes(config_path.read_bytes())
+    (run/'p2_clock_bridge.yaml').write_bytes(clock_path.read_bytes())
+    if sensor_session:
+        sensor_session.prepare(sim, root, run)
     (run/"p2-build-receipt.json").write_text(json.dumps(receipt, indent=2, allow_nan=False)+"\n")
     (run/"qgc-config/QGroundControl/QGroundControl.ini").write_text(
         (sim/"configs/qgc-monitor.ini").read_text().replace("@RUN_DATA@", str(run/"qgc-data")))
@@ -83,7 +92,7 @@ def trial(args):
     env = {key: os.environ[key] for key in allowed if key in os.environ}
     env.update({"TMPDIR": str(run/"tmp"), "ROS_DOMAIN_ID": str(config["dds_domain"]),
                 "GZ_PARTITION": run.name, "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic",
-                "PX4_SIM_MODEL": "gz_x500", "PX4_GZ_WORLD": "default", "PX4_UXRCE_DDS_NS": "px4_71",
+                "PX4_SIM_MODEL": "gz_x500_depth" if sensor_session else "gz_x500", "PX4_GZ_WORLD": config['world'], "PX4_UXRCE_DDS_NS": "px4_71",
                 "PX4_UXRCE_DDS_PORT": "8888", "PX4_PARAM_UXRCE_DDS_SYNCT": "0",
                 "PX4_PARAM_SDLOG_MODE": "1", "GWM_P2_OWNED_NAMESPACE": "1",
                 "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp"})
@@ -95,11 +104,11 @@ def trial(args):
                "native_wait_probe": args.native_wait_probe,
                "project_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=sim, text=True).strip(),
                "status": "incomplete", "failure": None, "controller_result": None,
-               "mode": "headless_physics" if args.headless else "gui_requested",
+               "mode": "headless_sensor_rendering" if sensor_session and args.headless else "headless_physics" if args.headless else "gui_requested",
                "isolation": "private user/mount/PID/network namespace, loopback only, exclusive P1/P2 lock",
                "qgc_monitor_present": True, "manual_flight_commands": False,
                "control_owner": "gwm_px4_control" if args.allow_simulated_flight or args.ground_diagnostic else "none_read_only",
-               "clock": {"gz_topic": "/world/default/clock", "ros_topic": "/clock", "direction": "GZ_TO_ROS",
+               "clock": {"gz_topic": "/world/"+config['world']+"/clock", "ros_topic": "/clock", "direction": "GZ_TO_ROS",
                          "use_sim_time": True, "UXRCE_DDS_SYNCT": 0}, "processes": []}
     processes, streams = [], []
     console = None
@@ -137,7 +146,7 @@ def trial(args):
         console = Console(command, work, env, px4log, start+config["wall_deadline_s"]+90)
         summary["processes"].append({"name": "px4", "pid": console.process.pid, "command": command})
         boot = console.prompt(90)
-        if "Gazebo world is ready" not in boot or "x500_71" not in boot:
+        if "Gazebo world is ready" not in boot or config['model'] not in boot:
             raise ValueError("Expected owned world/model not observed")
         parameters = console.command("param show -a")
         if config.get("reference_policy") in ("p2-estimator-reference-v2", "p2-estimator-reference-v3"):
@@ -159,10 +168,15 @@ def trial(args):
         console.command("logger status")
         topics = subprocess.check_output(["gz", "topic", "-l"], env=env, text=True, timeout=10)
         (run/"gazebo-topics.txt").write_text(topics)
-        if "/world/default/clock" not in topics.splitlines():
+        if "/world/"+config['world']+"/clock" not in topics.splitlines():
             raise ValueError("Configured Gazebo clock topic absent")
         launch("clock-bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge", "--ros-args",
                                "-p", "config_file:="+str(run/"p2_clock_bridge.yaml"), "-p", "use_sim_time:=true"])
+        if sensor_session:
+            sensor_session.start(sim, root, run, env, launch, topics)
+            summary['sensor_transport_environment'] = {'FASTRTPS_DEFAULT_PROFILES_FILE': str(run/'sensors/p3_fastdds.xml'),
+                'applies_to': ['sensor-bridge','sensor-adapter'], 'shm_segment_bytes': 67108864,
+                'controller_uses_this_profile': False}
         controller_command = [str(Path(receipt["install"])/"gwm_px4_control/lib/gwm_px4_control/p2_control"),
                               "--config", str(run/"p2_control.yaml"), "--run-dir", str(run),
                               "--timing-config", str(run/"p2_timing.yaml")]
@@ -206,6 +220,8 @@ def trial(args):
             raise RuntimeError("controller_failed; inspect controller result and log")
         if status.get("arming_state") != 1 or landed.get("landed") is not True:
             raise ValueError("Final landed/disarmed state not independently observed")
+        if sensor_session:
+            sensor_session.stop(run)
         console.command("logger stop")
         os.write(console.fd, b"shutdown\n")
         console.process.wait(timeout=15)
@@ -214,6 +230,8 @@ def trial(args):
         summary["status"], summary["failure"] = "failed", str(exc) or "interrupted"
         print("P2 stopped: "+summary["failure"], flush=True)
     finally:
+        if sensor_session:
+            sensor_session.finish(run)
         owned = processes + ([("px4", console.process)] if console else [])
         for name, process in reversed(owned):
             try:
@@ -239,7 +257,7 @@ def trial(args):
         summary["wall_duration_s"] = time.monotonic()-start
         save()
     if summary["status"] == "passed" and args.observe:
-        (root/"state/p2-connection.json").write_text(json.dumps({"status": "passed", "identity": identity,
+        connection_path.write_text(json.dumps({"status": "passed", "identity": identity,
                                                                  "run_id": run.name}, indent=2, allow_nan=False)+"\n")
     print(json.dumps({"run_id": run.name, "status": summary["status"], "failure": summary["failure"]}, indent=2), flush=True)
     return 0 if summary["status"] == "passed" else 1

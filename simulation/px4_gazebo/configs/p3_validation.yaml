@@ -1,0 +1,24 @@
+{
+  "schema_version": 1, "profile": "p3-x500-depth-native-shm64-v1",
+  "ground_window_sim_s": 30, "settle_sim_s": 5, "startup_wall_s": 90,
+  "ground_wall_deadline_s": 240,
+  "plane_roi_uv": [160, 80, 480, 200],
+  "valid_fraction_min": 0.95, "median_error_m": 0.05, "median_error_fraction": 0.01,
+  "p95_error_m": 0.10, "p95_error_fraction": 0.02,
+  "source_gap_sim_s": 0.12, "delivered_hz_min": 25,
+  "processed_hz_min": 8, "observation_age_sim_s": 0.25,
+  "state_mismatch_s": 0.05, "health_poll_wall_s": 0.1,
+  "stall_wall_s": 1.0, "interruption_detect_wall_s": 1.2,
+  "recorded_fraction_required": 1.0, "recorder_overflow_allowed": 0,
+  "disk_reserve_bytes": 21474836480, "recorder_capacity": 8,
+  "geometry_pose_translation_drift_m": 0.005, "geometry_pose_rotation_drift_rad": 0.005,
+  "qualification_flights": 3, "stop_first_failure": true,
+  "fixtures": {
+    "plane2": {"distance_m": 2, "yaw_rad": 0},
+    "plane4": {"distance_m": 4, "yaw_rad": 0},
+    "plane6": {"distance_m": 6, "yaw_rad": 0},
+    "oblique": {"distance_m": 4, "yaw_rad": 0.35},
+    "asymmetric": {"distance_m": 4, "yaw_rad": 0},
+    "out_of_range": {"distance_m": 25, "yaw_rad": 0}
+  }
+}
