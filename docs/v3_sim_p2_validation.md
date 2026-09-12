@@ -2,10 +2,13 @@
 
 P2-R2 introduces `p2-estimator-reference-v3`: initialization position control
 with intentionally unspecified yaw, bounded heading-drift monitoring, and a
-measured handover to the original corrected mission anchor. R2 results are
-recorded in the final section and schema-3 evidence summary. The strict-v1
-and R1 failures below remain historical failures. P1 flights, diagnostic
-flights and runtime-free tests do not count toward the new P2 streak.
+measured handover to the original corrected mission anchor. R3 preserves that
+policy and repairs a measured native SHM publication wait. Three post-repair
+ground diagnostics, a complete new nominal smoke and a fresh **20/20** batch
+passed. Current results are in the R3 section and schema-4 evidence summary;
+the complete schema-3 value is preserved under `historical_p2_r2`. Strict-v1,
+R1 and R2 failures remain historical failures. P1 flights, diagnostics and
+runtime-free tests do not count toward the new P2 streak.
 
 ## Preserved strict-v1 implementation and evidence
 
@@ -538,3 +541,107 @@ including nested strict-v1 results. All R2 successful and failed trials retain
 manifest, raw recording and evaluator hashes. The next work is bounded
 diagnosis of the ground-prestream scheduling/publication delay before a
 separately authorized new smoke and fresh streak. P3 is not recommended.
+
+## P2-R3 control-loop latency diagnosis
+
+R3 begins at `a27efab` and preserves `p2-estimator-reference-v3`, all original
+`p2_control.yaml` values, pins and estimator parameters. See the separate
+[timing contract](v3_sim_p2_timing_contract.md) for measured attribution,
+timestamp migration, dispatch guards and remaining synchronous-writer limits.
+The historical R2 0.333905 s interval starts at Mission selection, despite
+the old `receipt_monotonic_s` name; it is not an isolated publish duration.
+
+Four pre-repair ground starts localized the native first-heartbeat SHM wait.
+Two passed, one failed `observation_gap`, and one failed stale attitude after
+a measured 335.442 ms publication. The fourth native stack captured an actual
+333 ms health-check sleep within Fast DDS SHM transport. Small concurrent
+bag/JSON/graph spans do not support blaming evidence persistence for that stall.
+The controller alone now uses official UDPv4 built-in transport. No dependency
+or host configuration was changed; the recorder remains synchronously owned.
+
+| Post-repair diagnostic | First heartbeat | Maximum publication | Maximum callback | Consumed gap | Result |
+|---|---:|---:|---:|---:|---|
+| `20260912T034634Z-p2-ground-c8971267` | 0.103 ms | 0.904 ms | 2.794 ms | 0.072 s | passed |
+| `20260912T034735Z-p2-ground-2bea0f79` | 0.191 ms | 0.191 ms | 4.525 ms | 0.064 s | passed |
+| `20260912T034826Z-p2-ground-20b540c4` | 0.112 ms | 0.312 ms | 2.415 ms | 0.064 s | passed |
+
+All three independently verified zero VehicleCommand, no REQUEST_OFFBOARD or
+REQUEST_ARM transition, continuous landed/disarmed observations in ROS/ULog,
+correct NaN-yaw/zero-rate wire semantics, complete trace/recording and owned
+cleanup. Actual prestream coverage was 2.948, 2.948 and 3.000 simulation seconds.
+These diagnostic passes give no credit toward a new 20-consecutive-flight run.
+
+### R3 complete nominal and repeated acceptance
+
+Build `20260912T034318Z-p2-build-wNyi8m` passed with installed package hash
+`e1857b3fc0a5678c0789b39860ba36cae5193b8daa83a20c246a02f49bb431af`.
+Read-only run `20260912T034509Z-p2-observe-69157ddb` passed for those exact
+inputs. Runtime manifests retain the starting Git commit plus the measured
+source/config/launcher/library identities of the tested working tree.
+
+New nominal smoke `20260912T034917Z-p2-flight-c74f35ba` passed the controller,
+recording integrity, timing, reference reconciliation, yaw ownership, all
+16 fixed ROS/ULog windows, command/ACK mapping and LAND. It recorded 311
+initialization targets, 0.694315-degree maximum initialization drift and
+135 exactly matched internal yaw samples. Actual prestream was 2.000 s;
+maximum publish was 1.073 ms, callback 4.767 ms and consumed gap 0.072 s.
+The internal-yaw sampling/coverage limitations in the R2 source contract remain.
+
+Fresh batch `20260912T035329Z-p2-repeat-84bb288d` passed **20/20**, from
+`20260912T035332Z-p2-flight-d1216632` through
+`20260912T043525Z-p2-flight-05a058bd`. It did not resume R2 trial 7 or reuse
+any previous success. All 20 controller exits and independent evaluator exits
+were zero; all 320 fixed ROS/ULog windows passed. Every trial had accepted
+mode/arm/LAND ACKs, final landed/disarmed confirmation and complete recording.
+No failed/interrupted trial was omitted, no retry occurred, and frozen source,
+config, evaluator, transport, binary and GUI-profile identities remained equal.
+
+| Worst measured batch metric | Value |
+|---|---:|
+| Controller-consumed source gap | 0.072 s |
+| Subscription callback-entry gap | 0.049549 wall s |
+| Source age at control / dispatch | 0.032 / 0.032 sim s |
+| Heartbeat / trajectory actual publication gap | 0.056 / 0.056 sim s |
+| Actual publish call | 3.115 ms |
+| Complete control callback | 10.630 ms |
+| Graph inspection | 9.475 ms |
+| Acquisition-through-persistence callback envelope (descriptive) | 26.498 ms |
+| Minimum actual prestream | 2.000 sim s |
+| Trace records / configured capacity | 221,632 / 500,000 |
+| Trace overflow / ULog dropouts | 0 / 0 |
+
+Post-batch verification confirmed all owned process exit codes, released
+exclusive lock, no remaining owned runtime processes and unchanged frozen
+inputs. Final console state and ULog independently confirm landed/disarmed.
+This is simulation-profile acceptance, not a hard-real-time or clean-rebuild claim.
+
+### R3 retained history and regression
+
+The schema-4 summary lists all 37 R3 build/runtime/batch directories with
+manifest, raw-recording and evaluator hashes, including every pre-repair
+failure and all 20 new trials. The four pre-repair ground attempts remain
+diagnostic outcomes, not warm-up exclusions from acceptance. The immutable
+historical reconstruction and native probe evidence remain in WSL.
+
+Additional retained setup runs are builds `20260912T031319Z-p2-build-XV0m7R`
+and `20260912T031814Z-p2-build-2g1BDL`; observe runs
+`20260912T031354Z-p2-observe-b7c7be32`,
+`20260912T031856Z-p2-observe-aa94ea2a`,
+`20260912T032305Z-p2-observe-1e71d62b`, and
+`20260912T032611Z-p2-observe-d0dec3bf`. All passed their build/connectivity
+checks; all observes passed offline recording integrity. None has flight credit.
+
+Regression: **177** focused P2/reference/yaw/timing tests; **398** C2/AgentOps
+tests; **1012 passed, 12 skipped** in the full ordinary suite; **2** installed
+ROS tests. Python compilation, Bash syntax and whitespace checks passed.
+ShellCheck passed with only SC1091 excluded for dynamically sourced ROS setup
+paths. The diagnostic interposer compiled with existing gcc and
+`-Wall -Wextra -Werror`. Ordinary pytest launched no optional simulator/runtime.
+Queue/worker-specific tests are inapplicable because no writer queue/worker
+was introduced; synchronous sink failure and bounded trace integrity are tested.
+
+P2 timing attribution is **established**, timing repair **verified**, new
+ground diagnostics and nominal smoke **passed**, and repeated acceptance
+**passed (20/20)**. P2 is complete for this profile. P3-P7 and v3-2-v3-7 remain
+unimplemented/incomplete; P3 is the next eligible slice, not started here.
+Clean rebuild remains **not_proven**.

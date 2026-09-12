@@ -271,11 +271,12 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
 - [x] P1 PX4/Gazebo simulator boot
 - [x] P1 Initial measured non-AI flight smoke
 - [x] P1 Repeated-flight acceptance: 20 consecutive trials
-- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: R2 yaw
-  ownership diagnostic and new nominal smoke passed. The fresh repeated
-  batch stopped on trial 6 for ground-prestream `observation_gap` (**5/20**).
-  R2 publication semantics are verified, but complete P2 acceptance remains
-  incomplete. Strict-v1 and R1 failures are preserved. P3 is not recommended.
+- [x] P2 ROS 2 control, ACK verification, and coordinate tests: R3 traced the
+  native Fast DDS SHM publication wait and applied controller-only UDPv4.
+  Three new ground diagnostics, a complete new nominal smoke and a fresh
+  **20/20** consecutive batch passed, including independent timing, reference,
+  motion and LAND checks. R2 yaw policy and all original limits are unchanged.
+  Strict-v1, R1 and R2 failures remain preserved. P3 is eligible as the next slice.
 - [ ] P3 Depth sensing
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution

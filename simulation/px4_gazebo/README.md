@@ -195,8 +195,10 @@ in [P2 validation](../../docs/v3_sim_p2_validation.md) and
 R2 diagnostic and new nominal smoke passed. The fresh R2 batch stopped on
 trial 6 for a ground-prestream `observation_gap`, leaving **5/20** consecutive
 passes. No mode/arm commands were sent in the failed trial; it remained
-landed/disarmed. P2 acceptance is incomplete. Diagnose that delay before a
-separately authorized new smoke and streak; do not restart the failed batch.
+landed/disarmed. That R2 batch remains failed. R3 subsequently localized a
+native SHM publish wait and completed a separate new smoke and **20/20**
+consecutive trials with controller-only UDPv4. P2 acceptance is now complete
+for this pinned simulation profile; the R2 streak was never resumed.
 
 The [pinned-source contract](../../docs/v3_sim_p2_reference_contract.md)
 allows one verified yaw-only initialization event during bounded takeoff,
@@ -279,3 +281,40 @@ The runner freezes inputs, independently verifies each new trial and stops
 at the first failure, interruption or input change. P1's previous 20 passes
 never count as P2 evidence. P3-P7, model decisions, obstacle avoidance,
 multi-UAV orchestration and hardware integration remain outside this slice.
+
+### P2-R3 timing diagnostics
+
+R3 preserves the R2 yaw policy and flight limits. The
+[timing contract](../../docs/v3_sim_p2_timing_contract.md) documents the measured
+333 ms Fast DDS SHM wait and the controller-only UDPv4 transport repair.
+The pinned middleware, BEST_EFFORT depth, synchronous publication and 20 Hz
+steady timer are unchanged. Timing settings are independently versioned in
+`configs/p2_timing.yaml`; the raw evidence writer remains synchronous, so this
+does not claim bounded disk latency or hard real-time operation.
+
+After a build and exact-input read-only connection pass, an explicitly gated
+ground diagnostic exercises the real first safe prestream without creating
+a VehicleCommand publisher:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
+bash simulation/px4_gazebo/scripts/run_p2_control.sh --run --ground-diagnostic
+```
+
+The declared R3 budget is at most six pre-repair and three post-repair starts;
+four pre-repair starts established attribution. These are not acceptance
+flights. `--native-wait-probe` is an optional ground-only diagnostic interposer
+using existing gcc; it never applies to nominal or repeated acceptance.
+Every attempt and native-probe version is retained. Ground evaluation uses
+`validation/timing_evidence.py --ground RUN --output RUN/p2-timing-evaluation.json`
+in the existing sourced ROS/PyULog environment. Outputs are exclusive-create.
+
+Schema 2 events distinguish callback acquisition, Mission selection, actual
+publish entry/return and persistence. A bounded in-memory trace is persisted
+after control stops. The full offline evaluator also reconciles this trace
+against bag/event publication identities and checks actual prestream coverage.
+An overflow, missing recording, stale action or over-limit consumed sample
+gap invalidates acceptance. The repeated runner freezes the timing evaluator,
+instrumentation, transport configuration and measured middleware binaries.
+No older R2 pass carries into the new R3 streak.

@@ -101,6 +101,8 @@ class StateCache:
         velocity = finite([p[k] for k in ("vx", "vy", "vz")], 3)
         yaw = yaw_from_quaternion(a["q"])
         return {"t": p["timestamp"]/1e6, "ros_sim_s": sim, "receipt_monotonic_s": wall,
+                "selection_monotonic_s": wall,
+                "source_callback_entry_monotonic_s": self.receipts["vehicle_local_position"],
                 "position": position, "velocity": velocity, "yaw": yaw,
                 "arming_state": s["arming_state"], "nav_state": s["nav_state"],
                 "landed": self.data["vehicle_land_detected"]["landed"],
