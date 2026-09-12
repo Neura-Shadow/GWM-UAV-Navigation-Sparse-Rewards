@@ -46,7 +46,7 @@ def evaluate_flight(result, samples, config):
         return {"status": "failed", "reason": "controller_not_complete"}
     if result.get("origin_ned") is None or result.get("initial_yaw_ned") is None:
         return {"status": "unknown", "reason": "missing_origin"}
-    if config.get("reference_policy") == "p2-estimator-reference-v2":
+    if config.get("reference_policy") in ("p2-estimator-reference-v2", "p2-estimator-reference-v3"):
         reference = result.get("reference")
         try:
             valid = (reference["policy"] == config["reference_policy"] and reference["state"] == "locked"
@@ -63,6 +63,17 @@ def evaluate_flight(result, samples, config):
                 return {"status": "failed", "reason": "invalid_reference_lock_evidence"}
         except (KeyError, TypeError):
             return {"status": "unknown", "reason": "missing_reference_lock_evidence"}
+    if config.get("reference_policy") == "p2-estimator-reference-v3":
+        try:
+            handover = result["handover"]
+            if (handover["start_sim_s"] < reference["lock_sim_s"]
+                    or handover["completed_sim_s"] <= handover["start_sim_s"]
+                    or abs(handover["corrected_anchor"]-result["initial_yaw_ned"]) > 1e-6
+                    or tuple(handover["ground_origin"]) != tuple(result["origin_ned"])
+                    or result["max_initialization_drift_deg"] > config["yaw_tolerance_deg"]):
+                return {"status": "failed", "reason": "invalid_yaw_handover_evidence"}
+        except (KeyError, TypeError):
+            return {"status": "unknown", "reason": "missing_yaw_handover_evidence"}
     transactions = result.get("transactions", [])
     if [r.get("command") for r in transactions] != [176, 400, 21] or any(r.get("status") != "accepted" for r in transactions):
         return {"status": "failed", "reason": "missing_command_acceptance"}

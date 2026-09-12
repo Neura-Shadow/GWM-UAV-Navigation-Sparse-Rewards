@@ -1,4 +1,100 @@
-# P2-R1 estimator reference contract
+# P2 estimator reference contracts
+
+## P2-R2 source-backed yaw ownership (policy v3)
+
+This section is frozen before the R2 diagnostic. It changes initialization
+yaw semantics explicitly; the R1 sections below retain their original failure
+and analysis. PX4 remains `d6f12ad1c4f70ad3230afd7d86e971421e02fef4`, px4_msgs
+`86d8239e962f6939e05c3737784f60c02fa884db`, and DDS Agent
+`73622810d984349b80bbac0ef55fc0b694d62222`. No firmware or parameter change is used.
+
+### Complete selected source path
+
+- `msg/versioned/TrajectorySetpoint.msg` defines float32 yaw and world-NED-z
+  yawspeed, with NaN indicating an uncontrolled state. The pinned generated
+  `build/px4_sitl_default/uORB/ucdr/trajectory_setpoint.h` copies both float
+  fields without replacing NaNs. Only timestamps receive the existing offset/
+  current-time handling; ROS continues to send truthful current simulation time.
+- `MulticopterPositionControl.cpp:373` obtains yaw from local-position.heading.
+  At 440-442 it updates the cached trajectory and applies one-time reset
+  compensation. NaN plus a finite delta stays NaN. At 548 it calls
+  `setInputSetpoint(_setpoint)` on every position-control update, even when no
+  new external target arrives; `setState(states)` follows. The resolved yaw is
+  an internal PositionControl value, not written back to the trajectory cache.
+- `PositionControl/PositionControl.cpp:92-125` copies the current estimator
+  state and incoming yaw/yawspeed, validates translation inputs and resolves
+  non-finite yaw to current `_yaw` on each valid update. Finite yawspeed=0 is
+  zero feedforward. `getAttitudeSetpoint()` passes the resolved yaw and thrust
+  into `ControlMath::thrustToAttitude()` and copies yawspeed to yaw_sp_move_rate.
+- `PositionControl/ControlMath.cpp:50-112` constructs a desired quaternion
+  from the thrust/body-z vector and desired yaw direction. Position control
+  timestamps its internal position and attitude outputs at publication.
+- `mc_att_control_main.cpp:306-339` loads newer attitude setpoints and adapts
+  them for a quaternion reset only if the attitude-estimate timestamp is newer
+  than the last setpoint timestamp. `AttitudeControl/AttitudeControl.cpp:97-106`
+  transforms world-z yaw feedforward to body coordinates and adds it to the
+  attitude-error-derived rate demand. Zero feedforward is not direct body-rate
+  control and does not imply zero attitude-control torque.
+
+This removes the external stale finite-yaw input from the R1 race. It does not
+prove that every internal PX4 scheduling discontinuity is impossible, nor is
+unspecified yaw equivalent to holding a fixed geographic heading.
+
+### Wire, monitoring and bounded handover
+
+`p2-estimator-reference-v3` publishes finite position, yaw=NaN, yawspeed=0.0
+from the first prestream target through TAKEOFF/STABILIZE_REFERENCE. Velocity,
+acceleration and jerk remain NaN. Position Offboard mode and 20 Hz heartbeat
+remain unchanged. During a pending reset, each fresh target repeats the last
+bounded position; upward progression pauses until paired validation succeeds
+or the existing 1.5 simulation / 2 wall second deadline fails. There is no
+heartbeat-only gap in this v3 trajectory stream.
+
+The R1 classifier retains independent uint8 baselines, one event <=5 degrees,
+all source/reference rejection rules and five seconds of final alignment.
+Initialization heading drift is checked against the original anchor in each
+measurement's own reset generation, using both local heading and attitude
+yaw. A candidate delta may normalize a pending drift measurement; it never
+authorizes progression without the complete pair. Any residual >5 degrees
+fails. Ground position origin, ENU axes and the 2 m target never move.
+
+LOCK_REFERENCE freezes the accepted generation. A fresh local heading,
+consistent with fresh attitude within the original 5-degree bound, seeds the
+first finite target exactly. Dedicated YAW_HANDOVER then ramps toward the
+original measured ground anchor plus accepted correction at <=10 degrees/s.
+It completes only after reaching that anchor and observing a subsequent fresh
+position sample at least one control period later. Drift/tracking remain
+bounded by 5 degrees; reset/freshness/health changes abort. No handover retry or
+re-anchoring is allowed. The entire original INITIAL_HOVER and eight motion
+windows follow. Phase-D LAND and terminal disarming semantics are unchanged.
+
+Explicit wire modes distinguish initialization from finite handover/nominal
+control. JSON uses yaw=null/inactive and yawspeed=0/active during initialization;
+finite yaw is active and yawspeed=null/inactive after handover. Invalid active
+measurements are rejected, not silently converted to inactive values. Installed
+ROS tests deserialize actual CDR for both modes; runtime evaluation compares
+the bag messages with every reported mode and activation mask.
+
+### Independent evidence and sequence
+
+The v3 evaluator retains the old finite-cache test for v1/v2 evidence. For v3
+it checks every initialization input, the full native-ULog drift interval,
+reset classification, pending position hold, original origin/anchor, the first
+finite target against its fresh measured heading, and finite-target rate and
+handover ordering. Internal resolved yaw is matched to the most recent native
+local-position sample, with at most one observed 8 ms estimator period and
+1e-5 rad serialization consistency error. This is a sample-matching guard,
+not a larger physical tracking tolerance. Internal outputs are logged around
+10 Hz; the evaluator reports counts and maximum gaps and makes no claim about
+unobserved internal updates. No extra logging or control parameter is changed.
+
+The labelled initialization/handover diagnostic runs the complete bounded
+profile to retain identical handover and LAND paths, but receives no nominal
+or repeat acceptance credit. Its actual bag/ULog must pass before a new nominal
+smoke, and that new smoke must pass before a fresh zero-based 20-trial batch.
+If the diagnostic disproves this strategy, stop and retain the actual result.
+
+## Preserved P2-R1 contract and failure
 
 This is an explicit application policy revision from strict-v1 to
 `p2-estimator-reference-v2`. PX4, its parameters, flight geometry, tracking

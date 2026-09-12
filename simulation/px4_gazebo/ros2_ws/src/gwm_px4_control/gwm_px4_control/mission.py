@@ -3,7 +3,8 @@ import math
 
 from .frames import offset_target, wrap
 from .protocol import AckTracker
-from .estimator_reference import ReferenceManager, V2
+from .estimator_reference import ReferenceManager, V2, V3
+from .contracts import INITIALIZATION, NOMINAL
 
 ORDER = ("WAIT_FOR_CLOCK_AND_CONNECTION", "WAIT_FOR_VALID_ESTIMATION", "PRESTREAM_SAFE_SETPOINTS",
          "REQUEST_OFFBOARD", "VERIFY_OFFBOARD", "REQUEST_ARM", "VERIFY_ARMED", "TAKEOFF",
@@ -12,7 +13,8 @@ ORDER = ("WAIT_FOR_CLOCK_AND_CONNECTION", "WAIT_FOR_VALID_ESTIMATION", "PRESTREA
          "VERIFY_LANDED_AND_DISARMED", "COMPLETE")
 MOTION = ORDER[7:16]
 ORDER_V2 = ORDER[:8] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE") + ORDER[8:]
-STREAMING = ORDER[2:16] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE")
+ORDER_V3 = ORDER[:8] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE", "YAW_HANDOVER") + ORDER[8:]
+STREAMING = ORDER[2:16] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE", "YAW_HANDOVER")
 
 
 def ramp(current, goal, speed, dt):
@@ -25,7 +27,8 @@ def ramp(current, goal, speed, dt):
 class Mission:
     def __init__(self, config, cache, start_wall, flight):
         self.config, self.cache, self.start_wall, self.flight = config, cache, start_wall, flight
-        self.order = ORDER_V2 if config.get("reference_policy") == V2 else ORDER
+        self.v3 = config.get("reference_policy") == V3
+        self.order = ORDER_V3 if self.v3 else ORDER_V2 if config.get("reference_policy") == V2 else ORDER
         self.reference = None
         self.state = ORDER[0]
         self.enter_sim = None
@@ -50,6 +53,15 @@ class Mission:
         self.connectivity_passed = False
         self.prestream_first_sim = None
         self.events = []
+        self.handover = None
+        self.handover_reached_sim = None
+        self.max_initialization_drift = 0.0
+
+    def position_action(self):
+        initialization = self.v3 and self.handover is None
+        return {"position": self.target, "yaw": None if initialization else self.yaw_target,
+                "mode": INITIALIZATION if initialization else NOMINAL,
+                "yaw_phase": "initialization" if initialization else "handover" if self.state == "YAW_HANDOVER" else "nominal"}
 
     def transition(self, next_state, sim, wall, **evidence):
         if next_state not in ("ABORTED", "RECOVERY"):
@@ -174,7 +186,7 @@ class Mission:
                     self.done = True
                     return actions
                 self.origin, self.initial_yaw = sample["position"], sample["yaw"]
-                if self.config.get("reference_policy") == V2:
+                if self.config.get("reference_policy") in (V2, V3):
                     self.reference = ReferenceManager(c, self.cache.data, self.origin, self.initial_yaw)
                     self.cache.reference_manager = self.reference
                 else:
@@ -185,7 +197,7 @@ class Mission:
         if not graph_ok:
             raise ValueError("control_graph_invalid_or_competing_owner")
         sample = self.cache.validate(sim, wall, terminal_landed=(
-            self.config.get("reference_policy") == V2 and self.state == "VERIFY_LANDED_AND_DISARMED"))
+            self.config.get("reference_policy") in (V2, V3) and self.state == "VERIFY_LANDED_AND_DISARMED"))
         actions["sample"] = sample
         reference_pending = False
         if self.reference is not None:
@@ -201,6 +213,12 @@ class Mission:
                                     "delta_heading": reconciled["correction"]})
             self.events.extend(self.reference.events)
             self.reference.events.clear()
+        if self.v3 and (self.handover is None or self.state == "YAW_HANDOVER"):
+            drift = self.reference.heading_drift(self.cache.data)
+            self.max_initialization_drift = max(self.max_initialization_drift, *(abs(v) for v in drift.values()))
+            sample["initialization_drift_rad"] = drift
+            if self.max_initialization_drift > math.radians(c["yaw_tolerance_deg"]):
+                raise ValueError("initialization_heading_drift")
         if self.last_sample is not None and sample["t"]-self.last_sample > c["max_sample_gap_sim_s"]:
             raise ValueError("observation_gap")
         fresh = self.last_sample is None or sample["t"] > self.last_sample
@@ -214,10 +232,13 @@ class Mission:
         height = self.origin[2]-sample["position"][2]
         if not c["min_height_m"] <= height <= c["max_height_m"]:
             raise ValueError("flight_envelope_height")
-        if self.state in MOTION + ("STABILIZE_REFERENCE", "LOCK_REFERENCE") and (sample["arming_state"] != 2 or sample["nav_state"] != 14):
+        if self.state in MOTION + ("STABILIZE_REFERENCE", "LOCK_REFERENCE", "YAW_HANDOVER") and (sample["arming_state"] != 2 or sample["nav_state"] != 14):
             raise ValueError("offboard_armed_state_lost")
         if reference_pending:
-            actions["heartbeat_only"] = True
+            if self.v3:
+                actions["setpoint"] = self.position_action()  # fresh bounded hold, no upward progression
+            else:
+                actions["heartbeat_only"] = True
             return actions
         if (self.state == "PRESTREAM_SAFE_SETPOINTS" and self.prestream_first_sim is not None
                 and sim-self.prestream_first_sim >= c["prestream_sim_s"]):
@@ -239,7 +260,32 @@ class Mission:
             self.reference.lock(sim)
             self.events.extend(self.reference.events)
             self.reference.events.clear()
-            self.transition("INITIAL_HOVER", sim, wall, reference_lock_sim_s=sim)
+            if self.v3:
+                p, a = self.cache.data["vehicle_local_position"], self.cache.data["vehicle_attitude"]
+                if abs(wrap(p["heading"]-sample["yaw"])) > math.radians(c["yaw_tolerance_deg"]):
+                    raise ValueError("inconsistent_aligned_heading")
+                self.yaw_target = wrap(p["heading"])
+                self.handover = {"start_sim_s": sim, "aligned_heading": self.yaw_target,
+                    "attitude_yaw": sample["yaw"], "position_timestamp": p["timestamp"],
+                    "attitude_timestamp": a["timestamp"], "corrected_anchor": self.initial_yaw,
+                    "ground_origin": self.origin, "completed_sim_s": None}
+                self.events.append({"event": "yaw_handover_started", **self.handover})
+                self.transition("YAW_HANDOVER", sim, wall, reference_lock_sim_s=sim)
+            else:
+                self.transition("INITIAL_HOVER", sim, wall, reference_lock_sim_s=sim)
+        elif self.state == "YAW_HANDOVER":
+            step = math.radians(c["yaw_ramp_deg_s"])*min(dt,c["max_sample_gap_sim_s"])
+            self.yaw_target = wrap(self.yaw_target+max(-step,min(step,wrap(self.initial_yaw-self.yaw_target))))
+            if abs(wrap(sample["yaw"]-self.yaw_target)) > math.radians(c["yaw_tolerance_deg"]):
+                raise ValueError("yaw_handover_tracking")
+            if abs(wrap(self.yaw_target-self.initial_yaw)) < 1e-6:
+                if self.handover_reached_sim is None:
+                    self.handover_reached_sim = sim
+                elif fresh and sample["t"] >= self.handover_reached_sim+1/c["rate_hz"]:
+                    self.handover["completed_sim_s"] = sim
+                    self.events.append({"event": "yaw_handover_completed", "sim_s": sim,
+                                        "target_yaw": self.yaw_target})
+                    self.transition("INITIAL_HOVER", sim, wall, handover_complete=True)
         elif self.state in MOTION:
             goal, yaw, offset = self.goal()
             self.target = ramp(self.target, goal, c["ramp_m_s"], min(dt, c["max_sample_gap_sim_s"]))
@@ -276,7 +322,7 @@ class Mission:
         elif self.state == "VERIFY_LANDED_AND_DISARMED" and sample["landed"] is True and sample["arming_state"] == 1:
             self.transition("COMPLETE", sim, wall, observed_landed=True, observed_disarmed=True)
         if self.state in STREAMING and dt > 0:
-            actions["setpoint"] = {"position": self.target, "yaw": self.yaw_target}
+            actions["setpoint"] = self.position_action()
             if self.prestream_first_sim is None:
                 self.prestream_first_sim = sim
         return actions

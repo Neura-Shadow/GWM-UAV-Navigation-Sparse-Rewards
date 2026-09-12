@@ -52,6 +52,8 @@ def trial(args):
         if observation["identity"] != identity or observation["status"] != "passed":
             raise ValueError("Read-only connection stage must pass for these exact inputs")
     kind = "flight" if args.allow_simulated_flight else "observe"
+    if args.diagnostic and not args.allow_simulated_flight:
+        raise ValueError("Diagnostic requires explicit flight authorization")
     run = root/"runs"/(time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())+"-p2-"+kind+"-"+uuid.uuid4().hex[:8])
     run.mkdir(parents=True)
     for folder in ("rootfs", "tmp", "qgc-config/QGroundControl"):
@@ -79,6 +81,7 @@ def trial(args):
         env["HEADLESS"] = "1"
     start = time.monotonic()
     summary = {"run_id": run.name, "kind": kind, "identity": identity, "config": config,
+               "purpose": "initialization_handover_diagnostic" if args.diagnostic else "nominal" if args.allow_simulated_flight else "connectivity",
                "project_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=sim, text=True).strip(),
                "status": "incomplete", "failure": None, "controller_result": None,
                "mode": "headless_physics" if args.headless else "gui_requested",
@@ -126,7 +129,7 @@ def trial(args):
         if "Gazebo world is ready" not in boot or "x500_71" not in boot:
             raise ValueError("Expected owned world/model not observed")
         parameters = console.command("param show -a")
-        if config.get("reference_policy") == "p2-estimator-reference-v2":
+        if config.get("reference_policy") in ("p2-estimator-reference-v2", "p2-estimator-reference-v3"):
             clean_parameters = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", parameters)
             required = {"EKF2_MAG_TYPE": 0, "SENS_IMU_MODE": 1, "SENS_MAG_MODE": 1,
                         "EKF2_MULTI_IMU": 0, "EKF2_MULTI_MAG": 0}
@@ -224,4 +227,5 @@ if __name__ == "__main__":
     parser.add_argument("--observe", action="store_true")
     parser.add_argument("--allow-simulated-flight", action="store_true")
     parser.add_argument("--headless", action="store_true")
+    parser.add_argument("--diagnostic", action="store_true")
     raise SystemExit(trial(parser.parse_args()))

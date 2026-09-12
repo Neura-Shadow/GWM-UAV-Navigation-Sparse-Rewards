@@ -184,24 +184,38 @@ observed flight evidence. P0/P1 historical evidence remains unchanged.
 P2 adds `ros2_ws/src/gwm_px4_control`, with pure frame, wire-field, ACK,
 state-machine, freshness and acceptance modules and a thin ROS adapter.
 The original strict-v1 flight failed on a heading-reference reset and remains
-failed. P2-R1 introduces `p2-estimator-reference-v2`; its complete new nominal
-smoke and independent bag/ULog verification passed. The new twenty-trial
-sequence stopped on trial 2 with **1/20** consecutive passes. A late reset
-notification allowed an old ROS yaw target to overwrite PX4's cached
-correction; reference continuity remains **blocked**. See [P2 validation](../../docs/v3_sim_p2_validation.md) and
+failed. The historical P2-R1 twenty-trial sequence stopped on trial 2 with
+**1/20** consecutive passes: a late reset notification allowed an old ROS yaw
+target to overwrite PX4's cached correction. P2-R2 introduces
+`p2-estimator-reference-v3`, with no finite external yaw during initialization
+and a bounded handover after stable alignment. Current measured outcomes are
+in [P2 validation](../../docs/v3_sim_p2_validation.md) and
 [sanitized evidence](../../docs/evidence/v3_sim_p2_summary.json).
+
+R2 diagnostic and new nominal smoke passed. The fresh R2 batch stopped on
+trial 6 for a ground-prestream `observation_gap`, leaving **5/20** consecutive
+passes. No mode/arm commands were sent in the failed trial; it remained
+landed/disarmed. P2 acceptance is incomplete. Diagnose that delay before a
+separately authorized new smoke and streak; do not restart the failed batch.
 
 The [pinned-source contract](../../docs/v3_sim_p2_reference_contract.md)
 allows one verified yaw-only initialization event during bounded takeoff,
-followed by five seconds of final alignment and reference lock before the
-original full mission. This explicitly changes reset semantics. It preserves
+followed by five seconds of final alignment and reference lock. The first
+finite yaw target uses fresh aligned heading; a dedicated handover ramps at
+10 degrees/s toward the original measured ground anchor plus accepted reset
+correction before the full mission. Initialization uses yaw=NaN and
+yawspeed=0.0, with fresh bounded position holds during pending classification.
+This changes yaw semantics and does not promise fixed geographic heading
+during initialization. Both heading and attitude drift remain bounded by
+5 degrees; invalid or ambiguous reset evidence still fails. It preserves
 the ground origin, relative-yaw intent, PX4/default magnetic fusion, mission
 height and original flight limits. Unsupported or post-lock resets still
 abort. Source/configuration/evaluator changes require a new smoke and streak;
 historical failures never become successful flights.
-Do not restart the failed batch or relax its evaluator to discard the
-uncorrected interval. A source-supported repair of the pre-notification race
-is required before another nominal smoke and new acceptance sequence.
+The old failed batch is retained. The v3 evaluator checks explicit mode/mask
+agreement in actual CDR, initialization drift, matched internal resolved yaw,
+handover and the original full motion/LAND contract. Internal ULog output is
+sampled around 10 Hz and does not prove every internal controller update.
 
 From the Windows checkout mounted in a WSL shell, build the one-way,
 hash-verified package mirror with Linux system Python and sourced Jazzy:
@@ -220,8 +234,10 @@ GWM_ALLOW_PX4_LAUNCH=1 \
 bash simulation/px4_gazebo/scripts/run_p2_control.sh --run --observe
 ```
 
-The explicit flight entrypoint below documents the bounded workflow. Its
-current configuration is known to abort at the heading reset described above:
+Run one labelled initialization/handover diagnostic first by adding
+`--diagnostic` to the explicit flight entrypoint below. It exercises the same
+complete profile but cannot qualify a repeated batch. Independently verify
+that diagnostic before running a new nominal smoke without that flag:
 
 ```bash
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \

@@ -9,7 +9,7 @@ fi
 flight=0
 observe=0
 for arg in "${@:2}"; do
-  case "$arg" in --allow-simulated-flight) flight=1;; --observe) observe=1;; --headless) ;; *) fail "Unknown argument: $arg";; esac
+  case "$arg" in --allow-simulated-flight) flight=1;; --observe) observe=1;; --headless|--diagnostic) ;; *) fail "Unknown argument: $arg";; esac
 done
 [[ $((flight+observe)) == 1 ]] || fail 'Choose exactly one of observation and flight'
 for gate in GWM_ALLOW_OPTIONAL_RUNTIME GWM_RUN_GAZEBO_PX4_TESTS GWM_ALLOW_PX4_LAUNCH; do

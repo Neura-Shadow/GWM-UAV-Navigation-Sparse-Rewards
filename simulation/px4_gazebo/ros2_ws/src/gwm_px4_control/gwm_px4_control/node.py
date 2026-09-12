@@ -1,6 +1,7 @@
 """ROS transport/recording adapter; imported safely without ROS installed."""
 import argparse
 import json
+import math
 import os
 from pathlib import Path
 import time
@@ -182,10 +183,14 @@ def main(argv=None):
                     self.send("offboard_control_mode", offboard_mode(int(self.sim()*1e6)))
                     self.emit({"event": "reference_pending_heartbeat", "phase": self.mission.state})
                 if action["setpoint"]:
-                    fields = position_setpoint(action["setpoint"]["position"], action["setpoint"]["yaw"], int(self.sim()*1e6))
+                    mode = action["setpoint"]["mode"]
+                    fields = position_setpoint(action["setpoint"]["position"], action["setpoint"]["yaw"], int(self.sim()*1e6), mode)
                     self.send("offboard_control_mode", offboard_mode(fields["timestamp"]))
                     self.send("trajectory_setpoint", fields)
-                    self.emit({"event": "setpoint", "phase": self.mission.state, **encode_wire(fields)})
+                    record = {"event": "setpoint", "phase": self.mission.state, **encode_wire(fields, mode)}
+                    if self.mission.v3:
+                        record.update(mode=mode, yaw_phase=action["setpoint"]["yaw_phase"])
+                    self.emit(record)
                 if action["sample"]:
                     self.emit({"event": "sample", "phase": self.mission.state, "sample": action["sample"]})
             except (Exception, KeyboardInterrupt) as exc:
@@ -204,6 +209,9 @@ def main(argv=None):
                       "manual_flight_commands": False, "ros_external_control_owner": args.flight}
             result["reference_policy"] = c.get("reference_policy", "p2-estimator-reference-v1")
             result["reference"] = self.mission.reference.summary() if self.mission.reference else None
+            if self.mission.v3:
+                result["handover"] = self.mission.handover
+                result["max_initialization_drift_deg"] = math.degrees(self.mission.max_initialization_drift)
             for key, value in self.cache.stats.items():
                 elapsed = (value["last_us"]-value["first_us"])/1e6
                 result["topic_rates"][key] = {**value, "unique_rate_hz": (value["unique"]-1)/elapsed if elapsed > 0 else None}

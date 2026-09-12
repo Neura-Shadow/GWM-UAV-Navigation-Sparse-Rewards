@@ -271,10 +271,11 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
 - [x] P1 PX4/Gazebo simulator boot
 - [x] P1 Initial measured non-AI flight smoke
 - [x] P1 Repeated-flight acceptance: 20 consecutive trials
-- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: R1 revised
-  nominal smoke passed; new repeated batch failed on trial 2 (1/20).
-  Reference continuity remains blocked by an asynchronous cached-yaw
-  overwrite race; strict-v1 failures remain preserved. P3 is not recommended.
+- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: R2 yaw
+  ownership diagnostic and new nominal smoke passed. The fresh repeated
+  batch stopped on trial 6 for ground-prestream `observation_gap` (**5/20**).
+  R2 publication semantics are verified, but complete P2 acceptance remains
+  incomplete. Strict-v1 and R1 failures are preserved. P3 is not recommended.
 - [ ] P3 Depth sensing
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution

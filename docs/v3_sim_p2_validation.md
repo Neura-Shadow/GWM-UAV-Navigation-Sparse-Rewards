@@ -1,10 +1,11 @@
 # v3-SIM P2 validation
 
-P2-R1 adds `p2-estimator-reference-v2`, with a source-verified bounded heading
-initialization phase before the original full mission. Its current measured
-results are in the P2-R1 section below and the versioned evidence summary.
-The original strict-v1 flight remains **failed**. P1 flights and runtime-free
-tests do not establish P2 flight acceptance.
+P2-R2 introduces `p2-estimator-reference-v3`: initialization position control
+with intentionally unspecified yaw, bounded heading-drift monitoring, and a
+measured handover to the original corrected mission anchor. R2 results are
+recorded in the final section and schema-3 evidence summary. The strict-v1
+and R1 failures below remain historical failures. P1 flights, diagnostic
+flights and runtime-free tests do not count toward the new P2 streak.
 
 ## Preserved strict-v1 implementation and evidence
 
@@ -392,3 +393,148 @@ P3 is not recommended. The valid bounded-classification implementation and
 evidence are retained with this explicit incomplete status. No PX4 patch,
 estimator parameter change, fabricated timestamp, increased threshold or
 replacement console flight was used to mask the remaining conflict.
+
+## P2-R2 initialization yaw ownership and bounded handover
+
+R2 starts from `0e51fbfff437fc6214cf66ca738d55770bda27a5` on the same branch,
+after fast-forward-only synchronization. The unrelated `.codegraph/` tree is
+preserved. No upstream revision, binary, estimator parameter, model or
+AgentOps permission changed. The source-supported contract and its limitations
+were written before the diagnostic in
+[the reference document](v3_sim_p2_reference_contract.md).
+
+The actual runtime binary uses `build/px4_sitl_default_linux/bin/px4`. Its
+generated `uORB/ucdr/trajectory_setpoint.h` is byte-identical to the initially
+inspected `px4_sitl_default` header (SHA-256
+`dbb268de1e3fa4a1fb2b0e51a357ceb8ca4ce7c47269b5e10a194de7b5953bab`).
+The selected source paths and hashes are recorded in schema 3. Cached NaN yaw
+remains unspecified; PositionControl resolves it from its current heading on
+each valid update. Zero yawspeed is world-z yaw feedforward, not direct body
+rate control. Attitude-setpoint/reset scheduling still has its own timestamp
+rules; no claim is made that every downstream discontinuity is impossible.
+
+### Software and wire contract
+
+The package mirror is
+`4abf5ce22a3e9ddf723ea9570c90c5d88e64a4e41e461dacbc7c695d5fab404a`.
+Initialization begins at the first prestream publication with finite position,
+yaw=NaN and yawspeed=0.0. JSON records intentional inactivity as yaw=null and
+an inactive mask, while zero yawspeed is active. Finite handover/nominal yaw
+uses the opposite yaw/yawspeed activation masks. Actual CDR messages are
+checked against those records. Invalid measurements are never silently
+converted into valid inactive commands.
+
+Pending reset validation freezes bounded position progression while sending
+fresh targets at the original 20 Hz rate. Both estimator heading and attitude
+yaw retain the original 5-degree drift bound in their own reset generations.
+The independent R1 reset classifier, one-event limit, 5-degree correction
+limit, five stable alignment seconds and rejection deadlines are preserved.
+After lock, the first finite target equals fresh aligned heading. Handover
+ramps at 10 degrees/s to the original ground heading plus accepted correction.
+Only then do the full original dwell windows begin. Original position origin,
+ENU axes, +30-degree yaw maneuver, LAND and terminal disarming checks remain.
+Every configuration value except the policy identifier equals R1, including
+all numeric geometry, ramps, tracking, freshness, envelope and deadline limits.
+
+The pure source-faithful scheduler model reproduces finite R1 cache overwrite
+and exercises both reset/publication orders, delayed notifications, both
+notification orders, duplicates, timestamp ordering, signed corrections and
+angle wraparound. The model establishes a publication invariant, not vehicle
+dynamics or actual PX4 scheduling. Historical fixtures and v1/v2 evaluator
+semantics remain testable; v3 adds explicit mode-specific evaluation.
+
+### Diagnostic and new nominal smoke
+
+| Stage | Run ID | Independent result |
+|---|---|---|
+| Linux build / installed tests | `20260912T023023Z-p2-build-2btPMr` | passed; 2 installed tests |
+| Read-only DDS | `20260912T023340Z-p2-observe-724a0465` | passed; no flight commands |
+| Labelled full-profile diagnostic | `20260912T023504Z-p2-flight-8cf8a6ad` | passed; no nominal or repeat credit |
+| New nominal smoke | `20260912T023930Z-p2-flight-94486276` | passed; qualifies only the new R2 batch |
+
+The diagnostic contains 309 initialization targets, all yaw-unspecified with
+zero yawspeed. Native ULog maximum drift is 0.316696 degrees for local heading
+and 0.316784 degrees for attitude yaw. All 134 matched internal resolved-yaw
+samples equal their current estimator heading (zero measured error and time
+offset). Internal output maximum sample gap is 0.104 s. Handover spans
+29.548-29.696 simulation seconds; its first finite yaw is 1.676488638 rad and
+its original corrected anchor is 1.678364707 rad. Both complete independent
+motion evaluations and normal ROS LAND/ACK, landed/disarmed checks pass.
+
+The new nominal smoke has 311 initialization targets, maximum drift
+0.260421 degrees, and another 134 exact internal-heading matches. Handover
+spans 29.612-29.760 s from fresh heading 1.676015377 rad to corrected original
+anchor 1.676524640 rad. All sixteen fixed rosbag/ULog motion windows pass,
+including the full ten-second initial hover. Normal LAND ACK latency is
+0.016 simulation seconds and actual landed/disarmed is confirmed. There are
+4,953 exact ROS/ULog position pairs, no ULog dropouts, 1,728 trajectory targets
+and 1,728 heartbeats. Maximum stream gap is 0.052001 s. No fallback recovery
+is counted as success.
+
+The internal-output evidence is approximately 10 Hz. Exact matches establish
+the sampled source-defined behavior; intervals between them and downstream
+attitude scheduling are not proven at every update. No logging configuration
+was added. The complete raw recordings and their hashes remain in WSL.
+
+### R2 regression
+
+- Focused P2/reference tests: **159 passed**, including 45 new R2 cases.
+- AgentOps/C2 regression: **398 passed**.
+- Full normal Anaconda suite: **994 passed, 12 skipped**, 93.98 s.
+- Linux ROS build: passed; **2 installed tests passed**, including CDR round trips.
+- Final Python compilation: **20 files passed**.
+- Bash syntax and ShellCheck: **3 scripts passed**; only SC1091 excluded for sourced ROS paths.
+- Ordinary pytest launched no simulator. Git whitespace checks passed.
+- Clean rebuild remains **not_proven**.
+
+### New R2 consecutive acceptance
+
+Batch `20260912T024156Z-p2-repeat-70022b4f` starts at zero after the new smoke.
+Its frozen inputs include the controller package, configuration, launchers,
+dependency identities and all three independent evaluator source files.
+Each flight requires the full motion/reference/recording/LAND checks. The
+runner stops on the first failure or interruption. Neither the diagnostic
+nor any R1/P1 result contributes a pass. Final status and trial-by-trial
+evidence are recorded in schema 3 of
+[the sanitized summary](evidence/v3_sim_p2_summary.json).
+
+**Final R2 batch outcome: failed, 5/20.** Five new consecutive trials passed
+all independent motion/reference/recording/LAND checks. Their aggregate
+initialization drift maximum is 0.765620 degrees; 678 matched internal yaw
+samples have zero measured error against current heading. All five landed
+and disarmed normally.
+
+Trial 6, `20260912T025246Z-p2-flight-ac58a793`, stopped at 14.180 simulation
+seconds for `observation_gap` during PRESTREAM_SAFE_SETPOINTS. The previous
+accepted position timestamp was 13.820 s and the next was 14.164 s: a 0.344 s
+controller observation gap exceeded the unchanged 0.2 s bound. Only one
+initialization target and one heartbeat were transmitted. No external flight
+command, arm, takeoff, yaw reset, handover or nominal window occurred. The
+independent evaluator reports recording integrity **passed**, flight
+acceptance **failed**, zero ULog dropouts and `remained_grounded`, with actual
+landed/disarmed. No trial 7 started and the batch was not restarted.
+
+The first target's JSON event was recorded 0.333905 wall seconds after the
+sample receipt used by that callback. Received position timestamps themselves
+have maximum gap 0.024 s. These facts bracket delayed callback/publication
+work, but do not isolate serialization, recorder, middleware or host scheduling
+as the root cause. The similar historical R1 ground-prestream failure remains
+in the ledger. No callback repair, pre-warming change or threshold relaxation
+was applied after this failed batch. The failed trial never exercised the
+yaw-reset/handover interval, and supplies no acceptance evidence for it.
+
+| Final R2 gate | Status |
+|---|---|
+| Publication contract | verified by source, focused tests and sampled runtime evidence |
+| Runtime diagnostic | passed; not counted as nominal acceptance |
+| New nominal smoke | passed |
+| Repeated acceptance | failed; incomplete, **5/20** |
+| P2 complete | no |
+| P3 sensing / P4 avoidance | not_implemented |
+| Clean rebuild | not_proven |
+
+Schema 3 preserves the complete schema-2 JSON value under `historical_p2_r1`,
+including nested strict-v1 results. All R2 successful and failed trials retain
+manifest, raw recording and evaluator hashes. The next work is bounded
+diagnosis of the ground-prestream scheduling/publication delay before a
+separately authorized new smoke and fresh streak. P3 is not recommended.
