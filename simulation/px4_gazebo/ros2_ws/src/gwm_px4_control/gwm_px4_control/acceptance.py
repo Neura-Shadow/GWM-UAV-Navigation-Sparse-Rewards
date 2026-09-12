@@ -46,6 +46,23 @@ def evaluate_flight(result, samples, config):
         return {"status": "failed", "reason": "controller_not_complete"}
     if result.get("origin_ned") is None or result.get("initial_yaw_ned") is None:
         return {"status": "unknown", "reason": "missing_origin"}
+    if config.get("reference_policy") == "p2-estimator-reference-v2":
+        reference = result.get("reference")
+        try:
+            valid = (reference["policy"] == config["reference_policy"] and reference["state"] == "locked"
+                     and reference["lock_sim_s"] is not None and reference["stable_since_sim_s"] is not None
+                     and reference["lock_sim_s"]-reference["stable_since_sim_s"] >= config["reference_settings"]["stable_sim_s"]
+                     and reference["rejected_count"] == 0 and reference["rejection"] is None
+                     and reference["accepted_count"] == len(reference["accepted"]) <= 1
+                     and (reference["accepted_count"] == 1 or reference["aligned_at_preparation"] is True)
+                     and tuple(reference["ground_origin"]) == tuple(result["origin_ned"]))
+            corrected = reference["initial_anchor"]+sum(e["delta_heading"] for e in reference["accepted"])
+            error = corrected-result["initial_yaw_ned"]
+            valid = valid and math.isfinite(error) and abs(math.atan2(math.sin(error),math.cos(error))) < 1e-6
+            if not valid:
+                return {"status": "failed", "reason": "invalid_reference_lock_evidence"}
+        except (KeyError, TypeError):
+            return {"status": "unknown", "reason": "missing_reference_lock_evidence"}
     transactions = result.get("transactions", [])
     if [r.get("command") for r in transactions] != [176, 400, 21] or any(r.get("status") != "accepted" for r in transactions):
         return {"status": "failed", "reason": "missing_command_acceptance"}

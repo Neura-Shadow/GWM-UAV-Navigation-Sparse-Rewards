@@ -178,6 +178,9 @@ def main(argv=None):
                 action = self.mission.tick(self.sim(), time.monotonic(), self.graph_ok)
                 if action["command"]:
                     self.send_command(action["command"])
+                if action["heartbeat_only"]:
+                    self.send("offboard_control_mode", offboard_mode(int(self.sim()*1e6)))
+                    self.emit({"event": "reference_pending_heartbeat", "phase": self.mission.state})
                 if action["setpoint"]:
                     fields = position_setpoint(action["setpoint"]["position"], action["setpoint"]["yaw"], int(self.sim()*1e6))
                     self.send("offboard_control_mode", offboard_mode(fields["timestamp"]))
@@ -199,6 +202,8 @@ def main(argv=None):
                       "transactions": self.mission.transactions.records, "topic_rates": {},
                       "graph_valid": self.graph_ok, "qgc_monitor_present": True,
                       "manual_flight_commands": False, "ros_external_control_owner": args.flight}
+            result["reference_policy"] = c.get("reference_policy", "p2-estimator-reference-v1")
+            result["reference"] = self.mission.reference.summary() if self.mission.reference else None
             for key, value in self.cache.stats.items():
                 elapsed = (value["last_us"]-value["first_us"])/1e6
                 result["topic_rates"][key] = {**value, "unique_rate_hz": (value["unique"]-1)/elapsed if elapsed > 0 else None}

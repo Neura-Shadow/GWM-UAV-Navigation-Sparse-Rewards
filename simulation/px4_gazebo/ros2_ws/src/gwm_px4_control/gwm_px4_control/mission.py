@@ -3,6 +3,7 @@ import math
 
 from .frames import offset_target, wrap
 from .protocol import AckTracker
+from .estimator_reference import ReferenceManager, V2
 
 ORDER = ("WAIT_FOR_CLOCK_AND_CONNECTION", "WAIT_FOR_VALID_ESTIMATION", "PRESTREAM_SAFE_SETPOINTS",
          "REQUEST_OFFBOARD", "VERIFY_OFFBOARD", "REQUEST_ARM", "VERIFY_ARMED", "TAKEOFF",
@@ -10,6 +11,8 @@ ORDER = ("WAIT_FOR_CLOCK_AND_CONNECTION", "WAIT_FOR_VALID_ESTIMATION", "PRESTREA
          "YAW_TEST", "RESTORE_INITIAL_YAW", "FINAL_HOVER", "REQUEST_LAND", "VERIFY_LANDING",
          "VERIFY_LANDED_AND_DISARMED", "COMPLETE")
 MOTION = ORDER[7:16]
+ORDER_V2 = ORDER[:8] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE") + ORDER[8:]
+STREAMING = ORDER[2:16] + ("STABILIZE_REFERENCE", "LOCK_REFERENCE")
 
 
 def ramp(current, goal, speed, dt):
@@ -22,6 +25,8 @@ def ramp(current, goal, speed, dt):
 class Mission:
     def __init__(self, config, cache, start_wall, flight):
         self.config, self.cache, self.start_wall, self.flight = config, cache, start_wall, flight
+        self.order = ORDER_V2 if config.get("reference_policy") == V2 else ORDER
+        self.reference = None
         self.state = ORDER[0]
         self.enter_sim = None
         self.enter_wall = start_wall
@@ -48,7 +53,7 @@ class Mission:
 
     def transition(self, next_state, sim, wall, **evidence):
         if next_state not in ("ABORTED", "RECOVERY"):
-            if self.state not in ORDER or ORDER.index(next_state) != ORDER.index(self.state)+1:
+            if self.state not in self.order or self.order.index(next_state) != self.order.index(self.state)+1:
                 raise ValueError("illegal_transition:" + self.state + "->" + next_state)
         record = {"from": self.state, "to": next_state, "sim_s": sim, "monotonic_s": wall,
                   "evidence": evidence}
@@ -81,6 +86,9 @@ class Mission:
         if self.failure:
             return None
         self.failure, self.recovery_wall = reason, wall
+        if self.reference is not None:
+            self.events.extend(self.reference.events)
+            self.reference.events.clear()
         self.events.append({"event": "abort", "reason": reason, "sim_s": sim, "monotonic_s": wall})
         try:
             sample = self.cache.validate(sim, wall)
@@ -108,7 +116,7 @@ class Mission:
 
     def tick(self, sim, wall, graph_ok):
         c = self.config
-        actions = {"setpoint": None, "command": None, "sample": None}
+        actions = {"setpoint": None, "command": None, "sample": None, "heartbeat_only": False}
         if self.done:
             return actions
         if wall-self.start_wall > c["wall_deadline_s"]:
@@ -166,14 +174,33 @@ class Mission:
                     self.done = True
                     return actions
                 self.origin, self.initial_yaw = sample["position"], sample["yaw"]
-                self.cache.frozen_reference = reference
+                if self.config.get("reference_policy") == V2:
+                    self.reference = ReferenceManager(c, self.cache.data, self.origin, self.initial_yaw)
+                    self.cache.reference_manager = self.reference
+                else:
+                    self.cache.frozen_reference = reference
                 self.target, self.yaw_target = self.origin, self.initial_yaw
                 self.transition(ORDER[2], sim, wall, origin_ned=self.origin, yaw_ned=self.initial_yaw)
             return actions
         if not graph_ok:
             raise ValueError("control_graph_invalid_or_competing_owner")
-        sample = self.cache.validate(sim, wall)
+        sample = self.cache.validate(sim, wall, terminal_landed=(
+            self.config.get("reference_policy") == V2 and self.state == "VERIFY_LANDED_AND_DISARMED"))
         actions["sample"] = sample
+        reference_pending = False
+        if self.reference is not None:
+            reconciled = self.reference.inspect(self.cache.data, sample, sim, wall, self.state)
+            reference_pending = reconciled["pending"]
+            if reconciled.get("accepted"):
+                old_yaw = self.yaw_target
+                self.initial_yaw = self.reference.anchor
+                self.yaw_target = wrap(self.yaw_target+reconciled["correction"])
+                self.events.append({"event": "reference_target_correction", "sim_s": sim,
+                                    "yaw_before": old_yaw, "yaw_after": self.yaw_target,
+                                    "position_before": self.target, "position_after": self.target,
+                                    "delta_heading": reconciled["correction"]})
+            self.events.extend(self.reference.events)
+            self.reference.events.clear()
         if self.last_sample is not None and sample["t"]-self.last_sample > c["max_sample_gap_sim_s"]:
             raise ValueError("observation_gap")
         fresh = self.last_sample is None or sample["t"] > self.last_sample
@@ -187,8 +214,11 @@ class Mission:
         height = self.origin[2]-sample["position"][2]
         if not c["min_height_m"] <= height <= c["max_height_m"]:
             raise ValueError("flight_envelope_height")
-        if self.state in MOTION and (sample["arming_state"] != 2 or sample["nav_state"] != 14):
+        if self.state in MOTION + ("STABILIZE_REFERENCE", "LOCK_REFERENCE") and (sample["arming_state"] != 2 or sample["nav_state"] != 14):
             raise ValueError("offboard_armed_state_lost")
+        if reference_pending:
+            actions["heartbeat_only"] = True
+            return actions
         if (self.state == "PRESTREAM_SAFE_SETPOINTS" and self.prestream_first_sim is not None
                 and sim-self.prestream_first_sim >= c["prestream_sim_s"]):
             self.transition("REQUEST_OFFBOARD", sim, wall)
@@ -202,6 +232,14 @@ class Mission:
             self.transition("VERIFY_ARMED", sim, wall, ack_accepted=True)
         elif self.state == "VERIFY_ARMED" and sample["arming_state"] == 2 and sample["nav_state"] == 14:
             self.transition("TAKEOFF", sim, wall, observed_arming_state=2)
+        elif self.state == "STABILIZE_REFERENCE":
+            if self.reference.ready(sim):
+                self.transition("LOCK_REFERENCE", sim, wall, final_alignment_stable=True)
+        elif self.state == "LOCK_REFERENCE":
+            self.reference.lock(sim)
+            self.events.extend(self.reference.events)
+            self.reference.events.clear()
+            self.transition("INITIAL_HOVER", sim, wall, reference_lock_sim_s=sim)
         elif self.state in MOTION:
             goal, yaw, offset = self.goal()
             self.target = ramp(self.target, goal, c["ramp_m_s"], min(dt, c["max_sample_gap_sim_s"]))
@@ -227,7 +265,7 @@ class Mission:
                     if self.state != "TAKEOFF":
                         self.windows[self.state] = {"start_sim_s": self.window[0]["t"], "end_sim_s": self.window[-1]["t"],
                             "count": len(self.window), "goal_ned": goal, "goal_yaw_ned": yaw, "offset_enu": offset}
-                    next_state = ORDER[ORDER.index(self.state)+1]
+                    next_state = self.order[self.order.index(self.state)+1]
                     self.transition(next_state, sim, wall, settled_observed=True)
                     if next_state == "REQUEST_LAND":
                         actions["command"] = self.request(21, sim, wall)
@@ -237,7 +275,7 @@ class Mission:
             self.transition("VERIFY_LANDED_AND_DISARMED", sim, wall, observed_nav_state=18)
         elif self.state == "VERIFY_LANDED_AND_DISARMED" and sample["landed"] is True and sample["arming_state"] == 1:
             self.transition("COMPLETE", sim, wall, observed_landed=True, observed_disarmed=True)
-        if self.state in ORDER[2:16] and dt > 0:
+        if self.state in STREAMING and dt > 0:
             actions["setpoint"] = {"position": self.target, "yaw": self.yaw_target}
             if self.prestream_first_sim is None:
                 self.prestream_first_sim = sim

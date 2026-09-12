@@ -271,9 +271,10 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
 - [x] P1 PX4/Gazebo simulator boot
 - [x] P1 Initial measured non-AI flight smoke
 - [x] P1 Repeated-flight acceptance: 20 consecutive trials
-- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: implementation and
-  read-only connection complete; initial ROS flight failed on the pinned
-  estimator's in-flight heading reset; repeated acceptance not run (0/20)
+- [ ] P2 ROS 2 control, ACK verification, and coordinate tests: R1 revised
+  nominal smoke passed; new repeated batch failed on trial 2 (1/20).
+  Reference continuity remains blocked by an asynchronous cached-yaw
+  overwrite race; strict-v1 failures remain preserved. P3 is not recommended.
 - [ ] P3 Depth sensing
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution

@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import select
+import re
 import signal
 import subprocess
 import time
@@ -124,7 +125,19 @@ def trial(args):
         boot = console.prompt(90)
         if "Gazebo world is ready" not in boot or "x500_71" not in boot:
             raise ValueError("Expected owned world/model not observed")
-        console.command("param show -a")
+        parameters = console.command("param show -a")
+        if config.get("reference_policy") == "p2-estimator-reference-v2":
+            clean_parameters = re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", parameters)
+            required = {"EKF2_MAG_TYPE": 0, "SENS_IMU_MODE": 1, "SENS_MAG_MODE": 1,
+                        "EKF2_MULTI_IMU": 0, "EKF2_MULTI_MAG": 0}
+            effective = {}
+            for name, expected in required.items():
+                found = re.search(r"\b"+name+r"\s+\[[-0-9,]+\]\s*:\s*([-0-9.]+)", clean_parameters)
+                if found is None or float(found.group(1)) != expected:
+                    raise ValueError("Unsupported estimator launch contract: "+name)
+                effective[name] = float(found.group(1))
+            summary["estimator_launch_contract"] = effective
+            (run/"ekf2-status.txt").write_text(console.command("ekf2 status"))
         sync = console.command("param show UXRCE_DDS_SYNCT")
         if "UXRCE_DDS_SYNCT" not in sync or ": 0" not in sync:
             raise ValueError("Effective UXRCE_DDS_SYNCT=false not verified")

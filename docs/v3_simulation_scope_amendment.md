@@ -48,6 +48,15 @@ QGC retains monitoring/heartbeat only. P2 has its own initial flight and
 20-consecutive-flight acceptance records, separate from P1. Failures remain
 in the history. This is simulation-side control, not AgentOps flight authority.
 
+P2-R1 authorizes the focused, versioned estimator-reference contract repair
+described in [the pinned-source contract](v3_sim_p2_reference_contract.md),
+historical offline classification, a new complete ROS smoke and a new
+20-consecutive-flight sequence. One bounded, paired yaw-only initialization
+event may be reconciled before reference lock. This explicitly revises
+strict-v1 reset semantics; PX4/dependency versions, estimator parameters,
+mission geometry and original flight limits remain fixed. The historical
+aborted flight remains failed and contributes no acceptance credit.
+
 P3 depth sensing, P4 non-learning avoidance, P5 fixed-weight inference, P6
 failure validation, and P7 batch evaluation remain unimplemented. Micro
 XRCE-DDS Agent is middleware, not an AgentOps reasoning agent.

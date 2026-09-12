@@ -47,6 +47,15 @@ def load_config(path):
         raise ValueError("Unsafe prestream/rate")
     if config["horizontal_tolerance_m"] >= min(config["east_m"], config["north_m"]):
         raise ValueError("Axis response must exceed tolerance")
+    policy = config.get("reference_policy", "p2-estimator-reference-v1")
+    if policy not in ("p2-estimator-reference-v1", "p2-estimator-reference-v2"):
+        raise ValueError("Unknown estimator reference policy")
+    if policy == "p2-estimator-reference-v2":
+        expected = {"max_events": 1, "max_yaw_deg": 5.0, "stable_sim_s": 5.0,
+                    "pair_sim_s": 1.5, "pair_wall_s": 2.0, "pair_skew_s": 0.1,
+                    "yaw_consistency_rad": 1e-5, "tilt_component_tolerance": 1e-5, "post_event_sim_s": 0.1}
+        if config.get("reference_settings") != expected:
+            raise ValueError("Unregistered reference policy bounds")
     return config
 
 

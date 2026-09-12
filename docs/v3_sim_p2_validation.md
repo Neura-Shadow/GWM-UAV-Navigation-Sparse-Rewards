@@ -1,9 +1,16 @@
 # v3-SIM P2 validation
 
-P2 control implementation and read-only DDS connectivity are complete. The
-first actual ROS-controlled flight **failed** on an estimator-reference reset
-during ascent. Repeated acceptance is **not_run, 0/20**. Neither the completed
-P1 flights nor runtime-free tests establish full P2 flight acceptance.
+P2-R1 adds `p2-estimator-reference-v2`, with a source-verified bounded heading
+initialization phase before the original full mission. Its current measured
+results are in the P2-R1 section below and the versioned evidence summary.
+The original strict-v1 flight remains **failed**. P1 flights and runtime-free
+tests do not establish P2 flight acceptance.
+
+## Preserved strict-v1 implementation and evidence
+
+The following original sections describe strict-v1 and its failed acceptance
+state, not the outcome of P2-R1. The original schema-1 summary is preserved
+verbatim as `historical_strict_v1` inside the schema-2 evidence document.
 
 ## Repository and scope
 
@@ -253,3 +260,135 @@ reset-invalidates-trial contract cannot both produce a 2 m P2 pass. P3 is
 not yet recommended. There is no claim of QGC-free startup, QGC-disconnect
 behavior, obstacle avoidance, model decisions, multi-UAV autonomy or hardware
 readiness. P3-P7 and v3-2-v3-7 remain unimplemented by this change.
+
+## P2-R1 policy revision and revalidation
+
+R1 starts from `c59cc3246be8a74ea2683aedfa30ff2b4dcd6918` on the same branch,
+after an up-to-date fast-forward-only synchronization. All three dependency
+pins, the PX4 binary, default `EKF2_MAG_TYPE=0`, original geometry and flight
+thresholds remain unchanged. The application reference policy changes to
+`p2-estimator-reference-v2`; [the source contract](v3_sim_p2_reference_contract.md)
+records the pinned implementation, exact bounds, compensation ownership,
+online/offline evidence limits and phase-D terminal interpretation.
+
+The pure reference manager pairs independent heading/quaternion uint8
+increments, supports either arrival order and duplicates, and applies one
+bounded yaw correction only during TAKEOFF/STABILIZE_REFERENCE. It freezes
+position/velocity/terrain/origin and aiding-source state. Pending validation
+keeps the Offboard heartbeat while PX4 holds its last position target and
+corrects cached yaw. The ROS relative-yaw anchor and future target are then
+corrected once; geographic axes and the ground origin never move. A final
+alignment interval precedes LOCK_REFERENCE and all original eight windows.
+After locking, unsupported resets remain fatal. The package mirror hash is
+`1001cc827c1945403b8e7ab1d09cb8b61e6f0f8ab8fb2c75865a7a662c463827`.
+
+### Historical offline classification
+
+`20260912T010200Z-p2-r1-offline-df9cc28c` passed offline reset classification
+against the old recording. The original -0.000763416465 rad event advances
+each independent counter 1->2, preserves position/velocity/origin, and
+coincides with magnetic in-flight alignment. Four internal PX4 setpoint
+samples show the once-corrected anchor, with zero measured error. Device IDs
+and the single EKF instance remain stable. The historical flight still
+**failed**: no offline classifier can establish its unflown nominal windows.
+No command topics were replayed and no original result was overwritten.
+
+### New nominal smoke
+
+`20260912T010218Z-p2-flight-9cf2ff9c` passed both the actual controller and
+independent bag/ULog verification. It accepted one initialization correction
+of -0.001433611149 rad and completed final alignment, reference lock, full
+INITIAL_HOVER, east/return, north/return, yaw/restore, FINAL_HOVER and normal
+ROS LAND. The matching LAND ACK latency was 0.016 simulation seconds; actual
+AUTO_LAND and final landed/disarmed were observed at completion (106.804 s).
+No failsafe was observed. Independent checks used each fixed controller
+window, with no search for a better segment or restarted dwell.
+
+The recording contains 4,946 exact ROS/ULog position pairs with zero position
+difference, zero ULog dropouts, a 2.0 s ground prestream, and a 20.0023 Hz
+Offboard heartbeat (maximum interval 0.052001 s). There are 1,727 trajectory
+targets and 1,730 heartbeats; the three pending-validation ticks withheld
+trajectory targets according to v2. Position ramp and compensated commanded
+yaw ramp remain within the original 0.3 m/s and 10 degrees/s bounds plus
+the existing serialization-rounding checks. Raw wire yaw rates are retained
+separately. The independent evaluator and helper hashes are frozen by the
+repeat runner together with controller, configuration, launchers and pins.
+
+### Retained R1 attempts
+
+Every run below remains beneath `/home/joker0625/uav_autonomy/runs/`:
+
+| Run ID | Outcome |
+|---|---|
+| `20260912T004359Z-p2-r1-offline-dd913691` | Passed historical classification with initial R1 implementation |
+| `20260912T004636Z-p2-build-DsIsLc` | Passed initial R1 ROS build/test |
+| `20260912T004658Z-p2-observe-3b4dfa98` | Passed read-only connection and offline integrity |
+| `20260912T004707Z-p2-r1-offline-489f7187` | Passed historical classification after zero-reset-path hardening |
+| `20260912T004810Z-p2-flight-0950fb87` | Failed terminal arming-eligibility check after all motion windows, normal LAND ACK and actual landing; remains failed |
+| `20260912T005607Z-p2-r1-offline-ef9e0cda` | Failed offline classification due to a local variable-shadowing defect introduced during cleanup; corrected before the next live flight |
+| `20260912T005624Z-p2-r1-offline-1dc99d39` | Passed corrected historical classification |
+| `20260912T005630Z-p2-build-orbFx4` | Passed final controller ROS build and installed test |
+| `20260912T005646Z-p2-observe-dad84605` | Passed final-controller read-only connection and offline integrity |
+| `20260912T005746Z-p2-flight-29957c89` | Failed ground prestream on `observation_gap`, before any flight command; stayed landed/disarmed |
+| `20260912T010200Z-p2-r1-offline-df9cc28c` | Passed final historical offline classification |
+| `20260912T010218Z-p2-flight-9cf2ff9c` | Passed complete new nominal smoke and independent verification |
+
+The ground-prestream failure exposed missing early-abort handling in the
+evaluator. Its original evaluation and two unsuccessful diagnostic
+assessments remain alongside `p2-offline-evaluation-r1-ground-abort-v3.json`,
+which confirms intact recording and a failed, never-armed trial. First target
+publication took about 0.33 wall seconds; the deeper scheduler/serialization
+cause was not established. The observation threshold was not increased and
+the controller was not changed to bypass this failure. No diagnostic attempt
+counts toward the consecutive acceptance streak.
+
+### R1 regressions and consecutive acceptance
+
+- P2/reference tests: **114 passed**, including the original 68 strict-v1 tests and two retained-race regressions.
+- AgentOps/C2 regressions: **398 passed**; permissions, 13-tool catalogue and mock invocation unchanged.
+- Full Windows Anaconda suite: **949 passed, 12 skipped**, final run 83.22 s.
+- Linux ROS build and installed-package test: **passed; 1 test, 0 failures**.
+- Python compile: **17 files passed**. Bash syntax/ShellCheck: **3 scripts passed**, SC1091 excluded for sourced ROS paths only.
+- Ordinary pytest did not launch simulation. Git whitespace validation passed.
+
+Batch `20260912T010456Z-p2-repeat-7da31865` is a new frozen-input sequence,
+separate from the smoke and all P1/strict-v1 history. Its authoritative count
+and each trial's raw evidence/hash references are recorded in schema 2 of
+[the evidence summary](evidence/v3_sim_p2_summary.json). P2 is complete only
+if this batch records twenty consecutive independently verified successes.
+
+**Final batch outcome: failed, 1/20.** Trial 1
+(`20260912T010459Z-p2-flight-db751110`) passed controller and independent
+verification. Trial 2 (`20260912T010708Z-p2-flight-775b24dc`) completed all
+motion and normal LAND but failed the frozen ULog compensation check. No
+trial 3 started. No batch input or threshold changed and the batch was not
+restarted. The original second-trial evaluator records `recording_integrity:
+failed`, `flight_acceptance: unknown` with the semantic reason
+`PX4 cached setpoint correction missing/doubled`; this is not a claim of
+physical bag/ULog corruption.
+
+The separate read-only diagnostic
+`20260912T011351Z-p2-r1-diagnostic-b9773624` confirmed all sixteen fixed
+bag/ULog motion windows and final landed/disarmed, but reproduced the
+reference-continuity rejection. PX4 reset at 23.408 s; ROS published its old
+yaw at 23.412 s, 1.248873 wall milliseconds before receiving the heading
+notification. Internal PX4 targets at 23.496 and 23.600 s retained that old
+yaw. ROS restored the corrected anchor after paired validation at 23.612 s.
+The source's one-time cached-setpoint correction does not automatically
+repair later external publications for an already-consumed reset counter.
+The full timeline and limits are in the source-contract note. The diagnostic
+is not another flight and adds no acceptance credit.
+
+| Final R1 gate | Status |
+|---|---|
+| P2 reference contract | **blocked** by pre-notification compensation race |
+| P2 revised nominal smoke | passed |
+| P2 repeated acceptance | failed; incomplete, 1/20 |
+| P2 complete | no |
+| P3 sensing / P4 avoidance | not_implemented |
+| Clean rebuild | not_proven |
+
+P3 is not recommended. The valid bounded-classification implementation and
+evidence are retained with this explicit incomplete status. No PX4 patch,
+estimator parameter change, fabricated timestamp, increased threshold or
+replacement console flight was used to mask the remaining conflict.

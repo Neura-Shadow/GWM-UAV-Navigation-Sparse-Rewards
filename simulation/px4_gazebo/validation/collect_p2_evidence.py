@@ -87,6 +87,10 @@ def read_ulog(path, flight=True):
     if flight:
         names += ("vehicle_command", "vehicle_command_ack", "trajectory_setpoint", "offboard_control_mode")
     for name in names:
+        if name not in {d.name for d in log.data_list} and name in (
+                "vehicle_command", "vehicle_command_ack", "trajectory_setpoint", "offboard_control_mode"):
+            streams[name] = []  # a ground abort can precede the first command
+            continue
         data = log.get_dataset(name).data
         rows = []
         for i in range(len(data["timestamp"])):
@@ -99,29 +103,43 @@ def read_ulog(path, flight=True):
     return log, streams
 
 
-def wire_checks(streams, config):
+def wire_checks(streams, config, reference=None):
     targets, modes = streams["trajectory_setpoint"], streams["offboard_control_mode"]
-    require(len(targets) > 2 and len(targets) == len(modes), "Missing wire stream")
-    for target, mode in zip(targets, modes):
+    revised = config.get("reference_policy") == "p2-estimator-reference-v2"
+    require(len(targets) > 2 and len(modes) >= len(targets), "Missing wire stream")
+    if not revised:
+        require(len(targets) == len(modes), "Strict-v1 heartbeat/target count differs")
+    for target in targets:
         require(all(math.isfinite(v) for v in target["position"]) and math.isfinite(target["yaw"]), "Invalid active target")
         require(all(math.isnan(v) for key in ("velocity", "acceleration", "jerk") for v in target[key])
                 and math.isnan(target["yawspeed"]), "Inactive wire fields not NaN")
+    for mode in modes:
         require(mode["position"] is True and all(mode[k] is False for k in
                 ("velocity", "acceleration", "attitude", "body_rate", "thrust_and_torque", "direct_actuator")), "Wrong Offboard level")
-    speed, yaw_rate, gaps = [], [], []
+    speed, yaw_rate, raw_yaw_rate, gaps = [], [], [], []
+    accepted = (reference or {}).get("accepted", [])
     for a, b in zip(targets, targets[1:]):
         dt = (b["timestamp"]-a["timestamp"])/1e6
         require(dt > 0, "Repeated/backwards transmitted stamp")
         gaps.append(dt)
         speed.append(math.dist(a["position"], b["position"])/dt)
         dyaw = b["yaw"]-a["yaw"]
+        raw_yaw_rate.append(abs(math.degrees(math.atan2(math.sin(dyaw), math.cos(dyaw))))/dt)
+        corrections = [e for e in accepted if a["timestamp"]/1e6 < e["accepted_sim_s"] <= b["timestamp"]/1e6+1e-6]
+        dyaw -= sum(e["delta_heading"] for e in corrections)
         yaw_rate.append(abs(math.degrees(math.atan2(math.sin(dyaw), math.cos(dyaw))))/dt)
+        if dt > config["max_sample_gap_sim_s"]:
+            require(revised and len(corrections) == 1 and dt <= config["reference_settings"]["pair_sim_s"]+.1
+                    and a["timestamp"]/1e6 <= corrections[0]["start_sim_s"], "Unexplained trajectory stream gap")
     # Float32 serialization contributes sub-micrometre rounding only.
     require(max(speed) <= config["ramp_m_s"]+1e-5 and max(yaw_rate) <= config["yaw_ramp_deg_s"]+1e-3, "Wire ramp exceeded")
-    require(max(gaps) <= config["max_sample_gap_sim_s"], "Wire heartbeat gap")
+    heartbeat_gaps = [(b["timestamp"]-a["timestamp"])/1e6 for a,b in zip(modes,modes[1:])]
+    require(min(heartbeat_gaps)>0 and max(heartbeat_gaps) <= config["max_sample_gap_sim_s"], "Wire heartbeat gap")
     return {"samples": len(targets), "rate_per_sim_s": 1/(sum(gaps)/len(gaps)),
             "max_gap_sim_s": max(gaps), "max_position_ramp_m_s": max(speed),
-            "max_yaw_ramp_deg_s": max(yaw_rate), "inactive_fields_nan": True}
+            "max_yaw_ramp_deg_s": max(yaw_rate), "raw_max_yaw_wire_rate_deg_s": max(raw_yaw_rate),
+            "heartbeat_rate_per_sim_s": 1/(sum(heartbeat_gaps)/len(heartbeat_gaps)),
+            "max_heartbeat_gap_sim_s": max(heartbeat_gaps), "inactive_fields_nan": True}
 
 
 def verify(run):
@@ -151,7 +169,7 @@ def verify(run):
         require(not streams["vehicle_command"] and not streams["trajectory_setpoint"], "Read-only stage published flight input")
         report["connectivity"] = result["connectivity"]
         return report
-    report["wire"] = wire_checks(streams, config)
+    report["reference_policy"] = config.get("reference_policy", "p2-estimator-reference-v1")
     sent = streams["vehicle_command"]
     own = [r for r in ulog["vehicle_command"] if r["source_system"] == config["source_system"]
            and r["source_component"] == config["source_component"]]
@@ -162,6 +180,19 @@ def verify(run):
     report["command_ids"] = [r["command"] for r in sent]
     report["command_timestamp_exact_ulog_match"] = True
     report["acks"] = []
+    if not sent:
+        aborts = [r for r in events if r["event"] == "abort"]
+        require(aborts and result["final_state"] != "COMPLETE", "Missing nominal commands")
+        require(all(s["arming_state"] == 1 for s in ulog["vehicle_status"])
+                and all(s["landed"] for s in ulog["vehicle_land_detected"]), "Uncommanded airborne/armed state")
+        require(all(t["timestamp"]/1e6 <= aborts[0]["sim_s"] for t in streams["trajectory_setpoint"]),
+                "Old targets continued after ground abort")
+        report.update(flight_acceptance="failed", controller_failure=aborts[0]["reason"],
+                      abort_sim_s=aborts[0]["sim_s"], final_disarmed=True, final_landed=True,
+                      observed_recovery="remained_grounded", setpoints_stopped_at_abort=True,
+                      wire={"status": "not_completed", "samples": len(streams["trajectory_setpoint"])})
+        return report
+    report["wire"] = wire_checks(streams, config, result.get("reference"))
     for command in sent:
         matches = [ack for ack in streams["vehicle_command_ack"] if ack["command"] == command["command"]
                    and ack["target_system"] == 201 and ack["target_component"] == 191
@@ -213,6 +244,12 @@ def verify(run):
         require(abort["reason"] != "estimator_reference_reset" or reset_events, "Reset failure not independently supported")
         return report
     samples = [r["sample"] for r in events if r["event"] == "sample"]
+    if config.get("reference_policy") == "p2-estimator-reference-v2":
+        from reference_evidence import classify, ulog_reference
+        independent_reference = classify(run, config)
+        report["reference_reconciliation"] = independent_reference
+        report["reference_ulog"] = ulog_reference(log, result, independent_reference)
+        report["reference_evaluator_sha256"] = digest(Path(__file__).with_name("reference_evidence.py"))
     report["ros_controller_samples"] = evaluate_flight(result, samples, config)
     fixture = expected_fixture(result["origin_ned"], result["initial_yaw_ned"], config)
     report["independent_windows"] = {}
@@ -241,8 +278,10 @@ def verify(run):
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("run", type=Path)
+    parser.add_argument("--output-name", default="p2-offline-evaluation.json")
     args = parser.parse_args(argv)
-    output = args.run/"p2-offline-evaluation.json"
+    require(Path(args.output_name).name == args.output_name and args.output_name.endswith(".json"), "Output must be a JSON basename")
+    output = args.run/args.output_name
     require(not output.exists(), "Offline result already exists; retain the first evaluation")
     try:
         report = verify(args.run.resolve())

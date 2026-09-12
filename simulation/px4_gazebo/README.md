@@ -179,22 +179,29 @@ and import safety without Linux, ROS, Gazebo, or PX4. Bash syntax/shellcheck
 and ordinary project regression are separate from P0 build logs and P1
 observed flight evidence. P0/P1 historical evidence remains unchanged.
 
-## P2 ROS 2 control procedure and current blocker
+## P2 ROS 2 control and revised reference policy
 
 P2 adds `ros2_ws/src/gwm_px4_control`, with pure frame, wire-field, ACK,
 state-machine, freshness and acceptance modules and a thin ROS adapter.
-The actual read-only connection passed. The first ROS flight entered Offboard,
-armed normally and climbed, then correctly aborted on an estimator reference
-reset. Full P2 flight acceptance is **failed**, and repeated acceptance is
-**not_run (0/20)**. See [P2 validation](../../docs/v3_sim_p2_validation.md) and
+The original strict-v1 flight failed on a heading-reference reset and remains
+failed. P2-R1 introduces `p2-estimator-reference-v2`; its complete new nominal
+smoke and independent bag/ULog verification passed. The new twenty-trial
+sequence stopped on trial 2 with **1/20** consecutive passes. A late reset
+notification allowed an old ROS yaw target to overwrite PX4's cached
+correction; reference continuity remains **blocked**. See [P2 validation](../../docs/v3_sim_p2_validation.md) and
 [sanitized evidence](../../docs/evidence/v3_sim_p2_summary.json).
 
-The pinned default magnetometer configuration deliberately resets heading
-above approximately 1.5 m HAGL. This conflicts with the requested 2 m mission
-and strict reset-invalidates-trial rule. Do not repeatedly run the unchanged
-flight expecting a streak. Resolving the estimator/reference contract is the
-next implementation decision; no reset exemption, magnetometer-fusion change,
-height reduction or threshold relaxation was applied to produce a pass.
+The [pinned-source contract](../../docs/v3_sim_p2_reference_contract.md)
+allows one verified yaw-only initialization event during bounded takeoff,
+followed by five seconds of final alignment and reference lock before the
+original full mission. This explicitly changes reset semantics. It preserves
+the ground origin, relative-yaw intent, PX4/default magnetic fusion, mission
+height and original flight limits. Unsupported or post-lock resets still
+abort. Source/configuration/evaluator changes require a new smoke and streak;
+historical failures never become successful flights.
+Do not restart the failed batch or relax its evaluator to discard the
+uncorrected interval. A source-supported repair of the pre-notification race
+is required before another nominal smoke and new acceptance sequence.
 
 From the Windows checkout mounted in a WSL shell, build the one-way,
 hash-verified package mirror with Linux system Python and sourced Jazzy:
