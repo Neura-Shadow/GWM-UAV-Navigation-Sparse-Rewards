@@ -6,6 +6,7 @@ from .frames import finite, normalized_quaternion, wrap, yaw_from_quaternion
 
 V1 = "p2-estimator-reference-v1"
 V2 = "p2-estimator-reference-v2"
+V3 = "p2-estimator-reference-v3"
 INITIALIZING = ("TAKEOFF", "STABILIZE_REFERENCE")
 FIXED = ("xy_reset_counter", "z_reset_counter", "vxy_reset_counter", "vz_reset_counter",
          "dist_bottom_reset_counter", "ref_timestamp", "ref_lat", "ref_lon", "ref_alt", "xy_global", "z_global")
@@ -99,7 +100,7 @@ class ReferenceManager:
         if any(changed[k] == 0 and deltas[k] != self.last_delta[k] for k in changed):
             self.reject("delta_changed_without_counter", sim)
         if any(changed.values()):
-            if self.policy != V2:
+            if self.policy not in (V2, V3):
                 self.reject("strict_v1", sim)
             if phase not in INITIALIZING or self.lock_sim_s is not None:
                 self.reject("reset_outside_initialization", sim)
@@ -184,6 +185,25 @@ class ReferenceManager:
         return (self.pending is None and self.rejected is None and self.stable_since is not None
                 and (self.aligned_at_preparation or bool(self.accepted))
                 and sim-self.stable_since >= self.settings["stable_sim_s"])
+
+    def heading_drift(self, data):
+        """Compare each observation in its own reset generation, including pending.
+
+        A provisional delta only normalizes a drift measurement; it cannot
+        authorize progress or replace the bounded paired-event validation.
+        """
+        p, a = data["vehicle_local_position"], data["vehicle_attitude"]
+        residuals = {}
+        for key, count, measured, delta in (
+                ("heading", p["heading_reset_counter"], p["heading"], p["delta_heading"]),
+                ("quaternion", a["quat_reset_counter"], yaw_from_quaternion(a["q"]),
+                 yaw_from_quaternion(a["delta_q_reset"]))):
+            increment = (counter(count)-self.baseline[key]) % 256
+            if increment not in (0, 1):
+                raise ValueError("Ambiguous drift reference generation")
+            anchor = self.anchor + (finite([delta],1)[0] if increment else 0.0)
+            residuals[key] = wrap(finite([measured],1)[0]-anchor)
+        return residuals
 
     def lock(self, sim):
         if not self.ready(sim):

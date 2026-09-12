@@ -57,6 +57,17 @@ strict-v1 reset semantics; PX4/dependency versions, estimator parameters,
 mission geometry and original flight limits remain fixed. The historical
 aborted flight remains failed and contributes no acceptance credit.
 
+P2-R2 authorizes initialization yaw ownership and a bounded handover under
+`p2-estimator-reference-v3`. From the first prestream target, ROS supplies
+finite position with yaw unspecified and zero world-z yaw feedforward.
+Drift monitoring and the R1 reset classifier remain active. Stable alignment
+precedes a fresh-heading-seeded handover to the original corrected anchor.
+The source review, scheduling tests, labelled diagnostic, new nominal smoke
+and fresh twenty-trial sequence are distinct gates. The R1 failed batch and
+its one passed trial remain historical and contribute no R2 credit. All
+original numeric flight limits, dependency pins and control ownership remain
+unchanged; this authorization does not extend to P3 or AgentOps work.
+
 P3 depth sensing, P4 non-learning avoidance, P5 fixed-weight inference, P6
 failure validation, and P7 batch evaluation remain unimplemented. Micro
 XRCE-DDS Agent is middleware, not an AgentOps reasoning agent.

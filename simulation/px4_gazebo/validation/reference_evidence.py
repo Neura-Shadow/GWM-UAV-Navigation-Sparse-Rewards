@@ -9,7 +9,7 @@ import uuid
 
 SIM = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SIM/"ros2_ws/src/gwm_px4_control"))
-from gwm_px4_control.estimator_reference import ReferenceManager, V2
+from gwm_px4_control.estimator_reference import ReferenceManager, V2, V3
 from gwm_px4_control.timing import StateCache
 
 
@@ -48,7 +48,7 @@ def classify(run, config, historical=False):
     require(manager is not None, "Missing reference preparation")
     if not historical:
         actual = result.get("reference")
-        require(actual and actual["policy"] == V2, "Missing revised policy result")
+        require(actual and actual["policy"] == config["reference_policy"] and actual["policy"] in (V2,V3), "Missing revised policy result")
         require(manager.lock_sim_s is not None, "Missing recorded final alignment lock")
         require(len(manager.accepted) == actual["accepted_count"], "Fabricated/missing reset event")
         require(abs(manager.anchor-actual["anchor"]) < 1e-8, "Fabricated anchor correction")
@@ -99,7 +99,8 @@ def ulog_reference(log, result, reference):
         # Raw internal PX4 output must exhibit the once-corrected anchor.
         window = (control["timestamp"] >= max(p["timestamp"][h],a["timestamp"][q])) & (control["timestamp"] <= (accepted["accepted_sim_s"]+.25)*1e6)
         values = control["yaw"][window]
-        require(len(values) and np.all(np.abs(values-accepted["anchor_after"]) < 1e-5), "PX4 cached setpoint correction missing/doubled")
+        if reference.get("policy", V2) != V3:
+            require(len(values) and np.all(np.abs(values-accepted["anchor_after"]) < 1e-5), "PX4 cached setpoint correction missing/doubled")
         events.append({"ulog_reset_sim_s": float(p["timestamp"][h])/1e6, "delta_heading": accepted["delta_heading"],
                        "internal_yaw_samples": len(values), "internal_yaw_max_error_rad": float(np.max(np.abs(values-accepted["anchor_after"])))})
     if reference["lock_sim_s"] is not None:
@@ -111,7 +112,7 @@ def ulog_reference(log, result, reference):
             require(last > first and source[key][first:last].all(), "ULog final alignment not stable for full five seconds")
     return {"status": "passed", "instance_ids": sorted(estimator_instances), "devices": devices,
             "reset_events": events, "position_velocity_origin_unchanged": True,
-            "compensation_ownership": "PX4 corrected cached target; ROS preserved one corrected anchor"}
+            "compensation_ownership": "mode-specific yaw evaluation required" if reference.get("policy", V2) == V3 else "PX4 corrected cached target; ROS preserved one corrected anchor"}
 
 
 def main():

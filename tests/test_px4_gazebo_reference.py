@@ -15,7 +15,9 @@ from gwm_px4_control.estimator_reference import ReferenceManager, V1, V2
 
 @pytest.fixture
 def config():
-    return contracts.load_config(SIM/"configs/p2_control.yaml")
+    config = contracts.load_config(SIM/"configs/p2_control.yaml")
+    config["reference_policy"] = V2  # R1 history retains its exact finite-yaw policy.
+    return config
 
 
 @pytest.fixture

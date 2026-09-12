@@ -18,6 +18,8 @@ TOPICS = {
     "failsafe_flags": ("out", "FailsafeFlags"),
 }
 GATES = ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH")
+INITIALIZATION = "POSITION_INITIALIZATION_YAW_UNSPECIFIED"
+NOMINAL = "POSITION_NOMINAL_YAW_TARGET"
 
 
 def gates(env, flight=False):
@@ -48,9 +50,9 @@ def load_config(path):
     if config["horizontal_tolerance_m"] >= min(config["east_m"], config["north_m"]):
         raise ValueError("Axis response must exceed tolerance")
     policy = config.get("reference_policy", "p2-estimator-reference-v1")
-    if policy not in ("p2-estimator-reference-v1", "p2-estimator-reference-v2"):
+    if policy not in ("p2-estimator-reference-v1", "p2-estimator-reference-v2", "p2-estimator-reference-v3"):
         raise ValueError("Unknown estimator reference policy")
-    if policy == "p2-estimator-reference-v2":
+    if policy in ("p2-estimator-reference-v2", "p2-estimator-reference-v3"):
         expected = {"max_events": 1, "max_yaw_deg": 5.0, "stable_sim_s": 5.0,
                     "pair_sim_s": 1.5, "pair_wall_s": 2.0, "pair_skew_s": 0.1,
                     "yaw_consistency_rad": 1e-5, "tilt_component_tolerance": 1e-5, "post_event_sim_s": 0.1}
@@ -63,13 +65,18 @@ def topic_name(prefix, base, direction, version):
     return f"{prefix}/fmu/{direction}/{base}" + (f"_v{version}" if version else "")
 
 
-def position_setpoint(position, yaw, timestamp_us):
+def position_setpoint(position, yaw, timestamp_us, mode=NOMINAL):
     position = finite(position, 3)
-    if not isinstance(timestamp_us, int) or timestamp_us <= 0:
+    if isinstance(timestamp_us, bool) or not isinstance(timestamp_us, int) or timestamp_us <= 0:
         raise ValueError("Invalid shared-simulation timestamp")
+    if mode not in (INITIALIZATION, NOMINAL):
+        raise ValueError("Unknown position yaw mode")
+    if mode == INITIALIZATION and yaw is not None:
+        raise ValueError("Initialization requires intentionally unspecified yaw")
     return {"timestamp": timestamp_us, "position": list(position),
             "velocity": [math.nan]*3, "acceleration": [math.nan]*3,
-            "jerk": [math.nan]*3, "yaw": wrap(yaw), "yawspeed": math.nan}
+            "jerk": [math.nan]*3, "yaw": math.nan if mode == INITIALIZATION else wrap(yaw),
+            "yawspeed": 0.0 if mode == INITIALIZATION else math.nan}
 
 
 def offboard_mode(timestamp_us):
@@ -78,9 +85,21 @@ def offboard_mode(timestamp_us):
             "thrust_and_torque": False, "direct_actuator": False}
 
 
-def encode_wire(fields):
+def encode_wire(fields, mode=NOMINAL):
     """Inactive wire NaNs become explicit nulls with a field activation mask."""
-    inactive = {"velocity", "acceleration", "jerk", "yawspeed"}
+    if mode not in (INITIALIZATION, NOMINAL):
+        raise ValueError("Unknown position yaw mode")
+    finite(fields["position"], 3)
+    inactive = {"velocity", "acceleration", "jerk", "yaw" if mode == INITIALIZATION else "yawspeed"}
+    for key in inactive:
+        values = fields[key] if isinstance(fields[key], list) else [fields[key]]
+        if not all(isinstance(v, float) and math.isnan(v) for v in values):
+            raise ValueError("Invalid intentionally inactive field:"+key)
+    if mode == INITIALIZATION:
+        if fields["yawspeed"] != 0.0:
+            raise ValueError("Initialization yawspeed must be zero")
+    else:
+        finite([fields["yaw"]], 1)
     return {"fields": {k: ([None]*3 if isinstance(v, list) else None) if k in inactive else v
                        for k, v in fields.items()},
             "active": {k: k not in inactive for k in fields}}
