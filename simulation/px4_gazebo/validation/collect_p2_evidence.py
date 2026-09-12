@@ -172,6 +172,10 @@ def verify(run):
               "artifacts": artifacts, "bag_message_counts": dict(counts), "ulog_dropouts": len(log.dropouts),
               "clock_mapping": "PX4 microseconds and Gazebo/ROS seconds share simulation boot epoch; no wall-epoch subtraction",
               "raw_jsonl_sha256": digest(run/"ros-events.jsonl"), "bag_event_ledger_equal": True}
+    if result.get("evidence_schema") == 2:
+        from timing_evidence import verify_timing
+        report["timing"] = verify_timing(run, result, streams, events, config)
+        report["timing_evaluator_sha256"] = digest(Path(__file__).with_name("timing_evidence.py"))
     if summary["kind"] != "flight":
         require(not streams["vehicle_command"] and not streams["trajectory_setpoint"], "Read-only stage published flight input")
         report["connectivity"] = result["connectivity"]

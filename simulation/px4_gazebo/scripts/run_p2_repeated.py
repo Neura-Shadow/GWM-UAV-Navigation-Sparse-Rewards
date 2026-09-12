@@ -35,7 +35,8 @@ def current_inputs(sim):
                       [*sorted((sim/"configs").glob("p2*.yaml")), sim/"configs/versions.lock.yaml", sim/"configs/qgc-monitor.ini",
                        *(sim/"scripts"/name for name in ("run_p2_repeated.py", "run_p2_control.sh", "p2_runner.py",
                                                         "p2_build.py", "p1_runner.py", "p1_contract.py", "common.sh", "verify_p2_evidence.sh")),
-                       sim/"validation/collect_p2_evidence.py", sim/"validation/reference_evidence.py", sim/"validation/yaw_evidence.py"]}}
+                       sim/"validation/collect_p2_evidence.py", sim/"validation/reference_evidence.py", sim/"validation/yaw_evidence.py",
+                       sim/"validation/timing_evidence.py", sim/"validation/publish_wait_probe.c"]}}
 
 
 def execute(command, output, deadline=600):
@@ -83,10 +84,14 @@ def main(args):
             raise ValueError("Reference evaluator changed since initial smoke")
         if offline.get("yaw_evaluator_sha256") != digest(sim/"validation/yaw_evidence.py"):
             raise ValueError("Yaw evaluator changed since initial smoke")
+        if (offline.get("timing_evaluator_sha256") != digest(sim/"validation/timing_evidence.py")
+                or offline.get("timing",{}).get("status") != "passed"):
+            raise ValueError("Current independent timing evaluation must pass")
         if smoke["identity"]["package_hash"] != report["frozen_inputs"]["package_hash"]:
             raise ValueError("Controller changed since initial smoke")
         for key, name in (("config_sha256", "p2_control.yaml"), ("clock_bridge_sha256", "p2_clock_bridge.yaml"),
-                          ("lock_sha256", "versions.lock.yaml"), ("qgc_profile_sha256", "qgc-monitor.ini")):
+                          ("lock_sha256", "versions.lock.yaml"), ("qgc_profile_sha256", "qgc-monitor.ini"),
+                          ("timing_config_sha256", "p2_timing.yaml")):
             if smoke["identity"][key] != digest(sim/"configs"/name):
                 raise ValueError("Configuration changed since initial smoke: "+name)
         for name, expected in smoke["identity"]["launcher_sha256"].items():

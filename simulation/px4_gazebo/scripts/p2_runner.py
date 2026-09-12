@@ -16,13 +16,18 @@ from p2_build import package_hash, package_manifest
 
 
 def trial(args):
-    require_gates(os.environ, args.allow_simulated_flight)
+    require_gates(os.environ, args.allow_simulated_flight or args.ground_diagnostic)
+    if sum((args.observe,args.allow_simulated_flight,args.ground_diagnostic)) != 1:
+        raise ValueError("Select one runtime purpose")
+    if args.native_wait_probe and not args.ground_diagnostic:
+        raise ValueError("Native wait probe is ground diagnostic only")
     interfaces = json.loads(subprocess.check_output(["ip", "-j", "link"], text=True))
     if os.getpid() != 1 or {item["ifname"] for item in interfaces} != {"lo"}:
         raise ValueError("Owned private PID/network namespace required")
     sim = Path(__file__).resolve().parents[1]
     root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home()/"uav_autonomy")))
     config = json.loads((sim/"configs/p2_control.yaml").read_text())
+    timing_config = json.loads((sim/"configs/p2_timing.yaml").read_text())
     receipt = json.loads((root/"state/p2-built.json").read_text())
     if package_hash(package_manifest(sim)) != receipt["package_hash"]:
         raise ValueError("Controller sources differ from tested build mirror")
@@ -41,17 +46,22 @@ def trial(args):
         if digest(px4/name) != expected:
             raise ValueError("Pinned model/world changed: "+name)
     identity = {"package_hash": receipt["package_hash"], "config_sha256": digest(sim/"configs/p2_control.yaml"),
+                "timing_config_sha256": digest(sim/"configs/p2_timing.yaml"),
+                "native_probe_source_sha256": digest(sim/"validation/publish_wait_probe.c"),
+                "ros_runtime_sha256": {str(p):digest(p) for p in [Path("/opt/ros/jazzy/lib/libfastrtps.so.2.14"),
+                    Path("/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so"),
+                    Path("/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py")]},
                 "clock_bridge_sha256": digest(sim/"configs/p2_clock_bridge.yaml"),
                 "qgc_profile_sha256": digest(sim/"configs/qgc-monitor.ini"),
                 "lock_sha256": digest(sim/"configs/versions.lock.yaml"), "binary_sha256": digest(binary),
                 "topic_contract": receipt["topic_contract"],
                 "launcher_sha256": {name: digest(sim/"scripts"/name) for name in
                     ("p2_runner.py", "run_p2_control.sh", "p2_build.py", "common.sh", "p1_runner.py", "p1_contract.py")}}
-    if args.allow_simulated_flight:
+    if args.allow_simulated_flight or args.ground_diagnostic:
         observation = json.loads((root/"state/p2-connection.json").read_text())
         if observation["identity"] != identity or observation["status"] != "passed":
             raise ValueError("Read-only connection stage must pass for these exact inputs")
-    kind = "flight" if args.allow_simulated_flight else "observe"
+    kind = "ground" if args.ground_diagnostic else "flight" if args.allow_simulated_flight else "observe"
     if args.diagnostic and not args.allow_simulated_flight:
         raise ValueError("Diagnostic requires explicit flight authorization")
     run = root/"runs"/(time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())+"-p2-"+kind+"-"+uuid.uuid4().hex[:8])
@@ -60,7 +70,7 @@ def trial(args):
         (run/folder).mkdir(parents=True)
     work = run/"rootfs"
     (work/"gz_env.sh").write_bytes((build/"rootfs/gz_env.sh").read_bytes())
-    for name in ("p2_control.yaml", "p2_clock_bridge.yaml", "versions.lock.yaml"):
+    for name in ("p2_control.yaml", "p2_timing.yaml", "p2_clock_bridge.yaml", "versions.lock.yaml"):
         (run/name).write_bytes((sim/"configs"/name).read_bytes())
     (run/"p2-build-receipt.json").write_text(json.dumps(receipt, indent=2, allow_nan=False)+"\n")
     (run/"qgc-config/QGroundControl/QGroundControl.ini").write_text(
@@ -81,13 +91,14 @@ def trial(args):
         env["HEADLESS"] = "1"
     start = time.monotonic()
     summary = {"run_id": run.name, "kind": kind, "identity": identity, "config": config,
-               "purpose": "initialization_handover_diagnostic" if args.diagnostic else "nominal" if args.allow_simulated_flight else "connectivity",
+               "purpose": "ground_timing_diagnostic" if args.ground_diagnostic else "initialization_handover_diagnostic" if args.diagnostic else "nominal" if args.allow_simulated_flight else "connectivity",
+               "native_wait_probe": args.native_wait_probe,
                "project_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=sim, text=True).strip(),
                "status": "incomplete", "failure": None, "controller_result": None,
                "mode": "headless_physics" if args.headless else "gui_requested",
                "isolation": "private user/mount/PID/network namespace, loopback only, exclusive P1/P2 lock",
                "qgc_monitor_present": True, "manual_flight_commands": False,
-               "control_owner": "gwm_px4_control" if args.allow_simulated_flight else "none_read_only",
+               "control_owner": "gwm_px4_control" if args.allow_simulated_flight or args.ground_diagnostic else "none_read_only",
                "clock": {"gz_topic": "/world/default/clock", "ros_topic": "/clock", "direction": "GZ_TO_ROS",
                          "use_sim_time": True, "UXRCE_DDS_SYNCT": 0}, "processes": []}
     processes, streams = [], []
@@ -153,10 +164,23 @@ def trial(args):
         launch("clock-bridge", ["ros2", "run", "ros_gz_bridge", "parameter_bridge", "--ros-args",
                                "-p", "config_file:="+str(run/"p2_clock_bridge.yaml"), "-p", "use_sim_time:=true"])
         controller_command = [str(Path(receipt["install"])/"gwm_px4_control/lib/gwm_px4_control/p2_control"),
-                              "--config", str(run/"p2_control.yaml"), "--run-dir", str(run)]
+                              "--config", str(run/"p2_control.yaml"), "--run-dir", str(run),
+                              "--timing-config", str(run/"p2_timing.yaml")]
         if args.allow_simulated_flight:
             controller_command.append("--flight")
-        controller = launch("ros-controller", controller_command)
+        if args.ground_diagnostic:
+            controller_command.append("--ground-diagnostic")
+        controller_env = dict(env)
+        from gwm_px4_control.execution_timing import controller_transport_env
+        controller_env.update(controller_transport_env(timing_config))
+        summary["controller_transport_environment"] = controller_transport_env(timing_config)
+        if args.native_wait_probe:
+            probe = run/"publish-wait-probe.so"
+            subprocess.run(["/usr/bin/gcc","-O2","-Wall","-Wextra","-Werror","-shared","-fPIC",
+                str(sim/"validation/publish_wait_probe.c"),"-ldl","-o",str(probe)],check=True,timeout=20)
+            controller_env.update(LD_PRELOAD=str(probe),GWM_P2_WAIT_PROBE_OUTPUT=str(run/"native-wait-probe.txt"))
+            summary["native_probe_binary_sha256"] = digest(probe)
+        controller = launch("ros-controller", controller_command, controller_env)
         (run/"processes.txt").write_text(subprocess.check_output(["ps", "-eo", "pid,ppid,user,comm,args"], text=True))
         (run/"endpoints.txt").write_text(subprocess.check_output(["ss", "-lunp"], text=True))
         save()
@@ -228,4 +252,6 @@ if __name__ == "__main__":
     parser.add_argument("--allow-simulated-flight", action="store_true")
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--diagnostic", action="store_true")
+    parser.add_argument("--ground-diagnostic", action="store_true")
+    parser.add_argument("--native-wait-probe", action="store_true")
     raise SystemExit(trial(parser.parse_args()))

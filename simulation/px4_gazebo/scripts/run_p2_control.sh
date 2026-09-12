@@ -2,20 +2,21 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 if [[ $# == 0 || ${1:-} == --help ]]; then
-  echo 'No runtime started. Use --run --observe or --run --allow-simulated-flight, optionally --headless.'
+  echo 'No runtime started. Use --run with --observe, --ground-diagnostic, or --allow-simulated-flight; optionally --headless. --native-wait-probe is ground-only.'
   exit 0
 fi
 [[ $1 == --run ]] || fail 'Explicit --run required'
 flight=0
 observe=0
+ground=0
 for arg in "${@:2}"; do
-  case "$arg" in --allow-simulated-flight) flight=1;; --observe) observe=1;; --headless|--diagnostic) ;; *) fail "Unknown argument: $arg";; esac
+  case "$arg" in --allow-simulated-flight) flight=1;; --observe) observe=1;; --ground-diagnostic) ground=1;; --headless|--diagnostic|--native-wait-probe) ;; *) fail "Unknown argument: $arg";; esac
 done
-[[ $((flight+observe)) == 1 ]] || fail 'Choose exactly one of observation and flight'
+[[ $((flight+observe+ground)) == 1 ]] || fail 'Choose exactly one of observation, ground diagnostic and flight'
 for gate in GWM_ALLOW_OPTIONAL_RUNTIME GWM_RUN_GAZEBO_PX4_TESTS GWM_ALLOW_PX4_LAUNCH; do
   [[ ${!gate:-} == 1 ]] || fail "Missing $gate=1"
 done
-[[ $flight == 0 || ${GWM_ALLOW_SITL_COMMANDS:-} == 1 ]] || fail 'Missing GWM_ALLOW_SITL_COMMANDS=1'
+[[ $((flight+ground)) == 0 || ${GWM_ALLOW_SITL_COMMANDS:-} == 1 ]] || fail 'Missing GWM_ALLOW_SITL_COMMANDS=1'
 check_root
 verify_checkout "$PX4_DIR" px4
 verify_checkout "$ROS_WS/src/px4_msgs" px4_msgs

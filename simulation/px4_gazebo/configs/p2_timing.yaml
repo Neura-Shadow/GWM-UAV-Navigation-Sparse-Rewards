@@ -1,0 +1,13 @@
+{
+  "contract": "p2-timing-v1",
+  "evidence_schema": 2,
+  "profile": "udp_control_synchronous_evidence",
+  "controller_transport": "UDPv4",
+  "dispatch_budget_wall_s": 0.05,
+  "graph_fresh_wall_s": 1.5,
+  "trace_capacity": 500000,
+  "ground_prestream_sim_s": 3.0,
+  "ground_wall_s": 75.0,
+  "diagnostic_starts_before_repair": 6,
+  "diagnostic_starts_after_repair": 3
+}

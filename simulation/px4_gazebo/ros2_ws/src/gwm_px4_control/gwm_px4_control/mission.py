@@ -25,8 +25,9 @@ def ramp(current, goal, speed, dt):
 
 
 class Mission:
-    def __init__(self, config, cache, start_wall, flight):
+    def __init__(self, config, cache, start_wall, flight, ground_diagnostic=False, ground_duration=3.0):
         self.config, self.cache, self.start_wall, self.flight = config, cache, start_wall, flight
+        self.ground_diagnostic, self.ground_duration = ground_diagnostic, ground_duration
         self.v3 = config.get("reference_policy") == V3
         self.order = ORDER_V3 if self.v3 else ORDER_V2 if config.get("reference_policy") == V2 else ORDER
         self.reference = None
@@ -64,6 +65,8 @@ class Mission:
                 "yaw_phase": "initialization" if initialization else "handover" if self.state == "YAW_HANDOVER" else "nominal"}
 
     def transition(self, next_state, sim, wall, **evidence):
+        if self.ground_diagnostic and next_state in ("REQUEST_OFFBOARD", "REQUEST_ARM"):
+            raise ValueError("ground_diagnostic_command_transition")
         if next_state not in ("ABORTED", "RECOVERY"):
             if self.state not in self.order or self.order.index(next_state) != self.order.index(self.state)+1:
                 raise ValueError("illegal_transition:" + self.state + "->" + next_state)
@@ -78,6 +81,8 @@ class Mission:
             self.done = True
 
     def request(self, command, sim, wall):
+        if self.ground_diagnostic:
+            raise ValueError("ground_diagnostic_command_request")
         self.transactions.issue(command, self.state, sim, wall)
         params = [0.0]*7
         if command == 176:
@@ -127,6 +132,7 @@ class Mission:
         return offset_target(self.origin, offset), yaw, offset
 
     def tick(self, sim, wall, graph_ok):
+        self.control_selection = None
         c = self.config
         actions = {"setpoint": None, "command": None, "sample": None, "heartbeat_only": False}
         if self.done:
@@ -199,6 +205,9 @@ class Mission:
         sample = self.cache.validate(sim, wall, terminal_landed=(
             self.config.get("reference_policy") in (V2, V3) and self.state == "VERIFY_LANDED_AND_DISARMED"))
         actions["sample"] = sample
+        self.control_selection = sample
+        if self.ground_diagnostic and (sample["landed"] is not True or sample["arming_state"] != 1):
+            raise ValueError("ground_diagnostic_not_landed_disarmed")
         reference_pending = False
         if self.reference is not None:
             reconciled = self.reference.inspect(self.cache.data, sample, sim, wall, self.state)
@@ -240,7 +249,11 @@ class Mission:
             else:
                 actions["heartbeat_only"] = True
             return actions
-        if (self.state == "PRESTREAM_SAFE_SETPOINTS" and self.prestream_first_sim is not None
+        if (self.ground_diagnostic and self.state == "PRESTREAM_SAFE_SETPOINTS"
+                and self.prestream_first_sim is not None and sim-self.prestream_first_sim >= self.ground_duration):
+            self.done = True
+            return actions
+        if (not self.ground_diagnostic and self.state == "PRESTREAM_SAFE_SETPOINTS" and self.prestream_first_sim is not None
                 and sim-self.prestream_first_sim >= c["prestream_sim_s"]):
             self.transition("REQUEST_OFFBOARD", sim, wall)
             actions["command"] = self.request(176, sim, wall)
