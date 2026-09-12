@@ -1,0 +1,2311 @@
+{
+  "schema_version": 1,
+  "contract": "p3-yaw-causal-evidence-v1",
+  "status": "offline_budget_qualified_causal_evidence_unobservable",
+  "observability_outcome": "C",
+  "runtime_runs_performed": [],
+  "qualification_flights": 0,
+  "clean_rebuild_proven": false,
+  "baseline_measurements": [
+    {
+      "label": "original",
+      "command": [
+        "bash",
+        "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+        "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18",
+        "--output-name",
+        "p3-r2-baseline-control-v1.json",
+        "--sample-contract",
+        "p3-sample-evidence-v2"
+      ],
+      "wall_s": 246.65688854499967,
+      "cpu_s": 264.579725,
+      "peak_rss_kib": 1057580,
+      "exit_code": 1,
+      "cache": "uncontrolled existing OS cache, first fresh-process measurement",
+      "new_runtime_credit": false
+    },
+    {
+      "label": "latest",
+      "command": [
+        "bash",
+        "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+        "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60",
+        "--output-name",
+        "p3-r2-baseline-control-v1.json"
+      ],
+      "wall_s": 281.47544246600046,
+      "cpu_s": 300.705035,
+      "peak_rss_kib": 1057580,
+      "exit_code": 1,
+      "cache": "uncontrolled existing OS cache, first fresh-process measurement",
+      "new_runtime_credit": false
+    }
+  ],
+  "baseline_rss_limitation": "RUSAGE_CHILDREN original RSS is a cumulative upper bound, not a separately measured per-job peak",
+  "baseline_profile": {
+    "total_profiled_s": 646.722426357,
+    "wrapper_supervisor_s": 647.7724800870001,
+    "functions": [
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 187,
+        "name": "joined_samples_v2",
+        "calls": 16,
+        "self_s": 2.541946475,
+        "inclusive_s": 454.46949653800004
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 78,
+        "name": "validate_stream",
+        "calls": 124,
+        "self_s": 12.950320553000001,
+        "inclusive_s": 289.174330735
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 173,
+        "name": "causal_asof",
+        "calls": 39550,
+        "self_s": 61.484881067,
+        "inclusive_s": 258.300512009
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control/sample_identity.py",
+        "line": 61,
+        "name": "source_record",
+        "calls": 688045,
+        "self_s": 7.692488299000001,
+        "inclusive_s": 158.151596113
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 63,
+        "name": "fingerprint",
+        "calls": 657311,
+        "self_s": 2.6952609720000003,
+        "inclusive_s": 73.139410165
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/yaw_evidence.py",
+        "line": 141,
+        "name": "verify_yaw_ownership",
+        "calls": 1,
+        "self_s": 0.212154537,
+        "inclusive_s": 42.47595552
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 138,
+        "name": "exact_overlap",
+        "calls": 2,
+        "self_s": 0.238359277,
+        "inclusive_s": 24.946111028
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/timing_evidence.py",
+        "line": 96,
+        "name": "verify_timing",
+        "calls": 1,
+        "self_s": 0.18275326900000002,
+        "inclusive_s": 13.499616918000001
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/collect_p2_evidence.py",
+        "line": 55,
+        "name": "read_bag",
+        "calls": 1,
+        "self_s": 1.02686016,
+        "inclusive_s": 11.304933655000001
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/p3_provenance.py",
+        "line": 191,
+        "name": "require_finalized",
+        "calls": 1,
+        "self_s": 0.000250356,
+        "inclusive_s": 11.17191906
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/p3_provenance.py",
+        "line": 121,
+        "name": "verify_artifacts",
+        "calls": 1,
+        "self_s": 0.004180019,
+        "inclusive_s": 9.159490827
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/collect_p2_evidence.py",
+        "line": 88,
+        "name": "read_ulog",
+        "calls": 1,
+        "self_s": 1.8620453620000001,
+        "inclusive_s": 9.030479198
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 418,
+        "name": "verify_source_deliveries",
+        "calls": 1,
+        "self_s": 0.319897796,
+        "inclusive_s": 8.399553524
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/validation/sample_evidence.py",
+        "line": 252,
+        "name": "reconstruct_controller_samples",
+        "calls": 1,
+        "self_s": 0.460924033,
+        "inclusive_s": 7.673789574000001
+      },
+      {
+        "file": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-source/simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control/acceptance.py",
+        "line": 44,
+        "name": "evaluate_window_v2",
+        "calls": 24,
+        "self_s": 0.048325894,
+        "inclusive_s": 0.15899938700000002
+      }
+    ],
+    "inclusive_times_overlap": true,
+    "profile_exit_code": 0,
+    "profile_exit_code_meaning": "cProfile swallowed SystemExit; byte-identical report remains failed"
+  },
+  "performance_only_differential": [
+    {
+      "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+      "wall_s": 68.77,
+      "cpu_s": 71.49,
+      "peak_rss_kib": 717612,
+      "exit_code": 1,
+      "differences": [],
+      "ignored_only_code_hashes": [
+        "evaluator_sha256",
+        "sample_evaluator_sha256"
+      ],
+      "before_sha256": "9524b28635e9ac0c57cc5d265074868e2e2ba7bdeb562136413d807aa496c31b",
+      "after_sha256": "8c49603951322ab8f4dd0b3a13835c180203a0920b11eeae367e009970fc329f",
+      "cache": "warm recorded files, fresh process; concurrent separate baseline profiling",
+      "flight_status": "failed"
+    },
+    {
+      "run_id": "20260912T141235Z-p3-flight-778e3f60",
+      "wall_s": 80.09,
+      "cpu_s": 81.38999999999999,
+      "peak_rss_kib": 1149520,
+      "exit_code": 1,
+      "differences": [],
+      "ignored_only_code_hashes": [
+        "evaluator_sha256",
+        "sample_evaluator_sha256"
+      ],
+      "before_sha256": "fcfe5b208c242ab84b37154ea7b15652edb15017b1701785a7ba91c7f78bf5d5",
+      "after_sha256": "b072423406c571cf61d8aed1dc6faa8b4e27add1ebf17e5beb652d8c2f742600",
+      "cache": "warm recorded files, fresh process; concurrent separate baseline profiling",
+      "flight_status": "failed"
+    }
+  ],
+  "final_measurements": {
+    "analysis_inputs": {
+      "files": {
+        "configs/p1_smoke.yaml": "44a01bb187e29b72925b02050c39f1eeb3c6a17020e5350cb917223c9b9017e3",
+        "configs/p2_clock_bridge.yaml": "452de2f2cc4da4945814c1bc73ff1dbb9a8c089f9384fb55c9600af0762b9f78",
+        "configs/p2_control.yaml": "e50f824ac01674513c10aeaf6fb4ac7817c4d2319e28be08de9d371a8e997a4d",
+        "configs/p2_timing.yaml": "d0b8927f3ba29a18def5d0d5cb90a9674d4388a42f6f46fb667f08d225d64d33",
+        "configs/p3_clock_bridge.yaml": "460dea6a84b868f20892f1e8a444316a66afb9c0497cbd7e2c6aac4426a88a8c",
+        "configs/p3_control.yaml": "2d21d0bd42a53f20ff7db382a3be27812fcba4affe6a67546bcc6680fe63c4ca",
+        "configs/p3_fastdds.xml": "09a275ff566f8252134a93acefdffa4ff5857df0751b8dc245ceb3b1106059fc",
+        "configs/p3_offline_budget.json": "13d1347794d6e324795137d64f5591c730fb76eefd68e0e845ebde55826eaa75",
+        "configs/p3_sensor_bridge.yaml": "02455c17bd422e269d2e002b70c9b264bc36e4277be6a7a4c505377f89815e33",
+        "configs/p3_sensors.yaml": "1da79bb2324b150523d1c86393bfa5311c31fdde0b4c1ababfbed0e2343150ea",
+        "configs/p3_validation.yaml": "6d83330207060b9301fcdbc4268a11e50cd97e4ec8170732c58a8d4b632b300c",
+        "configs/qgc-monitor.ini": "0d3d50a80c85c71e5dad8a49ca4514582a36413e1d64252003683c4769e464f4",
+        "configs/versions.lock.yaml": "9a37285d5aa8b9f498dd000c8405092d7bbd07f6a213a84a79ddb6cdca31bde9",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/__init__.py": "e3cbb7875577c98af5b731036721fed45c1cb6979d06cc1864f0cbedabb897c4",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/acceptance.py": "a47353226742fbd40e7187dca3c47ceea8b415a34a25a37a0961c4a1b35b2781",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/contracts.py": "bad7469409c6312f6bd3a48db9b2b4b3897f612bf6809a1b1021a7fb2abba5ec",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/estimator_reference.py": "d19316d1fcaeee5fb6ad091b1e4a22ac436f3da872d4d445541d3476a15a6928",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/execution_timing.py": "eb9991c5e162c62eb6d25031a204a2032403da79a935a36340e3a0aa136b6fc6",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/frames.py": "d8f55db8412cdfa4ba9a167e7d60d715e7a42a393502ad7a4dd0fbfc05fffb6d",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/mission.py": "28d4a7c15dd9fe37ba883d296652cdea7600ee49f221a9de93a31dc5ada4aec7",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/node.py": "7254b275a8ee3e5f9c6c95936704e0c94e9f1e3dcef3dc599d65ae3dc2db37b5",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/protocol.py": "b448b275dcd730a8f9e5ede24e8d25da16eb7fb0a2025038f41d0c667e2cad8d",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/sample_identity.py": "133f9572aa132207ec432c8bcc160784af8c62a16c5493c232e0a875220eda6a",
+        "ros2_ws/src/gwm_px4_control/gwm_px4_control/timing.py": "3bfa6b7c7df4792af3aa3259f3f69b7a3df4cebd4a3b1e29b5004401a2b63382",
+        "ros2_ws/src/gwm_px4_control/package.xml": "288fb4032f50660312ad7313d0e3b9e221de00f5bc9ab71f40167ea38459a97e",
+        "ros2_ws/src/gwm_px4_control/resource/gwm_px4_control": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "ros2_ws/src/gwm_px4_control/setup.cfg": "33725d7ba50068773c13090a06c3446f187676f2b39928e6a0e7aacddb0058d6",
+        "ros2_ws/src/gwm_px4_control/setup.py": "5ec8bf2eb97f7550f0aee0177ace262ad2ae91cbbc01214c461fc6b907c508c9",
+        "ros2_ws/src/gwm_px4_control/test/test_installed_contract.py": "e8f0d8fafb4699fa40bbbdaaf76532ce2e7d73303c6e11b35c2af9231d8a216c",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/__init__.py": "7a108227e35c9c3ce8bef3b5a297f60c70260fa4c9f25bfff6cb512efbae17ca",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/contracts.py": "db9d36072c0239414d8a2e1b3d4058baec058990a6c2efde87e4cba9a612df22",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/depth.py": "ace03f168254fb5b1623cc7c2c50ef035976a52ef5e32778d655952b95ade453",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/geometry.py": "5ca25c9178151069f0f4803d78f28c3c931a034992784b86137634f58886e244",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/node.py": "b00186f3087f582b59f30f5832acf81e2565d5ab87307f3a8bab566f1c139a06",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/recording.py": "716678d4c29440890a20a635ad0d1f1410aec1b97365da3e884d968214d82916",
+        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/state.py": "2060f0668726a1cdc40df5a8401f89ccf4eb4829137b8daaa5bd78fd77d7178f",
+        "ros2_ws/src/gwm_sensor_adapter/package.xml": "867da3b1cac2dc578df3a3b6f5cad9134a4a55c67582d651d08320d5d3f46c48",
+        "ros2_ws/src/gwm_sensor_adapter/resource/gwm_sensor_adapter": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+        "ros2_ws/src/gwm_sensor_adapter/setup.cfg": "135c27299f7f2dfd4151724bc780b427881af54ca869e5b6fb6cd1e3a38e6039",
+        "ros2_ws/src/gwm_sensor_adapter/setup.py": "9a3f71eadd86f3c80cca9a93c97d3c7226328dcde4f506814b681975d69f5bcf",
+        "ros2_ws/src/gwm_sensor_adapter/test/test_installed.py": "ec65eda0b6545646eaaed02b0f8860f87bf5c517832fc6085bc66fd661bd6503",
+        "scripts/build_baseline.sh": "326a7036bc961227a9715137e3c6979f0111368c2f9676c8d0e7c1b4ea31f0a8",
+        "scripts/build_p2.sh": "298520117e1e0dc73de2d288818dae43e2ff164dbd874f79c5df0fd59135f4a8",
+        "scripts/build_p3.sh": "7f6df0bc04c4c0bb528d54880cad7c0e581d964f49ff5538b7c6454ae84590f4",
+        "scripts/check_environment.sh": "99b3f7317cbc21ce4bf255267c8c7eae9b603bf2df4c7ef367e80f01955c4037",
+        "scripts/common.sh": "f84399b6b3938327b4ca817fd2d08dab340dd09a4ff57368a2041a63035622cb",
+        "scripts/measure_p3_offline.py": "f3a0826c8c22b866aba7e0b0df105e58c374e14386a7395b38706a53e30ccba2",
+        "scripts/offline_jobs.py": "2ae0fb26c9c031fa1ce74da75d16e742d138f13433ac024a81d13cb2904e0c2f",
+        "scripts/p1_contract.py": "daf348b6af40bf430166aa8f24936bd56396e4fc1312cd36828e99ce811222c8",
+        "scripts/p1_runner.py": "7db73916c05f6848094c5f0ea98892d8e794cab0bad20be35398b7aa1f54c1c8",
+        "scripts/p2_build.py": "659643cf840a367812e03a816e1131d152c83cba605d6f7e3d7af6f92986ff87",
+        "scripts/p2_runner.py": "6cc6e95dc75d4f76db893b451a35b219c382a0963598fbcf939067be24a05a36",
+        "scripts/p3_build.py": "0a76ac76c727e4d4dedf882d2c277658043e903ebfb4ea181bbff3bc9ee1c19a",
+        "scripts/p3_coexistence.py": "122f370fc4f140ec2c5cb9b0722a466678ae7b6bb9348a91ea3c7961384d0761",
+        "scripts/p3_runner.py": "c504dbb29f8b322c226184787004691effc9dd5cd29de60b66486143a5691429",
+        "scripts/record_versions.py": "6e1451dd9e37fa4963a794e637d961fada006456cf6a3e2ffbec3163e3dadf2a",
+        "scripts/run_p1_baseline.sh": "e630e8f0b0ffb736bbcb1900501729e68268b29143635f7579a634670ce9589c",
+        "scripts/run_p1_repeated.py": "4765892d6eab71faad01d74743e564cbfd7c7a7f18a1ca8cfe99d4612ac9661a",
+        "scripts/run_p2_control.sh": "940e17ee963806b737131e843a10cd83f213f6dda5775cf2498681ec7e2c123c",
+        "scripts/run_p2_repeated.py": "653eb799cb4a2dd0ce7075288d22f335695b78415714b391aae20d7bc102f4ec",
+        "scripts/run_p3_coexistence.sh": "385c6b1c42c362edd6f28c5d27ca390595231bd75551eb5d4efa5bce96b77fb4",
+        "scripts/run_p3_ground_matrix.py": "6d62f933cbe4b2758f13d507c6ebe2c6aca49a0474984543c02ec6782c35bfea",
+        "scripts/run_p3_qualification.py": "0aa3f5993549e5fae3c3992a4b372594a21be50e0c6a6b15c23e98982f085a67",
+        "scripts/run_p3_sensing.sh": "6793a4e635a3175de7b90d7b4107bbb1fc7d16021d6c8f009311b951a5a36bf2",
+        "scripts/setup_environment.sh": "e566eb7eabdffe9580bbcf8553a65897fee78baeab0300da6efafce6415ed147",
+        "scripts/setup_qgc_monitor.sh": "a0c1d99a4a2a334ffee40a5508dbc31461d4d778d2f1b80102bfdb2fd7775882",
+        "scripts/verify_p2_evidence.sh": "f534e943dd48f006839dabedc49cd04dc788b81852125274e6a95051d6786161",
+        "scripts/verify_p3_coexistence.sh": "9c24a77abff83eea5d667bb5449a16393ba1567a9663bd6a93b06b2a9668ac2c",
+        "validation/adjudicate_p3_sample_time.py": "70f48c2ef60564ebe163ed26a260fd4ff1f734cab5b241ef94ba4f38f0963baf",
+        "validation/collect_evidence.py": "16666918de585e1fd09363f85be8734c49fcf1a141ccd339fa7f4b5bd8173aba",
+        "validation/collect_p2_evidence.py": "0bd35f837245feb56087b52627dca8ae211d99b21cbfb73055891837f1382308",
+        "validation/collect_p3_coexistence.py": "a9ad384a7a0e9b35d7afa8cb8265cf2aa2bd74af68d2bf2a00c67f1da2fb83ae",
+        "validation/collect_p3_evidence.py": "746efaf6cba5fc6fad6cf60e77e85088f3412b2b7f0c11bb05cbce7685fef3fb",
+        "validation/p3_provenance.py": "2c2ad49b8680208b0fb9df38eeb5be75d7d15a20c637202d171a43284c20d8e6",
+        "validation/p3_source_probe.py": "8c11dd0835f169ca1b6ccd20fb24b8a6b5ae9eba5117d89d240a500262ad870a",
+        "validation/publish_wait_probe.c": "a6249188ff94516ab03a69b46699f92c9327e0bbc7675e73b89b24cffd3f51ad",
+        "validation/reference_evidence.py": "8e09dbc109596d60d39b0315405ea882c9c6170b24665a708537fadb9a17b175",
+        "validation/sample_evidence.py": "b70058144b3ffd1f53dd035574351be549cbb97ab65f8e4871a0da1f48d0f759",
+        "validation/timing_evidence.py": "420d11fcf2379964d671534ce95c3fd18d257be23d46be149f42573a906742de",
+        "validation/verify_ulog.py": "e35a29acbf6ca3becd0ef8b497c1cb1b4280cde7945c13c1c2d19e08f7c1a8c4",
+        "validation/yaw_evidence.py": "b42b6d6e771101338518853d45818d49bc00079d182e2c26b19d88929a0a4897",
+        "validation/yaw_provenance.py": "a733b3f6567b4354462e515beead2310df68f5c87df36c69dd4c2d5dcbe92d09"
+      },
+      "sample_evidence_contract": "p3-sample-evidence-v2"
+    },
+    "budget": {
+      "cleanup_seconds": 10,
+      "contract": "p3-offline-budget-v1",
+      "control_seconds": 90,
+      "scope": "offline evaluation only; no mid-job extension",
+      "sensor_seconds": 120
+    },
+    "complete": true,
+    "contract": "p3-offline-measurement-v1",
+    "measurements": [
+      {
+        "budget_seconds": 90,
+        "cache": "uncontrolled existing cache",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18",
+          "--output-name",
+          "p3-r2-final-v1-r1-control.json",
+          "--historical-analysis",
+          "--sample-contract",
+          "p3-sample-evidence-v2"
+        ],
+        "cpu_s": 54.419999999999995,
+        "exit_code": 1,
+        "peak_rss_kib": 717376,
+        "recording_seal": "legacy artifact manifests only",
+        "repetition": 1,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r1-control.json",
+        "result_sha256": "f250a648db13a7a9e45e4f6f251176b767259e76d351c3b7df2ba2929726e808",
+        "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+        "runtime_credit": false,
+        "stage": "control",
+        "supervisor_wall_s": 53.6745783589995,
+        "wrapper_wall_s": 55.51
+      },
+      {
+        "budget_seconds": 120,
+        "cache": "uncontrolled existing cache",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p3_coexistence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18",
+          "--output-name",
+          "p3-r2-final-v1-r1-sensor.json",
+          "--historical-analysis",
+          "--control-name",
+          "p3-r2-final-v1-r1-control.json"
+        ],
+        "cpu_s": 25.980000000000004,
+        "exit_code": 1,
+        "peak_rss_kib": 179360,
+        "recording_seal": "legacy artifact manifests only",
+        "repetition": 1,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r1-sensor.json",
+        "result_sha256": "057c2f633df931e0a5ac630c1a1ff336320db29432dc753a5a4d5b65c116c710",
+        "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+        "runtime_credit": false,
+        "stage": "sensor",
+        "supervisor_wall_s": 31.875361381999028,
+        "wrapper_wall_s": 33.77
+      },
+      {
+        "budget_seconds": 90,
+        "cache": "uncontrolled existing cache",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60",
+          "--output-name",
+          "p3-r2-final-v1-r1-control.json",
+          "--historical-analysis"
+        ],
+        "cpu_s": 85.97,
+        "exit_code": 1,
+        "peak_rss_kib": 1149180,
+        "recording_seal": "runtime-finalized.json",
+        "repetition": 1,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r1-control.json",
+        "result_sha256": "3c09efc1cce0e3c9c53397e3b2d583067e1e31a81d4a5d821d70649d151d7498",
+        "run_id": "20260912T141235Z-p3-flight-778e3f60",
+        "runtime_credit": false,
+        "stage": "control",
+        "supervisor_wall_s": 84.66979953200098,
+        "wrapper_wall_s": 88.43
+      },
+      {
+        "budget_seconds": 120,
+        "cache": "uncontrolled existing cache",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p3_coexistence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60",
+          "--output-name",
+          "p3-r2-final-v1-r1-sensor.json",
+          "--historical-analysis",
+          "--control-name",
+          "p3-r2-final-v1-r1-control.json"
+        ],
+        "cpu_s": 27.79,
+        "exit_code": 1,
+        "peak_rss_kib": 429108,
+        "recording_seal": "runtime-finalized.json",
+        "repetition": 1,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r1-sensor.json",
+        "result_sha256": "dff22811f546a504f98ef9c096743bcb19e35e8e3c8c108bebec24e2f509d129",
+        "run_id": "20260912T141235Z-p3-flight-778e3f60",
+        "runtime_credit": false,
+        "stage": "sensor",
+        "supervisor_wall_s": 33.82396730800065,
+        "wrapper_wall_s": 37.65
+      },
+      {
+        "budget_seconds": 90,
+        "cache": "warm filesystem after first repetition; fresh process",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18",
+          "--output-name",
+          "p3-r2-final-v1-r2-control.json",
+          "--historical-analysis",
+          "--sample-contract",
+          "p3-sample-evidence-v2"
+        ],
+        "cpu_s": 52.169999999999995,
+        "exit_code": 1,
+        "peak_rss_kib": 716628,
+        "recording_seal": "legacy artifact manifests only",
+        "repetition": 2,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r2-control.json",
+        "result_sha256": "f250a648db13a7a9e45e4f6f251176b767259e76d351c3b7df2ba2929726e808",
+        "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+        "runtime_credit": false,
+        "stage": "control",
+        "supervisor_wall_s": 51.41736876200048,
+        "wrapper_wall_s": 53.31
+      },
+      {
+        "budget_seconds": 120,
+        "cache": "warm filesystem after first repetition; fresh process",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p3_coexistence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18",
+          "--output-name",
+          "p3-r2-final-v1-r2-sensor.json",
+          "--historical-analysis",
+          "--control-name",
+          "p3-r2-final-v1-r2-control.json"
+        ],
+        "cpu_s": 15.84,
+        "exit_code": 1,
+        "peak_rss_kib": 178920,
+        "recording_seal": "legacy artifact manifests only",
+        "repetition": 2,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r2-sensor.json",
+        "result_sha256": "057c2f633df931e0a5ac630c1a1ff336320db29432dc753a5a4d5b65c116c710",
+        "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+        "runtime_credit": false,
+        "stage": "sensor",
+        "supervisor_wall_s": 19.975665089999893,
+        "wrapper_wall_s": 21.83
+      },
+      {
+        "budget_seconds": 90,
+        "cache": "warm filesystem after first repetition; fresh process",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p2_evidence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60",
+          "--output-name",
+          "p3-r2-final-v1-r2-control.json",
+          "--historical-analysis"
+        ],
+        "cpu_s": 71.35,
+        "exit_code": 1,
+        "peak_rss_kib": 1146612,
+        "recording_seal": "runtime-finalized.json",
+        "repetition": 2,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r2-control.json",
+        "result_sha256": "3c09efc1cce0e3c9c53397e3b2d583067e1e31a81d4a5d821d70649d151d7498",
+        "run_id": "20260912T141235Z-p3-flight-778e3f60",
+        "runtime_credit": false,
+        "stage": "control",
+        "supervisor_wall_s": 69.28557132400056,
+        "wrapper_wall_s": 73.09
+      },
+      {
+        "budget_seconds": 120,
+        "cache": "warm filesystem after first repetition; fresh process",
+        "command": [
+          "bash",
+          "/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo/scripts/verify_p3_coexistence.sh",
+          "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60",
+          "--output-name",
+          "p3-r2-final-v1-r2-sensor.json",
+          "--historical-analysis",
+          "--control-name",
+          "p3-r2-final-v1-r2-control.json"
+        ],
+        "cpu_s": 20.83,
+        "exit_code": 1,
+        "peak_rss_kib": 429188,
+        "recording_seal": "runtime-finalized.json",
+        "repetition": 2,
+        "result": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r2-sensor.json",
+        "result_sha256": "dff22811f546a504f98ef9c096743bcb19e35e8e3c8c108bebec24e2f509d129",
+        "run_id": "20260912T141235Z-p3-flight-778e3f60",
+        "runtime_credit": false,
+        "stage": "sensor",
+        "supervisor_wall_s": 24.278921851000632,
+        "wrapper_wall_s": 26.17
+      }
+    ]
+  },
+  "analyses": [
+    {
+      "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+      "hypothesis": "Strict prior logged state need not be the MC consumed input",
+      "new_flight_credit": false,
+      "control_report": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r1-control.json",
+        "sha256": "f250a648db13a7a9e45e4f6f251176b767259e76d351c3b7df2ba2929726e808"
+      },
+      "sensor_report": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T113430Z-p3-flight-0dc41a18/p3-r2-final-v1-r1-sensor.json",
+        "sha256": "057c2f633df931e0a5ac630c1a1ff336320db29432dc753a5a4d5b65c116c710"
+      },
+      "recording_integrity": "passed",
+      "flight_acceptance": "unknown",
+      "evidence_statuses": {
+        "A_external_initialization": "verified",
+        "B_handover": "unobservable_from_recording",
+        "C_physical_behavior": "verified",
+        "D_exact_internal_relation": "unobservable_from_recording",
+        "E_prior_state_diagnostic": "contradicted"
+      },
+      "prior_state_diagnostic": {
+        "distinct_internal_observations": 135,
+        "duplicate_internal_deliveries": 0,
+        "exact_mc_consumed_source_identity": "unproven",
+        "failed_samples": 79,
+        "internal_max_sample_gap_s": 0.104,
+        "internal_samples": 135,
+        "match_age_limit_s": 0.008001,
+        "matched_internal_samples": 135,
+        "max_match_age_s": 0.008,
+        "max_resolved_yaw_error_rad": 7.283687591552734e-05,
+        "meaning": "prior-state feedback consistency, not exact MC consumed-source identity",
+        "policy": "latest_strictly_earlier_publication_group_final_validated_output",
+        "status": "failed",
+        "yaw_error_limit_rad": 1e-05
+      },
+      "controller_windows": "8 passed",
+      "independent_windows": "16 passed",
+      "timing": {
+        "actual_prestream_publication_sim_s": 2.0,
+        "callback_entry_gap_wall_s": 0.0719068469998092,
+        "contract": "p2-timing-v1",
+        "control_callback_duration_wall_s": 0.014113425000232382,
+        "control_callback_entry_gap_wall_s": 0.06223368900009518,
+        "control_callback_rate_wall_hz": 19.999740767590687,
+        "control_consumed_sample_gap_sim_s": 0.06799999999999784,
+        "evaluator_sha256": "420d11fcf2379964d671534ce95c3fd18d257be23d46be149f42573a906742de",
+        "evidence_enqueue_duration_wall_s": null,
+        "evidence_persist_delay_wall_s": 0.007083807000071829,
+        "graph_check_duration_wall_s": 0.009266862999993464,
+        "heartbeat_publish_gap_sim_s": 0.060000000000002274,
+        "limitations": [
+          "Application callback entry is not DDS arrival; the same-process bag is not independent middleware arrival.",
+          "Persistence delay brackets callback acquisition through synchronous serialization, write return and text flush; no fsync durability or physical-disk latency claim.",
+          "No evidence queue is used; enqueue latency is unavailable. A guard detects but cannot preempt a blocking middleware or disk call."
+        ],
+        "observed_sim_seconds_per_wall_second": 0.8970923212393288,
+        "prestream_publish_gaps_sim_s": {
+          "offboard_control_mode": 0.052000000000003155,
+          "trajectory_setpoint": 0.052000000000003155
+        },
+        "publication_bag_event_identity_verified": true,
+        "publish_call_duration_wall_s": 0.001955095000084839,
+        "source_age_at_control_sim_s": 0.031999999999996476,
+        "source_age_at_dispatch_sim_s": 0.031999999999996476,
+        "source_sample_gap_sim_s": 0.03200000000000358,
+        "spans": {
+          "bag_write:/clock": {
+            "cold_wall_s": 0.0001299479999943287,
+            "count": 24716,
+            "later_max_wall_s": 0.010640879000220593,
+            "max_wall_s": 0.010640879000220593
+          },
+          "bag_write:/gwm/p2/events": {
+            "cold_wall_s": 0.0002750179996837687,
+            "count": 4025,
+            "later_max_wall_s": 0.0067498219996195985,
+            "max_wall_s": 0.0067498219996195985
+          },
+          "bag_write:/px4_71/fmu/in/offboard_control_mode": {
+            "cold_wall_s": 0.00010956699998132535,
+            "count": 1904,
+            "later_max_wall_s": 0.0020097719998375396,
+            "max_wall_s": 0.0020097719998375396
+          },
+          "bag_write:/px4_71/fmu/in/trajectory_setpoint": {
+            "cold_wall_s": 7.399599962809589e-05,
+            "count": 1904,
+            "later_max_wall_s": 0.0009079739998014702,
+            "max_wall_s": 0.0009079739998014702
+          },
+          "bag_write:/px4_71/fmu/in/vehicle_command": {
+            "cold_wall_s": 8.47510000312468e-05,
+            "count": 3,
+            "later_max_wall_s": 0.00032324199992217473,
+            "max_wall_s": 0.00032324199992217473
+          },
+          "bag_write:/px4_71/fmu/out/estimator_status_flags": {
+            "cold_wall_s": 0.00010969000004479312,
+            "count": 104,
+            "later_max_wall_s": 0.0006438919999709469,
+            "max_wall_s": 0.0006438919999709469
+          },
+          "bag_write:/px4_71/fmu/out/failsafe_flags": {
+            "cold_wall_s": 7.031499990262091e-05,
+            "count": 184,
+            "later_max_wall_s": 0.004462214000341191,
+            "max_wall_s": 0.004462214000341191
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_attitude": {
+            "cold_wall_s": 7.727799993517692e-05,
+            "count": 9886,
+            "later_max_wall_s": 0.005394867999712005,
+            "max_wall_s": 0.005394867999712005
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_command_ack": {
+            "cold_wall_s": 0.0001485129996581236,
+            "count": 3,
+            "later_max_wall_s": 0.00032597300014458597,
+            "max_wall_s": 0.00032597300014458597
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_land_detected": {
+            "cold_wall_s": 5.888199984838138e-05,
+            "count": 114,
+            "later_max_wall_s": 0.0006985420000091835,
+            "max_wall_s": 0.0006985420000091835
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_local_position_v1": {
+            "cold_wall_s": 0.0001315309996243741,
+            "count": 4943,
+            "later_max_wall_s": 0.0014881689999128866,
+            "max_wall_s": 0.0014881689999128866
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_status_v1": {
+            "cold_wall_s": 8.886600016921875e-05,
+            "count": 201,
+            "later_max_wall_s": 0.0004639240000869904,
+            "max_wall_s": 0.0004639240000869904
+          },
+          "cache_update:estimator_status_flags": {
+            "cold_wall_s": 6.117999873822555e-06,
+            "count": 104,
+            "later_max_wall_s": 0.00018346900014876155,
+            "max_wall_s": 0.00018346900014876155
+          },
+          "cache_update:failsafe_flags": {
+            "cold_wall_s": 4.7939997784851585e-06,
+            "count": 184,
+            "later_max_wall_s": 0.0005084419999548118,
+            "max_wall_s": 0.0005084419999548118
+          },
+          "cache_update:vehicle_attitude": {
+            "cold_wall_s": 7.370999810518697e-06,
+            "count": 9886,
+            "later_max_wall_s": 0.000995216999854165,
+            "max_wall_s": 0.000995216999854165
+          },
+          "cache_update:vehicle_land_detected": {
+            "cold_wall_s": 5.063000116933836e-06,
+            "count": 114,
+            "later_max_wall_s": 6.440900006055017e-05,
+            "max_wall_s": 6.440900006055017e-05
+          },
+          "cache_update:vehicle_local_position": {
+            "cold_wall_s": 1.0897000265686074e-05,
+            "count": 4943,
+            "later_max_wall_s": 0.001280040999972698,
+            "max_wall_s": 0.001280040999972698
+          },
+          "cache_update:vehicle_status": {
+            "cold_wall_s": 9.097999736695783e-06,
+            "count": 201,
+            "later_max_wall_s": 0.00023049499986882438,
+            "max_wall_s": 0.00023049499986882438
+          },
+          "cdr_serialize:/clock": {
+            "cold_wall_s": 4.401499973027967e-05,
+            "count": 24716,
+            "later_max_wall_s": 0.01066310899977907,
+            "max_wall_s": 0.01066310899977907
+          },
+          "cdr_serialize:/gwm/p2/events": {
+            "cold_wall_s": 7.570300022052834e-05,
+            "count": 4025,
+            "later_max_wall_s": 0.0014224609999473614,
+            "max_wall_s": 0.0014224609999473614
+          },
+          "cdr_serialize:/px4_71/fmu/in/offboard_control_mode": {
+            "cold_wall_s": 3.5371000194572844e-05,
+            "count": 1904,
+            "later_max_wall_s": 0.0008625119999123854,
+            "max_wall_s": 0.0008625119999123854
+          },
+          "cdr_serialize:/px4_71/fmu/in/trajectory_setpoint": {
+            "cold_wall_s": 2.695399962249212e-05,
+            "count": 1904,
+            "later_max_wall_s": 0.005181732999972155,
+            "max_wall_s": 0.005181732999972155
+          },
+          "cdr_serialize:/px4_71/fmu/in/vehicle_command": {
+            "cold_wall_s": 4.744199986816966e-05,
+            "count": 3,
+            "later_max_wall_s": 0.00011676099984470056,
+            "max_wall_s": 0.00011676099984470056
+          },
+          "cdr_serialize:/px4_71/fmu/out/estimator_status_flags": {
+            "cold_wall_s": 5.975300018690177e-05,
+            "count": 104,
+            "later_max_wall_s": 0.0009965060003196413,
+            "max_wall_s": 0.0009965060003196413
+          },
+          "cdr_serialize:/px4_71/fmu/out/failsafe_flags": {
+            "cold_wall_s": 5.1417999657132896e-05,
+            "count": 184,
+            "later_max_wall_s": 0.0003009220004059898,
+            "max_wall_s": 0.0003009220004059898
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_attitude": {
+            "cold_wall_s": 2.6772999717650237e-05,
+            "count": 9886,
+            "later_max_wall_s": 0.0010813089998009673,
+            "max_wall_s": 0.0010813089998009673
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_command_ack": {
+            "cold_wall_s": 4.879199968854664e-05,
+            "count": 3,
+            "later_max_wall_s": 0.00010962599981212406,
+            "max_wall_s": 0.00010962599981212406
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_land_detected": {
+            "cold_wall_s": 5.07929999002954e-05,
+            "count": 114,
+            "later_max_wall_s": 0.00026098899979842827,
+            "max_wall_s": 0.00026098899979842827
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_local_position_v1": {
+            "cold_wall_s": 0.00011812200000349549,
+            "count": 4943,
+            "later_max_wall_s": 0.0013928210000813124,
+            "max_wall_s": 0.0013928210000813124
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_status_v1": {
+            "cold_wall_s": 5.333500030246796e-05,
+            "count": 201,
+            "later_max_wall_s": 0.00021452700002555503,
+            "max_wall_s": 0.00021452700002555503
+          },
+          "clock_callback": {
+            "cold_wall_s": 0.00024466900003972114,
+            "count": 24716,
+            "later_max_wall_s": 0.011135356000067986,
+            "max_wall_s": 0.011135356000067986
+          },
+          "control_callback": {
+            "cold_wall_s": 0.0029017300003033597,
+            "count": 2204,
+            "later_max_wall_s": 0.014113425000232382,
+            "max_wall_s": 0.014113425000232382
+          },
+          "dispatch_validation": {
+            "cold_wall_s": 3.694699989864603e-05,
+            "count": 3814,
+            "later_max_wall_s": 0.0008243269999184122,
+            "max_wall_s": 0.0008243269999184122
+          },
+          "event_publish": {
+            "cold_wall_s": 4.8444000185554614e-05,
+            "count": 4025,
+            "later_max_wall_s": 0.0020696450001196354,
+            "max_wall_s": 0.0020696450001196354
+          },
+          "graph_check": {
+            "cold_wall_s": 0.0023771480000505107,
+            "count": 106,
+            "later_max_wall_s": 0.009266862999993464,
+            "max_wall_s": 0.009266862999993464
+          },
+          "graph_json_persistence": {
+            "cold_wall_s": 0.0007033910001155164,
+            "count": 106,
+            "later_max_wall_s": 0.005069896000350127,
+            "max_wall_s": 0.005069896000350127
+          },
+          "json_encode:estimator_status_flags": {
+            "cold_wall_s": 9.396499990543816e-05,
+            "count": 104,
+            "later_max_wall_s": 0.000688354999965668,
+            "max_wall_s": 0.000688354999965668
+          },
+          "json_encode:event": {
+            "cold_wall_s": 3.247400036343606e-05,
+            "count": 4025,
+            "later_max_wall_s": 0.0012951469998370158,
+            "max_wall_s": 0.0012951469998370158
+          },
+          "json_encode:failsafe_flags": {
+            "cold_wall_s": 6.9934999828547e-05,
+            "count": 184,
+            "later_max_wall_s": 0.000626927000212163,
+            "max_wall_s": 0.000626927000212163
+          },
+          "json_encode:vehicle_attitude": {
+            "cold_wall_s": 9.623100004318985e-05,
+            "count": 9886,
+            "later_max_wall_s": 0.004954133999945043,
+            "max_wall_s": 0.004954133999945043
+          },
+          "json_encode:vehicle_command_ack": {
+            "cold_wall_s": 5.6862999826989835e-05,
+            "count": 3,
+            "later_max_wall_s": 0.0001305109999520937,
+            "max_wall_s": 0.0001305109999520937
+          },
+          "json_encode:vehicle_land_detected": {
+            "cold_wall_s": 3.824300029009464e-05,
+            "count": 114,
+            "later_max_wall_s": 0.00026386299987279926,
+            "max_wall_s": 0.00026386299987279926
+          },
+          "json_encode:vehicle_local_position": {
+            "cold_wall_s": 0.00021336400004656753,
+            "count": 4943,
+            "later_max_wall_s": 0.005775987000106397,
+            "max_wall_s": 0.005775987000106397
+          },
+          "json_encode:vehicle_status": {
+            "cold_wall_s": 7.910800013632979e-05,
+            "count": 201,
+            "later_max_wall_s": 0.00046130700002322556,
+            "max_wall_s": 0.00046130700002322556
+          },
+          "message_construct:offboard_control_mode": {
+            "cold_wall_s": 2.8235999707248993e-05,
+            "count": 1904,
+            "later_max_wall_s": 0.0005194279997340345,
+            "max_wall_s": 0.0005194279997340345
+          },
+          "message_construct:trajectory_setpoint": {
+            "cold_wall_s": 5.938100002822466e-05,
+            "count": 1904,
+            "later_max_wall_s": 0.001297040000281413,
+            "max_wall_s": 0.001297040000281413
+          },
+          "message_construct:vehicle_command": {
+            "cold_wall_s": 4.2905000100290636e-05,
+            "count": 3,
+            "later_max_wall_s": 5.8790000366570894e-05,
+            "max_wall_s": 5.8790000366570894e-05
+          },
+          "message_convert:estimator_status_flags": {
+            "cold_wall_s": 9.69289999375178e-05,
+            "count": 104,
+            "later_max_wall_s": 0.0006626890003644803,
+            "max_wall_s": 0.0006626890003644803
+          },
+          "message_convert:failsafe_flags": {
+            "cold_wall_s": 6.991300006120582e-05,
+            "count": 184,
+            "later_max_wall_s": 0.00040919699995356495,
+            "max_wall_s": 0.00040919699995356495
+          },
+          "message_convert:vehicle_attitude": {
+            "cold_wall_s": 4.7092999921005685e-05,
+            "count": 9886,
+            "later_max_wall_s": 0.00265160199978709,
+            "max_wall_s": 0.00265160199978709
+          },
+          "message_convert:vehicle_command_ack": {
+            "cold_wall_s": 4.202599984637345e-05,
+            "count": 3,
+            "later_max_wall_s": 0.00010628200016071787,
+            "max_wall_s": 0.00010628200016071787
+          },
+          "message_convert:vehicle_land_detected": {
+            "cold_wall_s": 2.998099989781622e-05,
+            "count": 114,
+            "later_max_wall_s": 0.0003338379997330776,
+            "max_wall_s": 0.0003338379997330776
+          },
+          "message_convert:vehicle_local_position": {
+            "cold_wall_s": 0.00012811299984605284,
+            "count": 4943,
+            "later_max_wall_s": 0.005535620000046038,
+            "max_wall_s": 0.005535620000046038
+          },
+          "message_convert:vehicle_status": {
+            "cold_wall_s": 7.567499960714485e-05,
+            "count": 201,
+            "later_max_wall_s": 0.0002879660000871809,
+            "max_wall_s": 0.0002879660000871809
+          },
+          "mission_tick": {
+            "cold_wall_s": 3.76829998458561e-05,
+            "count": 2204,
+            "later_max_wall_s": 0.0014089369997236645,
+            "max_wall_s": 0.0014089369997236645
+          },
+          "publish:offboard_control_mode": {
+            "cold_wall_s": 0.00018731599993770942,
+            "count": 1904,
+            "later_max_wall_s": 0.0008246669999607548,
+            "max_wall_s": 0.0008246669999607548
+          },
+          "publish:trajectory_setpoint": {
+            "cold_wall_s": 0.00010976000021400978,
+            "count": 1904,
+            "later_max_wall_s": 0.001955095000084839,
+            "max_wall_s": 0.001955095000084839
+          },
+          "publish:vehicle_command": {
+            "cold_wall_s": 0.00012534699999378063,
+            "count": 3,
+            "later_max_wall_s": 0.0003924650000044494,
+            "max_wall_s": 0.0003924650000044494
+          },
+          "publisher_prepare:offboard_control_mode": {
+            "cold_wall_s": 0.007484177999685926,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.007484177999685926
+          },
+          "publisher_prepare:trajectory_setpoint": {
+            "cold_wall_s": 0.0008706700000402634,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.0008706700000402634
+          },
+          "publisher_prepare:vehicle_command": {
+            "cold_wall_s": 0.0011542800002644071,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.0011542800002644071
+          },
+          "subscription_callback:estimator_status_flags": {
+            "cold_wall_s": 0.00046402699990721885,
+            "count": 104,
+            "later_max_wall_s": 0.002519548000236682,
+            "max_wall_s": 0.002519548000236682
+          },
+          "subscription_callback:failsafe_flags": {
+            "cold_wall_s": 0.00034158800008299295,
+            "count": 184,
+            "later_max_wall_s": 0.005075995999959559,
+            "max_wall_s": 0.005075995999959559
+          },
+          "subscription_callback:vehicle_attitude": {
+            "cold_wall_s": 0.00032251199991151225,
+            "count": 9886,
+            "later_max_wall_s": 0.007083807000071829,
+            "max_wall_s": 0.007083807000071829
+          },
+          "subscription_callback:vehicle_command_ack": {
+            "cold_wall_s": 0.00040379899974141154,
+            "count": 3,
+            "later_max_wall_s": 0.0009080719996745756,
+            "max_wall_s": 0.0009080719996745756
+          },
+          "subscription_callback:vehicle_land_detected": {
+            "cold_wall_s": 0.0002647379997142707,
+            "count": 114,
+            "later_max_wall_s": 0.0016501949999110366,
+            "max_wall_s": 0.0016501949999110366
+          },
+          "subscription_callback:vehicle_local_position": {
+            "cold_wall_s": 0.0006969199998820841,
+            "count": 4943,
+            "later_max_wall_s": 0.006591457000013179,
+            "max_wall_s": 0.006591457000013179
+          },
+          "subscription_callback:vehicle_status": {
+            "cold_wall_s": 0.0004073820000485284,
+            "count": 201,
+            "later_max_wall_s": 0.0017353319999529049,
+            "max_wall_s": 0.0017353319999529049
+          },
+          "text_write_flush:estimator_status_flags": {
+            "cold_wall_s": 2.4981000024126843e-05,
+            "count": 104,
+            "later_max_wall_s": 0.00018114000022251275,
+            "max_wall_s": 0.00018114000022251275
+          },
+          "text_write_flush:event": {
+            "cold_wall_s": 1.705900012893835e-05,
+            "count": 4025,
+            "later_max_wall_s": 0.0013968940002087038,
+            "max_wall_s": 0.0013968940002087038
+          },
+          "text_write_flush:failsafe_flags": {
+            "cold_wall_s": 1.8992000150319654e-05,
+            "count": 184,
+            "later_max_wall_s": 0.0007284770003934682,
+            "max_wall_s": 0.0007284770003934682
+          },
+          "text_write_flush:vehicle_attitude": {
+            "cold_wall_s": 1.0907000159932068e-05,
+            "count": 9886,
+            "later_max_wall_s": 0.0007907269996394461,
+            "max_wall_s": 0.0007907269996394461
+          },
+          "text_write_flush:vehicle_command_ack": {
+            "cold_wall_s": 1.5907000033621443e-05,
+            "count": 3,
+            "later_max_wall_s": 3.9741999898978975e-05,
+            "max_wall_s": 3.9741999898978975e-05
+          },
+          "text_write_flush:vehicle_land_detected": {
+            "cold_wall_s": 2.587000017229002e-05,
+            "count": 114,
+            "later_max_wall_s": 0.000244849999944563,
+            "max_wall_s": 0.000244849999944563
+          },
+          "text_write_flush:vehicle_local_position": {
+            "cold_wall_s": 1.4979000297898892e-05,
+            "count": 4943,
+            "later_max_wall_s": 0.001695150999694306,
+            "max_wall_s": 0.001695150999694306
+          },
+          "text_write_flush:vehicle_status": {
+            "cold_wall_s": 3.0487999993056292e-05,
+            "count": 201,
+            "later_max_wall_s": 0.00017350600001009298,
+            "max_wall_s": 0.00017350600001009298
+          },
+          "type_support_prepare:estimator_status_flags": {
+            "cold_wall_s": 3.2699999792384915e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.2699999792384915e-06
+          },
+          "type_support_prepare:failsafe_flags": {
+            "cold_wall_s": 2.859000233002007e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 2.859000233002007e-06
+          },
+          "type_support_prepare:offboard_control_mode": {
+            "cold_wall_s": 3.141999968647724e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.141999968647724e-06
+          },
+          "type_support_prepare:trajectory_setpoint": {
+            "cold_wall_s": 3.872999968734803e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.872999968734803e-06
+          },
+          "type_support_prepare:vehicle_attitude": {
+            "cold_wall_s": 3.2890002330532297e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.2890002330532297e-06
+          },
+          "type_support_prepare:vehicle_command": {
+            "cold_wall_s": 2.3239999791258015e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 2.3239999791258015e-06
+          },
+          "type_support_prepare:vehicle_command_ack": {
+            "cold_wall_s": 3.2070001907413825e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.2070001907413825e-06
+          },
+          "type_support_prepare:vehicle_land_detected": {
+            "cold_wall_s": 3.2519997148483526e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.2519997148483526e-06
+          },
+          "type_support_prepare:vehicle_local_position": {
+            "cold_wall_s": 3.785999979299959e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.785999979299959e-06
+          },
+          "type_support_prepare:vehicle_status": {
+            "cold_wall_s": 3.2879997888812795e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 3.2879997888812795e-06
+          }
+        },
+        "status": "passed",
+        "trace": {
+          "calls": {
+            "bag_write:/clock": 24716,
+            "bag_write:/gwm/p2/events": 4025,
+            "bag_write:/px4_71/fmu/in/offboard_control_mode": 1904,
+            "bag_write:/px4_71/fmu/in/trajectory_setpoint": 1904,
+            "bag_write:/px4_71/fmu/in/vehicle_command": 3,
+            "bag_write:/px4_71/fmu/out/estimator_status_flags": 104,
+            "bag_write:/px4_71/fmu/out/failsafe_flags": 184,
+            "bag_write:/px4_71/fmu/out/vehicle_attitude": 9886,
+            "bag_write:/px4_71/fmu/out/vehicle_command_ack": 3,
+            "bag_write:/px4_71/fmu/out/vehicle_land_detected": 114,
+            "bag_write:/px4_71/fmu/out/vehicle_local_position_v1": 4943,
+            "bag_write:/px4_71/fmu/out/vehicle_status_v1": 201,
+            "cache_update:estimator_status_flags": 104,
+            "cache_update:failsafe_flags": 184,
+            "cache_update:vehicle_attitude": 9886,
+            "cache_update:vehicle_land_detected": 114,
+            "cache_update:vehicle_local_position": 4943,
+            "cache_update:vehicle_status": 201,
+            "cdr_serialize:/clock": 24716,
+            "cdr_serialize:/gwm/p2/events": 4025,
+            "cdr_serialize:/px4_71/fmu/in/offboard_control_mode": 1904,
+            "cdr_serialize:/px4_71/fmu/in/trajectory_setpoint": 1904,
+            "cdr_serialize:/px4_71/fmu/in/vehicle_command": 3,
+            "cdr_serialize:/px4_71/fmu/out/estimator_status_flags": 104,
+            "cdr_serialize:/px4_71/fmu/out/failsafe_flags": 184,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_attitude": 9886,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_command_ack": 3,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_land_detected": 114,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_local_position_v1": 4943,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_status_v1": 201,
+            "clock_callback": 24716,
+            "control_callback": 2204,
+            "dispatch_validation": 3814,
+            "event_publish": 4025,
+            "graph_check": 106,
+            "graph_json_persistence": 106,
+            "json_encode:estimator_status_flags": 104,
+            "json_encode:event": 4025,
+            "json_encode:failsafe_flags": 184,
+            "json_encode:vehicle_attitude": 9886,
+            "json_encode:vehicle_command_ack": 3,
+            "json_encode:vehicle_land_detected": 114,
+            "json_encode:vehicle_local_position": 4943,
+            "json_encode:vehicle_status": 201,
+            "message_construct:offboard_control_mode": 1904,
+            "message_construct:trajectory_setpoint": 1904,
+            "message_construct:vehicle_command": 3,
+            "message_convert:estimator_status_flags": 104,
+            "message_convert:failsafe_flags": 184,
+            "message_convert:vehicle_attitude": 9886,
+            "message_convert:vehicle_command_ack": 3,
+            "message_convert:vehicle_land_detected": 114,
+            "message_convert:vehicle_local_position": 4943,
+            "message_convert:vehicle_status": 201,
+            "mission_tick": 2204,
+            "publish:offboard_control_mode": 1904,
+            "publish:trajectory_setpoint": 1904,
+            "publish:vehicle_command": 3,
+            "publisher_prepare:offboard_control_mode": 1,
+            "publisher_prepare:trajectory_setpoint": 1,
+            "publisher_prepare:vehicle_command": 1,
+            "subscription_callback:estimator_status_flags": 104,
+            "subscription_callback:failsafe_flags": 184,
+            "subscription_callback:vehicle_attitude": 9886,
+            "subscription_callback:vehicle_command_ack": 3,
+            "subscription_callback:vehicle_land_detected": 114,
+            "subscription_callback:vehicle_local_position": 4943,
+            "subscription_callback:vehicle_status": 201,
+            "text_write_flush:estimator_status_flags": 104,
+            "text_write_flush:event": 4025,
+            "text_write_flush:failsafe_flags": 184,
+            "text_write_flush:vehicle_attitude": 9886,
+            "text_write_flush:vehicle_command_ack": 3,
+            "text_write_flush:vehicle_land_detected": 114,
+            "text_write_flush:vehicle_local_position": 4943,
+            "text_write_flush:vehicle_status": 201,
+            "type_support_prepare:estimator_status_flags": 1,
+            "type_support_prepare:failsafe_flags": 1,
+            "type_support_prepare:offboard_control_mode": 1,
+            "type_support_prepare:trajectory_setpoint": 1,
+            "type_support_prepare:vehicle_attitude": 1,
+            "type_support_prepare:vehicle_command": 1,
+            "type_support_prepare:vehicle_command_ack": 1,
+            "type_support_prepare:vehicle_land_detected": 1,
+            "type_support_prepare:vehicle_local_position": 1,
+            "type_support_prepare:vehicle_status": 1
+          },
+          "capacity": 500000,
+          "complete": true,
+          "overflow": 0,
+          "records": 226006
+        },
+        "trace_sha256": "07f7f020d133bbb548431abec557aa08877e824f20e4029b497c8d1ab3f53b0d",
+        "trajectory_publish_gap_sim_s": 0.060000000000002274
+      },
+      "unchanged_non_yaw_fields_differences": [],
+      "deliberate_changed_fields": [
+        "analysis_inputs",
+        "evaluation_finalized",
+        "evaluator_sha256",
+        "flight_acceptance",
+        "historical_reanalysis",
+        "qualification_credit",
+        "sample_evaluator_sha256",
+        "yaw_evaluator_sha256",
+        "yaw_ownership"
+      ],
+      "sensor_metrics": {
+        "raw_frames": 3282,
+        "raw_bytes": 4032921600,
+        "delivered_hz": 30.30241690619813,
+        "source_gap_max_sim_s": 0.036,
+        "processed_hz": 10.002834811485036,
+        "observations": 989,
+        "observation_age_max_sim_s": 0.07600000000000762,
+        "state_mismatch_max_s": 0.012,
+        "state_correlation": {
+          "ambiguous": 0,
+          "distinct_matched_sources": 0,
+          "loss_or_full_parity_claim": false,
+          "matched": 989,
+          "reused": 0,
+          "unmatched": 0
+        },
+        "failures": [
+          "control_acceptance"
+        ]
+      }
+    },
+    {
+      "run_id": "20260912T141235Z-p3-flight-778e3f60",
+      "hypothesis": "Strict prior logged state need not be the MC consumed input",
+      "new_flight_credit": false,
+      "control_report": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r1-control.json",
+        "sha256": "3c09efc1cce0e3c9c53397e3b2d583067e1e31a81d4a5d821d70649d151d7498"
+      },
+      "sensor_report": {
+        "path": "/home/joker0625/uav_autonomy/runs/20260912T141235Z-p3-flight-778e3f60/p3-r2-final-v1-r1-sensor.json",
+        "sha256": "dff22811f546a504f98ef9c096743bcb19e35e8e3c8c108bebec24e2f509d129"
+      },
+      "recording_integrity": "passed",
+      "flight_acceptance": "unknown",
+      "evidence_statuses": {
+        "A_external_initialization": "verified",
+        "B_handover": "verified",
+        "C_physical_behavior": "verified",
+        "D_exact_internal_relation": "unobservable_from_recording",
+        "E_prior_state_diagnostic": "contradicted"
+      },
+      "prior_state_diagnostic": {
+        "distinct_internal_observations": 135,
+        "duplicate_internal_deliveries": 0,
+        "exact_mc_consumed_source_identity": "unproven",
+        "failed_samples": 68,
+        "internal_max_sample_gap_s": 0.112,
+        "internal_samples": 135,
+        "match_age_limit_s": 0.008001,
+        "matched_internal_samples": 135,
+        "max_match_age_s": 0.016,
+        "max_resolved_yaw_error_rad": 8.08238983154297e-05,
+        "meaning": "prior-state feedback consistency, not exact MC consumed-source identity",
+        "policy": "latest_strictly_earlier_publication_group_final_validated_output",
+        "status": "failed",
+        "yaw_error_limit_rad": 1e-05
+      },
+      "controller_windows": "8 passed",
+      "independent_windows": "16 passed",
+      "timing": {
+        "actual_prestream_publication_sim_s": 2.0,
+        "callback_entry_gap_wall_s": 0.14327154800048447,
+        "contract": "p2-timing-v1",
+        "control_callback_duration_wall_s": 0.027466723000543425,
+        "control_callback_entry_gap_wall_s": 0.10263612200105854,
+        "control_callback_rate_wall_hz": 19.993306925543582,
+        "control_consumed_sample_gap_sim_s": 0.06400000000000716,
+        "evaluator_sha256": "420d11fcf2379964d671534ce95c3fd18d257be23d46be149f42573a906742de",
+        "evidence_enqueue_duration_wall_s": null,
+        "evidence_persist_delay_wall_s": 0.055817058999309666,
+        "graph_check_duration_wall_s": 0.016751952998674824,
+        "heartbeat_publish_gap_sim_s": 0.06799999999999784,
+        "limitations": [
+          "Application callback entry is not DDS arrival; the same-process bag is not independent middleware arrival.",
+          "Persistence delay brackets callback acquisition through synchronous serialization, write return and text flush; no fsync durability or physical-disk latency claim.",
+          "No evidence queue is used; enqueue latency is unavailable. A guard detects but cannot preempt a blocking middleware or disk call."
+        ],
+        "observed_sim_seconds_per_wall_second": 0.6570202793079735,
+        "prestream_publish_gaps_sim_s": {
+          "offboard_control_mode": 0.04400000000000048,
+          "trajectory_setpoint": 0.04400000000000048
+        },
+        "publication_bag_event_identity_verified": true,
+        "publish_call_duration_wall_s": 0.0050919740006065695,
+        "source_age_at_control_sim_s": 0.03200000000000358,
+        "source_age_at_dispatch_sim_s": 0.03200000000000358,
+        "source_sample_gap_sim_s": 0.03200000000001069,
+        "spans": {
+          "bag_write:/clock": {
+            "cold_wall_s": 0.00014913899940438569,
+            "count": 24601,
+            "later_max_wall_s": 0.005869235999853117,
+            "max_wall_s": 0.005869235999853117
+          },
+          "bag_write:/gwm/p2/events": {
+            "cold_wall_s": 0.00026372200045443606,
+            "count": 8500,
+            "later_max_wall_s": 0.008822251000310644,
+            "max_wall_s": 0.008822251000310644
+          },
+          "bag_write:/px4_71/fmu/in/offboard_control_mode": {
+            "cold_wall_s": 0.0002486280009179609,
+            "count": 2633,
+            "later_max_wall_s": 0.006850419000329566,
+            "max_wall_s": 0.006850419000329566
+          },
+          "bag_write:/px4_71/fmu/in/trajectory_setpoint": {
+            "cold_wall_s": 0.00015080299999681301,
+            "count": 2633,
+            "later_max_wall_s": 0.002823368999088416,
+            "max_wall_s": 0.002823368999088416
+          },
+          "bag_write:/px4_71/fmu/in/vehicle_command": {
+            "cold_wall_s": 0.00019720599993888754,
+            "count": 3,
+            "later_max_wall_s": 0.001621434999833582,
+            "max_wall_s": 0.001621434999833582
+          },
+          "bag_write:/px4_71/fmu/out/estimator_status_flags": {
+            "cold_wall_s": 0.00015465799879166298,
+            "count": 103,
+            "later_max_wall_s": 0.0008855750002112472,
+            "max_wall_s": 0.0008855750002112472
+          },
+          "bag_write:/px4_71/fmu/out/failsafe_flags": {
+            "cold_wall_s": 0.00021973599905322772,
+            "count": 184,
+            "later_max_wall_s": 0.0019379340010345913,
+            "max_wall_s": 0.0019379340010345913
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_attitude": {
+            "cold_wall_s": 0.0003129460001218831,
+            "count": 9843,
+            "later_max_wall_s": 0.005572717000177363,
+            "max_wall_s": 0.005572717000177363
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_command_ack": {
+            "cold_wall_s": 0.00032386100065195933,
+            "count": 3,
+            "later_max_wall_s": 0.0002576019996922696,
+            "max_wall_s": 0.00032386100065195933
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_land_detected": {
+            "cold_wall_s": 0.0002636539993545739,
+            "count": 114,
+            "later_max_wall_s": 0.001338564999969094,
+            "max_wall_s": 0.001338564999969094
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_local_position_v1": {
+            "cold_wall_s": 0.00022643700140179135,
+            "count": 4922,
+            "later_max_wall_s": 0.005344504999811761,
+            "max_wall_s": 0.005344504999811761
+          },
+          "bag_write:/px4_71/fmu/out/vehicle_status_v1": {
+            "cold_wall_s": 0.00023680100093770307,
+            "count": 200,
+            "later_max_wall_s": 0.00122356999963813,
+            "max_wall_s": 0.00122356999963813
+          },
+          "cache_update:estimator_status_flags": {
+            "cold_wall_s": 0.00037642300048901234,
+            "count": 103,
+            "later_max_wall_s": 0.0017875800003821496,
+            "max_wall_s": 0.0017875800003821496
+          },
+          "cache_update:failsafe_flags": {
+            "cold_wall_s": 0.0005479969986481592,
+            "count": 184,
+            "later_max_wall_s": 0.0013736580003751442,
+            "max_wall_s": 0.0013736580003751442
+          },
+          "cache_update:vehicle_attitude": {
+            "cold_wall_s": 0.00043142899994563777,
+            "count": 9843,
+            "later_max_wall_s": 0.006342889999359613,
+            "max_wall_s": 0.006342889999359613
+          },
+          "cache_update:vehicle_land_detected": {
+            "cold_wall_s": 0.00030993400105217006,
+            "count": 114,
+            "later_max_wall_s": 0.0016309019993059337,
+            "max_wall_s": 0.0016309019993059337
+          },
+          "cache_update:vehicle_local_position": {
+            "cold_wall_s": 0.000846867998916423,
+            "count": 4922,
+            "later_max_wall_s": 0.05456275299911795,
+            "max_wall_s": 0.05456275299911795
+          },
+          "cache_update:vehicle_status": {
+            "cold_wall_s": 0.00042137700074817985,
+            "count": 200,
+            "later_max_wall_s": 0.005849310000485275,
+            "max_wall_s": 0.005849310000485275
+          },
+          "cdr_serialize:/clock": {
+            "cold_wall_s": 6.228699930943549e-05,
+            "count": 24601,
+            "later_max_wall_s": 0.004835825000554905,
+            "max_wall_s": 0.004835825000554905
+          },
+          "cdr_serialize:/gwm/p2/events": {
+            "cold_wall_s": 6.384699918271508e-05,
+            "count": 8500,
+            "later_max_wall_s": 0.006114578998676734,
+            "max_wall_s": 0.006114578998676734
+          },
+          "cdr_serialize:/px4_71/fmu/in/offboard_control_mode": {
+            "cold_wall_s": 0.00013156400018488057,
+            "count": 2633,
+            "later_max_wall_s": 0.001447069000278134,
+            "max_wall_s": 0.001447069000278134
+          },
+          "cdr_serialize:/px4_71/fmu/in/trajectory_setpoint": {
+            "cold_wall_s": 5.6620001487317495e-05,
+            "count": 2633,
+            "later_max_wall_s": 0.004356078999990132,
+            "max_wall_s": 0.004356078999990132
+          },
+          "cdr_serialize:/px4_71/fmu/in/vehicle_command": {
+            "cold_wall_s": 8.733799950277898e-05,
+            "count": 3,
+            "later_max_wall_s": 0.00021694600036425982,
+            "max_wall_s": 0.00021694600036425982
+          },
+          "cdr_serialize:/px4_71/fmu/out/estimator_status_flags": {
+            "cold_wall_s": 0.0001962040005309973,
+            "count": 103,
+            "later_max_wall_s": 0.00035868899976776447,
+            "max_wall_s": 0.00035868899976776447
+          },
+          "cdr_serialize:/px4_71/fmu/out/failsafe_flags": {
+            "cold_wall_s": 0.0001199630005430663,
+            "count": 184,
+            "later_max_wall_s": 0.0003832669990515569,
+            "max_wall_s": 0.0003832669990515569
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_attitude": {
+            "cold_wall_s": 9.183900147036184e-05,
+            "count": 9843,
+            "later_max_wall_s": 0.002473126000040793,
+            "max_wall_s": 0.002473126000040793
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_command_ack": {
+            "cold_wall_s": 0.00018576199909148272,
+            "count": 3,
+            "later_max_wall_s": 0.00010450399895489682,
+            "max_wall_s": 0.00018576199909148272
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_land_detected": {
+            "cold_wall_s": 6.088199916121084e-05,
+            "count": 114,
+            "later_max_wall_s": 0.00028849699992861133,
+            "max_wall_s": 0.00028849699992861133
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_local_position_v1": {
+            "cold_wall_s": 0.00012765899919031654,
+            "count": 4922,
+            "later_max_wall_s": 0.0032752219995018095,
+            "max_wall_s": 0.0032752219995018095
+          },
+          "cdr_serialize:/px4_71/fmu/out/vehicle_status_v1": {
+            "cold_wall_s": 0.00012667500050156377,
+            "count": 200,
+            "later_max_wall_s": 0.0012923169997520745,
+            "max_wall_s": 0.0012923169997520745
+          },
+          "clock_callback": {
+            "cold_wall_s": 0.0002912460004154127,
+            "count": 24601,
+            "later_max_wall_s": 0.006848827000794699,
+            "max_wall_s": 0.006848827000794699
+          },
+          "control_callback": {
+            "cold_wall_s": 0.008088283000688534,
+            "count": 2994,
+            "later_max_wall_s": 0.027466723000543425,
+            "max_wall_s": 0.027466723000543425
+          },
+          "dispatch_validation": {
+            "cold_wall_s": 0.00023220000002766028,
+            "count": 5272,
+            "later_max_wall_s": 0.002572160999989137,
+            "max_wall_s": 0.002572160999989137
+          },
+          "event_publish": {
+            "cold_wall_s": 9.623999903851654e-05,
+            "count": 8500,
+            "later_max_wall_s": 0.005315334001352312,
+            "max_wall_s": 0.005315334001352312
+          },
+          "graph_check": {
+            "cold_wall_s": 0.006343777000438422,
+            "count": 143,
+            "later_max_wall_s": 0.016751952998674824,
+            "max_wall_s": 0.016751952998674824
+          },
+          "graph_json_persistence": {
+            "cold_wall_s": 0.0014538400009769248,
+            "count": 143,
+            "later_max_wall_s": 0.009105322998948395,
+            "max_wall_s": 0.009105322998948395
+          },
+          "json_encode:estimator_status_flags": {
+            "cold_wall_s": 0.00013743100134888664,
+            "count": 103,
+            "later_max_wall_s": 0.0018398779993731296,
+            "max_wall_s": 0.0018398779993731296
+          },
+          "json_encode:event": {
+            "cold_wall_s": 6.468199899245519e-05,
+            "count": 8500,
+            "later_max_wall_s": 0.005865230999916093,
+            "max_wall_s": 0.005865230999916093
+          },
+          "json_encode:failsafe_flags": {
+            "cold_wall_s": 0.00016117300037876703,
+            "count": 184,
+            "later_max_wall_s": 0.0007483949993911665,
+            "max_wall_s": 0.0007483949993911665
+          },
+          "json_encode:vehicle_attitude": {
+            "cold_wall_s": 0.0001338519996352261,
+            "count": 9843,
+            "later_max_wall_s": 0.0033590170005481923,
+            "max_wall_s": 0.0033590170005481923
+          },
+          "json_encode:vehicle_command_ack": {
+            "cold_wall_s": 0.00016074800078058615,
+            "count": 3,
+            "later_max_wall_s": 0.0001343259991699597,
+            "max_wall_s": 0.00016074800078058615
+          },
+          "json_encode:vehicle_land_detected": {
+            "cold_wall_s": 0.00013704900084121618,
+            "count": 114,
+            "later_max_wall_s": 0.0006585939991055056,
+            "max_wall_s": 0.0006585939991055056
+          },
+          "json_encode:vehicle_local_position": {
+            "cold_wall_s": 0.0003012189990840852,
+            "count": 4922,
+            "later_max_wall_s": 0.005444296999485232,
+            "max_wall_s": 0.005444296999485232
+          },
+          "json_encode:vehicle_status": {
+            "cold_wall_s": 0.00015279999934136868,
+            "count": 200,
+            "later_max_wall_s": 0.0009771050008566817,
+            "max_wall_s": 0.0009771050008566817
+          },
+          "message_construct:offboard_control_mode": {
+            "cold_wall_s": 4.666499989980366e-05,
+            "count": 2633,
+            "later_max_wall_s": 0.0025693540010252036,
+            "max_wall_s": 0.0025693540010252036
+          },
+          "message_construct:trajectory_setpoint": {
+            "cold_wall_s": 0.00011615899893513415,
+            "count": 2633,
+            "later_max_wall_s": 0.0042307739986426895,
+            "max_wall_s": 0.0042307739986426895
+          },
+          "message_construct:vehicle_command": {
+            "cold_wall_s": 7.50519993744092e-05,
+            "count": 3,
+            "later_max_wall_s": 9.726299867907073e-05,
+            "max_wall_s": 9.726299867907073e-05
+          },
+          "message_convert:estimator_status_flags": {
+            "cold_wall_s": 0.00016404699999839067,
+            "count": 103,
+            "later_max_wall_s": 0.0007570920006401138,
+            "max_wall_s": 0.0007570920006401138
+          },
+          "message_convert:failsafe_flags": {
+            "cold_wall_s": 0.00026037499992526136,
+            "count": 184,
+            "later_max_wall_s": 0.0004983599992556265,
+            "max_wall_s": 0.0004983599992556265
+          },
+          "message_convert:vehicle_attitude": {
+            "cold_wall_s": 9.424699965165928e-05,
+            "count": 9843,
+            "later_max_wall_s": 0.0025933179986168398,
+            "max_wall_s": 0.0025933179986168398
+          },
+          "message_convert:vehicle_command_ack": {
+            "cold_wall_s": 0.00012199399861856364,
+            "count": 3,
+            "later_max_wall_s": 8.163399979821406e-05,
+            "max_wall_s": 0.00012199399861856364
+          },
+          "message_convert:vehicle_land_detected": {
+            "cold_wall_s": 8.391300070798025e-05,
+            "count": 114,
+            "later_max_wall_s": 0.00038235799911490176,
+            "max_wall_s": 0.00038235799911490176
+          },
+          "message_convert:vehicle_local_position": {
+            "cold_wall_s": 0.0002785840006254148,
+            "count": 4922,
+            "later_max_wall_s": 0.007593705999170197,
+            "max_wall_s": 0.007593705999170197
+          },
+          "message_convert:vehicle_status": {
+            "cold_wall_s": 0.0001983459987968672,
+            "count": 200,
+            "later_max_wall_s": 0.0007303149996005232,
+            "max_wall_s": 0.0007303149996005232
+          },
+          "mission_tick": {
+            "cold_wall_s": 6.415999996534083e-05,
+            "count": 2994,
+            "later_max_wall_s": 0.0055746010002621915,
+            "max_wall_s": 0.0055746010002621915
+          },
+          "publish:offboard_control_mode": {
+            "cold_wall_s": 0.0004054369983350625,
+            "count": 2633,
+            "later_max_wall_s": 0.0032494849983777385,
+            "max_wall_s": 0.0032494849983777385
+          },
+          "publish:trajectory_setpoint": {
+            "cold_wall_s": 0.0002547369986132253,
+            "count": 2633,
+            "later_max_wall_s": 0.0050919740006065695,
+            "max_wall_s": 0.0050919740006065695
+          },
+          "publish:vehicle_command": {
+            "cold_wall_s": 0.0002880040010495577,
+            "count": 3,
+            "later_max_wall_s": 0.000617244000750361,
+            "max_wall_s": 0.000617244000750361
+          },
+          "publisher_prepare:offboard_control_mode": {
+            "cold_wall_s": 0.010753062999356189,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.010753062999356189
+          },
+          "publisher_prepare:trajectory_setpoint": {
+            "cold_wall_s": 0.004703344000517973,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.004703344000517973
+          },
+          "publisher_prepare:vehicle_command": {
+            "cold_wall_s": 0.0026028929987660376,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 0.0026028929987660376
+          },
+          "subscription_callback:estimator_status_flags": {
+            "cold_wall_s": 0.001196130000607809,
+            "count": 103,
+            "later_max_wall_s": 0.004584399999657762,
+            "max_wall_s": 0.004584399999657762
+          },
+          "subscription_callback:failsafe_flags": {
+            "cold_wall_s": 0.001544794999063015,
+            "count": 184,
+            "later_max_wall_s": 0.005613411998638185,
+            "max_wall_s": 0.005613411998638185
+          },
+          "subscription_callback:vehicle_attitude": {
+            "cold_wall_s": 0.0013061509998806287,
+            "count": 9843,
+            "later_max_wall_s": 0.011538779001057264,
+            "max_wall_s": 0.011538779001057264
+          },
+          "subscription_callback:vehicle_command_ack": {
+            "cold_wall_s": 0.0013028230005147634,
+            "count": 3,
+            "later_max_wall_s": 0.0007702610000706045,
+            "max_wall_s": 0.0013028230005147634
+          },
+          "subscription_callback:vehicle_land_detected": {
+            "cold_wall_s": 0.0013355380015127594,
+            "count": 114,
+            "later_max_wall_s": 0.0032353240003430983,
+            "max_wall_s": 0.0032353240003430983
+          },
+          "subscription_callback:vehicle_local_position": {
+            "cold_wall_s": 0.002351377001104993,
+            "count": 4922,
+            "later_max_wall_s": 0.055817058999309666,
+            "max_wall_s": 0.055817058999309666
+          },
+          "subscription_callback:vehicle_status": {
+            "cold_wall_s": 0.0013932179990661098,
+            "count": 200,
+            "later_max_wall_s": 0.007627453998793499,
+            "max_wall_s": 0.007627453998793499
+          },
+          "text_write_flush:estimator_status_flags": {
+            "cold_wall_s": 2.0931000108248554e-05,
+            "count": 103,
+            "later_max_wall_s": 0.00017086600018956233,
+            "max_wall_s": 0.00017086600018956233
+          },
+          "text_write_flush:event": {
+            "cold_wall_s": 2.4574999770266004e-05,
+            "count": 8500,
+            "later_max_wall_s": 0.005264183000690537,
+            "max_wall_s": 0.005264183000690537
+          },
+          "text_write_flush:failsafe_flags": {
+            "cold_wall_s": 2.7737998607335612e-05,
+            "count": 184,
+            "later_max_wall_s": 0.0007514550015912391,
+            "max_wall_s": 0.0007514550015912391
+          },
+          "text_write_flush:vehicle_attitude": {
+            "cold_wall_s": 4.044099841848947e-05,
+            "count": 9843,
+            "later_max_wall_s": 0.005210204000832164,
+            "max_wall_s": 0.005210204000832164
+          },
+          "text_write_flush:vehicle_command_ack": {
+            "cold_wall_s": 7.046800055832136e-05,
+            "count": 3,
+            "later_max_wall_s": 3.0441000490100123e-05,
+            "max_wall_s": 7.046800055832136e-05
+          },
+          "text_write_flush:vehicle_land_detected": {
+            "cold_wall_s": 4.6367000322788954e-05,
+            "count": 114,
+            "later_max_wall_s": 0.00028251999901840463,
+            "max_wall_s": 0.00028251999901840463
+          },
+          "text_write_flush:vehicle_local_position": {
+            "cold_wall_s": 0.00026495599922782276,
+            "count": 4922,
+            "later_max_wall_s": 0.0044633640009124065,
+            "max_wall_s": 0.0044633640009124065
+          },
+          "text_write_flush:vehicle_status": {
+            "cold_wall_s": 4.5771999793942086e-05,
+            "count": 200,
+            "later_max_wall_s": 0.0003004179998242762,
+            "max_wall_s": 0.0003004179998242762
+          },
+          "type_support_prepare:estimator_status_flags": {
+            "cold_wall_s": 7.558999641332775e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 7.558999641332775e-06
+          },
+          "type_support_prepare:failsafe_flags": {
+            "cold_wall_s": 6.7189994297223166e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 6.7189994297223166e-06
+          },
+          "type_support_prepare:offboard_control_mode": {
+            "cold_wall_s": 6.99600059306249e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 6.99600059306249e-06
+          },
+          "type_support_prepare:trajectory_setpoint": {
+            "cold_wall_s": 6.102998668211512e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 6.102998668211512e-06
+          },
+          "type_support_prepare:vehicle_attitude": {
+            "cold_wall_s": 7.308999556698836e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 7.308999556698836e-06
+          },
+          "type_support_prepare:vehicle_command": {
+            "cold_wall_s": 5.408999641076662e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 5.408999641076662e-06
+          },
+          "type_support_prepare:vehicle_command_ack": {
+            "cold_wall_s": 4.842999260290526e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 4.842999260290526e-06
+          },
+          "type_support_prepare:vehicle_land_detected": {
+            "cold_wall_s": 6.54399991617538e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 6.54399991617538e-06
+          },
+          "type_support_prepare:vehicle_local_position": {
+            "cold_wall_s": 8.281000191345811e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 8.281000191345811e-06
+          },
+          "type_support_prepare:vehicle_status": {
+            "cold_wall_s": 6.472999302786775e-06,
+            "count": 1,
+            "later_max_wall_s": null,
+            "max_wall_s": 6.472999302786775e-06
+          }
+        },
+        "status": "passed",
+        "trace": {
+          "calls": {
+            "bag_write:/clock": 24601,
+            "bag_write:/gwm/p2/events": 8500,
+            "bag_write:/px4_71/fmu/in/offboard_control_mode": 2633,
+            "bag_write:/px4_71/fmu/in/trajectory_setpoint": 2633,
+            "bag_write:/px4_71/fmu/in/vehicle_command": 3,
+            "bag_write:/px4_71/fmu/out/estimator_status_flags": 103,
+            "bag_write:/px4_71/fmu/out/failsafe_flags": 184,
+            "bag_write:/px4_71/fmu/out/vehicle_attitude": 9843,
+            "bag_write:/px4_71/fmu/out/vehicle_command_ack": 3,
+            "bag_write:/px4_71/fmu/out/vehicle_land_detected": 114,
+            "bag_write:/px4_71/fmu/out/vehicle_local_position_v1": 4922,
+            "bag_write:/px4_71/fmu/out/vehicle_status_v1": 200,
+            "cache_update:estimator_status_flags": 103,
+            "cache_update:failsafe_flags": 184,
+            "cache_update:vehicle_attitude": 9843,
+            "cache_update:vehicle_land_detected": 114,
+            "cache_update:vehicle_local_position": 4922,
+            "cache_update:vehicle_status": 200,
+            "cdr_serialize:/clock": 24601,
+            "cdr_serialize:/gwm/p2/events": 8500,
+            "cdr_serialize:/px4_71/fmu/in/offboard_control_mode": 2633,
+            "cdr_serialize:/px4_71/fmu/in/trajectory_setpoint": 2633,
+            "cdr_serialize:/px4_71/fmu/in/vehicle_command": 3,
+            "cdr_serialize:/px4_71/fmu/out/estimator_status_flags": 103,
+            "cdr_serialize:/px4_71/fmu/out/failsafe_flags": 184,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_attitude": 9843,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_command_ack": 3,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_land_detected": 114,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_local_position_v1": 4922,
+            "cdr_serialize:/px4_71/fmu/out/vehicle_status_v1": 200,
+            "clock_callback": 24601,
+            "control_callback": 2994,
+            "dispatch_validation": 5272,
+            "event_publish": 8500,
+            "graph_check": 143,
+            "graph_json_persistence": 143,
+            "json_encode:estimator_status_flags": 103,
+            "json_encode:event": 8500,
+            "json_encode:failsafe_flags": 184,
+            "json_encode:vehicle_attitude": 9843,
+            "json_encode:vehicle_command_ack": 3,
+            "json_encode:vehicle_land_detected": 114,
+            "json_encode:vehicle_local_position": 4922,
+            "json_encode:vehicle_status": 200,
+            "message_construct:offboard_control_mode": 2633,
+            "message_construct:trajectory_setpoint": 2633,
+            "message_construct:vehicle_command": 3,
+            "message_convert:estimator_status_flags": 103,
+            "message_convert:failsafe_flags": 184,
+            "message_convert:vehicle_attitude": 9843,
+            "message_convert:vehicle_command_ack": 3,
+            "message_convert:vehicle_land_detected": 114,
+            "message_convert:vehicle_local_position": 4922,
+            "message_convert:vehicle_status": 200,
+            "mission_tick": 2994,
+            "publish:offboard_control_mode": 2633,
+            "publish:trajectory_setpoint": 2633,
+            "publish:vehicle_command": 3,
+            "publisher_prepare:offboard_control_mode": 1,
+            "publisher_prepare:trajectory_setpoint": 1,
+            "publisher_prepare:vehicle_command": 1,
+            "subscription_callback:estimator_status_flags": 103,
+            "subscription_callback:failsafe_flags": 184,
+            "subscription_callback:vehicle_attitude": 9843,
+            "subscription_callback:vehicle_command_ack": 3,
+            "subscription_callback:vehicle_land_detected": 114,
+            "subscription_callback:vehicle_local_position": 4922,
+            "subscription_callback:vehicle_status": 200,
+            "text_write_flush:estimator_status_flags": 103,
+            "text_write_flush:event": 8500,
+            "text_write_flush:failsafe_flags": 184,
+            "text_write_flush:vehicle_attitude": 9843,
+            "text_write_flush:vehicle_command_ack": 3,
+            "text_write_flush:vehicle_land_detected": 114,
+            "text_write_flush:vehicle_local_position": 4922,
+            "text_write_flush:vehicle_status": 200,
+            "type_support_prepare:estimator_status_flags": 1,
+            "type_support_prepare:failsafe_flags": 1,
+            "type_support_prepare:offboard_control_mode": 1,
+            "type_support_prepare:trajectory_setpoint": 1,
+            "type_support_prepare:vehicle_attitude": 1,
+            "type_support_prepare:vehicle_command": 1,
+            "type_support_prepare:vehicle_command_ack": 1,
+            "type_support_prepare:vehicle_land_detected": 1,
+            "type_support_prepare:vehicle_local_position": 1,
+            "type_support_prepare:vehicle_status": 1
+          },
+          "capacity": 500000,
+          "complete": true,
+          "overflow": 0,
+          "records": 256518
+        },
+        "trace_sha256": "b8c402a5c3bd62e998ed147b87b92f11659be9b2b021404dd59ccf7073617727",
+        "trajectory_publish_gap_sim_s": 0.06799999999999784
+      },
+      "unchanged_non_yaw_fields_differences": [],
+      "deliberate_changed_fields": [
+        "analysis_inputs",
+        "evaluation_finalized",
+        "evaluator_sha256",
+        "flight_acceptance",
+        "historical_reanalysis",
+        "qualification_credit",
+        "sample_evaluator_sha256",
+        "yaw_evaluator_sha256",
+        "yaw_ownership"
+      ],
+      "sensor_metrics": {
+        "raw_frames": 3297,
+        "raw_bytes": 4051353600,
+        "delivered_hz": 30.303338348310493,
+        "source_gap_max_sim_s": 0.036,
+        "processed_hz": 9.999593098958334,
+        "observations": 984,
+        "observation_age_max_sim_s": 0.08399999999999963,
+        "state_mismatch_max_s": 0.012,
+        "state_correlation": {
+          "ambiguous": 0,
+          "distinct_matched_sources": 984,
+          "loss_or_full_parity_claim": false,
+          "matched": 984,
+          "reused": 0,
+          "unmatched": 0
+        },
+        "failures": [
+          "control_acceptance"
+        ]
+      }
+    }
+  ],
+  "input_sizes": [
+    {
+      "run_id": "20260912T113430Z-p3-flight-0dc41a18",
+      "total_input_bytes": 4148864486,
+      "input_file_sizes": {
+        "rootfs/log/2026-09-12/11_34_42.ulg": 32992395,
+        "ros-events.jsonl": 15679076,
+        "rosbag/metadata.yaml": 3472,
+        "rosbag/rosbag_0.db3": 7270400,
+        "sensor-artifacts.json": 1318,
+        "sensors/depth-index.jsonl": 1338679,
+        "sensors/depth.bin": 4032921600,
+        "sensors/gazebo-source-headers.jsonl": 642969,
+        "sensors/p3_fastdds.xml": 786,
+        "sensors/p3_sensor_bridge.yaml": 531,
+        "sensors/p3_sensors.yaml": 931,
+        "sensors/p3_validation.yaml": 1163,
+        "sensors/sensor-events.jsonl": 12305233,
+        "sensors/sensor-ready.json": 127,
+        "sensors/sensor-result.json": 403,
+        "summary.json": 42448,
+        "timing-trace.jsonl": 45662955
+      },
+      "depth_bytes": 4032921600,
+      "report_hashes": {
+        "p2-build-receipt.json": "cfd84c27795b0366fe58802549066f02ce4088ba90f416c86d13da9ba5641210",
+        "p3-smoke-window-diagnostic.json": "79c20455bd3f5f6e2f0f7486b7f9c3b9e77938ef4d86bf515b4e584523d44cb8",
+        "sensor-artifacts.json": "34834a00b52410c83c8da1aa4267fbe13bb03c354940f4db502e6d1c3ba5c153",
+        "ros-graph.json": "1d5b380e1f03cbc8a6ffd192f8ca4277efc77797bfe31defe6f44593daa6ec9e",
+        "p3-r1-historical-adjudication-v2r1.json": "79b6661b40b0fe1e107c9c3ae15f02aa76dd6a621604435976eb4dfc95ac4ed1",
+        "topic-contract.json": "62a4732baa604474e03603c119d06a1b4a3af0684244a13838fe59d1020fbf08",
+        "p3-r1-quaternion-reconstruction-diagnostic-v1.json": "0948c0aff587c27f9d769cecd381c72df0b3101278b310206ce64147d0948440",
+        "p2-offline-evaluation.json": "f5e018fdefed0d8da8279010fda1766de3ed7568fc02e7dbe3b09cda66e82ac5",
+        "p3-flight-profile.json": "45284599c50d7581e48c90f080919592cd7c3dca659fa41a9ced01941ea93f8e",
+        "p3-r1-native-record-reconstruction-v1.json": "15f833f6f8bd62015831ef00d016cca820cff01eb3c1cec88a7ba5b83524ac6e",
+        "p3-r1-historical-adjudication-v2.json": "3aa9a6f492cbe82d3d737db2ac32b704a3225898190e67ca00c56fe2ee6e5696",
+        "controller-result.json": "540e0e501f6878127f733929573081ad2b93f57bc9ef4fcd9459a3eba8acfcf5",
+        "summary.json": "7d217b0ed346788c9b9937c210717536e8c917425910ad34d711b78859710983",
+        "p3-coexistence-prerequisite-failure.json": "dbbfa9d18ceddf9c6259e54c06000cd39a58f253310050b41eb3e8291160ea87",
+        "p3-coexistence-evaluation.json": "4d489789058aa791a0abb000903b65063c17f40d4f6ff8a2b44058928b14c031",
+        "p3-r1-original-evaluator-reproduction.json": "f5e018fdefed0d8da8279010fda1766de3ed7568fc02e7dbe3b09cda66e82ac5"
+      }
+    },
+    {
+      "run_id": "20260912T141235Z-p3-flight-778e3f60",
+      "total_input_bytes": 4371651598,
+      "input_file_sizes": {
+        "clock-bridge.log": 233,
+        "controller-result.json": 273582,
+        "dds-agent.log": 41563,
+        "ekf2-status.txt": 201,
+        "endpoints.txt": 3636,
+        "gazebo-topics.txt": 1897,
+        "gwm_p3_flight.sdf": 3045,
+        "p2-build-receipt.json": 7198,
+        "p2_clock_bridge.yaml": 184,
+        "p2_control.yaml": 2069,
+        "p2_timing.yaml": 369,
+        "p3-build-receipt.json": 2289,
+        "p3-flight-profile.json": 585,
+        "p3-prerequisites.json": 691,
+        "processes.txt": 3251,
+        "px4-console.log": 118683,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/10282e98_04_0.cache": 168792,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/10282e98_04_0.meta": 16,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/4aef6b91_00_0.cache": 837,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/4aef6b91_00_0.meta": 16,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/8357267e_05_0.cache": 29194,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/8357267e_05_0.meta": 16,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/ba651556_01_0.cache": 806638,
+        "qgc-cache/QGroundControl/QGroundControl/QGCCompInfoCache/ba651556_01_0.meta": 16,
+        "qgc-cache/QGroundControl/QGroundControl/QGCMapCache/qgcMapCache.db": 53248,
+        "qgc-cache/QGroundControl/QGroundControl/QGCMapCache/qgcMapCache.db-shm": 32768,
+        "qgc-cache/QGroundControl/QGroundControl/QGCMapCache/qgcMapCache.db-wal": 0,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/004509ee069bceda5e0eda5daf1db207023e32da.qmlc": 10440,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/02da439b2a20ff47d4ec268c2ecd33bb6ae4e805.qmlc": 6136,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/03f4c6b58d37c94f93571dc86644441a7bc6f341.qmlc": 24408,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/040d1ff65c9b20a0e6d6bed8e39f330bd1db3b66.qmlc": 1572,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/05fe45bb4c2e31bca0a1ab80ec1135c550aeee64.qmlc": 19596,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/08850eb82a3d7254c7043c89bbbc6c1fea55e142.qmlc": 39400,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/09d8d3a6e00495a3dcc27d5d7e92593262c29a54.qmlc": 2696,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/0b32f95484ddeac686fa2c75d46a6a4e821af557.qmlc": 11620,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/0cf953c1f182c010037a2db97c87aa764db2036b.qmlc": 32864,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/0e2ea9c78353e423501d9a90f605f94a472d984f.qmlc": 580,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/0ee0de93e38d3381f7599e6c9c5423d2e11b5f47.qmlc": 8604,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/0ef7d87a1bc95c949e60ce4abf3c22aa82537c87.qmlc": 45760,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/10ffcf00f6a6828e3b8319d7403c3d0a2684ae77.qmlc": 5656,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/11116a483d4535eaf7e861ad3f5b870b9381a78d.qmlc": 9836,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/126610f16d0b7aa4fb97fe4e4d5fabb4dd336b15.qmlc": 2000,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1339c70ec5b90655434d42fa4d45470c0e7c002a.qmlc": 1508,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/134ceb94c43d750c39231e59d802d70f1179f56f.qmlc": 16816,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/13b87cb796a0fe723ea8a6e7ac6f7eaae3976e0e.qmlc": 1708,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/14ceec9b68cb7c0fc0220c2752e8bf96e0060e9b.qmlc": 17008,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/15a193c7aa8a8fa92981095b00dbddc2835f113e.qmlc": 7028,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/18718c977ef3f25fb0272b41fe63206ca1d508d4.qmlc": 3264,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1929bb386bd9718ed0cba666bc6dffb60a77a204.qmlc": 19832,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/198bb13f3b964b01786b6ebb6d6bd2cac144fa31.qmlc": 4316,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/19e7bb444527403965b991b726f2307fb4f8555a.qmlc": 8252,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1c3ea49be4149295c0577c73e5ac5d5a6fd1c208.qmlc": 30568,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1c84bd9878acfe16ef35d58f5ed83acbe08c6e9c.qmlc": 1904,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1cf5b5a03fc9456762c07d7561523369f9cbc011.qmlc": 3176,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1d758c5a3728a96ef18f2d09b297c3e7ca9ca92b.qmlc": 9668,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1ee4233b2ec4f26af2182ea28db004b2d0a2419c.qmlc": 20224,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/1fd117465396a6744abb253efa4931206d4fb3ed.qmlc": 18760,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/2080298f50bb9b975bff67d8ffe637f50c718c0e.qmlc": 24168,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/21d13d76ff04f2ae8dcef2cc62efd946f828cb45.qmlc": 12360,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/224a98be56327a436afb35da43fb0a75b595cf73.qmlc": 596,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/234a18700ef3f3fea53b25f64c94a071278bac29.qmlc": 1704,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/2558930c9c03af9304171f1a156f46051415fceb.qmlc": 4488,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/2be94c1b3626647dde83f370bd4c9103eff015b1.qmlc": 11888,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/31a5b878cdd8edc6c5376504a90dc0c32930e8c5.qmlc": 596,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3559533b53c9103d7c095ae70f85b042d15970af.qmlc": 14396,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/369b4856c4fb6cccd6855c377e1c0d63a4d6a47a.qmlc": 2356,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/372ccb22c81b6c332d45849ed78415223ccffe45.qmlc": 9096,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3974365b04b7031c7e22da70e05fa090e7e46bbd.qmlc": 15636,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3c24f90433e2c1e0748ad1a4e4c6df9abd8f2250.qmlc": 6616,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3d28e081d86970eec5e9d5b3f500eb1cd07c173e.qmlc": 2844,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3d2d594a7803d62cbe93a526730e11f8cf53dfe4.qmlc": 9264,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3d46f2f738ce1dcc88f67d233f70c0e299300dc9.qmlc": 2260,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3db33b8b44da192d62e0f79349e09733de7e4bc6.qmlc": 25932,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3e744c15a88a77981202189b474813389419e529.qmlc": 16272,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/3fc5737811c4f0388dd19a10305b1f441733c3a9.qmlc": 1740,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/403a9ee1a939b97f156c72fc773d8f9ca868f3a6.qmlc": 72332,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/426028286dcad56462d97fafa787930ecbdeb82b.qmlc": 1516,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/44d694fde00f21eba4b01ccc0a427aa986114433.qmlc": 1636,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/44e90ac7cb5a8a8fdcc0871ab738fe4765e74b92.qmlc": 6028,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/460789ad97eccd852c1b8e09eb67c3fd65c10c14.qmlc": 8452,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/47b7161e43fb8951d2e5f48c1d2eb85dbff26476.qmlc": 11532,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/49a7f5322202208b9dfef993b273b1cd909039cd.qmlc": 1248,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/4a8452cdf29753caed100ebc968782826cff429a.qmlc": 3216,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/4b8fc86745d9bcfea49128864894d8d82f216ef7.qmlc": 4744,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/4c8c4698d8e348263eadb32dd593a208749fd14e.qmlc": 6380,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/4d37b7e53f1548c4b719f06b31b1305a16ce2f60.qmlc": 8516,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/506b3bc1ab6d39058d21b391349e53b59ee21dc4.qmlc": 24660,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/50b83b10ab7df101bb27175c09356ef7b9c8e0bb.qmlc": 9156,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/52dcaff60815c629aa61b6fe46dba43919c8e1aa.qmlc": 1240,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/533260bcf96adcd5148217e7710997d267c77ad1.qmlc": 16372,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/557a550af87328847317e3f24b86e79d6f0a70e3.qmlc": 5400,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/558dd192111dc8ee51eeeb54c8d36e97725224d1.qmlc": 1624,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/576e1682f388b7787fe54c78143104a7caa28675.qmlc": 7516,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/590add7bfd4d17c210ee4861654e57aa00c980d9.qmlc": 4032,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/5a99423a7c0ba2be24595e1516c4cc445a0a922e.qmlc": 4772,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/5ca06c2bd64751d08685ea5119cf0497e56a9c45.qmlc": 10432,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/5cb4b0f33fa5bfd9ac2179917bde6802ac74cc92.qmlc": 1148,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/5e9dd9cba0f180c272d9f90d2f9d8e0e212f3fb4.qmlc": 17152,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/5ef688bd0e6fd64024bf8c9c240f8badbf0959ca.qmlc": 9732,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/60f3b0814aa5281a3f6e55ef43022dce19915b9a.qmlc": 10740,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/63df941c76ca8d32b7f09a852d36e08e730ed4be.qmlc": 25780,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/64e2a3d77e1e54de3677bac3db2fe51109ab11e5.qmlc": 1852,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/670b2d3521d40e84a8a0a351cd69da62f060e6cc.qmlc": 3272,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/67b41c5f2f04633fcddfe001220ab9e66423a850.qmlc": 17480,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/6c11c19f6f9b4ca2381a9b3a06b99c45bc59c1f8.qmlc": 3284,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/6c2b37d5c520a966de2fc55850aa245b657989b5.qmlc": 13312,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/6c48cf799631550172c4feb4efc9f07a6767f4f8.qmlc": 3284,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/6e61ce255ffe63c649058660333f3bd99aa7f6eb.qmlc": 1452,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/708d8cd98efd851e95addb22085ece14dbeb5017.qmlc": 1356,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/70a0ac73ada70217b87170378ef06cbbf737aeb0.qmlc": 17772,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/74c58689c94be72ab6a9e588adad6be94ff28f81.qmlc": 8668,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/756af3e91f6e0fec76504b51eb6b7691c528a96f.qmlc": 6328,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/7667b6ba93f2bd35460eb2136e8b37069e6aadfe.qmlc": 33500,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/767c832cb6fe51d63f978b18bad640b707878e80.qmlc": 564,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/76ecf0bb62d172768acaabb436c04a6bc2561215.qmlc": 8812,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/7b957d2e6fd55169af4ae9af3f153b6278131989.qmlc": 2688,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/7c7b1fc65752279d01c9fd8eca9ca55305eba01e.qmlc": 26132,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/7d96e6df012243720658bda30cea75a9ab2781cf.qmlc": 26564,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/7edfb24cb65684cd2caa7ecbf8e22f5cf662078f.qmlc": 8244,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/82617052359b9d4d0d71904f30c19bf5aa64c063.qmlc": 7940,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/82e53b18cd09077d49a0ebc4945f7479b4216f28.qmlc": 3360,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/84f0fedf1f1669dcff7aa79f73213a2178385504.qmlc": 21620,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/8584fecf8c45ea26b0f06089ed49d26fbd16cce1.qmlc": 9008,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/86525d06199a8ca297a341595c3e8c267321da65.qmlc": 7384,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/8a0d280036b44d0d80ef1e1021330357d1aa9c78.qmlc": 7808,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/8bbb37b45dba3ee7fcd2d11da5c56e437a86e7ed.qmlc": 3276,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/8d16082c33b1ffb443af95ed3af7a39d9f6c5b17.qmlc": 3752,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/91105f81512093171586d7d2dabbccf9970b5ad1.qmlc": 9420,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/91d4c32748e5b5a712ffd982f0037708c61a9e0b.qmlc": 81820,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/92269a2bd1c3c7c5f8287c319cb64ef74c2cec9f.qmlc": 29776,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/92c1eeaad10b76bc3d304e7f1db193e156f57993.qmlc": 2500,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/94523c9c556dd411a15805688cb78d47cf606e9f.qmlc": 1964,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/95ce3ee0e1608d5c2ffcf98a818dfbc315e54eb3.qmlc": 6256,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/95d85c504fcf6d0833893c090322cd77c3d36093.qmlc": 5884,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/983772c0c6b8e24db1439fe7e36ef29978cd86b8.qmlc": 26100,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/9c489f0afa849925a9edbb8b14c7380161088d45.qmlc": 14228,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/9d1a283d097a90bf40ffead02673217c3de85624.qmlc": 10300,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/9fced9bec16267ed79519f145f994729272f34e5.qmlc": 5484,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/a2eeeb58e7fef096cb090c5c369c035f0729ac00.qmlc": 12172,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/a2f61469c41ab28b5f99a08d6732b2c2e7b51fec.qmlc": 6872,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/a4daed49541120db1579fd5d99c47822d0332d6a.qmlc": 7916,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/acdb6b71da0bd5a344291730414a27b689c64993.qmlc": 1140,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/adc00c5b1f8219356967bb982f2a1ead015bfb24.qmlc": 5852,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b074924b841930c55f6214d861b1540362f1baa0.qmlc": 11104,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b1b1d214b1dd5b9c26721f13b3157d7fa331b206.qmlc": 45660,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b345101c6ee3787ca86fc6c37e7ebcbd47bfc2ee.qmlc": 13196,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b79e5fffcfbfb289d2be8ef95edb25b6e2746047.qmlc": 8060,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b7e3c8146c3a9d2900d0bba1a33d4f4b504e1994.qmlc": 860,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/b9485bf3cf6541141d5ed139ffc975ff6630ed68.qmlc": 20416,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ba6f727e33bd7c62ea005421a3e4973b617facc9.qmlc": 12224,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/bb1ff1c600aa61a11bef059afb6b036f0096d1f2.qmlc": 2572,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/bd8246672439009bb2161dd224528aa682c00a96.qmlc": 9808,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/bdc7556e7b1037081b0e717c6be2d4abcc938d1d.qmlc": 6180,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/bf320159a85e6b95ad2a3e06309c16a15f783fd5.qmlc": 18600,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c21f89155265108d66dff8435880eb3653d1bc2d.qmlc": 58460,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c35470a14b1b0e2b5debfe5dc88e4fb2293e8659.qmlc": 30592,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c3a20668a819b164c8296c14a406a954d0f20f58.qmlc": 59348,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c6b691233d8f4ae56ec966a2b42a1204fd360347.qmlc": 2960,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c7890db795c095dc68355ebc3dd3f59e3845cfee.qmlc": 9220,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c813fad3348e314c34eed249d495f8584bf0389f.qmlc": 2776,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/c8f7c1a238a83bb67c3fbb216517187097b4b8d4.qmlc": 13132,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/cc65211e13fa480659b75020ce684ba14c4d4585.qmlc": 12512,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ce0a616ae8af809bcabccbe059fabff039ed77e7.qmlc": 23372,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d0008d4b390386df702d37d2124b8d2bd7735755.qmlc": 4768,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d01f58fcf9b98ae1ed812e81202a2ab816f38f0d.qmlc": 2068,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d0d32c636469736901ed61afb1b94b8b422f347e.qmlc": 2184,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d11330955205475ef453915b00f99eedf41e02b0.qmlc": 54648,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d19ec1b15ebca6c60981a0a8ccbaa6e5739495c7.qmlc": 22312,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d23e5a4f0e0a8ab3a0b1b4cae875ec98f9e31c45.qmlc": 8968,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d3daf469c7caf7ec87e4cadd109d2045015c32e3.qmlc": 2332,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d447682e638d3004478e072d66fbb96de66ec01c.qmlc": 22964,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d4c60c7ad1779d9429c1559e8b8ef524f601b329.qmlc": 60724,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d546904fd9aa50a6fcfd031a979248259161794f.qmlc": 21888,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d5a4b2d680c2a7a9cf7d39c15164cb579e15d543.qmlc": 64468,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d6a1c280d411a89e7f06c0c956409a321a15d3bc.qmlc": 15164,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/d8ffa85862282b4e0819821ed4e064498d950a5f.qmlc": 12564,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/da25a134d27561f37075f8023dc33ca9d98f04de.qmlc": 2692,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/da7e7a90a353c8057ca98387ef36218ff29730d0.qmlc": 5900,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/db6b761073ca2cfc7becc41541807ba4677c06cb.qmlc": 3748,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/dc8ded8938435276267335dc6780be713891a936.qmlc": 2960,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/dc979646419954ca10445a04ce26b911695d9945.qmlc": 15188,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/de7b3538b9b3bece181500956d9667c0c4666573.qmlc": 2084,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e12a8b24b81400c0e3e066011fa64e541211a5d4.qmlc": 9276,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e1d85c687444723f4cebfd2557ee925281892d34.qmlc": 5980,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e4be2a2c30e7301abaf9a2195283f68ef06594ce.qmlc": 1104,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e6c8ec9c14e3543d7c929a55677d78194fe8b549.qmlc": 11868,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e6d2887da7829d963cfbd80cc226be4f62d23cc8.qmlc": 27880,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e75c9fabf9658edd9c5aa2edbc794729bf3eea95.qmlc": 8052,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/e7e910284a664024474ba1a3faf5e3c34217205c.qmlc": 7388,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ea4bba3c3af24b56ac3b549d1f8a863f3cf60b6c.qmlc": 9456,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/eabc83f8d64b851e8c03aa1241530bdb6128d344.qmlc": 3416,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ebfc16d3e5e2f0e1abc89d7242eccee5d5b87ed2.qmlc": 8188,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ec3f3de683d308d708bd8507176f853fc4fba084.qmlc": 10652,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ec56543a997197d1e92029dd94c0dd6152053c01.qmlc": 17504,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f1a9b1d343fbe9d73c3b65357b5921477cfd87e4.qmlc": 3536,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f1e41942ac7d873bb86ed70238defbd7a80953f6.qmlc": 8468,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f1fa97ce0d2d9c69a542a3d834fa5b8be0e01135.qmlc": 9204,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f21aee9522314179d2b58088e567a722c1639056.qmlc": 9204,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f377afc528edf556101569483f843924c5d02232.qmlc": 5012,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f3b818d13696a309ca18be681535f56a5217b3a1.qmlc": 14492,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f5388a4e9892cd8cc7bb54e37d9205667cdda7c3.qmlc": 19308,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f5c2227c04073dbe7d5bf030933e736b8ac213d3.qmlc": 6412,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/f72bc8b4cb2a3ee64fcd5cae6ab723c865131c37.qmlc": 4752,
+        "qgc-cache/QGroundControl/QGroundControl/qmlcache/ff65ce181a1f76138e999984a7de57d3f2968724.qmlc": 5380,
+        "qgc-cache/gstreamer-1.0/registry.x86_64.bin": 862310,
+        "qgc-cache/mesa_shader_cache/04/5a0ea26d5d2c701f5e42c5535a220b42b36374": 602,
+        "qgc-cache/mesa_shader_cache/1e/058f526640d35e48adda5911e282813d97a693": 601,
+        "qgc-cache/mesa_shader_cache/8c/6b84d0da93ccb74df1fccc04e9e7f45fc507af": 599,
+        "qgc-cache/mesa_shader_cache/a1/6a7cf008f64ae9a78277c51c8245c798d3ff46": 436,
+        "qgc-cache/mesa_shader_cache/fa/657af3350b1c8c3260a0d4ce1de61beeaf954b": 413,
+        "qgc-cache/mesa_shader_cache/index": 1310728,
+        "qgc-cache/mesa_shader_cache/marker": 0,
+        "qgc-config/QGroundControl/QGroundControl/ParamCache/72_1.v2": 44888,
+        "qgc-config/QGroundControl/QGroundControl.ini": 896,
+        "qgc-monitor.log": 39395,
+        "rootfs/dataman": 1208528,
+        "rootfs/gz_env.sh": 1371,
+        "rootfs/log/2026-09-12/14_13_12.ulg": 33472248,
+        "rootfs/parameters.bson": 455,
+        "rootfs/parameters_backup.bson": 455,
+        "ros-controller.log": 273755,
+        "ros-events.jsonl": 103097335,
+        "ros-graph.json": 3492,
+        "rosbag/metadata.yaml": 3473,
+        "rosbag/rosbag_0.db3": 81805312,
+        "sensor-adapter.log": 0,
+        "sensor-artifacts.json": 1688,
+        "sensor-bridge.log": 432,
+        "sensor-source-probe.log": 0,
+        "sensors/depth-index.jsonl": 1806850,
+        "sensors/depth.bin": 4051353600,
+        "sensors/gazebo-source-headers.jsonl": 1109222,
+        "sensors/p3_fastdds.xml": 786,
+        "sensors/p3_sensor_bridge.yaml": 531,
+        "sensors/p3_sensors.yaml": 986,
+        "sensors/p3_validation.yaml": 1163,
+        "sensors/sensor-events.jsonl": 35048203,
+        "sensors/sensor-ready.json": 245,
+        "sensors/sensor-result.json": 554,
+        "sensors/sensor-startup.json": 439,
+        "summary.json": 337723,
+        "timing-trace.jsonl": 53706221,
+        "tmp/FlightDataZHeGIR.mavlink": 2273153,
+        "tmp/QGC.version.txt": 0,
+        "tmp/actuators.json.xz": 2784,
+        "tmp/all_events.json.xz": 16972,
+        "tmp/component_general.json.xz": 364,
+        "tmp/events_summary.json": 0,
+        "tmp/parameters.json.xz": 69804,
+        "tmp/parameters_summary.json": 0,
+        "tmp/qgc-0df946c7a211a30944bf3d6c8fb74ba330ff57d8.lock": 104,
+        "tmp/releases": 0,
+        "topic-contract.json": 10843,
+        "versions.lock.yaml": 36250
+      },
+      "depth_bytes": 4051353600,
+      "report_hashes": {
+        "p2-build-receipt.json": "66a67971c715739f58001a1d8c592bbd67ea73f7ace83756634c5da0af677c9e",
+        "runtime-finalized.json": "c5cfe04d5c8deaa044368ef10984d47cc19293ed47d9dfdec39d25c25c7087fb",
+        "sensor-artifacts.json": "eb0721a5c842c31bf48dfab3f7e8d0f62e8234bfba2c4f448400b4d064e6201c",
+        "ros-graph.json": "1d5b380e1f03cbc8a6ffd192f8ca4277efc77797bfe31defe6f44593daa6ec9e",
+        "topic-contract.json": "62a4732baa604474e03603c119d06a1b4a3af0684244a13838fe59d1020fbf08",
+        "p2-offline-evaluation.json": "760ba29201140f2131ea65b11a983f6e0afa5eb79210073d83dd160de2634b5d",
+        "p3-flight-profile.json": "45284599c50d7581e48c90f080919592cd7c3dca659fa41a9ced01941ea93f8e",
+        "p3-build-receipt.json": "214f1149b3152e5be232baf3465507d07c4ca7ba23f057ce301909e808c5f355",
+        "controller-result.json": "3263048d91a49a4c887882fc7f78a58e8d0d82c01d58592654932e8fa6111b7b",
+        "summary.json": "2a74607cf18c8e76b36c51822cba80e87a0dc2674e1b5cd9a54aac4d21c9952c",
+        "p3-prerequisites.json": "06b8e70e3a2be1eb90ff9b0ccbf0226944733790b0bdcb966e89607be72ac337",
+        "p3-coexistence-evaluation.json": "fbfe3cd54cad37a4910bd91dd06e62bedb228eac39a171418669ccbf4d148ed6"
+      }
+    }
+  ],
+  "retained_artifacts": {
+    "r1-source-ab2f2e2.tar": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/r1-source-ab2f2e2.tar",
+      "sha256": "fb96d4987e00d15dd66d880e9db9e012b7102a6b9f3ad414e10dd558b99e4da2"
+    },
+    "baseline-adaptations.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-adaptations.json",
+      "sha256": "a74e07badbc836cae7ef076230434f5feabbe649f5c390cc3e212760c6dd5a5c"
+    },
+    "baseline-full-profile.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/baseline-full-profile.json",
+      "sha256": "ffc29a96693d73e49fda31e87d7ee0b4d84dc6e0ef14e3e58f69af0b17f4a3c8"
+    },
+    "window-baseline-profile.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/window-baseline-profile.json",
+      "sha256": "c351a6cbcc8a9c2e6612b2389467612fc7d872dc6a26d28f075fc67844df79f8"
+    },
+    "performance-only-source-manifest.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/performance-only-source-manifest.json",
+      "sha256": "7f3f1afff3247b2a53ad1d4ec20627b2df591e14c30ecfbe063f32d34d6c5a14"
+    },
+    "performance-only-differential.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/performance-only-differential.json",
+      "sha256": "b1ffb84cd1e66978d8edfb8c15b6ff494b138cd6c10b8655a49df1f0e1a9224f"
+    },
+    "input-size-and-retention.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/input-size-and-retention.json",
+      "sha256": "5866fc175bd69be083f7cd83c8f62184ec6f57b7b83c21a3c37b4a04a0922d21"
+    },
+    "binary-trace-inventory.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/binary-trace-inventory.json",
+      "sha256": "6ff3921ba1b5b5f28df9212967944b34f5d89f86e0efd4b2f1e2437e677ea176"
+    },
+    "source-build-audit.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/source-build-audit.json",
+      "sha256": "8ff191e796e41cbd30cb1ea428bde25819fe30a23f745ab9574026b1440d5102"
+    },
+    "recording-observability.json": {
+      "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/recording-observability.json",
+      "sha256": "7cbc73304502c5c25940280e35c3441e239feb7b16c5a0b437e90aa7e51d7768"
+    }
+  },
+  "instrumentation_scope": "docs/v3_sim_p3_yaw_provenance_contract.md; requires separate approval before PX4 modification/rebuild"
+}

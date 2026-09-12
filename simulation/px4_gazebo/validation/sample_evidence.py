@@ -184,21 +184,61 @@ def causal_asof(rows, timestamp_us, freshness_s, topic):
     return selected
 
 
+class _FrozenDict(dict):
+    """JSON-compatible immutable owned value; nested arrays are tuples."""
+    def _deny(self, *args, **kwargs):
+        raise TypeError('Validated evidence is immutable')
+    __setitem__ = __delitem__ = clear = pop = popitem = setdefault = update = __ior__ = _deny
+
+
+def _freeze(value):
+    if isinstance(value, dict): return _FrozenDict({k:_freeze(v) for k,v in value.items()})
+    if isinstance(value, (list,tuple)): return tuple(_freeze(v) for v in value)
+    return value
+
+
+class ValidatedStreams:
+    """One evaluation's immutable native rows and lossless ordered time indexes.
+
+    Construct from raw rows, validating every record before indexing. There is
+    no global cache or result reuse across evaluations; caller mutation cannot
+    change the owned snapshot. Each timestamp keeps every collision member.
+    """
+    def __init__(self, streams, run_id):
+        self.run_id = run_id
+        results = {topic:validate_stream(rows,topic,run_id) for topic,rows in streams.items()
+            if topic in ('vehicle_local_position','vehicle_attitude','vehicle_status','vehicle_land_detected',
+                         'estimator_status_flags','failsafe_flags')}
+        self.records = _freeze({topic:result['records'] for topic,result in results.items()})
+        self.statistics = _freeze({topic:result['statistics'] for topic,result in results.items()})
+        self._times = _freeze({topic:[r['timestamp'] for r in rows] for topic,rows in self.records.items()})
+
+    def asof(self, topic, timestamp_us, freshness_s):
+        rows = self.records[topic]
+        require(rows, 'causal_join_requires_validated_native_records')
+        index = bisect_left(self._times[topic],timestamp_us)-1
+        require(index >= 0, 'missing_strictly_earlier_state:'+topic)
+        selected=rows[index]
+        require(0 < timestamp_us-selected['timestamp'] <= round(freshness_s*1e6), 'causal_state_gap:'+topic)
+        return selected
+
+
 def joined_samples_v2(streams, config, start_us, end_us, run_id):
+    return joined_indexed_samples(ValidatedStreams(streams,run_id),config,start_us,end_us)
+
+
+def joined_indexed_samples(index, config, start_us, end_us):
     from collect_p2_evidence import yaw
-    validated = {topic: validate_stream(rows, topic, run_id)["records"] for topic, rows in streams.items()
-                 if topic in ("vehicle_local_position", "vehicle_attitude", "vehicle_status", "vehicle_land_detected",
-                              "estimator_status_flags", "failsafe_flags")}
     output = []
-    for p in validated["vehicle_local_position"]:
+    for p in index.records["vehicle_local_position"]:
         stamp = p["timestamp"]
         if not start_us <= stamp <= end_us:
             continue
-        a = causal_asof(validated["vehicle_attitude"], stamp, config["attitude_fresh_sim_s"], "vehicle_attitude")
-        s = causal_asof(validated["vehicle_status"], stamp, config["flags_fresh_sim_s"], "vehicle_status")
-        land = causal_asof(validated["vehicle_land_detected"], stamp, config["flags_fresh_sim_s"], "vehicle_land_detected")
-        estimator = causal_asof(validated['estimator_status_flags'], stamp, config['flags_fresh_sim_s'], 'estimator_status_flags')
-        flags = causal_asof(validated['failsafe_flags'], stamp, config['flags_fresh_sim_s'], 'failsafe_flags')
+        a = index.asof('vehicle_attitude', stamp, config['attitude_fresh_sim_s'])
+        s = index.asof('vehicle_status', stamp, config['flags_fresh_sim_s'])
+        land = index.asof('vehicle_land_detected', stamp, config['flags_fresh_sim_s'])
+        estimator = index.asof('estimator_status_flags', stamp, config['flags_fresh_sim_s'])
+        flags = index.asof('failsafe_flags', stamp, config['flags_fresh_sim_s'])
         require(all(p[key] for key in ("xy_valid", "z_valid", "v_xy_valid", "v_z_valid")), "invalid_recorded_estimate")
         e = p["_evidence"]
         output.append(dict(t=stamp/1e6, timestamp_us=stamp, timestamp_sample_us=p["timestamp_sample"],

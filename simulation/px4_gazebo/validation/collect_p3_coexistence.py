@@ -9,19 +9,30 @@ from collect_p3_evidence import digest, acquisition_ns
 from collect_p2_evidence import read_bag
 
 
-def evaluate(run):
+def evaluate(run, control_name='p2-offline-evaluation.json', historical_analysis=False):
     out=dict(schema_version=1,status='failed',run_id=run.name,failures=[],evaluator_sha256=digest(Path(__file__)))
     def check(value,reason):
         if not value: out['failures'].append(reason)
     summary=json.loads((run/'summary.json').read_text())
     revised=summary.get('config',{}).get('sample_evidence_contract')=='p3-sample-evidence-v2'
+    from p3_provenance import strict_json, frozen_inputs
+    frozen=frozen_inputs(Path(__file__).resolve().parents[1])
     if revised:
         from p3_provenance import require_finalized, frozen_inputs, require_evaluation
-        frozen=frozen_inputs(Path(__file__).resolve().parents[1])
-        require_finalized(run,frozen,dependent='p2-offline-evaluation.json')
-        require_evaluation(run,'p2-offline-evaluation.json',frozen)
-        out.update(schema_version=2,sample_evidence_contract='p3-sample-evidence-v2',frozen_inputs=frozen)
-    control=json.loads((run/'p2-offline-evaluation.json').read_text())
+        require_finalized(run,summary['frozen_inputs'] if historical_analysis else frozen,dependent=control_name)
+        if not historical_analysis: require_evaluation(run,control_name,frozen)
+        out.update(schema_version=2,sample_evidence_contract='p3-sample-evidence-v2',frozen_inputs=summary['frozen_inputs'])
+    control=strict_json(run/control_name)
+    if historical_analysis:
+        from p3_provenance import require_historical_analysis
+        require_historical_analysis(run,control_name,frozen,summary.get('frozen_inputs'))
+    elif revised:
+        if (control.get('evaluation_finalized') is not True or control.get('analysis_inputs') != frozen
+                or control.get('historical_reanalysis') is not False
+                or control.get('recording_integrity') != 'passed'
+                or control.get('flight_acceptance') != ('passed' if summary['kind']=='flight' else 'not_run')):
+            raise ValueError('Control evaluation must finalize successfully before sensor composite')
+    out['control_evaluation_sha256']=digest(run/control_name)
     check(summary['status']=='passed' and control['recording_integrity']=='passed','control_recording')
     check(control['flight_acceptance']==('passed' if summary['kind']=='flight' else 'not_run'),'control_acceptance')
     sensor=run/'sensors'
@@ -130,10 +141,27 @@ def evaluate(run):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser(); p.add_argument('run',type=Path); args=p.parse_args()
-    try: result=evaluate(args.run)
+    p=argparse.ArgumentParser(); p.add_argument('run',type=Path)
+    p.add_argument('--output-name',default='p3-coexistence-evaluation.json')
+    p.add_argument('--control-name',default='p2-offline-evaluation.json')
+    p.add_argument('--historical-analysis',action='store_true'); args=p.parse_args()
+    for name in (args.output_name,args.control_name):
+        if Path(name).name!=name or not name.endswith('.json'): raise ValueError('JSON basename required')
+    if args.historical_analysis and (args.output_name=='p3-coexistence-evaluation.json' or args.control_name=='p2-offline-evaluation.json'):
+        raise ValueError('Historical analysis requires distinct report names')
+    if not args.historical_analysis and args.control_name!='p2-offline-evaluation.json':
+        raise ValueError('Runtime composite requires canonical control evaluation')
+    if (args.run/args.output_name).exists(): raise ValueError('Retain the existing evaluation')
+    from p3_provenance import atomic_json,frozen_inputs
+    analysis_inputs=frozen_inputs(Path(__file__).resolve().parents[1])
+    try: result=evaluate(args.run,args.control_name,args.historical_analysis)
     except Exception as exc: result=dict(schema_version=2,status='failed',run_id=args.run.name,failure=str(exc),
         sample_evidence_contract='p3-sample-evidence-v2',evaluator_sha256=digest(Path(__file__)))
-    with (args.run/'p3-coexistence-evaluation.json').open('x') as stream: stream.write(json.dumps(result,indent=2,allow_nan=False)+'\n')
+    if frozen_inputs(Path(__file__).resolve().parents[1])!=analysis_inputs:
+        result.update(status='failed',failure='analysis_inputs_changed_during_evaluation')
+    result.update(analysis_inputs=analysis_inputs,
+        historical_reanalysis=args.historical_analysis,evaluation_finalized=True,
+        qualification_credit=False if args.historical_analysis else None)
+    atomic_json(args.run/args.output_name,result,exclusive=True)
     print(json.dumps({k:v for k,v in result.items() if k not in ('control_timing','recorder')},indent=2,allow_nan=False))
     raise SystemExit(0 if result['status']=='passed' else 1)

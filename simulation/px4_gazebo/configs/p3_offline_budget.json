@@ -1,0 +1,7 @@
+{
+  "contract": "p3-offline-budget-v1",
+  "control_seconds": 90,
+  "sensor_seconds": 120,
+  "cleanup_seconds": 10,
+  "scope": "offline evaluation only; no mid-job extension"
+}

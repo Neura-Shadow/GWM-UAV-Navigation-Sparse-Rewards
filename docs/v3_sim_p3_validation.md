@@ -1,4 +1,45 @@
-# P3 depth sensing and P3-R1 sample/time acceptance
+# P3 depth sensing and P3-R2 evidence validity
+
+P3 remains incomplete. P3-R2 establishes **Outcome C**: the unchanged PX4
+binary and recordings do not expose the MC consumed-input identity required
+to prove internal yaw resolution. No new readiness, smoke or qualification
+flight is run in this slice; qualification remains **0/3**. The
+[yaw provenance contract](v3_sim_p3_yaw_provenance_contract.md) separates
+external publication, handover, physical behavior, exact internal causality
+and the preserved prior-state diagnostic. The proposed instrumentation scope
+requires separate approval before any upstream edit or rebuild.
+
+Historical E comparisons remain failed: original 79/135, latest R1 68/135.
+New analyses explicitly report required D as `unobservable_from_recording`;
+good physical checks cannot turn it into a pass. New report names and analysis
+hashes distinguish these results from the immutable historical evaluations.
+The full prior summary is retained as
+[schema-2 history](evidence/v3_sim_p3_summary_v2.json), alongside schema-1.
+Accepted P2 schema-4 and both ROS package builds remain unchanged.
+
+The [offline budget report](v3_sim_p3_offline_budget.md) records measured full
+wrapper costs, performance-only differential validation and enforced finite
+job deadlines. Timeout and incomplete/unknown evidence stop qualification
+before dependent sensor work or another flight; infrastructure timeout is
+recorded separately from the observed flight behavior.
+
+All eight fixed historical offline measurements finalized inside the original
+90/120-second budgets: control maximum 88.43 s, sensor maximum 37.65 s.
+Performance-only reanalysis retained every prior result field except changed
+implementation hashes. Under the new contract, latest R1 A/B/C are verified,
+D is unobservable and E remains contradicted (68/135). The original smoke
+also lacks exact recorded handover callback identity for B; its E remains
+79/135. Both new control analyses are `unknown`, and sensor composites fail
+only control acceptance. Repetition outputs are byte-identical.
+
+Final regression: **492 focused**, **398 C2**, and **1,292 full tests passed,
+12 skipped**. Python compilation, Bash syntax, ShellCheck and diff checks
+passed. No ROS package source changed, so no new package build or installed
+test is claimed. The [schema-3 summary](evidence/v3_sim_p3_summary.json) and
+[P3-R2 offline evidence index](evidence/v3_sim_p3_r2_offline.json) retain exact
+commands, inputs, report hashes, profiles and the authorization boundary.
+
+## Preserved P3-R1 acceptance report
 
 P3 acceptance remains incomplete. The single new smoke,
 `20260912T141235Z-p3-flight-778e3f60`, completed normal LAND/disarm and sealed
@@ -274,7 +315,7 @@ prerequisite remains unsatisfied by this campaign.
 | P6/P7 and v3-2 onward | not_implemented |
 | Clean rebuild | not_proven |
 
-The [current schema-2 evidence summary](evidence/v3_sim_p3_summary.json) tracks
+The [retained schema-2 evidence summary](evidence/v3_sim_p3_summary_v2.json) tracks
 the repair, final run identities, independent outcomes and incomplete campaign.
 The [schema-1 history](evidence/v3_sim_p3_summary_v1.json) remains byte-identical.
 

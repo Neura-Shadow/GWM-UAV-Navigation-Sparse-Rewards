@@ -138,13 +138,16 @@ def native_dataset(log, topic, run_id=None):
     return rows
 
 
-def verify_yaw_ownership(log, streams, events, result, config, reference):
+def verify_yaw_ownership(log, streams, events, result, config, reference, causal_contract=False, progress=None):
+    progress = progress if progress is not None else {}
+    progress['active_role'] = 'A_external_initialization'
     revised = config.get('sample_evidence_contract') == 'p3-sample-evidence-v2'
     targets = streams['trajectory_setpoint']
     records = [e for e in events if e['event'] == 'setpoint']
     require(len(records) == len(targets), 'Missing wire-mode ledger')
     first = next((i for i,t in enumerate(targets) if math.isfinite(t['yaw'])), None)
     require(first is not None and first > 0, 'Missing initialization or finite handover')
+    progress['active_role'] = 'B_handover'
     start = targets[first]['timestamp']/1e6
     handover = result.get('handover') or {}
     # Normal float-seconds -> integer-microseconds serialization can truncate
@@ -156,6 +159,7 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
     require(complete is not None and complete > start, 'Missing bounded handover completion')
     hover = next(t['sim_s'] for t in result['transitions'] if t['to']=='INITIAL_HOVER')
     require(hover >= complete, 'Nominal window before handover')
+    progress['active_role'] = 'A_external_initialization'
     for i,(t,r) in enumerate(zip(targets,records)):
         init = i < first
         mode = 'POSITION_INITIALIZATION_YAW_UNSPECIFIED' if init else 'POSITION_NOMINAL_YAW_TARGET'
@@ -176,6 +180,8 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
         if init:
             require(math.isnan(t['yaw']), 'Finite external initialization yaw')
             require(math.dist(t['position'][:2],result['origin_ned'][:2])<1e-5, 'Initialization horizontal target moved')
+    progress['A_external_initialization'] = dict(status='verified',samples=first)
+    progress['active_role'] = 'B_handover'
     run_ids = {row['_run_id'] for row in streams['vehicle_local_position'] if '_run_id' in row}
     run_id = result.get('run_id') or (next(iter(run_ids)) if len(run_ids) == 1 else None)
     new_metadata = result.get('sample_evidence_contract') == 'p3-sample-evidence-v2'
@@ -204,6 +210,10 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
     for e in reference['accepted']:
         pending = [t['position'] for t in targets if e['start_sim_s']<=t['timestamp']/1e6<e['accepted_sim_s']]
         require(pending and all(math.dist(p,pending[0])<1e-6 for p in pending), 'Pending reset did not hold position')
+    progress['B_handover'] = dict(status='verified' if seed_evidence.get('actual_callback_source_identity')=='verified'
+        and attitude_evidence and attitude_evidence.get('actual_callback_source_identity')=='verified' else 'unobservable_from_recording',
+        position_source=seed_evidence,attitude_source=attitude_evidence)
+    progress['active_role'] = 'C_physical_behavior'
     # Use each estimator topic's own reset generation for drift, not controller acceptance time.
     p=log.get_dataset('vehicle_local_position').data
     a=log.get_dataset('vehicle_attitude').data
@@ -225,6 +235,9 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
             errors.append(abs(angle(measurement(i)-current_anchor)))
         max_drift[label]=math.degrees(max(errors))
         require(max_drift[label]<=config['yaw_tolerance_deg'],'Initialization drift exceeded original bound')
+    progress['C_physical_behavior'] = dict(status='missing_required_evidence',initialization_drift_status='verified',
+        max_initialization_drift_deg=max_drift)
+    progress['active_role'] = 'E_prior_state_diagnostic'
     # Internal setpoints are sampled at 10 Hz. Match each sample to the most
     # recent native estimator publication; never search a window for a nicer yaw.
     control=log.get_dataset('vehicle_local_position_setpoint').data
@@ -235,7 +248,7 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
             native_dataset(log, 'vehicle_local_position_setpoint',run_id), round(offboard*1e6),
             targets[first]['timestamp'], run_id)
         require(prior_state['distinct_internal_observations'] >= 50, 'Insufficient distinct resolved-yaw samples')
-        if prior_state['status'] != 'passed':
+        if prior_state['status'] != 'passed' and not causal_contract:
             raise YawEvidenceError(prior_state)
     indexes=np.flatnonzero((control['timestamp']>=offboard*1e6)&(control['timestamp']<start*1e6))
     require(len(indexes)>=50,'Insufficient resolved-yaw samples')
@@ -253,12 +266,17 @@ def verify_yaw_ownership(log, streams, events, result, config, reference):
         errors = [row['resolved_yaw_error_rad'] for row in prior_state['matches']]
         ages = [row['match_age_us']/1e6 for row in prior_state['matches']]
     stamps=control['timestamp'][indexes].astype(float)/1e6
-    return {'status':'passed','initialization_wire_samples':first,'handover_start_sim_s':start,
+    report = {'status':'passed','initialization_wire_samples':first,'handover_start_sim_s':start,
             'handover_complete_sim_s':complete,'first_finite_yaw':targets[first]['yaw'],
             'fresh_aligned_heading':seed['heading'],'corrected_mission_anchor':anchor,
             'handover_position_source':seed_evidence,'handover_attitude_source':attitude_evidence,
             'prior_state_consistency':prior_state,
             'max_initialization_drift_deg':max_drift,'matched_internal_samples':len(indexes),
-            'max_resolved_yaw_error_rad':max(errors),'max_match_age_s':max(ages),
+            'max_resolved_yaw_error_rad':max((e for e in errors if e is not None),default=None),'max_match_age_s':max(ages,default=None),
             'internal_max_sample_gap_s':prior_state['internal_max_sample_gap_s'] if revised else float(np.max(np.diff(stamps))),
             'coverage_limit':'Internal output sampled about 10 Hz; intervals and downstream scheduling are not proven at every update.'}
+    if causal_contract:
+        from yaw_provenance import evidence_roles
+        require(revised, 'Causal evidence roles require the P3 sample contract')
+        report.update(status='unobservable_from_recording', evidence=evidence_roles(report))
+    return report

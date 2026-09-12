@@ -12,6 +12,7 @@ from run_p2_repeated import execute, check_smoke, digest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'validation'))
 from p3_provenance import (CONTRACT, strict_json, frozen_inputs, require_finalized,
     require_evaluation, require_ground_matrix, predecessor, atomic_json)
+from offline_jobs import evaluate_trial, require_current_result, require_causal_control, budget, OfflineJobError
 
 
 def inputs(sim):
@@ -29,8 +30,11 @@ def main():
     frozen=inputs(sim)
     require_finalized(args.smoke_run,frozen)
     smoke=strict_json(args.smoke_run/'summary.json')
-    offline=require_evaluation(args.smoke_run,'p2-offline-evaluation.json',frozen)
-    sensor=require_evaluation(args.smoke_run,'p3-coexistence-evaluation.json',frozen)
+    offline=require_current_result(args.smoke_run,'p2-offline-evaluation.json',frozen)
+    sensor=require_current_result(args.smoke_run,'p3-coexistence-evaluation.json',frozen)
+    require_causal_control(offline)
+    if sensor.get('control_evaluation_sha256') != digest(args.smoke_run/'p2-offline-evaluation.json'):
+        raise ValueError('Smoke sensor control dependency mismatch')
     prerequisites=strict_json(args.smoke_run/'p3-prerequisites.json')
     matrix=Path(prerequisites['ground_matrix'])
     ground=require_ground_matrix(matrix,frozen,Path(prerequisites['readiness']['run']))
@@ -42,11 +46,12 @@ def main():
     if sensor['evaluator_sha256']!=digest(sim/'validation/collect_p3_coexistence.py'): raise ValueError('Sensor evaluator changed')
     batch=root/'runs'/(time.strftime('%Y%m%dT%H%M%SZ',time.gmtime())+'-p3-qualification-'+uuid.uuid4().hex[:8])
     batch.mkdir()
-    report=dict(schema_version=2,run_id=batch.name,sample_evidence_contract=CONTRACT,status='incomplete',required_consecutive=3,passed=0,trials=[],
+    report=dict(schema_version=3,run_id=batch.name,sample_evidence_contract=CONTRACT,status='incomplete',required_consecutive=3,passed=0,trials=[],
         smoke_run=str(args.smoke_run),smoke=predecessor(args.smoke_run),ground_matrix=str(matrix),
         frozen_inputs=frozen,failure=None,started_unix_ns=time.time_ns())
     report['runtime_identity']=smoke['runtime_identity']
     report['calibration_id']=ground['calibration_id']
+    report['offline_budget']=budget(sim)
     def save(): atomic_json(batch/'summary.json',report)
     print('P3 qualification: '+str(batch),flush=True); save()
     try:
@@ -69,14 +74,7 @@ def main():
             if trial['started_unix_ns']<=previous['finalized_unix_ns']: raise ValueError('Qualification chronology')
             entry['predecessor']=previous
             if trial['identity']!=smoke['identity']: raise ValueError('Runtime differs from smoke')
-            control_code=execute(['bash',str(sim/'scripts/verify_p2_evidence.sh'),str(run)],batch/f'control-{index}.log',90)
-            sensor_code=execute(['bash',str(sim/'scripts/verify_p3_coexistence.sh'),str(run)],batch/f'sensor-{index}.log',120)
-            entry.update(control_evaluator_exit=control_code,sensor_evaluator_exit=sensor_code)
-            if code or control_code or sensor_code: raise ValueError('Coexistence failed: '+run.name)
-            control=require_evaluation(run,'p2-offline-evaluation.json',frozen)
-            sensor=require_evaluation(run,'p3-coexistence-evaluation.json',frozen)
-            check_smoke(trial,control,digest(sim/'validation/collect_p2_evidence.py'))
-            if sensor['status']!='passed': raise ValueError('Sensor acceptance failed')
+            control,sensor=evaluate_trial(sim,run,batch,index,frozen,trial,entry)
             entry['finalization_sha256']=digest(run/'runtime-finalized.json')
             entry['control_evaluation_sha256']=digest(run/'p2-offline-evaluation.json')
             entry['sensor_evaluation_sha256']=digest(run/'p3-coexistence-evaluation.json')
@@ -86,6 +84,9 @@ def main():
         report['status']='passed'
     except (Exception,KeyboardInterrupt) as exc:
         report.update(status='incomplete',failure=str(exc) or 'interrupted')
+        report['failure_kind']=exc.kind if isinstance(exc,OfflineJobError) else 'runtime_or_prerequisite_failure'
+        report['failure_stage']=exc.stage if isinstance(exc,OfflineJobError) else 'runtime_or_prerequisite'
+        report['qualification_progress_valid']=False
     finally: save()
     print(json.dumps({k:v for k,v in report.items() if k!='frozen_inputs'},indent=2),flush=True)
     return 0 if report['status']=='passed' else 1

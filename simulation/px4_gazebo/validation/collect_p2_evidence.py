@@ -170,7 +170,7 @@ def wire_checks(streams, config, reference=None):
             "max_heartbeat_gap_sim_s": max(heartbeat_gaps), "inactive_fields_nan": True}
 
 
-def verify(run, sample_contract=None):
+def verify(run, sample_contract=None, historical_analysis=False):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"ros2_ws/src/gwm_px4_control"))
     from gwm_px4_control.acceptance import evaluate_flight, evaluate_window, evaluate_window_v2, fixed_window_us, expected_fixture, PHASES
     summary = json.loads((run/"summary.json").read_text())
@@ -182,7 +182,8 @@ def verify(run, sample_contract=None):
     revised = config.get("sample_evidence_contract") == "p3-sample-evidence-v2"
     if revised and not historical:
         from p3_provenance import require_finalized, frozen_inputs
-        require_finalized(run, frozen_inputs(Path(__file__).resolve().parents[1]))
+        require_finalized(run, summary['frozen_inputs'] if historical_analysis else
+                          frozen_inputs(Path(__file__).resolve().parents[1]))
     require(result is not None, "Controller never initialized complete recording")
     require(len(summary["ulog_files"]) == 1, "Expected one continuous ULog")
     artifacts = summary["ulog_files"]+summary["rosbag_files"]
@@ -216,18 +217,15 @@ def verify(run, sample_contract=None):
               "clock_mapping": "PX4 microseconds and Gazebo/ROS seconds share simulation boot epoch; no wall-epoch subtraction",
               "raw_jsonl_sha256": digest(run/"ros-events.jsonl"), "bag_event_ledger_equal": True}
     if revised:
-        from sample_evidence import (validate_stream, exact_overlap, joined_samples_v2, verify_source_deliveries,
+        from sample_evidence import (ValidatedStreams, exact_overlap, joined_indexed_samples, verify_source_deliveries,
                                      all_record_window_checks, reconstruct_controller_samples)
         report.update(sample_evidence_contract=config["sample_evidence_contract"],
                       frozen_inputs=summary.get("frozen_inputs"), historical_reanalysis=historical,
                       qualification_credit=False if historical else None,
                       sample_evaluator_sha256=digest(Path(__file__).with_name("sample_evidence.py")),
                       acceptance_evaluator_sha256=digest(Path(__file__).resolve().parents[1]/"ros2_ws/src/gwm_px4_control/gwm_px4_control/acceptance.py"))
-        report["native_record_classification"] = {
-            label: {topic: validate_stream(data[topic], topic, summary["run_id"])["statistics"]
-                    for topic in ("vehicle_local_position", "vehicle_attitude", "vehicle_status", "vehicle_land_detected",
-                                  "estimator_status_flags", "failsafe_flags")}
-            for label, data in (("rosbag", streams), ("ulog", ulog))}
+        indexed = {label:ValidatedStreams(data,summary['run_id']) for label,data in (('rosbag',streams),('ulog',ulog))}
+        report['native_record_classification'] = {label:index.statistics for label,index in indexed.items()}
         if not historical:
             require(result.get('run_id') == run.name and result.get('sample_evidence_contract') == config['sample_evidence_contract'], 'Controller result identity')
             report['source_delivery_verification'] = verify_source_deliveries(streams,json_events,run.name)
@@ -345,10 +343,13 @@ def verify(run, sample_contract=None):
         if config["reference_policy"] == "p2-estimator-reference-v3":
             from yaw_evidence import verify_yaw_ownership
             if revised:
+                yaw_progress = {}
                 try:
-                    report["yaw_ownership"] = verify_yaw_ownership(log, streams, events, result, config, independent_reference)
+                    report["yaw_ownership"] = verify_yaw_ownership(log, streams, events, result, config, independent_reference, causal_contract=True, progress=yaw_progress)
                 except ValueError as exc:
+                    from yaw_provenance import incomplete_roles
                     report["yaw_ownership"] = {"status": "failed", "reason": str(exc),
+                        "evidence": incomplete_roles(yaw_progress,str(exc)),
                         "limitation": "Internal MC consumed source identity is not serialized; the frozen prior-state consistency check is not exact internal-selection proof."}
                     if getattr(exc, "report", None) is not None:
                         report["yaw_ownership"]["prior_state_consistency"] = exc.report
@@ -370,7 +371,7 @@ def verify(run, sample_contract=None):
                 start_us, end_us = fixed_window_us(window,historical)
                 left = max(p["timestamp"] for p in positions if p["timestamp"] <= start_us)
                 right = min(p["timestamp"] for p in positions if p["timestamp"] >= end_us)
-                joined = joined_samples_v2(data, config, left, right, summary["run_id"])
+                joined = joined_indexed_samples(indexed[label], config, left, right)
                 window_report = evaluate_window_v2(joined, fixture[phase], duration, config)
                 try:
                     window_report["all_record_components"] = all_record_window_checks(data, left, right, fixture[phase], config)
@@ -387,26 +388,38 @@ def verify(run, sample_contract=None):
     land_command = next(r for r in sent if r["command"] == 21)
     require(all(t["timestamp"] < land_command["timestamp"] for t in streams["trajectory_setpoint"]), "Competing targets after landing handover")
     require(any(s["nav_state"] == 18 and s["timestamp"] >= land_command["timestamp"] for s in status), "No actual landing mode")
-    passed = (summary["status"] == "passed" and report["ros_controller_samples"]["status"] == "passed"
+    physical_passed = (summary["status"] == "passed" and report["ros_controller_samples"]["status"] == "passed"
               and all(w["status"] == "passed" for phases in report["independent_windows"].values() for w in phases.values())
-              and report.get("yaw_ownership", {}).get("status", "passed") == "passed"
               and report["final_disarmed"] and report["final_landed"] and not report["failsafe_observed"])
-    report["flight_acceptance"] = "passed" if passed else "failed"
+    ownership = report.get('yaw_ownership', {})
+    if 'evidence' in ownership:
+        physical=ownership['evidence']['C_physical_behavior']
+        physical['mission_checks_status']='verified' if physical_passed else 'contradicted'
+        if not physical_passed: physical['status']='contradicted'
+        elif physical.get('initialization_drift_status')=='verified' and physical['status']!='contradicted':
+            physical['status']='verified'
+            physical['reason']='Initialization drift and all mission checks verified'
+    yaw_status = ownership.get('status', 'passed')
+    report['flight_acceptance'] = ('failed' if not physical_passed or yaw_status == 'failed' else
+        'unknown' if yaw_status != 'passed' else 'passed')
     return report
 
 
 def main(argv=None):
+    from p3_provenance import atomic_json, frozen_inputs
     parser = argparse.ArgumentParser()
     parser.add_argument("run", type=Path)
     parser.add_argument("--output-name", default="p2-offline-evaluation.json")
     parser.add_argument("--sample-contract", choices=["p3-sample-evidence-v2"], help="Explicit historical reanalysis; never runtime credit")
+    parser.add_argument('--historical-analysis', action='store_true', help='Bind sealed runtime to its recorded inputs; no new runtime credit')
     args = parser.parse_args(argv)
     require(Path(args.output_name).name == args.output_name and args.output_name.endswith(".json"), "Output must be a JSON basename")
     output = args.run/args.output_name
     require(not output.exists(), "Offline result already exists; retain the first evaluation")
+    analysis_inputs = frozen_inputs(Path(__file__).resolve().parents[1])
     try:
-        require(not args.sample_contract or args.output_name != "p2-offline-evaluation.json", "Historical reanalysis needs a distinct report name")
-        report = verify(args.run.resolve(), args.sample_contract)
+        require(not (args.sample_contract or args.historical_analysis) or args.output_name != "p2-offline-evaluation.json", "Historical reanalysis needs a distinct report name")
+        report = verify(args.run.resolve(), args.sample_contract, args.historical_analysis)
     except Exception as exc:
         try:
             from p3_provenance import strict_json
@@ -417,8 +430,13 @@ def main(argv=None):
                   "sample_evidence_contract": args.sample_contract or failed_input.get('config',{}).get('sample_evidence_contract'),
                   "frozen_inputs": failed_input.get('frozen_inputs'), "historical_reanalysis": bool(args.sample_contract)}
     report["evaluator_sha256"] = digest(__file__)
-    with output.open("x") as stream:
-        stream.write(json.dumps(report, indent=2, allow_nan=False)+"\n")
+    if frozen_inputs(Path(__file__).resolve().parents[1]) != analysis_inputs:
+        report.update(recording_integrity='failed',flight_acceptance='unknown',error='analysis_inputs_changed_during_evaluation')
+    report.update(analysis_inputs=analysis_inputs,
+        historical_reanalysis=bool(args.sample_contract or args.historical_analysis),
+        qualification_credit=False if args.sample_contract or args.historical_analysis else None,
+        evaluation_finalized=True)
+    atomic_json(output, report, exclusive=True)
     print(json.dumps({k: v for k, v in report.items() if k not in ("artifacts", "independent_windows")}, indent=2, allow_nan=False))
     return 0 if report["recording_integrity"] == "passed" and report["flight_acceptance"] in ("passed", "not_run") else 1
 

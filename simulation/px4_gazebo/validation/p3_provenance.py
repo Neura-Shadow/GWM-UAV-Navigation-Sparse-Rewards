@@ -255,6 +255,23 @@ def require_evaluation(run, name, frozen):
     return result
 
 
+def require_historical_analysis(run, name, analysis_inputs, recorded_inputs):
+    """A current analysis of old bytes is separate from the recorded runtime."""
+    result=strict_json(Path(run)/name)
+    if (result.get('run_id')!=Path(run).name or result.get('evaluation_finalized') is not True
+            or result.get('historical_reanalysis') is not True or result.get('qualification_credit') is not False
+            or result.get('recording_integrity')!='passed'
+            or result.get('sample_evidence_contract')!=CONTRACT
+            or result.get('analysis_inputs')!=analysis_inputs or result.get('frozen_inputs')!=recorded_inputs):
+        raise ValueError('historical_analysis_identity_or_integrity')
+    for field,source in (('evaluator_sha256','collect_p2_evidence.py'),
+        ('reference_evaluator_sha256','reference_evidence.py'),('yaw_evaluator_sha256','yaw_evidence.py'),
+        ('timing_evaluator_sha256','timing_evidence.py'),('sample_evaluator_sha256','sample_evidence.py')):
+        if result.get(field)!=analysis_inputs['files']['validation/'+source]:
+            raise ValueError('historical_analysis_arithmetic:'+field)
+    return result
+
+
 def require_readiness(run, frozen):
     seal=require_finalized(run,frozen)
     summary=strict_json(Path(run)/'summary.json')

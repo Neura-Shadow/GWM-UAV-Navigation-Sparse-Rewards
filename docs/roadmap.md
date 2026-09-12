@@ -280,29 +280,24 @@ and [P3 validation](v3_sim_p3_validation.md).
   motion and LAND checks. R2 yaw policy and all original limits are unchanged.
   Strict-v1, R1 and R2 failures remain preserved. P3 is eligible as the next slice.
 - [ ] P3 Depth sensing: implemented; historical rendering, bridge, fixed ground
-  geometry and interruption checks passed. The original x500_depth smoke landed
-  normally but failed independent timestamp-window acceptance; qualification
-  remained 0/3. P3-R1 sample/time and provenance repair is implemented and built,
-  and v4 read-only readiness and plane2 passed. The v4 matrix stopped at plane4
-  on direct CLI topic discovery despite recorded sensor flow; remaining cases
-  were not run. A bounded discovery correction is frozen in v5, whose fresh
-  readiness and complete seven-case ground matrix passed, including scene
-  change and interruption checks. The single new smoke completed normal
-  LAND/disarm and finalization but failed independent prior-state yaw acceptance
-  (68/135 comparisons); all sample windows, timing and sensor checks passed.
-  The sample/time contract and final observation identity are verified, while
-  P3 acceptance remains incomplete. No further flight followed; three-flight
-  qualification remains not_run, 0/3. The wrapper's existing 90 s evaluator
-  timeout is also not runtime-qualified: the standalone evaluator was observed
-  CPU-active beyond 180 s. Final ordinary checks passed 446 focused and
-  1,246 full tests with 12 skips. Earlier finalization/reader/discovery failures
-  remain preserved. Historical
-  reanalysis passes the fixed windows but remains failed on prior-state yaw
-  consistency with exact PX4-consumed state unproven. A passed new smoke and
-  three consecutive coexistence passes are still required. See the
-  [sample/time contract](v3_sim_p3_sample_time_contract.md) and
-  [P3 validation](v3_sim_p3_validation.md). Original x500 P2 evidence and the
-  [P3 schema-1 history](evidence/v3_sim_p3_summary_v1.json) remain preserved.
+  geometry and interruption checks passed. P3-R1 final readiness and the complete
+  seven-case ground matrix passed; its smoke landed/disarmed normally but failed
+  the original prior-state yaw gate (68/135). P3-R2 establishes Outcome C:
+  exact MC consumed-input identity is unobservable in the unchanged binary/logs.
+  The [versioned yaw contract](v3_sim_p3_yaw_provenance_contract.md) separates
+  physical checks from the preserved proxy; historical failures remain failed.
+  The measured indexing repair preserves all prior numeric results and completes
+  all eight required offline jobs inside unchanged 90/120-second budgets
+  (control max 88.43 s, sensor max 37.65 s). New analyses remain unknown for
+  required causal evidence. A separately approved instrumentation scope is needed
+  before more nominal flights; no PX4 patch/rebuild or new runtime was performed.
+  Final checks: 492 focused, 398 C2, 1,292 full passed with 12 skips.
+  Acceptance remains incomplete; qualification is not_run, **0/3**. A new passed
+  smoke and three consecutive coexistence passes are still required after all
+  gates are satisfied. See [P3 validation](v3_sim_p3_validation.md) and the
+  [offline budget report](v3_sim_p3_offline_budget.md). Accepted P2 and complete
+  [P3 schema-1](evidence/v3_sim_p3_summary_v1.json) /
+  [schema-2 history](evidence/v3_sim_p3_summary_v2.json) remain preserved.
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation

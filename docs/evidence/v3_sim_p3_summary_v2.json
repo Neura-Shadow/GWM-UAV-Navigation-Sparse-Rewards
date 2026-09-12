@@ -1,17 +1,18 @@
 {
-  "schema_version": 3,
-  "phase": "v3-SIM P3-R2",
+  "schema_version": 2,
+  "phase": "v3-SIM P3-R1",
   "status": "incomplete",
   "sample_evidence_contract": "p3-sample-evidence-v2",
-  "generated_unix_ns": 1789226381293731239,
+  "generated_unix_ns": 1789223274218984649,
   "clean_rebuild_proven": false,
   "generator": {
-    "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/build_r2_summary.py",
-    "sha256": "9da2024d8f70d4c92c761806d2126686a7a580abfb466fd6e744965ec7caa336"
+    "path": "/home/joker0625/uav_autonomy/state/p3-r1-implementation-20260912T130622Z/build_summary_v2.py",
+    "sha256": "3a34df2ced81258da044c295f3f9568ee8360ee5ac066be2bc5f8a23a1fc2592",
+    "bytes": 26858
   },
   "repository": {
     "branch": "v3/gwm-uav-c2-agentops-planning",
-    "implementation_base_commit": "ab2f2e27b7056de4640e4bb479c6dd9d6216e03d",
+    "implementation_base_commit": "76f014d74ef33663813cfaf4d5c4b980dfb418f1",
     "implementation_commit_reference": "commit containing this summary",
     "archive_tag": "v1.0.0-research-framework-complete",
     "archive_commit": "cb304c7a64b2edd57673a3323c0ed2e7d2923453",
@@ -6951,51 +6952,32 @@
   },
   "regression": {
     "ordinary_full_suite": {
-      "passed": 1292,
+      "passed": 1246,
       "skipped": 12,
-      "failures": 0,
-      "errors": 0,
-      "duration_s": 232.298,
-      "evidence": {
-        "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/regression-full-v1.xml",
-        "sha256": "a8aa01c2c29a12edd98e8605076ce6f731b10cf6ac921b88d32cdafa7af1b799"
-      }
+      "duration_s": 121.03
     },
     "focused_p2_p3": {
-      "passed": 492,
-      "skipped": 0,
-      "failures": 0,
-      "errors": 0,
-      "duration_s": 21.041,
-      "evidence": {
-        "path": "/home/joker0625/uav_autonomy/state/p3-r2-20260912T144755Z/regression-focused-v1.xml",
-        "sha256": "4434684ca19561bcd145b156438efcf2c51b0eb9341ea4fafe27be8f20e358d0"
-      }
+      "passed": 446,
+      "duration_s": 9.54
     },
-    "c2": {
-      "passed": 398,
-      "duration_s": 10.12,
-      "source_unchanged": true
+    "c2_baseline": {
+      "prior_passed": 398,
+      "source_unchanged": true,
+      "included_in_full_suite": true
     },
-    "linux_package_builds": {
-      "status": "not_run",
-      "reason": "No ROS package source changed; existing build identities retained"
+    "installed_build_checks": {
+      "controller_passed": 2,
+      "sensor_passed": 1
     },
-    "python_compilation": "passed",
-    "bash_syntax": "passed",
-    "shellcheck": "passed with SC1091 dynamic ROS overlay exclusion",
-    "git_diff_check": "passed"
+    "evidence_origin": "Explicit final validation results supplied by the coordinating agent; builds also bound to retained logs"
   },
   "offline_evaluator_runtime_budget": {
-    "contract": "p3-offline-budget-v1",
-    "status": "qualified",
-    "control_timeout_wall_s": 90,
-    "sensor_timeout_wall_s": 120,
-    "maximum_control_gnu_elapsed_s": 88.43,
-    "maximum_sensor_gnu_elapsed_s": 37.65,
-    "completed_required_measurements": 8,
-    "required_measurements": 8,
-    "scope": "Measured fixed historical profile; unknown evidence is not flight acceptance"
+    "qualification_control_timeout_wall_s": 90,
+    "observed_smoke_control_evaluator_cpu_active_at_elapsed_wall_s": 180,
+    "smoke_control_evaluator_exact_duration_wall_s": null,
+    "fit_within_qualification_timeout": "unproven",
+    "observation_source": "Coordinating agent process observation; no exact evaluator duration is claimed",
+    "limitation": "The completed smoke evaluator was observed CPU-active at 180 seconds elapsed; fitting the future qualification 90-second control-evaluator budget is unproven. Qualification was not launched because smoke acceptance failed."
   },
   "scope": {
     "P4": "not_implemented",
@@ -8936,134 +8918,20 @@
     "qualification_credit": false
   },
   "status_detail": {
-    "yaw_causal_evidence": "unobservable",
-    "offline_evaluation_budget": "qualified",
-    "final_input_readiness": "not_run",
-    "new_camera_equipped_smoke": "blocked",
+    "sample_time_contract": "verified",
+    "final_build_observation_identity": "passed",
+    "final_input_ground_matrix": "passed",
+    "new_camera_equipped_smoke": "failed",
     "coexistence_qualification": "not_run",
     "qualification_passed": 0,
     "qualification_required": 3,
-    "qualification_not_run_reason": "Outcome C: required MC consumed-input identity is not available; instrumentation amendment requires separate approval"
+    "ground_matrix_completion": "completed_pass",
+    "qualification_not_run_reason": "Required new smoke acceptance failed; campaign stopped without a qualification flight"
   },
   "aggregate_validation": {
-    "status": "passed",
-    "source": "P3-R2 aggregate generation assertions",
-    "checks": [
-      "all 8 required jobs completed within both elapsed measures",
-      "current 82-file analysis inputs match",
-      "all original report hashes unchanged",
-      "P2/schema1/schema2 byte hashes unchanged",
-      "new and old E diagnostics exactly equal",
-      "all non-yaw report fields equal after named metadata exclusions",
-      "all eight controller and sixteen independent windows pass for both recordings",
-      "latest A/B/C verified, D unobservable",
-      "sensor failures only control_acceptance",
-      "both repeat output pairs byte-identical",
-      "no new runtime credit"
-    ],
-    "new_runtime_credit": false
-  },
-  "retained_p3_schema2": {
-    "path": "docs/evidence/v3_sim_p3_summary_v2.json",
-    "sha256": "556d1b934dae2ca0434322158e962a3a4da696259fe1905f133af699bc902cde"
-  },
-  "p3_r2": {
-    "evidence_path": "docs/evidence/v3_sim_p3_r2_offline.json",
-    "evidence_sha256": "6a4509be0a45d50266a3cca5ee1bdd3a1201d8d433713bbcbb7d1a5fd91ad87c",
-    "observability_outcome": "C",
-    "new_runtime_runs": [],
-    "historical_analysis_run_ids": [
-      "20260912T113430Z-p3-flight-0dc41a18",
-      "20260912T141235Z-p3-flight-778e3f60"
-    ],
-    "no_px4_patch_or_rebuild": true,
-    "prior_failed_statuses_unchanged": true,
-    "analysis_inputs": {
-      "files": {
-        "configs/p1_smoke.yaml": "44a01bb187e29b72925b02050c39f1eeb3c6a17020e5350cb917223c9b9017e3",
-        "configs/p2_clock_bridge.yaml": "452de2f2cc4da4945814c1bc73ff1dbb9a8c089f9384fb55c9600af0762b9f78",
-        "configs/p2_control.yaml": "e50f824ac01674513c10aeaf6fb4ac7817c4d2319e28be08de9d371a8e997a4d",
-        "configs/p2_timing.yaml": "d0b8927f3ba29a18def5d0d5cb90a9674d4388a42f6f46fb667f08d225d64d33",
-        "configs/p3_clock_bridge.yaml": "460dea6a84b868f20892f1e8a444316a66afb9c0497cbd7e2c6aac4426a88a8c",
-        "configs/p3_control.yaml": "2d21d0bd42a53f20ff7db382a3be27812fcba4affe6a67546bcc6680fe63c4ca",
-        "configs/p3_fastdds.xml": "09a275ff566f8252134a93acefdffa4ff5857df0751b8dc245ceb3b1106059fc",
-        "configs/p3_offline_budget.json": "13d1347794d6e324795137d64f5591c730fb76eefd68e0e845ebde55826eaa75",
-        "configs/p3_sensor_bridge.yaml": "02455c17bd422e269d2e002b70c9b264bc36e4277be6a7a4c505377f89815e33",
-        "configs/p3_sensors.yaml": "1da79bb2324b150523d1c86393bfa5311c31fdde0b4c1ababfbed0e2343150ea",
-        "configs/p3_validation.yaml": "6d83330207060b9301fcdbc4268a11e50cd97e4ec8170732c58a8d4b632b300c",
-        "configs/qgc-monitor.ini": "0d3d50a80c85c71e5dad8a49ca4514582a36413e1d64252003683c4769e464f4",
-        "configs/versions.lock.yaml": "9a37285d5aa8b9f498dd000c8405092d7bbd07f6a213a84a79ddb6cdca31bde9",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/__init__.py": "e3cbb7875577c98af5b731036721fed45c1cb6979d06cc1864f0cbedabb897c4",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/acceptance.py": "a47353226742fbd40e7187dca3c47ceea8b415a34a25a37a0961c4a1b35b2781",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/contracts.py": "bad7469409c6312f6bd3a48db9b2b4b3897f612bf6809a1b1021a7fb2abba5ec",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/estimator_reference.py": "d19316d1fcaeee5fb6ad091b1e4a22ac436f3da872d4d445541d3476a15a6928",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/execution_timing.py": "eb9991c5e162c62eb6d25031a204a2032403da79a935a36340e3a0aa136b6fc6",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/frames.py": "d8f55db8412cdfa4ba9a167e7d60d715e7a42a393502ad7a4dd0fbfc05fffb6d",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/mission.py": "28d4a7c15dd9fe37ba883d296652cdea7600ee49f221a9de93a31dc5ada4aec7",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/node.py": "7254b275a8ee3e5f9c6c95936704e0c94e9f1e3dcef3dc599d65ae3dc2db37b5",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/protocol.py": "b448b275dcd730a8f9e5ede24e8d25da16eb7fb0a2025038f41d0c667e2cad8d",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/sample_identity.py": "133f9572aa132207ec432c8bcc160784af8c62a16c5493c232e0a875220eda6a",
-        "ros2_ws/src/gwm_px4_control/gwm_px4_control/timing.py": "3bfa6b7c7df4792af3aa3259f3f69b7a3df4cebd4a3b1e29b5004401a2b63382",
-        "ros2_ws/src/gwm_px4_control/package.xml": "288fb4032f50660312ad7313d0e3b9e221de00f5bc9ab71f40167ea38459a97e",
-        "ros2_ws/src/gwm_px4_control/resource/gwm_px4_control": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-        "ros2_ws/src/gwm_px4_control/setup.cfg": "33725d7ba50068773c13090a06c3446f187676f2b39928e6a0e7aacddb0058d6",
-        "ros2_ws/src/gwm_px4_control/setup.py": "5ec8bf2eb97f7550f0aee0177ace262ad2ae91cbbc01214c461fc6b907c508c9",
-        "ros2_ws/src/gwm_px4_control/test/test_installed_contract.py": "e8f0d8fafb4699fa40bbbdaaf76532ce2e7d73303c6e11b35c2af9231d8a216c",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/__init__.py": "7a108227e35c9c3ce8bef3b5a297f60c70260fa4c9f25bfff6cb512efbae17ca",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/contracts.py": "db9d36072c0239414d8a2e1b3d4058baec058990a6c2efde87e4cba9a612df22",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/depth.py": "ace03f168254fb5b1623cc7c2c50ef035976a52ef5e32778d655952b95ade453",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/geometry.py": "5ca25c9178151069f0f4803d78f28c3c931a034992784b86137634f58886e244",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/node.py": "b00186f3087f582b59f30f5832acf81e2565d5ab87307f3a8bab566f1c139a06",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/recording.py": "716678d4c29440890a20a635ad0d1f1410aec1b97365da3e884d968214d82916",
-        "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/state.py": "2060f0668726a1cdc40df5a8401f89ccf4eb4829137b8daaa5bd78fd77d7178f",
-        "ros2_ws/src/gwm_sensor_adapter/package.xml": "867da3b1cac2dc578df3a3b6f5cad9134a4a55c67582d651d08320d5d3f46c48",
-        "ros2_ws/src/gwm_sensor_adapter/resource/gwm_sensor_adapter": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
-        "ros2_ws/src/gwm_sensor_adapter/setup.cfg": "135c27299f7f2dfd4151724bc780b427881af54ca869e5b6fb6cd1e3a38e6039",
-        "ros2_ws/src/gwm_sensor_adapter/setup.py": "9a3f71eadd86f3c80cca9a93c97d3c7226328dcde4f506814b681975d69f5bcf",
-        "ros2_ws/src/gwm_sensor_adapter/test/test_installed.py": "ec65eda0b6545646eaaed02b0f8860f87bf5c517832fc6085bc66fd661bd6503",
-        "scripts/build_baseline.sh": "326a7036bc961227a9715137e3c6979f0111368c2f9676c8d0e7c1b4ea31f0a8",
-        "scripts/build_p2.sh": "298520117e1e0dc73de2d288818dae43e2ff164dbd874f79c5df0fd59135f4a8",
-        "scripts/build_p3.sh": "7f6df0bc04c4c0bb528d54880cad7c0e581d964f49ff5538b7c6454ae84590f4",
-        "scripts/check_environment.sh": "99b3f7317cbc21ce4bf255267c8c7eae9b603bf2df4c7ef367e80f01955c4037",
-        "scripts/common.sh": "f84399b6b3938327b4ca817fd2d08dab340dd09a4ff57368a2041a63035622cb",
-        "scripts/measure_p3_offline.py": "f3a0826c8c22b866aba7e0b0df105e58c374e14386a7395b38706a53e30ccba2",
-        "scripts/offline_jobs.py": "2ae0fb26c9c031fa1ce74da75d16e742d138f13433ac024a81d13cb2904e0c2f",
-        "scripts/p1_contract.py": "daf348b6af40bf430166aa8f24936bd56396e4fc1312cd36828e99ce811222c8",
-        "scripts/p1_runner.py": "7db73916c05f6848094c5f0ea98892d8e794cab0bad20be35398b7aa1f54c1c8",
-        "scripts/p2_build.py": "659643cf840a367812e03a816e1131d152c83cba605d6f7e3d7af6f92986ff87",
-        "scripts/p2_runner.py": "6cc6e95dc75d4f76db893b451a35b219c382a0963598fbcf939067be24a05a36",
-        "scripts/p3_build.py": "0a76ac76c727e4d4dedf882d2c277658043e903ebfb4ea181bbff3bc9ee1c19a",
-        "scripts/p3_coexistence.py": "122f370fc4f140ec2c5cb9b0722a466678ae7b6bb9348a91ea3c7961384d0761",
-        "scripts/p3_runner.py": "c504dbb29f8b322c226184787004691effc9dd5cd29de60b66486143a5691429",
-        "scripts/record_versions.py": "6e1451dd9e37fa4963a794e637d961fada006456cf6a3e2ffbec3163e3dadf2a",
-        "scripts/run_p1_baseline.sh": "e630e8f0b0ffb736bbcb1900501729e68268b29143635f7579a634670ce9589c",
-        "scripts/run_p1_repeated.py": "4765892d6eab71faad01d74743e564cbfd7c7a7f18a1ca8cfe99d4612ac9661a",
-        "scripts/run_p2_control.sh": "940e17ee963806b737131e843a10cd83f213f6dda5775cf2498681ec7e2c123c",
-        "scripts/run_p2_repeated.py": "653eb799cb4a2dd0ce7075288d22f335695b78415714b391aae20d7bc102f4ec",
-        "scripts/run_p3_coexistence.sh": "385c6b1c42c362edd6f28c5d27ca390595231bd75551eb5d4efa5bce96b77fb4",
-        "scripts/run_p3_ground_matrix.py": "6d62f933cbe4b2758f13d507c6ebe2c6aca49a0474984543c02ec6782c35bfea",
-        "scripts/run_p3_qualification.py": "0aa3f5993549e5fae3c3992a4b372594a21be50e0c6a6b15c23e98982f085a67",
-        "scripts/run_p3_sensing.sh": "6793a4e635a3175de7b90d7b4107bbb1fc7d16021d6c8f009311b951a5a36bf2",
-        "scripts/setup_environment.sh": "e566eb7eabdffe9580bbcf8553a65897fee78baeab0300da6efafce6415ed147",
-        "scripts/setup_qgc_monitor.sh": "a0c1d99a4a2a334ffee40a5508dbc31461d4d778d2f1b80102bfdb2fd7775882",
-        "scripts/verify_p2_evidence.sh": "f534e943dd48f006839dabedc49cd04dc788b81852125274e6a95051d6786161",
-        "scripts/verify_p3_coexistence.sh": "9c24a77abff83eea5d667bb5449a16393ba1567a9663bd6a93b06b2a9668ac2c",
-        "validation/adjudicate_p3_sample_time.py": "70f48c2ef60564ebe163ed26a260fd4ff1f734cab5b241ef94ba4f38f0963baf",
-        "validation/collect_evidence.py": "16666918de585e1fd09363f85be8734c49fcf1a141ccd339fa7f4b5bd8173aba",
-        "validation/collect_p2_evidence.py": "0bd35f837245feb56087b52627dca8ae211d99b21cbfb73055891837f1382308",
-        "validation/collect_p3_coexistence.py": "a9ad384a7a0e9b35d7afa8cb8265cf2aa2bd74af68d2bf2a00c67f1da2fb83ae",
-        "validation/collect_p3_evidence.py": "746efaf6cba5fc6fad6cf60e77e85088f3412b2b7f0c11bb05cbce7685fef3fb",
-        "validation/p3_provenance.py": "2c2ad49b8680208b0fb9df38eeb5be75d7d15a20c637202d171a43284c20d8e6",
-        "validation/p3_source_probe.py": "8c11dd0835f169ca1b6ccd20fb24b8a6b5ae9eba5117d89d240a500262ad870a",
-        "validation/publish_wait_probe.c": "a6249188ff94516ab03a69b46699f92c9327e0bbc7675e73b89b24cffd3f51ad",
-        "validation/reference_evidence.py": "8e09dbc109596d60d39b0315405ea882c9c6170b24665a708537fadb9a17b175",
-        "validation/sample_evidence.py": "b70058144b3ffd1f53dd035574351be549cbb97ab65f8e4871a0da1f48d0f759",
-        "validation/timing_evidence.py": "420d11fcf2379964d671534ce95c3fd18d257be23d46be149f42573a906742de",
-        "validation/verify_ulog.py": "e35a29acbf6ca3becd0ef8b497c1cb1b4280cde7945c13c1c2d19e08f7c1a8c4",
-        "validation/yaw_evidence.py": "b42b6d6e771101338518853d45818d49bc00079d182e2c26b19d88929a0a4897",
-        "validation/yaw_provenance.py": "a733b3f6567b4354462e515beead2310df68f5c87df36c69dd4c2d5dcbe92d09"
-      },
-      "sample_evidence_contract": "p3-sample-evidence-v2"
-    }
+    "source_draft_sha256": "7e145d41a932d432f8c16b3e61e869924094cb798f4c3787a5f9f0591e434c34",
+    "validator_report": "/home/joker0625/uav_autonomy/state/p3-r1-implementation-20260912T130622Z/summary-generator-validation-v3.json",
+    "validator_sha256": "5f89581fbf6aa4c58d782493daeb926793ddf741a2c02ed75a617a9b06ca4428",
+    "checks_passed": 57
   }
 }

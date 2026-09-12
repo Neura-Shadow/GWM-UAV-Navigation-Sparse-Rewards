@@ -319,7 +319,45 @@ gap invalidates acceptance. The repeated runner freezes the timing evaluator,
 instrumentation, transport configuration and measured middleware binaries.
 No older R2 pass carries into the new R3 streak.
 
+### P3-R2 offline evidence gate
+
+P3 acceptance is incomplete. Outcome C blocks new nominal flights: existing
+ULog fields do not identify the MC position input consumed for an internal
+yaw output. Read the [yaw provenance contract](../../docs/v3_sim_p3_yaw_provenance_contract.md)
+and its proposed instrumentation amendment before any future runtime sequence.
+No PX4 patch or rebuild is authorized by the offline repair. The old proxy's
+79/135 and 68/135 failures remain immutable diagnostics; new analyses have
+unobservable causal evidence and no flight credit.
+
+Offline historical analysis uses exclusive output names. For a sealed R1 run:
+
+```bash
+bash simulation/px4_gazebo/scripts/verify_p2_evidence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_RETAINED_R1_RUN" \
+  --historical-analysis --output-name UNIQUE-control.json
+```
+
+An unknown mandatory result exits nonzero and **must stop qualification**.
+Only explicitly labelled historical diagnostic work may subsequently inspect
+the dependent sensor metrics using `--historical-analysis`, a matching
+`--control-name` and a distinct `--output-name`. That result remains failed
+when control acceptance is unknown. The original pre-R1 smoke additionally
+uses `--sample-contract p3-sample-evidence-v2`; it cannot acquire a newer
+runtime seal or missing callback identity through reanalysis.
+
+The [offline budget measurements](../../docs/v3_sim_p3_offline_budget.md) use
+`measure_p3_offline.py` through these same wrappers/interpreters. Production
+qualification uses `p3_offline_budget.json`, requires finalized current-input
+control success and verified A/B/C/D before launching sensor evaluation, and
+increments progress only after both results pass. Partial/stale files, wrong
+run IDs, changed arithmetic, unknown evidence and timeout stop the batch.
+Owned evaluator descendants are cleaned up even if their leader has exited.
+Flight, dispatch, freshness and ACK deadlines are unchanged.
+
 ### P3-R1 final-input readiness, ground and flight procedure
+
+The following records the earlier campaign and future sequence prerequisites.
+The P3-R2 observability gate above must be resolved before another campaign.
 
 P3 adds the pinned native x500_depth camera, GZ_TO_ROS Image/CameraInfo bridge,
 a separate bounded sensor adapter/recorder and independent calibration tools.
