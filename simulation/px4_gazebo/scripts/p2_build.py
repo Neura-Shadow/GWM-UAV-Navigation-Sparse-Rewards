@@ -66,9 +66,9 @@ def build():
     workspace = root / "p2_ws" / identity
     source = workspace / "src/gwm_px4_control"
     if source.exists():
-        for name, digest in manifest.items():
-            if sha(source / name) != digest:
-                raise ValueError("Existing build mirror modified: " + name)
+        actual={p.relative_to(source).as_posix():sha(p) for p in sorted(source.rglob('*'))
+                if p.is_file() and '__pycache__' not in p.parts and p.suffix!='.pyc'}
+        if actual!=manifest: raise ValueError('Existing build mirror inventory modified')
     else:
         source.mkdir(parents=True)
         for name in manifest:
@@ -82,6 +82,13 @@ def build():
         subprocess.run(command, cwd=workspace, check=True)
     receipt = {"package_hash": identity, "source_files": manifest, "workspace": str(workspace),
                "install": str(workspace / "install"), "topic_contract": contract}
+    installed=next((workspace/'install').rglob('site-packages/gwm_px4_control/__init__.py')).parent
+    expected={p.relative_to(source/'gwm_px4_control').as_posix():sha(p)
+              for p in (source/'gwm_px4_control').rglob('*') if p.is_file() and '__pycache__' not in p.parts and p.suffix!='.pyc'}
+    actual={p.relative_to(installed).as_posix():sha(p) for p in installed.rglob('*')
+            if p.is_file() and '__pycache__' not in p.parts and p.suffix!='.pyc'}
+    if actual!=expected: raise ValueError('Installed controller sources differ from mirror')
+    receipt['installed_source_files']=expected
     (root / "state/p2-built.json").write_text(json.dumps(receipt, indent=2, allow_nan=False)+"\n")
     print("P2 package built/tested: " + identity, flush=True)
 

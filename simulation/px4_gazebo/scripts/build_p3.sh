@@ -9,6 +9,8 @@ verify_checkout "$ROS_WS/src/px4_msgs" px4_msgs
 set +u
 source /opt/ros/jazzy/setup.bash
 source "$ROS_WS/install/setup.bash"
+p2_install=$(/usr/bin/python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["install"])' "$SIM_ROOT/state/p2-built.json")
+source "$p2_install/setup.bash"
 set -u
 export PYTHONNOUSERSITE=1
 /usr/bin/python3 "$SIM_DIR/scripts/p3_build.py" --build

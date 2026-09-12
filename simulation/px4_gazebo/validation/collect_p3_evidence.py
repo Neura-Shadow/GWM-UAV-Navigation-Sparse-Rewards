@@ -14,6 +14,16 @@ def digest(path):
     return h.hexdigest()
 
 
+def acquisition_ns(record, required=False):
+    """Keep native image/source identity; only legacy records need conversion."""
+    if 'acquisition_sim_ns' in record:
+        value=record['acquisition_sim_ns']
+        if type(value) is not int or not 0 <= value < 2**63: raise ValueError('invalid_native_acquisition_ns')
+        return value
+    if required: raise ValueError('missing_native_acquisition_ns')
+    return round(record['acquisition_sim_s']*1e9)
+
+
 def rotation(q):
     x,y,z,w=[q.get(k,0.) for k in ('x','y','z','w')]
     if abs(x*x+y*y+z*z+w*w-1)>1e-6: raise ValueError('truth_quaternion')
@@ -58,6 +68,11 @@ def expected_depth(u,v,info,position,attitude,fixture):
 def evaluate(run):
     summary=json.loads((run/'summary.json').read_text())
     out=dict(schema_version=1,run_id=run.name,status='failed',failures=[],evaluator_sha256=digest(Path(__file__)))
+    revised=summary.get('frozen_inputs',{}).get('sample_evidence_contract') == 'p3-sample-evidence-v2'
+    if revised:
+        from p3_provenance import require_finalized, frozen_inputs
+        require_finalized(run,frozen_inputs(Path(__file__).resolve().parents[1]))
+        out.update(schema_version=2,sample_evidence_contract='p3-sample-evidence-v2',frozen_inputs=summary['frozen_inputs'])
     def check(condition,reason):
         if not condition: out['failures'].append(reason)
     check(summary['status']=='collected','run_not_collected')
@@ -69,8 +84,9 @@ def evaluate(run):
     rows=[json.loads(line) for line in (run/'depth-index.jsonl').read_text().splitlines()]
     result=json.loads((run/'sensor-result.json').read_text())
     begin,end=summary['window']['start_sim_s'],summary['window']['end_sim_s']
-    window=[r for r in rows if begin<=r['acquisition_sim_s']<=end]
-    observations=[e for e in events if e['kind']=='observation' and begin<=e['image']['acquisition_sim_s']<=end]
+    begin_ns,end_ns=round(begin*1e9),round(end*1e9)
+    window=[r for r in rows if begin_ns<=acquisition_ns(r,revised)<=end_ns]
+    observations=[e for e in events if e['kind']=='observation' and begin_ns<=acquisition_ns(e['image'],revised)<=end_ns]
     health=[e for e in events if e['kind']=='health' and begin<=e['sim_s']<=end]
     check(result['status']=='complete','recorder_completion')
     check(len(rows)==result['received']==result['recorder']['written']==result['recorder']['accepted'],'recording_coverage')
@@ -91,10 +107,12 @@ def evaluate(run):
         return out
     check(len(window)>=2 and len(observations)>=2,'missing_measurements')
     if len(window)<2 or len(observations)<2: return out
-    stamps=np.array([r['acquisition_sim_s'] for r in window]); gaps=np.diff(stamps)
-    rate=(len(window)-1)/(stamps[-1]-stamps[0])
-    obs_stamps=np.array([e['image']['acquisition_sim_s'] for e in observations])
-    processed_rate=(len(observations)-1)/(obs_stamps[-1]-obs_stamps[0])
+    stamps_ns=np.array([acquisition_ns(r,revised) for r in window],dtype=np.int64)
+    gaps_ns=np.diff(stamps_ns); gaps=gaps_ns/1e9
+    stamps=stamps_ns/1e9
+    rate=(len(window)-1)*1e9/int(stamps_ns[-1]-stamps_ns[0])
+    obs_stamps=np.array([acquisition_ns(e['image'],revised) for e in observations],dtype=np.int64)
+    processed_rate=(len(observations)-1)*1e9/int(obs_stamps[-1]-obs_stamps[0])
     out['timing']=dict(window_sim_s=end-begin,frames=len(window),delivered_hz=rate,
         source_gap_max_sim_s=float(gaps.max()),processed_hz=processed_rate,observations=len(observations),
         observation_age_max_sim_s=max(e['source_age_sim_s'] for e in observations),
@@ -125,7 +143,7 @@ def evaluate(run):
             check(row['id']==index+1 and row['offset']==offset,'raw_index_continuity')
             raw=data.read(row['bytes']); offset+=len(raw)
             check(hashlib.sha256(raw).hexdigest()==row['sha256'],'raw_frame_hash')
-            if not begin<=row['acquisition_sim_s']<=end: continue
+            if not begin_ns<=acquisition_ns(row,revised)<=end_ns: continue
             check((row['width'],row['height'],row['encoding'],row['step'],row['is_bigendian'])==(640,480,'32FC1',2560,0),'actual_layout')
             image=np.frombuffer(raw,dtype='<f4').reshape(480,640)
             if summary['case']=='asymmetric':
@@ -170,10 +188,10 @@ def evaluate(run):
         coordinate_samples=coordinates,coordinate_error_max_m=coord_error,unique_raw_frames=len(unique),invalid_counts=counts)
     if (run/'gazebo-source-headers.jsonl').exists():
         source=[json.loads(line) for line in (run/'gazebo-source-headers.jsonl').read_text().splitlines()]
-        source=[s for s in source if begin<=s['acquisition_sim_s']<=end]
-        source_times=np.array([s['acquisition_sim_s'] for s in source])
-        out['source_probe']=dict(frames=len(source),source_gap_max_sim_s=float(np.diff(source_times).max()),
-            gazebo_frames_missing_in_ros=len(set(source_times)-set(stamps)),
+        source=[s for s in source if begin_ns<=acquisition_ns(s,revised)<=end_ns]
+        source_times=np.array([acquisition_ns(s,revised) for s in source],dtype=np.int64)
+        out['source_probe']=dict(frames=len(source),source_gap_max_sim_s=float(np.diff(source_times).max()/1e9),
+            gazebo_frames_missing_in_ros=len(set(source_times)-set(stamps_ns)),
             source_sequence_first=source[0]['header_data'],source_sequence_last=source[-1]['header_data'])
         check(out['source_probe']['gazebo_frames_missing_in_ros']==0,'source_to_recording_loss')
         seq=[int(s['header_data']['seq'][0]) for s in source]
@@ -205,7 +223,9 @@ def evaluate(run):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(); p.add_argument('run',type=Path); args=p.parse_args()
-    result=evaluate(args.run)
+    try: result=evaluate(args.run)
+    except Exception as exc: result=dict(schema_version=2,run_id=args.run.name,status='failed',failure=str(exc),
+        sample_evidence_contract='p3-sample-evidence-v2',evaluator_sha256=digest(Path(__file__)))
     with (args.run/'p3-evaluation.json').open('x') as stream: stream.write(json.dumps(result,indent=2,allow_nan=False)+'\n')
     print(json.dumps(result,indent=2,allow_nan=False))
     raise SystemExit(0 if result['status'].startswith('passed') else 1)

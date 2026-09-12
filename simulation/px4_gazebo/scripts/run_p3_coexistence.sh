@@ -2,11 +2,17 @@
 set -euo pipefail
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 if [[ $# == 0 || ${1:-} == --help ]]; then
-  echo 'No runtime started. Use --run --observe|--allow-simulated-flight --ground-matrix ABSOLUTE_PASSED_MATRIX.'
+  echo 'No runtime started. Readiness: --run --observe. Flight: --run --allow-simulated-flight --ground-matrix ABSOLUTE_PASSED_MATRIX.'
   exit 0
 fi
-[[ $# == 4 && $1 == --run && $3 == --ground-matrix && -f $4/summary.json ]] || fail 'Exact P3 arguments required'
-case "$2" in --observe) ;; --allow-simulated-flight) [[ ${GWM_ALLOW_SITL_COMMANDS:-} == 1 ]] || fail 'Missing flight gate';; *) fail 'Unknown P3 purpose';; esac
+[[ ${1:-} == --run ]] || fail 'Explicit P3 --run required'
+case "${2:-}" in
+  --observe) [[ $# == 2 ]] || fail 'Readiness precedes ground qualification';;
+  --allow-simulated-flight)
+    [[ $# == 4 && $3 == --ground-matrix && -f $4/summary.json ]] || fail 'Exact P3 flight arguments required'
+    [[ ${GWM_ALLOW_SITL_COMMANDS:-} == 1 ]] || fail 'Missing flight gate';;
+  *) fail 'Unknown P3 purpose';;
+esac
 for gate in GWM_ALLOW_OPTIONAL_RUNTIME GWM_RUN_GAZEBO_PX4_TESTS GWM_ALLOW_PX4_LAUNCH; do
   [[ ${!gate:-} == 1 ]] || fail "Missing $gate=1"
 done

@@ -62,6 +62,10 @@ def trial(args, sensor_session=None):
                     ("p2_runner.py", "run_p2_control.sh", "p2_build.py", "common.sh", "p1_runner.py", "p1_contract.py")}}
     if sensor_session:
         identity['p3'] = sensor_session.identity(sim, root)
+        from p3_provenance import tree_manifest
+        if tree_manifest(source)!=receipt['source_files']: raise ValueError('Controller mirror inventory changed')
+        installed=next(Path(receipt['install']).rglob('site-packages/gwm_px4_control/__init__.py')).parent
+        if tree_manifest(installed)!=receipt['installed_source_files']: raise ValueError('Installed controller source changed')
     if args.allow_simulated_flight or args.ground_diagnostic:
         observation = json.loads(connection_path.read_text())
         if observation["identity"] != identity or observation["status"] != "passed":
@@ -110,12 +114,21 @@ def trial(args, sensor_session=None):
                "control_owner": "gwm_px4_control" if args.allow_simulated_flight or args.ground_diagnostic else "none_read_only",
                "clock": {"gz_topic": "/world/"+config['world']+"/clock", "ros_topic": "/clock", "direction": "GZ_TO_ROS",
                          "use_sim_time": True, "UXRCE_DDS_SYNCT": 0}, "processes": []}
+    if sensor_session:
+        summary['sample_evidence_contract']=config['sample_evidence_contract']
+        summary['frozen_inputs']=sensor_session.frozen
+        summary['runtime_identity']=sensor_session.runtime_identity
+        summary['started_unix_ns']=time.time_ns()
     processes, streams = [], []
     console = None
     print("P2 evidence: "+str(run), flush=True)
 
     def save():
-        (run/"summary.json").write_text(json.dumps(summary, indent=2, allow_nan=False)+"\n")
+        if sensor_session:
+            from p3_provenance import atomic_json
+            atomic_json(run/'summary.json',summary)
+        else:
+            (run/"summary.json").write_text(json.dumps(summary, indent=2, allow_nan=False)+"\n")
 
     def launch(name, command, process_env=env):
         stream = (run/(name+".log")).open("w")
@@ -256,6 +269,11 @@ def trial(args, sensor_session=None):
         summary["cleanup"] = "owned groups stopped; namespace init exit terminates remaining descendants"
         summary["wall_duration_s"] = time.monotonic()-start
         save()
+        if sensor_session:
+            try: sensor_session.finalize(run,summary)
+            except Exception as exc:
+                summary['status']='failed'; summary['failure']='runtime_finalization:'+str(exc)
+                save()
     if summary["status"] == "passed" and args.observe:
         connection_path.write_text(json.dumps({"status": "passed", "identity": identity,
                                                                  "run_id": run.name}, indent=2, allow_nan=False)+"\n")

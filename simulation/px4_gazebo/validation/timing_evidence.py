@@ -39,6 +39,14 @@ def trace_metrics(traces, result, streams, events, config):
         require(pub['selected_source_timestamp']==row['selected_source_timestamp'], 'Dispatch selection mismatch')
     selected = [r for r in groups['mission_tick'] if 'selected_source_timestamp' in r]
     consumed = [r['selected_source_timestamp']/1e6 for r in selected]
+    if config.get('sample_evidence_contract') == 'p3-sample-evidence-v2':
+        native = [r['selected_source_timestamp'] for r in selected]
+        require(all(type(t) is int and t > 0 for t in native), 'Invalid native consumed timestamp')
+        require(all(b >= a for a,b in zip(native,native[1:])), 'Consumed source time regression')
+        # Repeats add no time, while a delayed controller still leaves its full
+        # source-consumption jump. Continuous incoming data cannot bridge it.
+        require(not native or max((b-a for a,b in zip(native,native[1:])),default=0)
+                <= round(config['max_sample_gap_sim_s']*1e6), 'Control consumption gap')
     # A failing attempted selection stays in the trace. It cannot be replaced
     # with intervening continuously received source samples.
     commands = publications['vehicle_command']

@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "sample_evidence_contract": "p3-sample-evidence-v2",
   "reference_policy": "p2-estimator-reference-v3",
   "reference_settings": {
     "max_events": 1,

@@ -3,15 +3,18 @@ import json
 from pathlib import Path
 
 
-def run_identity(directory):
+def run_identity(directory, explicit=None):
     """Flight recording lives in a sensors child of the unique run directory."""
     directory = Path(directory)
-    return directory.parent.name if directory.name == 'sensors' else directory.name
+    actual=directory.parent.name if directory.name == 'sensors' else directory.name
+    if not actual or actual in ('.','..','sensors') or explicit is not None and explicit!=actual:
+        raise ValueError('run_identity_mismatch')
+    return actual
 
 
 def load_config(path):
     c=json.loads(Path(path).read_text())
-    expected=dict(schema_version=1,profile='p3-x500-depth-native-shm64-v1',model='x500_depth_71',world='gwm_p3_ground',
+    expected=dict(schema_version=1,sample_evidence_contract='p3-sample-evidence-v2',profile='p3-x500-depth-native-shm64-v1',model='x500_depth_71',world='gwm_p3_ground',
         width=640,height=480,sensor_hz=30,processing_hz=10,near_m=.2,far_m=19.1,horizontal_fov_rad=1.274,
         encoding='32FC1',raw_frame='camera_link',optical_frame='gwm_front_depth_optical',
         origin_model_m=[.13233,0,.26078],origin_base_flu_m=[.13233,0,.02078],

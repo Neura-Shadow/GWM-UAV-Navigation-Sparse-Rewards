@@ -5,11 +5,13 @@ import math
 import os
 from pathlib import Path
 import time
+from copy import deepcopy
 
 from .contracts import (TOPICS, encode_wire, gates, json_message, load_config,
                         offboard_mode, position_setpoint, strict_json, topic_name)
 from .mission import Mission
 from .timing import StateCache
+from .sample_identity import CONTRACT
 from .execution_timing import TraceBuffer, transport_allowed, DispatchGuard, PublicationCoverage, controller_transport_env
 
 
@@ -47,6 +49,10 @@ def main(argv=None):
             super().__init__("p2_control", namespace="/gwm",
                              parameter_overrides=[Parameter("use_sim_time", value=True)])
             self.run = args.run_dir
+            self.run_id = self.run.name
+            self.sample_identity_enabled = c.get('sample_evidence_contract') == CONTRACT
+            self.delivery_ordinal = self.evaluation_ordinal = self.publication_ordinal = 0
+            self.topic_delivery_ordinals = {}
             self.trace = TraceBuffer(tc["trace_capacity"])
             self.start_wall = time.monotonic()
             self.guard = DispatchGuard(tc["dispatch_budget_wall_s"],tc["graph_fresh_wall_s"])
@@ -61,7 +67,7 @@ def main(argv=None):
             self.writer.open(rosbag2_py.StorageOptions(uri=str(self.run / "rosbag"), storage_id="sqlite3"),
                              rosbag2_py.ConverterOptions("cdr", "cdr"))
             self.registered = set()
-            self.cache = StateCache(c)
+            self.cache = StateCache(c, run_id=self.run_id)
             self.mission = Mission(c, self.cache, self.start_wall, active,
                                    args.ground_diagnostic, tc["ground_prestream_sim_s"])
             self.graph_ok = False
@@ -117,6 +123,8 @@ def main(argv=None):
 
         def emit(self, record):
             record = {"ros_sim_s": self.sim(), "monotonic_s": time.monotonic(), **record}
+            if self.sample_identity_enabled:
+                record.update(run_id=self.run_id, sample_evidence_contract=CONTRACT)
             with self.trace.span("json_encode:event", record["ros_sim_s"]):
                 encoded = strict_json(record)
             with self.trace.span("text_write_flush:event", record["ros_sim_s"]):
@@ -137,13 +145,26 @@ def main(argv=None):
             self.trace.append("clock_callback", entry, time.monotonic(), sim)
 
         def received(self, key, msg):
+            entry_ns = time.monotonic_ns()
             sim, wall = self.sim(), time.monotonic()
+            self.delivery_ordinal += 1
+            self.topic_delivery_ordinals[key] = self.topic_delivery_ordinals.get(key, 0)+1
+            delivery_id = f'{self.run_id}:delivery:{self.delivery_ordinal}'
             with self.trace.span("message_convert:"+key, sim):
                 data = dict(message_to_ordereddict(msg))
             self.bag(self.topic_map[key]["topic"], msg, sim)
             with self.trace.span("json_encode:"+key, sim):
-                encoded = strict_json({"event": "received", "topic_key": key, "ros_sim_s": sim,
-                                       "monotonic_s": wall, **json_message(data)})+"\n"
+                record = {"event": "received", "topic_key": key, "ros_sim_s": sim,
+                          "monotonic_s": wall, **json_message(data)}
+                if self.sample_identity_enabled:
+                    record.update(run_id=self.run_id, sample_evidence_contract=CONTRACT,
+                        delivery_id=delivery_id, delivery_ordinal=self.delivery_ordinal,
+                        topic_delivery_ordinal=self.topic_delivery_ordinals[key],
+                        callback_entry_monotonic_ns=entry_ns,
+                        message_version=self.topic_map[key]['version'], uorb_instance=0,
+                        instance_basis='owned_default_uorb_subscription',
+                        bag_storage_timestamp_ns=max(0, int(sim*1e9)))
+                encoded = strict_json(record)+"\n"
             with self.trace.span("text_write_flush:"+key, sim):
                 self.record.write(encoded)
             try:
@@ -151,8 +172,18 @@ def main(argv=None):
                     self.mission.ack(data, sim, wall)
                 else:
                     with self.trace.span("cache_update:"+key, sim, source_timestamp=data["timestamp"], callback_entry_wall_s=wall):
-                        self.cache.update(key, data, wall)
+                        self.cache.update(key, data, wall, delivery_id=delivery_id,
+                            receipt_monotonic_ns=entry_ns, version=self.topic_map[key]['version'])
+                    if self.sample_identity_enabled:
+                        self.record.write(strict_json({'event': 'source_delivery', 'run_id': self.run_id,
+                            'sample_evidence_contract': CONTRACT, 'topic_key': key,
+                            'ros_sim_s': sim, 'monotonic_s': wall, 'source': self.cache.last_delivery})+'\n')
             except (ValueError, KeyError) as exc:
+                if self.sample_identity_enabled:
+                    self.record.write(strict_json({'event': 'source_delivery_rejected', 'run_id': self.run_id,
+                        'sample_evidence_contract': CONTRACT, 'delivery_id': delivery_id,
+                        'topic_key': key, 'ros_sim_s': sim, 'monotonic_s': wall,
+                        'reason': str(exc)})+'\n')
                 self.fail(str(exc))
             self.trace.append("subscription_callback:"+key, wall, time.monotonic(), sim, source_timestamp=data["timestamp"])
 
@@ -203,15 +234,26 @@ def main(argv=None):
                     setattr(msg, name, value)
             sample=self.check_dispatch(recovery)
             publication = {"entry_sim_s":self.sim(),"entry_wall_s":time.monotonic(),
-                "selected_source_timestamp":round(sample["t"]*1e6),
+                "selected_source_timestamp":sample.get('timestamp_us', round(sample["t"]*1e6)),
                 "source_age_at_dispatch_sim_s":self.sim()-sample["t"]}
+            if self.sample_identity_enabled:
+                self.publication_ordinal += 1
+                publication.update(run_id=self.run_id, sample_evidence_contract=CONTRACT,
+                    publication_id=f'{self.run_id}:publication:{self.publication_ordinal}',
+                    selection_id=sample['selection_id'], source_id=sample['source_id'],
+                    component_sources=deepcopy(sample['component_sources']),
+                    entry_monotonic_ns=time.monotonic_ns(), wire_timestamp_us=fields['timestamp'])
+            source_trace = ({k: publication[k] for k in ('publication_id', 'selection_id', 'source_id')}
+                            if self.sample_identity_enabled else {})
             with self.trace.span("publish:"+key, self.sim(), source_timestamp=fields["timestamp"],
                     selected_source_timestamp=publication["selected_source_timestamp"],
-                    source_age_at_dispatch_sim_s=publication["source_age_at_dispatch_sim_s"]) as measurement:
+                    source_age_at_dispatch_sim_s=publication["source_age_at_dispatch_sim_s"], **source_trace) as measurement:
                 cpu_start = time.thread_time()
                 self.publishers_by_key[key].publish(msg)
                 measurement["thread_cpu_s"] = time.thread_time()-cpu_start
             publication.update(return_wall_s=time.monotonic(),return_sim_s=self.sim())
+            if self.sample_identity_enabled:
+                publication['return_monotonic_ns'] = time.monotonic_ns()
             self.bag(self.topic_map[key]["topic"], msg, publication["entry_sim_s"])
             return publication
 
@@ -237,6 +279,13 @@ def main(argv=None):
 
         def tick(self):
             entry = time.monotonic()
+            entry_ns = time.monotonic_ns()
+            self.evaluation_ordinal += 1
+            evaluation_id = f'{self.run_id}:evaluation:{self.evaluation_ordinal}'
+            self.cache.current_evaluation_id = evaluation_id
+            evaluation_phase = self.mission.state
+            evaluation_error = None
+            self.mission.control_selection = None
             steady_entry = self.steady.now().nanoseconds
             expected = steady_entry+self.timer.time_until_next_call()-self.timer.timer_period_ns
             self.guard.begin(entry)
@@ -255,7 +304,7 @@ def main(argv=None):
                     finally:
                         selected = self.mission.control_selection
                         if selected:
-                            selection.update(selected_source_timestamp=round(selected["t"]*1e6),
+                            selection.update(selected_source_timestamp=selected.get('timestamp_us', round(selected["t"]*1e6)),
                                 selection_wall_s=selected["selection_monotonic_s"],
                                 callback_entry_wall_s=selected["source_callback_entry_monotonic_s"],
                                 source_age_at_control_sim_s=selected["ros_sim_s"]-selected["t"])
@@ -284,9 +333,18 @@ def main(argv=None):
                 if action["setpoint"] or action["command"]:
                     self.guard.check(time.monotonic(),self.graph_checked,self.graph_ok)
             except (Exception, KeyboardInterrupt) as exc:
+                evaluation_error = str(exc)
                 self.fail(str(exc))
             finally:
                 self.guard.end()
+                if self.sample_identity_enabled:
+                    self.emit({'event': 'control_evaluation', 'evaluation_id': evaluation_id,
+                        'selection_id': evaluation_id, 'evaluated_phase': evaluation_phase,
+                        'evaluation_entry_monotonic_ns': entry_ns,
+                        'evaluation_return_monotonic_ns': time.monotonic_ns(),
+                        'component_sources': deepcopy(self.cache.source_refs),
+                        'sample': self.mission.control_selection,
+                        'error': evaluation_error})
             while self.mission.events:
                 self.emit(self.mission.events.pop(0))
             self.trace.append("control_callback",entry,time.monotonic(),self.sim(),
@@ -302,6 +360,10 @@ def main(argv=None):
                       "graph_valid": self.graph_ok, "qgc_monitor_present": True,
                       "manual_flight_commands": False, "ros_external_control_owner": args.flight}
             result["reference_policy"] = c.get("reference_policy", "p2-estimator-reference-v1")
+            if self.sample_identity_enabled:
+                result.update(run_id=self.run_id, sample_evidence_contract=CONTRACT,
+                    source_identity_statistics={'deliveries': self.delivery_ordinal,
+                        'evaluations': self.evaluation_ordinal, 'publications': self.publication_ordinal})
             result["timing_contract"] = tc["contract"]
             result["timing_configuration"] = tc
             result["transport_environment"] = self.transport_environment

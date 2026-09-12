@@ -319,47 +319,141 @@ gap invalidates acceptance. The repeated runner freezes the timing evaluator,
 instrumentation, transport configuration and measured middleware binaries.
 No older R2 pass carries into the new R3 streak.
 
-### P3 depth sensing and observation validation
+### P3-R1 final-input readiness, ground and flight procedure
 
 P3 adds the pinned native x500_depth camera, GZ_TO_ROS Image/CameraInfo bridge,
 a separate bounded sensor adapter/recorder and independent calibration tools.
 See the [sensor contract](../../docs/v3_sim_p3_sensor_contract.md),
 [actual validation and retained failures](../../docs/v3_sim_p3_validation.md)
-and [schema-1 evidence](../../docs/evidence/v3_sim_p3_summary.json).
+and [sample/time contract](../../docs/v3_sim_p3_sample_time_contract.md).
+The [current schema-2 summary](../../docs/evidence/v3_sim_p3_summary.json) keeps the repair
+separate from [preserved schema-1 evidence](../../docs/evidence/v3_sim_p3_summary_v1.json).
 No camera input enters P2 control decisions, PX4 fusion or AgentOps.
 
-Actual rendering/bridge/ground checks passed. The one new depth-equipped smoke
+Historical rendering/bridge/ground checks passed; the original depth smoke
 landed normally but failed independent strict timestamp-window acceptance.
-The three-flight qualification was not started (0/3). The commands below
-document the guarded procedure; the recorded failed smoke cannot authorize
-qualification. Further flight work requires a separately authorized repair
-and fresh acceptance, without discarding this failure.
+Its qualification count remains 0/3. P3-R1 implements
+`p3-sample-evidence-v2`, explicit enclosing run IDs, lossless source records
+and finalized provenance. The initial historical reconstruction failure is
+retained; a separate normalized reanalysis passes the fixed motion windows but
+still fails the unchanged prior-state yaw consistency gate, with exact PX4
+controller-consumed source identity unproven. No tolerance or matching policy
+was relaxed, and the old smoke receives no qualification credit.
+Fresh read-only run `20260912T132733Z-p3-observe-1957cc82` now passes the
+launcher, sealed finalization and independent control/sensor checks, including
+actual enclosing run IDs. The next plane2 attempt
+`20260912T132932Z-p3-plane2-514444e3` collected data but failed sealing because
+an unregistered sleeping process remained. Installed-source review identified
+the default QoS-inspection daemon as a supported explanation, with exact PID
+identity unrecorded. Ground inspection now uses explicit `--no-daemon`; no
+finalization check was weakened. The failed run and immutable diagnosis are
+retained. A v3 freeze now includes the daemon-free launcher, constituent ground
+artifact revalidation and complete selected-record health/source binding.
+Readiness `20260912T134432Z-p3-observe-113909cf` finalized under that freeze
+but failed independent evaluation because the offline reader rejected native
+zero-publication timestamps permitted by the pinned uint64 contract. Its
+failed results and two read-only diagnostics remain unchanged. A minimal
+offline correction uses the shared validator while retaining positive
+estimator sample timestamps and all flight limits. Fresh v4 readiness
+`20260912T135042Z-p3-observe-f4e7bdeb` passed launcher, seal and both independent
+evaluations, with all 159 image/PX4 associations matched exactly and correct
+run identities. V4 plane2 `20260912T135209Z-p3-plane2-adca8021` also passed.
+Matrix `20260912T135352Z-p3-ground-matrix-2f3837c3` then stopped at plane4
+because the daemon-free QoS CLI reported an unknown image topic despite
+recorded fresh sensor flow. The remaining cases were not run. Installed-source
+review identified the direct CLI node's 0.5 s discovery default; ground
+inspection now uses `--no-daemon --spin-time 3` with the existing outer 10 s
+timeout. The exact failed CLI cache state is unrecorded; the diagnosis and
+original failed summaries are retained.
+
+The current v5 freeze is
+`state/p3-r1-implementation-20260912T130622Z/frozen-runtime-inputs-v5.json`,
+SHA-256 `202e17ebbcf9a3532445ff0a541bc2fc1f06a8a3b9c95c913cafa786b13146b4`.
+It retains the same packages, evaluator arithmetic and physical limits as v4.
+Final ordinary verification passed 446 PX4/Gazebo focused tests and 1,246 full
+tests with 12 skips, including the unchanged AgentOps/C2 coverage. Python,
+Bash, ShellCheck and diff checks passed. Fresh v5 readiness
+`20260912T140041Z-p3-observe-34709c89` passed its sealed independent checks,
+including all 159 exact image/PX4 associations. Plane2
+`20260912T140217Z-p3-plane2-2de3a546` then passed. Matrix
+`20260912T140437Z-p3-ground-matrix-1e3494df` passed all seven cases, including
+the expected bridge interruption and plane4's separate scene-change check.
+The single new smoke `20260912T141235Z-p3-flight-778e3f60` completed normal
+LAND/disarm, recording finalization and cleanup. Independent P2 recording,
+all eight controller and sixteen ROS/ULog sample windows, execution timing,
+and all sensor checks passed. Independent flight acceptance failed prior-state
+yaw consistency: 68/135 comparisons failed, including 63 heading mismatches
+and eight age violations (three overlap). Maximum error was
+8.08238983154297e-5 rad versus 1e-5 rad; maximum age was 0.016 s versus
+0.008001 s. P3 composite acceptance failed only `control_acceptance`.
+All 984 image/PX4 associations matched exactly without ambiguity, reuse or
+missing sources. The sample/time contract and final observation identity are
+verified; P3 flight acceptance remains incomplete.
+
+The smoke failure stopped progression: no further flight was attempted and
+qualification remains **not_run, 0/3**. The full independent P2 evaluator was
+observed CPU-active beyond 180 s before completion, so the qualification
+wrapper's existing 90 s control-evaluation timeout is also not runtime-qualified.
+No frozen timeout, arithmetic or flight limit was changed after the smoke.
+The commands below document the required sequence; qualification requires a
+fully passed new smoke, which this campaign did not provide.
 
 From the Windows checkout in a clean WSL shell, build the content-addressed
-Linux mirrors using already installed Jazzy dependencies:
+Linux mirrors using already installed Jazzy dependencies. Build the controller
+first: the sensor build verifies and sources that exact installed overlay.
 
 ```bash
+cd /mnt/d/GWM-UAV-Navigation-Sparse-Rewards
 bash simulation/px4_gazebo/scripts/build_p2.sh --build
 bash simulation/px4_gazebo/scripts/build_p3.sh --build
 ```
 
-The P3 mirror stays under `$HOME/uav_autonomy/p3_ws/<hash>`. No default script
-call launches runtime. A ground-only start requires the existing three
-runtime gates; it creates no PX4 process or flight-control publisher:
+The final builds recorded for P3-R1 are controller `0d994904f2e43310219e4505c246cc8ecd2f95f2467ed3463a5308c124840456`
+and sensor `8f0514da5d4e93a3b07efe9983567b8d487f9f1a93cc108676c896794f4778a3`.
+The P3 mirror stays under `$HOME/uav_autonomy/p3_ws/<hash>`. A fresh run verifies
+the complete source mirror and installed inventory, evaluator/configuration
+hashes and measured pinned runtime assets. Check disk reserve for the declared
+ground/flight set before starting; preserve all historical evidence.
+
+Read-only depth/PX4 readiness comes **before** the final-input ground matrix.
+It uses Ogre2 server rendering through WSLg, QGC offscreen monitoring and the
+existing exclusive private namespace/lock. It publishes no flight inputs:
 
 ```bash
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
 GWM_ALLOW_PX4_LAUNCH=1 \
-bash simulation/px4_gazebo/scripts/run_p3_sensing.sh --run --case plane2
+bash simulation/px4_gazebo/scripts/run_p3_coexistence.sh --run --observe
+
+bash simulation/px4_gazebo/scripts/verify_p2_evidence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_FINAL_READINESS_ID"
+bash simulation/px4_gazebo/scripts/verify_p3_coexistence.sh \
+  "$HOME/uav_autonomy/runs/ACTUAL_FINAL_READINESS_ID"
+```
+
+Wait for the launcher process to exit and `runtime-finalized.json` to exist
+before the first evaluator; wait for the P2 evaluator to finish before starting
+the P3 evaluator. A controller result or a partially written manifest is not
+completion. The seal requires stopped owned processes, a closed/drained/fsynced
+sensor writer, complete controller records and verified artifact hashes.
+Actual startup, health, observations, indices and result records must all carry
+the enclosing run ID. Existing evaluator reports are exclusive-create.
+
+After both readiness evaluations pass, start plane2 using that exact readiness
+predecessor. This ground-only run creates no PX4 process or flight publisher:
+
+```bash
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+GWM_ALLOW_PX4_LAUNCH=1 \
+bash simulation/px4_gazebo/scripts/run_p3_sensing.sh --run --case plane2 \
+  --readiness-run "$HOME/uav_autonomy/runs/ACTUAL_FINAL_READINESS_ID"
 
 /usr/bin/python3 simulation/px4_gazebo/validation/collect_p3_evidence.py \
   "$HOME/uav_autonomy/runs/ACTUAL_PLANE2_RUN_ID"
 ```
 
-Wait for the launcher to exit and finish its artifact manifest before offline
-evaluation. Existing results are exclusive-create. With an independently
-passed plane2 under the declared profile, the ground wrapper fixes the six
-remaining cases, one each, and retains every outcome:
+Again wait for launcher exit and the sealed runtime before evaluation. With
+an independently passed plane2 under the final frozen inputs, the matrix
+wrapper inherits its readiness predecessor and runs six remaining cases once:
 
 ```bash
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
@@ -371,35 +465,36 @@ GWM_ALLOW_PX4_LAUNCH=1 \
 It covers plane4, plane6, oblique, asymmetry, out-of-range and a ground-only
 bridge interruption. Truth, fixture coordinates and source-header probes
 stay evaluator-only. The interruption's expected failure is separate from
-nominal depth measurements. Native depth remains 640x480/30 Hz; the selected
+nominal depth measurements; plane4 also retains the separately labelled
+post-window scene-change proof. Native depth remains 640x480/30 Hz; the selected
 sensor-only middleware XML allocates 64 MiB SHM. P2's controller-only UDPv4
-transport and all numerical limits stay unchanged.
+transport and all numerical limits stay unchanged. Build/model/configuration/
+evaluator identities and calibration must match readiness. Historical ground
+measurements do not substitute for this final-input matrix.
 
-A complete passed ground matrix is required for the read-only depth/PX4
-connection. The selected mode uses actual Ogre2 server rendering through WSLg
-and QGC offscreen monitoring, with an exclusive private namespace and lock:
+After the complete matrix passes, run exactly one new nominal depth smoke:
 
 ```bash
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
-GWM_ALLOW_PX4_LAUNCH=1 \
-bash simulation/px4_gazebo/scripts/run_p3_coexistence.sh --run --observe \
+GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
+bash simulation/px4_gazebo/scripts/run_p3_coexistence.sh --run --allow-simulated-flight \
   --ground-matrix "$HOME/uav_autonomy/runs/ACTUAL_PASSED_GROUND_MATRIX_ID"
 
 bash simulation/px4_gazebo/scripts/verify_p2_evidence.sh \
-  "$HOME/uav_autonomy/runs/ACTUAL_DEPTH_OBSERVE_ID"
+  "$HOME/uav_autonomy/runs/ACTUAL_NEW_DEPTH_SMOKE_ID"
 bash simulation/px4_gazebo/scripts/verify_p3_coexistence.sh \
-  "$HOME/uav_autonomy/runs/ACTUAL_DEPTH_OBSERVE_ID"
+  "$HOME/uav_autonomy/runs/ACTUAL_NEW_DEPTH_SMOKE_ID"
 ```
 
-Run those evaluators sequentially **after launcher completion**. The sensor
-evaluator consumes the completed P2 result. A flight start uses the same
-entrypoint with `--allow-simulated-flight` instead of `--observe` and additionally
-requires `GWM_ALLOW_SITL_COMMANDS=1`. It checks exact build/configuration/
-launcher identity and the two independent connection results. The controller
-retains exclusive command ownership and its original bounded mission.
+Run the evaluators sequentially **after launcher completion and finalization**.
+They check the revised sample/time/correlation contract alongside unchanged
+physical, timing, ACK, nominal LAND and landed/disarmed requirements. The
+controller retains sole external command ownership and its original bounded
+mission. A failed or aborted smoke does not authorize qualification. An offline
+reanalysis of the historical smoke cannot supply new-runtime credit.
 
-For a future independently passed new depth smoke, the fixed qualification
-entrypoint is:
+Only after that new smoke and both independent evaluations pass, run the fixed
+three-consecutive-flight qualification:
 
 ```bash
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
@@ -410,8 +505,11 @@ GWM_ALLOW_PX4_LAUNCH=1 GWM_ALLOW_SITL_COMMANDS=1 \
 ```
 
 It freezes inputs, runs exactly three consecutive trials, evaluates both
-control and sensing after each, and stops on the first failure. Historical
+control and sensing after finalized recordings, checks unique run IDs and
+predecessor hashes, and stops on the first failed or interrupted attempt.
+Do not restart selectively to obtain three favorable outcomes. Historical
 x500 P2 20/20 results cannot serve as depth-model acceptance. Raw depth binary,
 indices, calibration/events, control traces, bags and ULogs remain in the Linux
-run directories. Do not replay command bags into a live graph. P4/P5 and
-AgentOps v3-2 onward remain outside the implemented scope.
+run directories. Do not replay command bags into a live graph. P4-P7 and
+AgentOps v3-2 onward remain incomplete. Clean rebuild remains unproven; P4 is
+recommended only after the complete declared P3 acceptance passes.

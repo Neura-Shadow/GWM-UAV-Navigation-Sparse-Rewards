@@ -1,14 +1,16 @@
 """Advancing simulation stamps and independent monotonic receipt watchdogs."""
 import math
+from copy import deepcopy
 
 from .frames import finite, yaw_from_quaternion
+from .sample_identity import CONTRACT, IdentityTracker
 
 STATE_TOPICS = ("vehicle_local_position", "vehicle_status", "vehicle_attitude",
                 "vehicle_land_detected", "estimator_status_flags", "failsafe_flags")
 
 
 class StateCache:
-    def __init__(self, config):
+    def __init__(self, config, run_id=None):
         self.config = config
         self.data = {}
         self.receipts = {}
@@ -17,6 +19,12 @@ class StateCache:
         self.clock_wall = None
         self.frozen_reference = None
         self.reference_manager = None
+        self.identity = (IdentityTracker(run_id) if config.get('sample_evidence_contract') == CONTRACT else None)
+        self.source_refs = {}
+        self.delivery_receipts = {}
+        self.last_delivery = None
+        self.delivery_ordinal = 0
+        self.current_evaluation_id = None
 
     def clock(self, sim, wall):
         finite([sim, wall], 2)
@@ -28,7 +36,35 @@ class StateCache:
             self.sim = sim
         return fresh
 
-    def update(self, name, data, wall):
+    def update(self, name, data, wall, delivery_id=None, receipt_monotonic_ns=None, version=None):
+        if self.identity is not None:
+            finite([wall], 1)
+            self.delivery_ordinal += 1
+            delivery_id = delivery_id or f'{self.identity.run_id}:delivery:{self.delivery_ordinal}'
+            receipt_monotonic_ns = (round(wall*1e9) if receipt_monotonic_ns is None else receipt_monotonic_ns)
+            record = self.identity.observe(name, data, delivery_id, receipt_monotonic_ns, version)
+            timestamp = record['publication_us']
+            old = self.data.get(name)
+            stats = self.stats.setdefault(name, {'received': 0, 'unique': 0, 'first_us': timestamp,
+                'last_us': timestamp, 'max_gap_s': 0., 'reuse': 0, 'same_publication_distinct': 0,
+                'covered_publication_times': 0})
+            stats['received'] += 1
+            fresh = record['classification'] != 'duplicate_reuse'
+            if fresh:
+                if old:
+                    stats['max_gap_s'] = max(stats['max_gap_s'], (timestamp-old['timestamp'])/1e6)
+                stats['unique'] += 1
+                stats['last_us'] = timestamp
+                stats['same_publication_distinct'] += record['classification'] == 'distinct_same_publication'
+                stats['covered_publication_times'] += record['classification'] == 'distinct_publication'
+                self.data[name] = deepcopy(data)
+                self.receipts[name] = wall
+                self.source_refs[name] = deepcopy(record)
+            else:
+                stats['reuse'] += 1
+            self.delivery_receipts[name] = wall
+            self.last_delivery = deepcopy(record)
+            return fresh
         timestamp = data.get("timestamp")
         if isinstance(timestamp, bool) or not isinstance(timestamp, (int, float)) or not math.isfinite(timestamp):
             raise ValueError("invalid_timestamp:" + name)
@@ -100,10 +136,20 @@ class StateCache:
         position = finite([p[k] for k in ("x", "y", "z")], 3)
         velocity = finite([p[k] for k in ("vx", "vy", "vz")], 3)
         yaw = yaw_from_quaternion(a["q"])
-        return {"t": p["timestamp"]/1e6, "ros_sim_s": sim, "receipt_monotonic_s": wall,
+        sample = {"t": p["timestamp"]/1e6, "ros_sim_s": sim, "receipt_monotonic_s": wall,
                 "selection_monotonic_s": wall,
                 "source_callback_entry_monotonic_s": self.receipts["vehicle_local_position"],
                 "position": position, "velocity": velocity, "yaw": yaw,
                 "arming_state": s["arming_state"], "nav_state": s["nav_state"],
                 "landed": self.data["vehicle_land_detected"]["landed"],
                 "clock_ages_s": offsets}
+        if self.identity is not None:
+            position_source = self.source_refs['vehicle_local_position']
+            sample.update(sample_evidence_contract=CONTRACT, run_id=self.identity.run_id,
+                position_publication_us=p['timestamp'], position_sample_us=p['timestamp_sample'],
+                timestamp_us=p['timestamp'], timestamp_sample_us=p['timestamp_sample'],
+                source_id=position_source['source_id'],
+                reference_generation=deepcopy(position_source['reference_generation']),
+                component_sources=deepcopy(self.source_refs),
+                selection_id=self.current_evaluation_id, evaluation_id=self.current_evaluation_id)
+        return sample

@@ -1,5 +1,6 @@
 """Bounded position Offboard state machine. No ROS imports or process actions."""
 import math
+from copy import deepcopy
 
 from .frames import offset_target, wrap
 from .protocol import AckTracker
@@ -57,6 +58,8 @@ class Mission:
         self.handover = None
         self.handover_reached_sim = None
         self.max_initialization_drift = 0.0
+        self.last_source_id = None
+        self.last_publication_us = None
 
     def position_action(self):
         initialization = self.v3 and self.handover is None
@@ -228,10 +231,24 @@ class Mission:
             sample["initialization_drift_rad"] = drift
             if self.max_initialization_drift > math.radians(c["yaw_tolerance_deg"]):
                 raise ValueError("initialization_heading_drift")
-        if self.last_sample is not None and sample["t"]-self.last_sample > c["max_sample_gap_sim_s"]:
-            raise ValueError("observation_gap")
-        fresh = self.last_sample is None or sample["t"] > self.last_sample
+        if self.cache.identity is not None:
+            publication_us = sample['timestamp_us']
+            if self.last_publication_us is not None:
+                if publication_us < self.last_publication_us:
+                    raise ValueError('observation_time_backwards')
+                if publication_us-self.last_publication_us > round(c['max_sample_gap_sim_s']*1e6):
+                    raise ValueError('observation_gap')
+            fresh = self.last_publication_us is None or publication_us > self.last_publication_us
+            self.last_publication_us = publication_us
+        else:
+            if self.last_sample is not None and sample["t"]-self.last_sample > c["max_sample_gap_sim_s"]:
+                raise ValueError("observation_gap")
+            fresh = self.last_sample is None or sample["t"] > self.last_sample
         self.last_sample = sample["t"]
+        if self.cache.identity is not None:
+            sample['position_observation_reused'] = sample['source_id'] == self.last_source_id
+            sample['position_coverage_progress'] = fresh
+            self.last_source_id = sample['source_id']
         if self.last_sim is not None and sim < self.last_sim:
             raise ValueError("clock_backwards")
         dt = max(0.0, sim-(self.last_sim if self.last_sim is not None else sim))
@@ -282,6 +299,9 @@ class Mission:
                     "attitude_yaw": sample["yaw"], "position_timestamp": p["timestamp"],
                     "attitude_timestamp": a["timestamp"], "corrected_anchor": self.initial_yaw,
                     "ground_origin": self.origin, "completed_sim_s": None}
+                if self.cache.identity is not None:
+                    self.handover.update(position_source=deepcopy(self.cache.source_refs['vehicle_local_position']),
+                        attitude_source=deepcopy(self.cache.source_refs['vehicle_attitude']))
                 self.events.append({"event": "yaw_handover_started", **self.handover})
                 self.transition("YAW_HANDOVER", sim, wall, reference_lock_sim_s=sim)
             else:
@@ -320,10 +340,17 @@ class Mission:
                 self.window.append({**sample, "goal_ned": goal, "goal_yaw_ned": yaw, "offset_enu": offset})
                 duration = (c["initial_hover_sim_s"] if self.state == "INITIAL_HOVER" else
                             c["final_hover_sim_s"] if self.state == "FINAL_HOVER" else c["dwell_sim_s"])
-                if self.state == "TAKEOFF" or self.window[-1]["t"]-self.window[0]["t"] >= duration:
+                covered = (self.window[-1]['timestamp_us']-self.window[0]['timestamp_us'] >= round(duration*1e6)
+                           if self.cache.identity is not None else self.window[-1]['t']-self.window[0]['t'] >= duration)
+                if self.state == "TAKEOFF" or covered:
                     if self.state != "TAKEOFF":
                         self.windows[self.state] = {"start_sim_s": self.window[0]["t"], "end_sim_s": self.window[-1]["t"],
                             "count": len(self.window), "goal_ned": goal, "goal_yaw_ned": yaw, "offset_enu": offset}
+                        if self.cache.identity is not None:
+                            self.windows[self.state].update(
+                                start_us=self.window[0]['timestamp_us'], end_us=self.window[-1]['timestamp_us'],
+                                source_ids=[row['source_id'] for row in self.window],
+                                selection_ids=[row['selection_id'] for row in self.window])
                     next_state = self.order[self.order.index(self.state)+1]
                     self.transition(next_state, sim, wall, settled_observed=True)
                     if next_state == "REQUEST_LAND":

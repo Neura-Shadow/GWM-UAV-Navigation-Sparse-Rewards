@@ -7,12 +7,16 @@ from pathlib import Path
 import shutil
 import signal
 import subprocess
+import sys
 import time
 import uuid
 import xml.etree.ElementTree as ET
 from p1_contract import require_gates
 from p2_build import sha, package_hash
 from p3_build import manifest
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'validation'))
+from p3_provenance import (CONTRACT, frozen_inputs, require_readiness, predecessor,
+    atomic_json, seal_run, tree_manifest,runtime_inputs,strict_json)
 
 
 def box(world, name, front, size, yaw=0):
@@ -56,11 +60,20 @@ def trial(args):
     root=Path(os.environ.get('GWM_SIM_ROOT',str(Path.home()/'uav_autonomy')))
     from gwm_sensor_adapter.contracts import load_config
     config=load_config(sim/'configs/p3_sensors.yaml')
+    frozen=frozen_inputs(sim)
+    require_readiness(args.readiness_run,frozen)
+    runtime_identity=runtime_inputs(root,sim)
+    if runtime_identity!=strict_json(args.readiness_run/'summary.json')['runtime_identity']:
+        raise ValueError('Ground runtime differs from final readiness')
     validation=json.loads((sim/'configs/p3_validation.yaml').read_text())
     receipt=json.loads((root/'state/p3-built.json').read_text())
     if package_hash(manifest(sim))!=receipt['package_hash']: raise ValueError('P3 build mismatch')
     for n,h in receipt['source_files'].items():
         if sha(Path(receipt['workspace'])/'src/gwm_sensor_adapter'/n)!=h: raise ValueError('Changed mirror')
+    if tree_manifest(Path(receipt['workspace'])/'src/gwm_sensor_adapter')!=receipt['source_files']:
+        raise ValueError('Changed mirror inventory')
+    installed=next(Path(receipt['install']).rglob('site-packages/gwm_sensor_adapter/__init__.py')).parent
+    if tree_manifest(installed)!=receipt['installed_source_files']: raise ValueError('Installed sensor source changed')
     case='plane4' if args.case=='interruption' else args.case
     if case not in validation['fixtures']: raise ValueError('Unknown case')
     run=root/'runs'/(time.strftime('%Y%m%dT%H%M%SZ',time.gmtime())+'-p3-'+args.case+'-'+uuid.uuid4().hex[:8])
@@ -69,6 +82,8 @@ def trial(args):
     px4=root/'upstream/PX4-Autopilot'
     models=px4/'Tools/simulation/gz/models'
     summary=dict(schema_version=1,run_id=run.name,case=args.case,status='incomplete',failure=None,
+        sample_evidence_contract=CONTRACT,frozen_inputs=frozen,readiness=predecessor(args.readiness_run),started_unix_ns=time.time_ns(),
+        runtime_identity=runtime_identity,
         project_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=sim,text=True).strip(),
         profile=config['profile'],package_hash=receipt['package_hash'],
         purpose='expected_failure_ground_interruption' if args.case=='interruption' else 'ground_calibration',
@@ -94,7 +109,7 @@ def trial(args):
         GWM_P3_OWNED_NAMESPACE='1',RMW_IMPLEMENTATION='rmw_fastrtps_cpp')
     summary['process_environment']={k:env.get(k) for k in ('ROS_DOMAIN_ID','GZ_PARTITION','GZ_IP','DISPLAY','GZ_SIM_SERVER_CONFIG_PATH',
         'RMW_IMPLEMENTATION','FASTDDS_BUILTIN_TRANSPORTS','SKIP_DEFAULT_XML','RMW_FASTRTPS_PUBLICATION_MODE')}
-    def save(): (run/'summary.json').write_text(json.dumps(summary,indent=2,allow_nan=False)+'\n')
+    def save(): atomic_json(run/'summary.json',summary)
     def launch(name,command):
         stream=(run/(name+'.log')).open('w'); streams.append(stream)
         process_env=dict(env)
@@ -117,13 +132,13 @@ def trial(args):
         (run/'resolved-model.sdf').write_text(resolve.stdout); (run/'resolved-model.log').write_text(resolve.stderr)
         summary['resolved_model_sha256']=sha(run/'resolved-model.sdf')
         launch('gazebo',['gz','sim','-r','-s','--render-engine','ogre2','-v','4',str(run/'gwm_p3_ground.sdf')])
-        launch('source-probe',['/usr/bin/python3',str(sim/'validation/p3_source_probe.py'),str(run)])
+        launch('source-probe',['/usr/bin/python3',str(sim/'validation/p3_source_probe.py'),str(run),run.name])
         clock=(sim/'configs/p2_clock_bridge.yaml').read_text().replace('/world/default/clock','/world/gwm_p3_ground/clock')
         (run/'clock-bridge.yaml').write_text(clock)
         launch('clock-bridge',['ros2','run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(run/'clock-bridge.yaml')])
         bridge=launch('sensor-bridge',['ros2','run','ros_gz_bridge','parameter_bridge','--ros-args','-p','config_file:='+str(run/'p3_sensor_bridge.yaml')])
         sensor=launch('sensor-adapter',[str(Path(receipt['install'])/'gwm_sensor_adapter/lib/gwm_sensor_adapter/p3_sensor'),
-            '--run-dir',str(run),'--config',str(run/'p3_sensors.yaml')])
+            '--run-dir',str(run),'--run-id',run.name,'--config',str(run/'p3_sensors.yaml')])
         ready=run/'sensor-ready.json'
         while not ready.exists():
             if time.monotonic()-start>validation['startup_wall_s']: raise TimeoutError('sensor_readiness_timeout')
@@ -134,7 +149,8 @@ def trial(args):
         (run/'gazebo-topics.txt').write_text(topics)
         for topic in ('/depth_camera','/camera_info'):
             if topic not in topics.splitlines(): raise ValueError('Owned depth topic absent')
-        (run/'ros-image-qos.txt').write_text(subprocess.check_output(['ros2','topic','info','-v',config['image_topic']],env=env,text=True,timeout=10))
+        # Give this new direct CLI node bounded graph-discovery time after sensor readiness.
+        (run/'ros-image-qos.txt').write_text(subprocess.check_output(['ros2','topic','info','--no-daemon','--spin-time','3','-v',config['image_topic']],env=env,text=True,timeout=10))
         initial=truth('truth-start')
         stamp=initial['header']['stamp']; begin=int(stamp.get('sec',0))+int(stamp.get('nsec',0))/1e9
         summary['window']=dict(start_sim_s=begin,end_sim_s=begin+validation['ground_window_sim_s'])
@@ -185,6 +201,9 @@ def trial(args):
         summary['wall_duration_s']=time.monotonic()-start
         summary['artifacts']={p.name:dict(bytes=p.stat().st_size,sha256=sha(p)) for p in run.iterdir() if p.is_file() and p.name!='summary.json'}
         save()
+        try: seal_run(run,summary,run)
+        except Exception as exc:
+            summary.update(status='failed',failure='runtime_finalization:'+str(exc)); save()
     print(json.dumps(dict(run_id=run.name,status=summary['status'],failure=summary['failure'])),flush=True)
     return 0 if summary['status']=='collected' else 1
 
@@ -192,4 +211,5 @@ def trial(args):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--run',action='store_true',required=True)
     parser.add_argument('--case',required=True)
+    parser.add_argument('--readiness-run',type=Path,required=True)
     raise SystemExit(trial(parser.parse_args()))

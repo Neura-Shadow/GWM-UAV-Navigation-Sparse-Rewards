@@ -35,6 +35,10 @@ def load_config(path):
                 "p3-depth-coexistence-v1": ("gwm_p3_flight", "x500_depth_71")}
     if config.get("simulation_profile") not in profiles:
         raise ValueError("Unsupported simulation profile")
+    if 'sample_evidence_contract' in config and (
+            config.get('sample_evidence_contract') != 'p3-sample-evidence-v2'
+            or config.get('simulation_profile') != 'p3-depth-coexistence-v1'):
+        raise ValueError('Unsupported sample evidence contract')
     world, model = profiles[config.get("simulation_profile")]
     for key, expected in {"schema_version": 1, "instance": 71, "vehicle_system": 72,
                           "vehicle_component": 1, "source_system": 201, "source_component": 191,

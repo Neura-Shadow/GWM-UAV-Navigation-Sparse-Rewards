@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "sample_evidence_contract": "p3-sample-evidence-v2",
   "profile": "p3-x500-depth-native-shm64-v1",
   "model": "x500_depth_71",
   "world": "gwm_p3_ground",

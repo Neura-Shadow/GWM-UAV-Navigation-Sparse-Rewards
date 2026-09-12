@@ -1,5 +1,6 @@
 """Guarded ROS transport. No flight publishers, truth input, or planner."""
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -18,10 +19,24 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-dir', type=Path, required=True)
     parser.add_argument('--config', type=Path, required=True)
+    parser.add_argument('--run-id', required=True)
     args = parser.parse_args()
     for gate in ('GWM_ALLOW_OPTIONAL_RUNTIME','GWM_RUN_GAZEBO_PX4_TESTS','GWM_ALLOW_PX4_LAUNCH','GWM_P3_OWNED_NAMESPACE'):
         if os.environ.get(gate) != '1': raise ValueError('Missing '+gate)
     config = load_config(args.config)
+    actual_run=run_identity(args.run_dir,args.run_id)
+    contract=config['sample_evidence_contract']
+    def metadata(value): return dict(run_id=actual_run,sample_evidence_contract=contract,**value)
+    def write_metadata(name,value):
+        path=args.run_dir/name
+        temporary=path.with_suffix(path.suffix+'.tmp')
+        with temporary.open('x') as stream:
+            stream.write(json.dumps(metadata(value),allow_nan=False,indent=2)+'\n')
+            stream.flush(); os.fsync(stream.fileno())
+        os.link(temporary,path); temporary.unlink()
+    write_metadata('sensor-startup.json',dict(config_sha256=hashlib.sha256(args.config.read_bytes()).hexdigest(),
+        adapter_source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        recording_directory=str(args.run_dir),startup_monotonic_ns=time.monotonic_ns()))
     if os.environ.get('ROS_DOMAIN_ID') != '71' or {name for _,name in socket.if_nameindex()} != {'lo'}:
         raise ValueError('owned_private_domain_required')
     import rclpy
@@ -45,6 +60,7 @@ def main():
             self.calibration_start = None
             self.received = self.processed = self.repeated = 0
             self.info_count = 0
+            self.position_callbacks = 0
             self.info_first_sim = self.info_last_sim = None
             self.schedule = ProcessingSchedule(config['processing_hz'])
             self.last_health_wall = -float('inf')
@@ -57,13 +73,15 @@ def main():
             self.create_subscription(CameraInfo, config['info_topic'], self.info, qos)
             if config['require_px4_state']:
                 from px4_msgs.msg import VehicleLocalPosition
+                from gwm_px4_control.sample_identity import IdentityTracker
+                self.state_identities=IdentityTracker(actual_run)
                 self.create_subscription(VehicleLocalPosition, '/px4_71/fmu/out/vehicle_local_position_v1', self.position, qos)
             self.create_timer(.02, self.tick, clock=Clock(clock_type=ClockType.STEADY_TIME))
 
         def sim(self): return self.get_clock().now().nanoseconds / 1e9
 
         def emit(self, kind, value, publisher=None):
-            event = dict(kind=kind, **value)
+            event = metadata(dict(kind=kind, **value))
             encoded = json.dumps(event, allow_nan=False)
             self.events.write(encoded+'\n')
             if publisher: publisher.publish(String(data=encoded))
@@ -97,18 +115,35 @@ def main():
                 self.error(exc)
 
         def position(self, msg):
-            self.history.add(msg.timestamp/1e6,
-                (msg.xy_reset_counter,msg.z_reset_counter,msg.heading_reset_counter,msg.vxy_reset_counter,msg.vz_reset_counter),
-                dict(timestamp_us=msg.timestamp, x=msg.x,y=msg.y,z=msg.z,heading=msg.heading,
-                     xy_valid=msg.xy_valid,z_valid=msg.z_valid))
+            self.position_callbacks += 1
+            from gwm_px4_control.contracts import json_message
+            raw_state=dict(message_to_ordereddict(msg))
+            retained=json_message(raw_state)
+            fields=retained['fields']
+            state=dict(timestamp_us=int(msg.timestamp),timestamp_sample_us=int(msg.timestamp_sample),
+                x=fields['x'],y=fields['y'],z=fields['z'],heading=fields['heading'],xy_valid=msg.xy_valid,z_valid=msg.z_valid,
+                callback_id=actual_run+':sensor-position:'+str(self.position_callbacks),run_id=actual_run,
+                receipt_monotonic_ns=time.monotonic_ns(),topic='/px4_71/fmu/out/vehicle_local_position_v1',
+                message_type='px4_msgs/msg/VehicleLocalPosition',message_version=1,uorb_instance=0,
+                instance_provenance='verified_single_EKF2_launch_and_pinned_non_selector_source',
+                source='single_EKF2_non_selector_DDS',payload=retained)
+            epoch=(msg.xy_reset_counter,msg.z_reset_counter,msg.heading_reset_counter,msg.vxy_reset_counter,msg.vz_reset_counter)
+            try:
+                state['source_reference']=self.state_identities.observe('vehicle_local_position',raw_state,
+                    state['callback_id'],state['receipt_monotonic_ns'],version=1,instance=0)
+                classification=self.history.add(int(msg.timestamp),epoch,state)
+            except ValueError as exc:
+                classification='rejected:'+str(exc)
+                self.history.fault=str(exc); self.error(exc)
+            self.emit('state_callback',dict(state=state,epoch=list(epoch),classification=classification))
 
         def image(self, msg):
             wall = time.monotonic()
             stamp = msg.header.stamp.sec + msg.header.stamp.nanosec/1e9
             self.received += 1
-            meta = dict(id=self.received, acquisition_sim_s=stamp, receipt_wall_s=wall,
+            meta = metadata(dict(id=self.received,acquisition_sim_ns=int(msg.header.stamp.sec)*1000000000+int(msg.header.stamp.nanosec), acquisition_sim_s=stamp, receipt_wall_s=wall,
                         receipt_sim_s=self.sim(), width=msg.width,height=msg.height,encoding=msg.encoding,
-                        step=msg.step,is_bigendian=msg.is_bigendian,raw_frame=msg.header.frame_id)
+                        step=msg.step,is_bigendian=msg.is_bigendian,raw_frame=msg.header.frame_id))
             raw = bytes(msg.data)
             try:
                 self.recorder.submit(meta, raw)
@@ -143,7 +178,7 @@ def main():
                 depth = decode(raw,meta['width'],meta['height'],meta['encoding'],meta['step'],meta['is_bigendian'])
                 mask = classify(depth,config['near_m'],config['far_m'])
                 counts = {r.name.lower():int(np.count_nonzero(mask==r)) for r in Reason}
-                associated = self.history.match(meta['acquisition_sim_s']) if config['require_px4_state'] else None
+                associated = self.history.match(meta['acquisition_sim_s'],native_ns=meta['acquisition_sim_ns']) if config['require_px4_state'] else None
                 if config['require_px4_state'] and (associated is None or not associated['state']['xy_valid'] or not associated['state']['z_valid']):
                     raise ValueError('state_association_unavailable')
                 samples=[]
@@ -157,7 +192,7 @@ def main():
                 finished_wall=time.monotonic(); finished_sim=self.sim()
                 if finished_sim-meta['acquisition_sim_s']>config['source_age_sim_s']: raise ValueError('stale_after_processing')
                 self.processed += 1
-                self.emit('observation',dict(schema_version=1,run_id=run_identity(args.run_dir),observation_id=self.processed,
+                self.emit('observation',dict(schema_version=2,observation_id=self.processed,
                     image=meta,processing_wall_s=wall,processing_sim_s=sim,source_age_sim_s=sim-meta['acquisition_sim_s'],
                     processing_return_wall_s=finished_wall,processing_return_sim_s=finished_sim,raw_frame=meta['raw_frame'],optical_frame=OPTICAL_FRAME,
                     calibration_id=self.calibration.identity,extrinsic_id=EXTRINSIC_ID,depth_semantics='optical_axis_Z_m',
@@ -166,7 +201,7 @@ def main():
                     measurement_status='measured' if counts['valid'] else 'all_invalid_unknown',
                     overwritten_processing_frames=self.slot.overwritten,health='fresh'),self.obs)
                 if self.first_source is not None and sim-self.first_source >= 5 and not (args.run_dir/'sensor-ready.json').exists():
-                    (args.run_dir/'sensor-ready.json').write_text(json.dumps(dict(sim_s=sim,wall_s=wall,calibration_id=self.calibration.identity)))
+                    write_metadata('sensor-ready.json',dict(sim_s=sim,wall_s=wall,calibration_id=self.calibration.identity))
             except ValueError as exc: self.error(exc)
 
     rclpy.init()
@@ -187,7 +222,7 @@ def main():
         try: result['recorder']=node.recorder.close()
         except RuntimeError as exc: result.update(status='failed',failure=str(exc))
         node.events.close()
-        (args.run_dir/'sensor-result.json').write_text(json.dumps(result,allow_nan=False,indent=2)+'\n')
+        write_metadata('sensor-result.json',result)
         node.destroy_node(); rclpy.shutdown()
     return 0 if result['status']=='complete' else 1
 

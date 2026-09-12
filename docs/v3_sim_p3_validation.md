@@ -1,11 +1,291 @@
-# P3 depth sensing: measured ground pass, flight acceptance incomplete
+# P3 depth sensing and P3-R1 sample/time acceptance
 
-P3 sensing is implemented, and real depth rendering, one-way bridging,
-independent ground geometry and the bounded interruption diagnostic passed.
-The one new camera-equipped smoke completed its maneuver, normal LAND and
-disarm, but **failed independent flight acceptance**. No qualification flight
-was launched: 0 of the required 3. P3 is incomplete and P4 is not recommended
-until the declared P3 acceptance passes.
+P3 acceptance remains incomplete. The single new smoke,
+`20260912T141235Z-p3-flight-778e3f60`, completed normal LAND/disarm and sealed
+its recordings, but independent acceptance failed the unchanged prior-state
+yaw checks. All sample-window, execution-timing and sensor checks passed.
+Qualification was not run and remains 0/3; no further flight was attempted.
+
+P3-R1's sample/time contract is verified by pinned-source review, tests and
+the new sample-window evidence. Final v5 readiness and the complete seven-case
+ground matrix passed with actual enclosing run IDs and finalized provenance.
+Contract verification does not imply flight acceptance. Historical reanalysis
+also remains failed on prior-state yaw consistency; all historical and new
+failed attempts retain their original results. P3 is not marked complete.
+
+## P3-R1 implementation and current gate
+
+The [sample/time contract](v3_sim_p3_sample_time_contract.md) defines
+`p3-sample-evidence-v2`. It preserves `p2-estimator-reference-v3`, controller
+transport, mission windows and numeric limits. In particular, the 0.2-second
+controller-consumption gap, 50 ms dispatch-age budget, source freshness,
+tracking/drift limits, fixed dwell durations and ACK/LAND checks remain gates.
+The evaluator semantics have changed explicitly; this is not a claim that the
+original strict-timestamp evaluator was unchanged.
+
+The two original failures are separate evidence cases. FINAL_HOVER includes
+three controller evaluations reusing position callbacks while evaluation
+clocks advance. RESTORE_INITIAL_YAW includes two distinct ULog estimator
+outputs with equal publication time and different predictor sample times.
+New evidence separates raw source records, callback deliveries, controller
+selections, distinct source observations, outgoing publications and fixed
+window records. Native timestamps remain integers. Publication-time groups
+provide temporal coverage; all records remain available for tracking, mode,
+health, reference and order checks. A repeated observation adds no new
+position coverage or freshness. Equal-time estimator outputs are not silently
+overwritten, and uncertain identity or ordering remains a rejection.
+
+The minimal controller-cache correction uses the same source identity
+contract. The sensor history also retains ordered equal-time outputs, records
+callback/source references and rejects ambiguous association. A timestamp-only
+map cannot choose a favorable ROS/ULog or image/PX4 match. Rendering is not
+claimed as the cause of either historical timestamp case.
+
+Every new sensor startup, readiness, observation, health, result, index and
+Gazebo source-header record carries the launcher's enclosing run ID, including
+recording under a `sensors` child directory. Frozen source/configuration inputs
+include both packages, launchers and all evaluator arithmetic. A separate
+measured runtime identity verifies exact build mirrors, installed sources,
+the sensor build's controller dependency, pinned revisions, model/world assets
+and PX4 binary. Ground/readiness/flight prerequisites compare those identities
+and calibration while retaining separate predecessor references.
+
+Final offline evaluation requires `runtime-finalized.json`: owned processes
+have stopped, the sensor writer has closed, drained and fsynced, controller
+results and artifact manifests are complete, and recorded hashes verify.
+Dependent P3 evaluation waits for the matching completed P2 evaluation. Strict
+JSON readers reject nonstandard numbers, duplicate keys and partial JSONL.
+Original reports and old run IDs are never rewritten.
+
+The final builds completed in:
+
+| Package | Build run | Package hash |
+|---|---|---|
+| controller | `20260912T131520Z-p2-build-vytU8n` | `0d994904f2e43310219e4505c246cc8ecd2f95f2467ed3463a5308c124840456` |
+| sensor adapter | `20260912T131525Z-p3-build-NnOzlQ` | `8f0514da5d4e93a3b07efe9983567b8d487f9f1a93cc108676c896794f4778a3` |
+
+Final v5 ordinary verification passed **446 PX4/Gazebo focused tests** in
+9.54 s and **1,246 full-suite tests, with 12 skips**, in 121.03 s. The unchanged
+398-test AgentOps/C2 result remains valid and those tests are included in the
+full suite. Python compilation, Bash syntax, ShellCheck (`-x -e SC1091`) and
+`git diff --check` passed. Linux build and installed-package tests passed.
+These checks establish source/build verification, not flight acceptance or a
+clean rebuild.
+
+The first immutable analysis, `p3-r1-historical-adjudication-v2.json`, failed
+controller-attitude reconstruction. A separate read-only diagnostic verified
+that normalization reproduces all 2,086 recorded controller yaw values exactly.
+The explicitly revised report `p3-r1-historical-adjudication-v2r1.json`, SHA-256
+`79b6661b40b0fe1e107c9c3ae15f02aa76dd6a621604435976eb4dfc95ac4ed1`,
+passes the eight controller windows and sixteen independent ROS/ULog windows.
+It still **fails overall**: 79 of 135 prior-state yaw comparisons exceed the
+unchanged 1e-5 rad tolerance; the maximum difference is
+7.283687591552734e-5 rad. The exact state consumed by PX4's multicopter
+controller is unproven in those historical records. That limitation does not
+justify changing the tolerance, selecting favorable matches or awarding
+qualification credit. Both analysis versions and the original failed reports
+remain immutable; neither analysis represents a new flight.
+
+The runtime freeze used for the first P3-R1 readiness and plane2 attempt is
+`state/p3-r1-implementation-20260912T130622Z/frozen-runtime-inputs-v2.json`
+under the Linux workspace, SHA-256
+`3f1a4f77a9d56f0fb73de81568165385083f0ef6ae721c5066e77050a8b46102`.
+Read-only run `20260912T132733Z-p3-observe-1957cc82` passed the owned launcher,
+runtime seal and both independent evaluations with these final inputs. Every
+record used the enclosing run ID. It recorded 739 raw frames (908,083,200 bytes).
+Across the control window [16.072,31.832] s, it delivered 478 frames at
+30.297 Hz with a 0.036 s maximum gap, and 158 observations at 9.9949 Hz.
+Maximum observation age was 0.068 s and maximum image/state difference 0.012 s.
+All 158 associations matched independent PX4 records, with zero ambiguity and
+zero missing source frames. These are new read-only results, not flight credit.
+
+Plane2 `20260912T132932Z-p3-plane2-514444e3` completed its fixed collection
+window [8.820,38.820] s, with 1,183 accepted/written frames and a closed,
+drained/fsynced recorder, zero overflow and no adapter errors. Its five
+registered process leaders exited, but sealing found an unregistered sleeping
+PID 236. The original status remains **failed**; no sealed ground acceptance
+or matrix credit was awarded.
+
+Read-only inspection of the exact installed ROS CLI source established that
+`ros2 topic info -v` invokes `NodeStrategy`, which spawns a daemon by default.
+That subprocess is outside the launcher's registered child groups. The
+recorded QoS output confirms the inspection succeeded, but PID 236's command
+line, executable and group were not captured, so its attribution to that
+daemon remains a source-backed inference. The installed CLI supports explicit
+`--no-daemon`; no `ROS2CLI_NO_DAEMON` implementation reference was found in
+ros2cli/ros2topic. Only that flag was added to ground QoS inspection, retaining
+the existing timeout and every finalization check.
+
+The immutable diagnosis is
+`p3-r1-ground-finalization-daemon-diagnostic-v1.json` within the failed run,
+SHA-256 `d1590a16a45ffc5c2682c46264b541220eb7b535f22d97858df610daf2347573`.
+It records installed source hashes and the attribution limit. The original
+summary remains byte-identical, SHA-256
+`c39d78952f23fd64da05fdceb6abf826f62a0428e5f5e722a0078c797643a802`.
+
+The retained v3 freeze is
+`state/p3-r1-implementation-20260912T130622Z/frozen-runtime-inputs-v3.json`,
+SHA-256 `afe676da5982e35fd1e654d2b14adcb0227bb1d53981186131d69d80e616bb55`.
+It records the daemon-free ground inspection, revalidation of each ground
+run's raw artifact manifest and complete selected-record health checks with
+the existing terminal-state exception. It also binds finite raw/selected
+position, velocity and yaw, vehicle identity and raw velocity evidence.
+These are launcher/evaluator changes; the controller and sensor package builds
+above are unchanged, and no package rebuild is claimed. The disk preflight
+recorded 930,577,448,960 free bytes against the declared 64 GiB campaign budget
+plus 20 GiB reserve.
+
+Read-only run `20260912T134432Z-p3-observe-113909cf` passed the launcher and
+runtime seal but failed independent P2 evaluation with
+`invalid_integer_timestamp`. Its initial ULog `vehicle_status` and
+`failsafe_flags` records contain true native uint64 publication timestamp zero.
+The pinned source and shared uint64 contract allow zero, while the offline
+reader had added an unsupported `>0` constraint. The dependent P3 evaluation
+also failed; neither result is overwritten or credited as readiness.
+
+The failed run retains
+`p3-r1-readiness-invalid-timestamp-diagnostic-v1.json` (SHA-256
+`0e83a2f278b2594602a40720804e8ccda7088536d7efe45cdb833ae1e8ad49f7`)
+and `p3-r1-readiness-native-zero-publication-diagnostic-v1.json` (SHA-256
+`73a68eaf15691af660027e2df0dc546c8186a8acdca080fcbb40e12517497b20`).
+The offline correction now uses the shared `stamp_us` validator. Estimator
+sample timestamps remain strictly positive; no online cache, scheduling,
+flight limit or estimator behavior changed to address this reader mismatch.
+
+The retained v4 freeze is
+`state/p3-r1-implementation-20260912T130622Z/frozen-runtime-inputs-v4.json`,
+SHA-256 `34532c83229d7364d8f3bce789c33a8c99aae7444d6daf023d6a2ff197eb7bd7`.
+Disk free space was 929,706,799,104 bytes. Fresh read-only run
+`20260912T135042Z-p3-observe-f4e7bdeb` passed launcher, runtime seal, independent
+P2 control/recording and P3 sensor checks under v4. It recorded 675 raw frames
+(829,440,000 bytes). The control window [13.548,29.428] s contains 481 frames
+at 30.303 Hz with maximum source gap 0.036 s, and 159 observations at
+9.994939 Hz. Maximum observation age was 0.064 s and image/state difference
+0.012 s. All 159 state associations matched exactly; unmatched, ambiguous,
+reused-match and missing-source counts were zero. Run identity and recording
+finalization passed; this remains read-only evidence with no flight credit.
+
+Plane2 `20260912T135209Z-p3-plane2-adca8021` passed launcher, runtime seal and
+independent evaluation under v4. Matrix
+`20260912T135352Z-p3-ground-matrix-2f3837c3` stopped at its first case, plane4
+`20260912T135358Z-p3-plane4-f54aa882`, when
+`ros2 topic info --no-daemon -v` returned `Unknown topic` for the image stream.
+The remaining matrix cases were not run. The adapter recorded 264 raw frames
+over [0.008,8.680] s with maximum source gap 0.036 s, including 112 frames
+after readiness, and all 32 post-readiness health records were fresh. Its
+writer closed, drained and fsynced with no overflow or adapter errors.
+The requested fixed collection window had not started.
+
+Installed ROS CLI source shows that each direct inspection creates its own
+node and defaults to 0.5 s of graph discovery. Actual sensor flow was present;
+incomplete discovery in that new CLI node is a source-backed explanation,
+but its graph-cache state was not recorded, so the exact cause remains an
+inference. The sole launcher correction adds `--spin-time 3` alongside
+`--no-daemon`, retaining the outer 10 s timeout and all runtime, recording,
+geometry and flight budgets. The immutable
+`p3-r1-ground-direct-discovery-diagnostic-v1.json` in the failed plane4 run
+records raw, readiness and installed-source hashes, SHA-256
+`c6a61196d8e117b01d475ac810c1a03180a2ccf9309a9b980059c5703bb44f2b`.
+The failed run and matrix summaries remain unchanged.
+
+The current v5 freeze is
+`state/p3-r1-implementation-20260912T130622Z/frozen-runtime-inputs-v5.json`,
+SHA-256 `202e17ebbcf9a3532445ff0a541bc2fc1f06a8a3b9c95c913cafa786b13146b4`.
+Disk free space was 927,048,028,160 bytes against the same 64 GiB campaign
+budget and 20 GiB reserve. The package builds and evaluator arithmetic are
+unchanged from v4. Fresh readiness
+`20260912T140041Z-p3-observe-34709c89` passed launcher, runtime seal and both
+independent evaluations after final ordinary verification completed. It
+recorded 682 raw frames (838,041,600 bytes). The control window
+[13.592,29.448] s contains 481 frames at 30.303 Hz with maximum source gap
+0.036 s, and 159 observations at 10.01521298 Hz. Maximum observation age was
+0.076 s and image/state difference 0.012 s. All 159 associations matched
+exactly; unmatched, ambiguous, reused-match and missing-source counts were
+zero.
+
+V5 plane2 `20260912T140217Z-p3-plane2-2de3a546` then passed. The matching
+matrix `20260912T140437Z-p3-ground-matrix-1e3494df` passed all seven cases,
+with sealed recordings and independent evaluation for every constituent run:
+
+| Ground case | Run ID | Result |
+|---|---|---|
+| plane2 | `20260912T140217Z-p3-plane2-2de3a546` | passed |
+| plane4 | `20260912T140443Z-p3-plane4-4a162bb4` | passed, including separate post-window scene change |
+| plane6 | `20260912T140557Z-p3-plane6-55a7ff9c` | passed |
+| oblique | `20260912T140717Z-p3-oblique-31317a8b` | passed |
+| asymmetric | `20260912T140829Z-p3-asymmetric-377736f0` | passed |
+| out_of_range | `20260912T140947Z-p3-out_of_range-d2567c2d` | passed |
+| interruption | `20260912T141116Z-p3-interruption-d6519c7b` | expected interruption detected; acceptance passed |
+
+The nominal ground source rates were 30.303–30.304 Hz with a maximum source
+gap of 0.036 s. The minimum processed rate was 9.990644 Hz and maximum
+observation age 0.076 s. The separate scene-change check recorded fourteen
+observations at 5.00000095367 m. Interruption acceptance records expected
+stream loss separately from nominal geometry results.
+
+With these prerequisites complete, the single new nominal depth smoke
+`20260912T141235Z-p3-flight-778e3f60` ran under the same v5 freeze. The launcher
+passed, the controller reached `COMPLETE`, normal LAND ended in landed/disarmed
+state with no failsafe, owned-process cleanup passed, and the runtime was
+finalized. Independent P2 recording validation passed. Independent flight
+acceptance **failed solely at prior-state yaw consistency**: 68 of 135
+comparisons failed, comprising 63 heading mismatches and eight age violations,
+with three comparisons failing both. Maximum heading error was
+8.08238983154297e-5 rad against the unchanged 1e-5 rad limit; maximum prior-state
+age was 0.016 s against the unchanged 0.008001 s limit. All eight controller
+windows, sixteen independent ROS/ULog windows and execution-timing checks
+passed. These passing components do not cancel the yaw failure.
+
+The sensor recorder retained 3,297 raw frames (4,051,353,600 bytes). Across
+the control window [15.028,113.448] s, 2,982 frames delivered 30.303338 Hz with
+a maximum source gap of 0.036 s; 984 observations delivered 9.999593 Hz.
+Maximum observation age was 0.084 s and image/state difference 0.012 s.
+All 984 associations matched exactly, with zero unmatched, ambiguous,
+reused-match or missing-source cases and zero sensor errors. Independent P3
+composite acceptance **failed only `control_acceptance`**, reflecting the
+independent yaw failure. Final observation identity and sensor provenance
+passed; sensor success provides no flight qualification credit.
+
+The full independent P2 evaluator was still CPU-active after more than
+180 s of elapsed execution before it completed. The existing qualification
+wrapper's 90 s control-evaluation timeout therefore remains unqualified by
+runtime evidence. That limit and all frozen inputs were left unchanged after
+this sole smoke. Fixing the yaw evidence would not establish that the batch
+could complete within its existing evaluator budget.
+
+The smoke failure stopped progression. Qualification was **not_run, 0/3**;
+no additional smoke or qualification flight followed, and no P4/P5 work began.
+Earlier attempts retain their original inputs and outcomes. The
+[operator procedure](../simulation/px4_gazebo/README.md#p3-r1-final-input-readiness-ground-and-flight-procedure)
+documents the required chronological prerequisites; the qualification
+prerequisite remains unsatisfied by this campaign.
+
+| P3-R1 gate | Current result |
+|---|---|
+| Sample/time contract | verified by source review, tests and all new sample-window checks; flight acceptance remains failed |
+| Final-build observation identity | passed in sealed v5 readiness and the new smoke; exact image/PX4 associations verified |
+| Final-input plane2 | passed under v5: `20260912T140217Z-p3-plane2-2de3a546` |
+| Final-input ground matrix | passed: `20260912T140437Z-p3-ground-matrix-1e3494df`; all seven cases and scene change |
+| New camera-equipped smoke | failed independent prior-state yaw acceptance: `20260912T141235Z-p3-flight-778e3f60`; normal LAND/disarm and finalization passed |
+| Coexistence qualification | not_run; 0/3 |
+| Qualification evaluator budget | existing 90 s timeout not runtime-qualified; standalone evaluator observed CPU-active beyond 180 s |
+| P3 overall | incomplete |
+| P4 avoidance / P5 model inference | not_implemented |
+| P6/P7 and v3-2 onward | not_implemented |
+| Clean rebuild | not_proven |
+
+The [current schema-2 evidence summary](evidence/v3_sim_p3_summary.json) tracks
+the repair, final run identities, independent outcomes and incomplete campaign.
+The [schema-1 history](evidence/v3_sim_p3_summary_v1.json) remains byte-identical.
+
+## Preserved P3 implementation history
+
+The sections below retain the original P3 component measurements and failed
+flight campaign delivered in `76f014d`. Real rendering, one-way bridging,
+ground geometry and interruption checks passed for their recorded builds.
+The original depth smoke completed normal LAND/disarm but failed independent
+acceptance; its qualification count remains 0/3. These are historical
+component results, not new final-build measurements or P3-R1 acceptance.
 
 The source base was `6204fedb9ac8a2b554ff825c93159a509a1b91ad` on
 `v3/gwm-uav-c2-agentops-planning`; origin matched after fast-forward-only
@@ -16,10 +296,12 @@ The standalone design-report attachment was unavailable; the operator's
 pasted requirements were used.
 
 The [sensor contract](v3_sim_p3_sensor_contract.md) defines the implementation;
-the [schema-1 summary](evidence/v3_sim_p3_summary.json) retains exact metrics,
+the [preserved schema-1 summary](evidence/v3_sim_p3_summary_v1.json) retains exact metrics,
 hashes, source revisions and attempt identities. Raw artifacts remain under
 `/home/joker0625/uav_autonomy/runs/` in Ubuntu-24.04. Run IDs below are relative
 to that directory. Recorded outcomes are not overwritten by this report.
+The schema-1 copy is byte-identical, with SHA-256
+`c51b876b836a9efdf8f287e774ecb3a3d9dc09d13160fac2ed6b52123db2d2c0`.
 
 ## Sensor/model and bridge
 
@@ -219,7 +501,7 @@ Historical P2 schema 4 remains byte-for-byte unchanged: x500 smoke
 `20260912T035329Z-p2-repeat-84bb288d` (20/20). Strict-v1/R1/R2 failures remain
 in that history. None of those flights is relabelled x500_depth.
 
-## Verification and remaining status
+## Historical verification and status at 76f014d
 
 Final Windows Anaconda regression passed: 33 P3 tests, 210 combined
 P3/P2/reference/yaw/timing tests, 398 C2/AgentOps tests, and the full ordinary

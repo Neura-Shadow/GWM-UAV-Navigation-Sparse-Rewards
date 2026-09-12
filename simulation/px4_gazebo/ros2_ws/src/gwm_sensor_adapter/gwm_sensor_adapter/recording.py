@@ -15,10 +15,12 @@ class RawRecorder:
         self.accepted = self.written = self.overflow = self.peak = 0
         self.directory = directory
         self.thread = Thread(target=self._write, name='p3-raw-recorder', daemon=True)
+        self.closed = False
         self.thread.start()
 
     def submit(self, meta, raw):
         if self.failure: raise RuntimeError(self.failure)
+        if self.closed or self.stop.is_set(): raise RuntimeError('recorder_closed')
         try:
             self.queue.put_nowait((dict(meta), bytes(raw)))
             self.accepted += 1
@@ -50,5 +52,7 @@ class RawRecorder:
         if self.thread.is_alive(): self.failure = 'recorder_drain_timeout'
         if self.failure or self.accepted != self.written or self.overflow:
             raise RuntimeError(self.failure or 'recording_incomplete')
+        self.closed = True
         return dict(accepted=self.accepted, written=self.written, overflow=self.overflow,
-                    peak=self.peak, capacity=self.queue.maxsize, fsync_completed=True)
+                    peak=self.peak, capacity=self.queue.maxsize, fsync_completed=True,
+                    writer_closed=True,drain_completed=True)

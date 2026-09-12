@@ -20,7 +20,7 @@ def require(condition, reason):
 
 def classify(run, config, historical=False):
     result = json.loads((run/"controller-result.json").read_text())
-    cache, manager = StateCache(config), None
+    cache, manager = StateCache(config, run_id=run.name) if config.get('sample_evidence_contract') else StateCache(config), None
     phase = "WAIT_FOR_CLOCK_AND_CONNECTION"
     for line in (run/"ros-events.jsonl").open():
         row = json.loads(line)
