@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — D3D12 v1.2 candidate `3302379c`: Gate A ACCEPTED (section V), Gate B not yet authorized; llvmpipe candidate `764fcfd7`: Gate B failed (section S) — Qualification 0/3**
+**P3 INCOMPLETE — Gate A accepted (llvmpipe `764fcfd7`, D3D12 `3302379c`); Gate B failed for both on flight timing (sections S, W); native Linux GPU host recommended — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -764,4 +764,25 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   sim `vehicle_land_detected` interval is about 1.55 s wall against the unchanged 2 s limit.
   Gate B judges it unchanged.
 
-Final status: **P3 INCOMPLETE — llvmpipe candidate 764fcfd7: Gate A accepted, Gate B failed; D3D12 v1.2 candidate 3302379c: Gate A ACCEPTED, Gate B not yet authorized — Qualification 0/3**
+## W. Gate B of candidate `3302379c` (v1.2, D3D12) — FAILED on flight timing (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-3302379cffc4.json` `77d97b69…51ae`, consumed.
+  Result `state/p3-gate-B-3302379c….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T100510Z-p3-flight-5a2b42b8` (SITL, unchanged P2 mission, renderer
+  `D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`): takeoff, reference lock, handover, hover, east
+  test and return completed. At sim 64.748 s in **NORTH_TEST** the unchanged controller entered
+  RECOVERY with **`stale_state:vehicle_land_detected`** (`Abort:controller_failed`).
+* **Graceful cleanup held:** every owned process, Gazebo included, exited 0, so the v1.2
+  libd3d12core fix held in flight as well.
+* **Measured cause:** PX4's sim interval was 1.000 s (86 receipts). The wall receipt gap
+  exceeded 1.8 s in 15 of 85 intervals and 2.0 s in 5, worst **2.725 s** (sim 63.916). That is
+  better than llvmpipe (65 over 1.8 s, worst 2.658 s) but still violates the unchanged 2 s
+  wall freshness limit. Real-time factor under the full depth+RGB+flight workload on this
+  WSL2 host is insufficient on either renderer.
+* **Decision rule (operator instruction, section N):** no relaxation. The 2 s limit, the P2
+  controller and every threshold stay unchanged.
+* **Recommendation:** run P3 Gates A–C on a **native Linux host with a hardware GPU**. On this
+  host both renderers now shut down cleanly, but neither sustains the real-time factor the
+  unchanged freshness limit needs in flight.
+
+Final status: **P3 INCOMPLETE — on this WSL2 host Gate A was accepted for both candidates (llvmpipe 764fcfd7, D3D12 3302379c) and Gate B failed for both on the unchanged 2 s vehicle_land_detected wall freshness; native Linux GPU host recommended — Qualification 0/3**
