@@ -318,3 +318,32 @@ An overflow, missing recording, stale action or over-limit consumed sample
 gap invalidates acceptance. The repeated runner freezes the timing evaluator,
 instrumentation, transport configuration and measured middleware binaries.
 No older R2 pass carries into the new R3 streak.
+
+## P3 depth sensing and flight-control coexistence
+
+P3 adds the native OakD-Lite depth camera on `gz_x500_depth` without changing the
+accepted P2 controller (package hash `e1857b3f…` unchanged) or its mission. The
+[P3 contract](../../docs/v3_sim_p3_contract.md) defines the data path, frames,
+fixtures, thresholds, cleanup rules and gates; the
+[acceptance report](../../docs/v3_sim_p3_acceptance_report.md) states what has and
+has not been verified. **No P3 runtime gate has been authorized or executed.**
+
+Build (no runtime): `build_p3.sh --build`; the MC causal-trace overlay build and
+benchmark; and the unattended QGC build, which now binds `scripts/p3_namespace_owner.py`.
+Then freeze, obtain one explicit authorization per gate and run exactly one gate:
+
+```bash
+python3 simulation/px4_gazebo/scripts/p3_manifest.py freeze \
+  --output "$HOME/uav_autonomy/state/p3-candidate.json" --mc-benchmark-run "$HOME/uav_autonomy/runs/ACTUAL_BENCHMARK"
+python3 simulation/px4_gazebo/scripts/p3_manifest.py authorize "$HOME/uav_autonomy/state/p3-candidate.json" \
+  --gate A --operator NAME --confirm "authorize Gate A <manifest-sha>" --output "$HOME/uav_autonomy/state/p3-auth-A.json"
+GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 GWM_ALLOW_PX4_LAUNCH=1 \
+  /usr/bin/python3 simulation/px4_gazebo/scripts/run_p3_gates.py --gate A \
+  --manifest "$HOME/uav_autonomy/state/p3-candidate.json" --authorization "$HOME/uav_autonomy/state/p3-auth-A.json"
+```
+
+Gate B (one smoke) and Gate C (three consecutive flights) additionally need
+`GWM_ALLOW_SITL_COMMANDS=1`, `--allow-simulated-flight`, their own authorization and an
+accepted predecessor for the same manifest. Each runtime is evaluated offline by
+`verify_p3_evidence.sh RUN` before anything else starts; the first failure stops the gate,
+and a consumed authorization can never be retried.
