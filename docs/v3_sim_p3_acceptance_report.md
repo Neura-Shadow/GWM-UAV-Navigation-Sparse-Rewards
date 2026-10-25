@@ -347,5 +347,12 @@ frozen manifest by the operator.
   evidence as a `failed` evaluation and never leaves it missing. Both have regression tests.
   The README gate command now sets `GWM_PX4_MC_TRACE`. No threshold, P2 file or sensor
   package changed (package `f6605fb7…` and `p3-built.json` still valid).
+* **Linux regressions on `966794b`:** P2 212, sensor 61, evaluators 27, runtime 56, MC 23,
+  all passed.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `966794b`.
+  Receipt `state/p3-policy-A-approval-966794b.json` `4787af49…084c`; the `0d38eec` receipt
+  stays with the failed candidate. Manifest `state/p3-candidate-966794b.json`, canonical SHA-256
+  **`8eaefbb63d3122f6e3373ae245de8c11af8aee029978d76ef111822529b2c11d`**; `verify` reproduces
+  it, the explicit MC selection matches the frozen build, and no Gate A artifacts exist for it.
 
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
