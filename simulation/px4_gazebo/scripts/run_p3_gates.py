@@ -32,6 +32,8 @@ PLAN["V"] = list(PLAN["A"])  # same ground plan; llvmpipe; no acceptance credit,
 PLAN["D"] = [("diagnostic", variant, "diag-" + role) for variant, role in (
     ("baseline", "baseline"), ("no_rgb_observer", "no_rgb_observer"), ("recorder_none", "recorder_none"),
     ("no_probe", "no_probe"), ("baseline", "baseline_repeat"))]
+# Native Ubuntu 24.04 + NVIDIA host: the identical baseline / no-RGB-observer pair, never credit.
+PLAN["N"] = [("diagnostic", "baseline", "diag-baseline"), ("diagnostic", "no_rgb_observer", "diag-no_rgb_observer")]
 PREDECESSOR = {"B": "A", "C": "B"}
 
 
@@ -120,7 +122,7 @@ def main(argv=None):
             if run is None:
                 result["first_failure"] = role + ":runtime_did_not_create_evidence"
                 break
-            if args.gate == "D":
+            if args.gate in p3_manifest.DIAGNOSTIC_GATES:
                 # Diagnostics are measured by p3_stall_diagnostic.py, not acceptance-evaluated.
                 if completed.returncode != 0:
                     result["first_failure"] = role + ":runtime_failed"

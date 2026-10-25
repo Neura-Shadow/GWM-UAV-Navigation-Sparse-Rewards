@@ -696,6 +696,37 @@ def test_stall_diagnostic_sim_second_crossings():
     assert [round(b - a, 3) for a, b in zip(marks, marks[1:])] == [2.0, 0.667]
 
 
+def test_native_gate_n_is_the_identical_two_start_pair_and_never_credit():
+    assert run_p3_gates.PLAN["N"] == [("diagnostic", "baseline", "diag-baseline"),
+                                     ("diagnostic", "no_rgb_observer", "diag-no_rgb_observer")]
+    assert run_p3_gates.PLAN["N"] == run_p3_gates.PLAN["D"][:2]
+    assert p3_manifest.DIAGNOSTIC_GATES == ("D", "N") and "N" in p3_manifest.GROUND_GATES
+    assert "N" not in run_p3_gates.PREDECESSOR.values()
+    assert p3_manifest.authorization_template("N", "s", "op")["excludes"] == ["flight"]
+
+
+def test_native_profile_requires_the_nvidia_driver(monkeypatch):
+    real = Path.exists
+    monkeypatch.setattr(Path, "exists", lambda self: False if str(self).startswith("/proc/driver/nvidia")
+                        else real(self))
+    with pytest.raises(ValueError, match="/proc/driver/nvidia/version"):
+        p3_manifest.native_gpu_profile_identity()
+
+
+@POSIX_ONLY
+def test_gate_n_environment_is_native_nvidia_and_host_guard(monkeypatch, tmp_path):
+    import p3_runner
+    runner = p3_runner.Runner.__new__(p3_runner.Runner)
+    runner.run = tmp_path
+    runner.args = p3_runner.argparse.Namespace(gate="N")
+    env = runner.environment()
+    assert env["__EGL_VENDOR_LIBRARY_FILENAMES"] == "/usr/share/glvnd/egl_vendor.d/10_nvidia.json"
+    assert "GALLIUM_DRIVER" not in env and "GWM_P3_GZ_SIM_PRELOAD" not in env
+    assert not env.get("PATH", "").startswith(str(SIM / "scripts/p3_gz_shim"))
+    source = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'if (self.args.gate == "N") == p3_manifest.wsl_host():' in source
+
+
 def test_source_probe_keeps_the_sourced_ros_python_path():
     runner = (SIM / "scripts/p3_runner.py").read_text()
     launch = runner[runner.index('self.launch("source-probe"'):][:200]

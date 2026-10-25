@@ -291,8 +291,11 @@ class Runner:
             raise PermissionError("Flights belong to Gate B or Gate C only")
         if self.scope != "flight" and self.args.gate not in p3_manifest.GROUND_GATES:
             raise PermissionError("Ground scopes belong to Gate A or validation V only")
-        if (self.args.gate == "D") != (self.scope == "diagnostic"):
-            raise PermissionError("The diagnostic scope belongs to diagnostic gate D only")
+        if (self.args.gate in p3_manifest.DIAGNOSTIC_GATES) != (self.scope == "diagnostic"):
+            raise PermissionError("The diagnostic scope belongs to diagnostic gates D/N only")
+        # Contract v1.2 and diagnostic D are bound to the WSL D3D12 profile; N to a native NVIDIA host.
+        if (self.args.gate == "N") == p3_manifest.wsl_host():
+            raise PermissionError("Gate N runs only on a native NVIDIA host; gates A/B/C/D/V only on WSL")
         return frozen, sha, authorization
 
     # ---- launching -----------------------------------------------------------------------
@@ -305,9 +308,12 @@ class Runner:
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
                     "GWM_P3_OWNED_NAMESPACE": "1"})
-        if getattr(getattr(self, "args", None), "gate", None) != "V":
+        gate = getattr(getattr(self, "args", None), "gate", None)
+        if gate == "N":
+            env.update(strict_json(SIM / "configs/p3_native_gpu_profile.json")["environment"])
+        elif gate != "V":
             env.update(d3d12_environment(env.get("PATH", "")))
-        # Validation V keeps Mesa's default llvmpipe: no D3D12 variables, no shim.
+        # Validation V keeps Mesa's default llvmpipe; gate N uses NVIDIA EGL without D3D12 or shim.
         env.update(extra or {})
         return env
 
@@ -817,7 +823,7 @@ def main(argv=None):
     parser.add_argument("--scope", choices=("readiness", "fixture", "flight", "diagnostic"), required=True)
     parser.add_argument("--fixture")
     parser.add_argument("--variant", choices=DIAGNOSTIC_VARIANTS)
-    parser.add_argument("--gate", choices=("A", "B", "C", "V", "D"), required=True)
+    parser.add_argument("--gate", choices=("A", "B", "C", "V", "D", "N"), required=True)
     parser.add_argument("--role", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)

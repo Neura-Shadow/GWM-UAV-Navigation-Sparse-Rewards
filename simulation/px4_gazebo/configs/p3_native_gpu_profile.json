@@ -1,0 +1,20 @@
+{
+  "contract": "p3-native-gpu-runtime-profile-v1",
+  "scope": "diagnostic gate N only (native Ubuntu 24.04 + NVIDIA proprietary driver); no acceptance contract uses it",
+  "environment": {
+    "__EGL_VENDOR_LIBRARY_FILENAMES": "/usr/share/glvnd/egl_vendor.d/10_nvidia.json",
+    "__GLX_VENDOR_LIBRARY_NAME": "nvidia"
+  },
+  "required_files": [
+    "/usr/share/glvnd/egl_vendor.d/10_nvidia.json",
+    "/proc/driver/nvidia/version"
+  ],
+  "recorded_library_sonames": [
+    "libEGL_nvidia.so.0",
+    "libGLX_nvidia.so.0",
+    "libnvidia-eglcore.so",
+    "libnvidia-glcore.so",
+    "libcuda.so.1"
+  ],
+  "renderer_must_contain": "NVIDIA"
+}

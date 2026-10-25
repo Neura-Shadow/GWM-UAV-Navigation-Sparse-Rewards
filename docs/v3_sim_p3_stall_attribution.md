@@ -198,3 +198,15 @@ already cheap. Two directions remain, and each needs an operator decision:
    is a material acceptance change and is not proposed here without operator direction.
 
 No candidate, threshold, P2 file or earlier gate result was changed by this analysis.
+
+## Direction 1 prepared (operator choice, 2026-10-25)
+
+The identical two-start diagnostic (baseline, then no RGB observer; 120 s; ground; no credit)
+is prepared as gate `N` for a native Ubuntu 24.04 + NVIDIA host. The setup checklist,
+decision rule (fixed in advance) and run commands are in
+[`v3_sim_p3_native_gpu_diagnostic_setup.md`](v3_sim_p3_native_gpu_diagnostic_setup.md).
+
+On that host, gate N uses `configs/p3_native_gpu_profile.json` (NVIDIA EGL/GLX vendor, no D3D12
+variables, no preload or shim). The manifest records, rather than pins, the native NVIDIA
+libraries and driver version. Gate N refuses to run on WSL, and gates A/B/C/D/V refuse to run
+off WSL. The RGB workload and every limit are unchanged. Nothing was run.
