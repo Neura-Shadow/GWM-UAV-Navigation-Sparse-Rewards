@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A accepted (llvmpipe `764fcfd7`, D3D12 `3302379c`); Gate B failed for both on flight timing (sections S, W); native Linux GPU host recommended — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A ACCEPTED (section Y), Gate B not yet authorized — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -823,4 +823,22 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   `p3_validation.yaml` `83d27b26…`. `verify` reproduces it, and no authorization, consumption
   or result artifact exists for it under any gate. Gate A has not been run.
 
-Final status: **P3 INCOMPLETE — on this WSL2 host Gate A was accepted for both candidates (llvmpipe 764fcfd7, D3D12 3302379c) and Gate B failed for both on the unchanged 2 s vehicle_land_detected wall freshness; native Linux GPU host recommended — Qualification 0/3**
+## Y. Gate A of v1.3 candidate `06b3fa54` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-06b3fa54851b.json` `4fc3004a…0bae`, consumed.
+  Result `state/p3-gate-A-06b3fa54….result.json` `7e578357…cc14`, `accepted: true`,
+  `acceptance_credit: true`. Run 11:26:19–11:33:28 UTC; no leftover processes.
+* **Readiness** `20261025T112631Z-p3-readiness-ff8a3401` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, with the mandatory RGB observer active (`rgb_subscribed: true`). The unchanged RGB
+  checks passed: 1920×1080, source 30.31 Hz sim (≥ 25), maximum source gap 0.036 s (≤ 0.12),
+  receipt stall 0.093 s wall (≤ 1.0), 454 frames, 0 late or unrendered. Depth: 30.31 Hz source,
+  10.0 Hz processed, maximum age 0.072 s. Native commands passed policy A (1 × 401, 34 × 512);
+  MC causality `verified`. Readiness RTF 0.603, with the RGB consumer active as v1.3 requires.
+  This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`. Source 30.30 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum stall ≤ 0.064 s.
+* Gazebo and the sensor adapter exited 0 in all 8 runs; every owned process shut down gracefully.
+* Flight timing with RGB absent is not yet measured; Gate B judges it against unchanged limits.
+
+Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A ACCEPTED, Gate B not yet authorized — Qualification 0/3**
