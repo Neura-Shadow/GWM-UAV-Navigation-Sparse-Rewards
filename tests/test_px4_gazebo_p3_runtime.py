@@ -566,19 +566,78 @@ def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
     assert main.index("pthread_sigmask") < main.index("agent_instance.create")
 
 
-def test_contract_v1_1_declares_llvmpipe_and_keeps_every_limit():
-    # Operator-approved v1.1 (proposal 8df667d): only the renderer requirement changed.
+V1_2_NUMERIC_LIMITS = {
+    "schema_version": 1, "ground_window_sim_s": 30, "settle_sim_s": 5, "readiness_observation_sim_s": 15,
+    "startup_wall_s": 75, "fixture_wall_deadline_s": 240, "valid_fraction_min": 0.95, "median_error_m": 0.05,
+    "median_error_fraction": 0.01, "p95_error_m": 0.1, "p95_error_fraction": 0.02, "source_gap_sim_s": 0.12,
+    "delivered_hz_min": 25, "processed_hz_min": 8, "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05,
+    "stall_wall_s": 1.0, "interruption_detect_wall_s": 1.2, "recorded_fraction_required": 1.0,
+    "recorder_overflow_allowed": 0, "disk_reserve_bytes": 21474836480, "geometry_pose_translation_drift_m": 0.005,
+    "geometry_pose_rotation_drift_rad": 0.005, "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0,
+    "qualification_flights": 3, "front_plane_center_height_m": 4}
+
+
+def test_contract_v1_3_rgb_consumer_by_scope_and_every_numeric_limit_identical():
+    # Operator-approved v1.3 (proposal e18ed8c): only the per-scope RGB consumer rule is new.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.1"
-    assert validation["renderer_requirement"] == "software:llvmpipe"
+    assert validation["contract"] == "p3-acceptance-v1.3"
+    assert validation["rgb_consumer"] == {"readiness": "required", "fixture": "absent", "flight": "absent_verified"}
+    assert validation["rgb_absence_monitor"] == {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera",
+                                                 "sample_period_wall_s": 0.5, "max_sample_gap_wall_s": 1.0}
+    numeric = {k: v for k, v in validation.items() if isinstance(v, (int, float)) and not isinstance(v, bool)}
+    assert numeric == V1_2_NUMERIC_LIMITS
+    assert validation["scene_change"] == {"fixture": "plane4", "to_distance_m": 5, "settle_sim_s": 2, "window_sim_s": 3}
+    p2 = json.loads((SIM / "configs/p2_control.yaml").read_text())
+    assert (p2["state_fresh_wall_s"], p2["flags_fresh_sim_s"], p2["clock_stall_wall_s"]) == (2.0, 1.5, 1.0)
+    sensors = json.loads((SIM / "configs/p3_sensors.yaml").read_text())
+    assert sensors["rgb_sensor"]["width"] == 1920 and sensors["rgb_sensor"]["height"] == 1080
+    assert sensors["rgb_sensor"]["sensor_hz"] == 30 and sensors["rgb_sensor"]["native_metadata_observer"] is True
+    assert "/sensor/IMX214/" not in (SIM / "configs/p3_sensor_bridge.yaml").read_text()
+
+
+def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
+    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3.
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.3"
+    assert validation["renderer_requirement"] == "hardware:d3d12"
+    profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
+    assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}
+    assert profile["gz_sim_preload"] == "/usr/lib/wsl/lib/libd3d12core.so" in profile["pinned_libraries"]
+    assert profile["renderer_identity"] == "D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"
     limits = {k: validation[k] for k in ("delivered_hz_min", "processed_hz_min", "source_gap_sim_s",
                                          "observation_age_sim_s", "state_mismatch_s", "stall_wall_s",
                                          "graceful_stop_wall_s", "qgc_graceful_stop_wall_s", "qualification_flights")}
     assert limits == {"delivered_hz_min": 25, "processed_hz_min": 8, "source_gap_sim_s": 0.12,
                       "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05, "stall_wall_s": 1.0,
                       "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0, "qualification_flights": 3}
-    runner = (SIM / "scripts/p3_runner.py").read_text()
-    assert "GALLIUM_DRIVER" not in runner and "MESA_D3D12" not in runner
+
+
+def test_manifest_rejects_a_changed_d3d12_library(monkeypatch):
+    real = p3_manifest.digest
+    pinned = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())["pinned_libraries"]
+    target = "/usr/lib/wsl/lib/libd3d12core.so"
+
+    def fake(path, changed=None):
+        path = str(path)
+        return (changed or {}).get(path, pinned[path]) if path in pinned else real(path)
+    monkeypatch.setattr(p3_manifest, "digest", fake)
+    assert p3_manifest.d3d12_profile_identity()["libraries"] == pinned
+    monkeypatch.setattr(p3_manifest, "digest", lambda p: fake(p, {target: "0" * 64}))
+    with pytest.raises(ValueError, match="libd3d12core.so"):
+        p3_manifest.d3d12_profile_identity()
+
+
+@POSIX_ONLY
+def test_gz_shim_preloads_only_gz_sim(tmp_path):
+    fake = tmp_path / "gz"
+    fake.write_text('#!/usr/bin/env bash\necho "ARGS=$* PRELOAD=${LD_PRELOAD:-}"\n')
+    fake.chmod(0o755)
+    shim = SIM / "scripts/p3_gz_shim/gz"
+    env = {"PATH": os.environ["PATH"], "GWM_P3_REAL_GZ": str(fake), "GWM_P3_GZ_SIM_PRELOAD": "/x/libd3d12core.so"}
+    sim = subprocess.run(["bash", str(shim), "sim", "-s", "w.sdf"], env=env, text=True, capture_output=True)
+    assert sim.stdout.strip() == "ARGS=sim -s w.sdf PRELOAD=/x/libd3d12core.so"
+    service = subprocess.run(["bash", str(shim), "service", "-l"], env=env, text=True, capture_output=True)
+    assert service.stdout.strip() == "ARGS=service -l PRELOAD="
 
 
 def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
@@ -593,20 +652,30 @@ def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
     with pytest.raises(PermissionError, match="requires an accepted Gate A"):
         run_p3_gates.require_predecessor(tmp_path, "B", "sha")
     source = (SIM / "scripts/run_p3_gates.py").read_text()
-    assert '"acceptance_credit": args.gate != "V"' in source
+    assert '"acceptance_credit": args.gate in ("A", "B", "C")' in source
 
 
 @POSIX_ONLY
-def test_every_gate_environment_has_no_d3d12_selection(monkeypatch, tmp_path):
+def test_gate_environment_d3d12_with_shim_for_abc_and_llvmpipe_for_v(monkeypatch, tmp_path):
     import p3_runner
-    monkeypatch.setenv("GALLIUM_DRIVER", "d3d12")  # an inherited selection must not leak through
-    monkeypatch.setenv("MESA_D3D12_DEFAULT_ADAPTER_NAME", "NVIDIA")
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    (bindir / "gz").write_text("#!/bin/sh\n")
+    (bindir / "gz").chmod(0o755)
+    monkeypatch.setenv("PATH", str(bindir) + ":/usr/bin:/bin")
+    monkeypatch.setenv("LD_PRELOAD", "/inherited.so")  # never passed to owned processes
     runner = p3_runner.Runner.__new__(p3_runner.Runner)
     runner.run = tmp_path
-    for gate in ("A", "B", "C", "V"):
+    shim = str(SIM / "scripts/p3_gz_shim")
+    for gate in ("A", "B", "C"):
         runner.args = p3_runner.argparse.Namespace(gate=gate)
         env = runner.environment()
-        assert "GALLIUM_DRIVER" not in env and "MESA_D3D12_DEFAULT_ADAPTER_NAME" not in env
+        assert env["GALLIUM_DRIVER"] == "d3d12" and env["MESA_D3D12_DEFAULT_ADAPTER_NAME"] == "NVIDIA"
+        assert env["PATH"].split(":")[0] == shim and env["GWM_P3_REAL_GZ"] == str(bindir / "gz")
+        assert env["GWM_P3_GZ_SIM_PRELOAD"] == "/usr/lib/wsl/lib/libd3d12core.so" and "LD_PRELOAD" not in env
+    runner.args = p3_runner.argparse.Namespace(gate="V")
+    env = runner.environment()
+    assert "GALLIUM_DRIVER" not in env and "GWM_P3_GZ_SIM_PRELOAD" not in env and not env["PATH"].startswith(shim)
 
 
 def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
@@ -616,6 +685,122 @@ def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
     assert "signal_handler_options=SignalHandlerOptions.NO" in text and "rclpy.spin(" not in text
     assert "while not stop_requested.is_set():" in text and "executor.spin_once(timeout_sec=0.05)" in text
     assert text.index("executor.shutdown()") < text.index("node.destroy_node()") < text.index("rclpy.shutdown()")
+
+
+def test_diagnostic_gate_d_is_fixed_ground_only_and_never_credit(tmp_path):
+    assert [(s, v, r) for s, v, r in run_p3_gates.PLAN["D"]] == [
+        ("diagnostic", "baseline", "diag-baseline"), ("diagnostic", "no_rgb_observer", "diag-no_rgb_observer"),
+        ("diagnostic", "recorder_none", "diag-recorder_none"), ("diagnostic", "no_probe", "diag-no_probe"),
+        ("diagnostic", "baseline", "diag-baseline_repeat")]
+    assert "D" not in run_p3_gates.PREDECESSOR.values() and "D" in p3_manifest.GROUND_GATES
+    assert p3_manifest.authorization_template("D", "s", "op")["excludes"] == ["flight"]
+    (tmp_path / "state").mkdir()
+    atomic_json(tmp_path / "state" / "p3-gate-D-sha.result.json", {"accepted": True, "manifest_sha256": "sha",
+                                                                      "runs": []})
+    with pytest.raises(PermissionError, match="requires an accepted Gate A"):
+        run_p3_gates.require_predecessor(tmp_path, "B", "sha")
+    assert '"acceptance_credit": args.gate in ("A", "B", "C")' in (SIM / "scripts/run_p3_gates.py").read_text()
+
+
+@POSIX_ONLY
+def test_runner_variant_is_exactly_for_the_diagnostic_scope(tmp_path):
+    import p3_runner
+    base = ["--run", "--gate", "D", "--role", "r", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")]
+    for extra in (["--scope", "diagnostic"], ["--scope", "readiness", "--variant", "baseline"],
+                  ["--scope", "diagnostic", "--variant", "something_else"]):
+        with pytest.raises(SystemExit):
+            p3_runner.main(base + extra)
+
+
+def test_source_probe_clock_only_excludes_image_subscriptions(tmp_path):
+    with pytest.raises(ValueError, match="clock_only"):
+        p3_source_probe.main([str(tmp_path), "default", "x500_depth_71", "--clock-only", "--rgb"])
+
+
+def test_stall_diagnostic_sim_second_crossings():
+    import p3_stall_diagnostic
+    points = [(0.0, 0.5), (1.0, 1.0), (3.0, 2.0), (4.0, 3.5)]  # 1 s sim takes 2 s wall in the middle
+    marks = p3_stall_diagnostic.crossings(points)
+    assert [round(m, 3) for m in marks] == [1.0, 3.0, 3.667]
+    assert [round(b - a, 3) for a, b in zip(marks, marks[1:])] == [2.0, 0.667]
+
+
+def test_native_gate_n_is_the_identical_two_start_pair_and_never_credit():
+    assert run_p3_gates.PLAN["N"] == [("diagnostic", "baseline", "diag-baseline"),
+                                     ("diagnostic", "no_rgb_observer", "diag-no_rgb_observer")]
+    assert run_p3_gates.PLAN["N"] == run_p3_gates.PLAN["D"][:2]
+    assert p3_manifest.DIAGNOSTIC_GATES == ("D", "N") and "N" in p3_manifest.GROUND_GATES
+    assert "N" not in run_p3_gates.PREDECESSOR.values()
+    assert p3_manifest.authorization_template("N", "s", "op")["excludes"] == ["flight"]
+
+
+def test_native_profile_requires_the_nvidia_driver(monkeypatch):
+    real = Path.exists
+    monkeypatch.setattr(Path, "exists", lambda self: False if str(self).startswith("/proc/driver/nvidia")
+                        else real(self))
+    with pytest.raises(ValueError, match="/proc/driver/nvidia/version"):
+        p3_manifest.native_gpu_profile_identity()
+
+
+@POSIX_ONLY
+def test_gate_n_environment_is_native_nvidia_and_host_guard(monkeypatch, tmp_path):
+    import p3_runner
+    runner = p3_runner.Runner.__new__(p3_runner.Runner)
+    runner.run = tmp_path
+    runner.args = p3_runner.argparse.Namespace(gate="N")
+    env = runner.environment()
+    assert env["__EGL_VENDOR_LIBRARY_FILENAMES"] == "/usr/share/glvnd/egl_vendor.d/10_nvidia.json"
+    assert "GALLIUM_DRIVER" not in env and "GWM_P3_GZ_SIM_PRELOAD" not in env
+    assert not env.get("PATH", "").startswith(str(SIM / "scripts/p3_gz_shim"))
+    source = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'if (self.args.gate == "N") == p3_manifest.wsl_host():' in source
+
+
+def test_source_probe_rgb_absence_monitor_excludes_rgb(tmp_path):
+    for extra in (["--rgb"], ["--clock-only"]):
+        with pytest.raises(ValueError, match="rgb_absence_monitor"):
+            p3_source_probe.main([str(tmp_path), "default", "x500_depth_71", "--rgb-absence-monitor"] + extra)
+
+
+def test_runner_rgb_consumer_by_scope_and_no_rgb_bridge():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'rule = self.validation["rgb_consumer"][self.scope]' in runner
+    assert 'rgb=rule == "required"' in runner and 'rgb_absence_monitor=rule == "absent_verified"' in runner
+    assert 'raise Abort("rgb_bridge_configured")' in runner
+    assert 'self.sensor_stack(GROUND_WORLD, require_state=False, rgb=False, watch=watch)' in runner  # fixtures
+
+
+@POSIX_ONLY
+def test_rgb_absence_snapshot_parser_counts_cli_subscribers():
+    import p3_runner
+    parse = p3_runner.RgbAbsenceSnapshotter.subscribers
+    assert parse("No publishers on topic [/t]\nNo subscribers on topic [/t]\n") == 0
+    assert parse("Publishers [Address, Message Type]:\n  tcp://a, x\nSubscribers [Address, Message Type]:\n"
+                 "  tcp://127.0.0.1:1, gz.msgs.Image\n  tcp://127.0.0.1:2, gz.msgs.Image\n") == 2
+    assert parse("garbled") is None  # unparseable output never counts as zero
+
+
+@POSIX_ONLY
+def test_rgb_absence_snapshotter_thread_runs_and_records_both_windows(monkeypatch, tmp_path):
+    # Gate B 06b3fa54: an attribute named `run` shadowed Thread.run and no snapshot was taken.
+    import p3_runner
+    (tmp_path / "source").mkdir()
+    events = tmp_path / "ros-events.jsonl"
+    events.write_text("".join(json.dumps({"event": "transition", "to": to, "monotonic_s": t}) + "\n"
+                              for to, t in (("PRESTREAM_SAFE_SETPOINTS", 1.0), ("TAKEOFF", 2.0), ("COMPLETE", 3.0))))
+    settings = {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera"}
+    snap = p3_runner.RgbAbsenceSnapshotter(tmp_path, {}, settings, [])
+    assert callable(snap.run) and snap.run_dir == tmp_path
+    imx = "/world/default/model/x500_depth_71/link/camera_link/sensor/IMX214/image"
+    replies = {("-l",): imx + "\n/depth_camera\n", ("-i", "-t", imx): "No subscribers on topic [x]\n",
+               ("-i", "-t", "/depth_camera"): "Subscribers [Address, Message Type]:\n  tcp://127.0.0.1:1, gz.msgs.Image\n"}
+    monkeypatch.setattr(snap, "gz", lambda *args: (0, replies[args], ""))
+    snap.start()
+    snap.join(timeout=10)
+    record = json.loads((tmp_path / "source/rgb-absence-snapshots.json").read_text())
+    assert record["errors"] == [] and set(record["snapshots"]) == {"window_start", "window_end"}
+    assert record["snapshots"]["window_start"]["topics"][imx]["subscribers"] == 0
+    assert record["snapshots"]["window_end"]["topics"]["/depth_camera"]["subscribers"] == 1
 
 
 def test_source_probe_keeps_the_sourced_ros_python_path():

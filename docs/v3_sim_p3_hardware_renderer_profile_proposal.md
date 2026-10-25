@@ -1,7 +1,7 @@
 # P3 hardware-renderer profile — proposal `p3-acceptance-v1.2` (D3D12 + `libd3d12core` lifetime fix)
 
-**Status: PROPOSAL ONLY — NOT APPLIED, NOT APPROVED.** P3 remains INCOMPLETE, qualification
-0/3. Existing Gate A (accepted, `764fcfd7`) and Gate B (failed, `764fcfd7`) results and their
+**Status: APPROVED by operator Neura-Shadow on 2026-10-25 and APPLIED as proposed** (see
+acceptance report section U). P3 remains INCOMPLETE, qualification 0/3. Existing Gate A (accepted, `764fcfd7`) and Gate B (failed, `764fcfd7`) results and their
 consumed budgets are unchanged. The llvmpipe candidate `764fcfd7` is not modified.
 
 Date: 2026-10-25. Host: WSL 3.0.1.0, kernel 6.18.40.1-1, WSLg 1.0.79, Direct3D 1.611.1-81528511,

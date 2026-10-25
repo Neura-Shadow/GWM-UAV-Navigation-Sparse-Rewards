@@ -1,9 +1,16 @@
 {
   "schema_version": 1,
-  "contract": "p3-acceptance-v1.1",
+  "contract": "p3-acceptance-v1.3",
   "threshold_source": "p3_validation.yaml at archived P3 commit 76f014d (frozen before any P3 runtime); values unchanged",
-  "contract_revision": "v1.1 (operator-approved 2026-10-25, proposal commit 8df667d): renderer requirement hardware -> software:llvmpipe only; every limit unchanged",
-  "renderer_requirement": "software:llvmpipe",
+  "contract_revision": "v1.3 (operator-approved 2026-10-25, proposal commit e18ed8c): RGB consumer by scope (readiness required, fixture absent, flight absent_verified); renderer hardware:d3d12 and every limit unchanged",
+  "renderer_requirement": "hardware:d3d12",
+  "rgb_consumer": {"readiness": "required", "fixture": "absent", "flight": "absent_verified"},
+  "rgb_absence_monitor": {
+    "topic_marker": "/sensor/IMX214/",
+    "control_topic": "/depth_camera",
+    "sample_period_wall_s": 0.5,
+    "max_sample_gap_wall_s": 1.0
+  },
   "ground_window_sim_s": 30,
   "settle_sim_s": 5,
   "readiness_observation_sim_s": 15,

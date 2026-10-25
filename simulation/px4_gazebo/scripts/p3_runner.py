@@ -37,6 +37,9 @@ import p3_manifest  # noqa: E402
 GATES = ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH")
 PARAMETER_BRIDGE = "/opt/ros/jazzy/lib/ros_gz_bridge/parameter_bridge"
 SOFTWARE_RENDERERS = re.compile(r"llvmpipe|softpipe|swrast|software rasterizer", re.I)
+# Stall-attribution diagnostics (gate D only): one P3 consumer changed per variant.
+DIAGNOSTIC_VARIANTS = ("baseline", "no_rgb_observer", "recorder_none", "no_probe")
+DIAGNOSTIC_WINDOW_WALL_S = 120.0
 
 
 class Abort(RuntimeError):
@@ -111,6 +114,21 @@ class Owned:
             self.record["remaining_group_members"] = members
 
 
+def d3d12_environment(path):
+    """Contract v1.2 environment: D3D12 on the pinned adapter, gz shim first on PATH.
+
+    The shim adds the libd3d12core preload only to `gz sim` (also when PX4 starts it), so
+    PX4, ROS and QGC processes never load it. The real gz is resolved before the shim.
+    """
+    profile = strict_json(SIM / "configs/p3_d3d12_profile.json")
+    shim = SIM / "scripts/p3_gz_shim"
+    real = shutil.which("gz", path=path)
+    if real is None or Path(real).parent == shim:
+        raise Abort("real_gz_not_found_for_shim")
+    return dict(profile["environment"], PATH=str(shim) + ":" + path, GWM_P3_REAL_GZ=real,
+                GWM_P3_GZ_SIM_PRELOAD=profile["gz_sim_preload"])
+
+
 def group_members(pgid):
     members = []
     for entry in Path("/proc").iterdir():
@@ -135,6 +153,75 @@ def namespace_processes():
             except OSError:
                 continue
     return rows
+
+
+def process_rows():
+    """Namespace processes with pgid/ppid for closed-process-set evidence."""
+    rows = []
+    for row in namespace_processes():
+        try:
+            fields = Path(f"/proc/{row['pid']}/stat").read_text().rsplit(")", 1)[1].split()
+        except OSError:
+            continue
+        rows.append(dict(row, ppid=int(fields[1]), pgid=int(fields[2])))
+    return rows
+
+
+class RgbAbsenceSnapshotter(threading.Thread):
+    """Contract v1.3 flights: `gz topic -i` subscriber snapshots of every IMX214 topic plus the
+    depth positive control, and the namespace process set, at the flight-window start
+    (PRESTREAM_SAFE_SETPOINTS) and end (COMPLETE). Off the control path; raw output retained."""
+
+    TRIGGERS = (("PRESTREAM_SAFE_SETPOINTS", "window_start"), ("COMPLETE", "window_end"))
+
+    def __init__(self, run, env, settings, owned):
+        super().__init__(name="p3-rgb-absence-snapshots", daemon=True)
+        # Not `self.run`: that name is threading.Thread.run (Gate B 06b3fa54 lost both snapshots).
+        self.run_dir, self.env, self.settings, self.owned = run, env, settings, owned
+        self.path = run / "source/rgb-absence-snapshots.json"
+        self.stop_event = threading.Event()
+        self.record = {"contract": "p3-rgb-absence-snapshots-v1", "runner_pgid": os.getpgid(0),
+                       "snapshots": {}, "errors": []}
+
+    def gz(self, *args):
+        completed = subprocess.run(["gz", "topic", *args], env=self.env, capture_output=True, text=True, timeout=20)
+        return completed.returncode, completed.stdout, completed.stderr[-400:]
+
+    @staticmethod
+    def subscribers(stdout):
+        if "No subscribers on topic" in stdout:
+            return 0
+        lines = stdout.split("Subscribers [Address, Message Type]:", 1)
+        return len([line for line in lines[1].splitlines() if line.strip()]) if len(lines) == 2 else None
+
+    def snapshot(self, label):
+        begin = time.monotonic()
+        code, listing, err = self.gz("-l")
+        topics = sorted(t.strip() for t in listing.splitlines() if self.settings["topic_marker"] in t)
+        info = {}
+        for topic in topics + [self.settings["control_topic"]]:
+            rc, out, err = self.gz("-i", "-t", topic)
+            info[topic] = {"returncode": rc, "subscribers": self.subscribers(out), "stdout": out, "stderr": err}
+        self.record["snapshots"][label] = {
+            "begin_monotonic_s": begin, "end_monotonic_s": time.monotonic(), "list_returncode": code,
+            "imx214_topics": topics, "topics": info, "processes": process_rows(),
+            "owned_pids": [o.pid for o in list(self.owned)]}
+        atomic_json(self.path, self.record)
+
+    def run(self):
+        tail = Tail(self.run_dir / "ros-events.jsonl")
+        pending = list(self.TRIGGERS)
+        try:
+            while pending:
+                stopping = self.stop_event.wait(0.1)
+                for row in tail.read():  # one final read after a stop request, so COMPLETE is never missed
+                    if pending and row.get("event") == "transition" and row.get("to") == pending[0][0]:
+                        self.snapshot(pending.pop(0)[1])
+                if stopping:
+                    break
+        except Exception as exc:  # recorded; the evaluator fails a flight without both snapshots
+            self.record["errors"].append(type(exc).__name__ + ":" + str(exc))
+        atomic_json(self.path, self.record)
 
 
 class ResourceSampler(threading.Thread):
@@ -164,6 +251,38 @@ class ResourceSampler(threading.Thread):
                     peak = self.peaks.setdefault(item.name, {"cpu_s": 0, "rss_kb": 0})
                     peak["cpu_s"], peak["rss_kb"] = max(peak["cpu_s"], cpu), max(peak["rss_kb"], rss)
                 stream.write(json.dumps(row) + "\n")
+
+
+class GazeboThreadSampler(threading.Thread):
+    """Gate D only: 10 Hz passive /proc sample of every Gazebo thread (state, wait channel,
+    CPU ticks) plus the mean host CPU MHz. Separates kernel waits from running and sleeping."""
+
+    def __init__(self, run, pid):
+        super().__init__(name="p3-gazebo-threads", daemon=True)
+        self.path, self.pid = run / "diagnostic-gazebo-threads.jsonl", pid
+        self.stop_event = threading.Event()
+
+    def run(self):
+        with self.path.open("x", buffering=1) as stream:
+            while not self.stop_event.wait(0.1):
+                threads = []
+                try:
+                    tids = os.listdir(f"/proc/{self.pid}/task")
+                except OSError:
+                    break
+                for tid in tids:
+                    try:
+                        raw = Path(f"/proc/{self.pid}/task/{tid}/stat").read_text()
+                        wchan = Path(f"/proc/{self.pid}/task/{tid}/wchan").read_text().strip()
+                    except OSError:
+                        continue
+                    comm = raw[raw.index("(") + 1:raw.rindex(")")]
+                    fields = raw.rsplit(")", 1)[1].split()
+                    threads.append([int(tid), comm, fields[0], wchan, int(fields[11]) + int(fields[12])])
+                mhz = [float(line.split(":")[1]) for line in Path("/proc/cpuinfo").read_text().splitlines()
+                       if line.startswith("cpu MHz")]
+                stream.write(json.dumps({"monotonic_s": time.monotonic(), "cpu_mhz_mean": sum(mhz) / len(mhz)
+                                         if mhz else None, "threads": threads}) + "\n")
 
 
 class Tail:
@@ -241,6 +360,11 @@ class Runner:
             raise PermissionError("Flights belong to Gate B or Gate C only")
         if self.scope != "flight" and self.args.gate not in p3_manifest.GROUND_GATES:
             raise PermissionError("Ground scopes belong to Gate A or validation V only")
+        if (self.args.gate in p3_manifest.DIAGNOSTIC_GATES) != (self.scope == "diagnostic"):
+            raise PermissionError("The diagnostic scope belongs to diagnostic gates D/N only")
+        # Contract v1.2 and diagnostic D are bound to the WSL D3D12 profile; N to a native NVIDIA host.
+        if (self.args.gate == "N") == p3_manifest.wsl_host():
+            raise PermissionError("Gate N runs only on a native NVIDIA host; gates A/B/C/D/V only on WSL")
         return frozen, sha, authorization
 
     # ---- launching -----------------------------------------------------------------------
@@ -253,8 +377,12 @@ class Runner:
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
                     "GWM_P3_OWNED_NAMESPACE": "1"})
-        # Contract v1.1: Mesa's default llvmpipe for every gate. No D3D12 variables are passed
-        # (the WSL D3D12 path faults in Gazebo shutdown; acceptance report sections L-O).
+        gate = getattr(getattr(self, "args", None), "gate", None)
+        if gate == "N":
+            env.update(strict_json(SIM / "configs/p3_native_gpu_profile.json")["environment"])
+        elif gate != "V":
+            env.update(d3d12_environment(env.get("PATH", "")))
+        # Validation V keeps Mesa's default llvmpipe; gate N uses NVIDIA EGL without D3D12 or shim.
         env.update(extra or {})
         return env
 
@@ -324,15 +452,18 @@ class Runner:
         return self.clock_tail.last["sim_s"] if self.clock_tail.last else None
 
     # ---- shared sensor stack ---------------------------------------------------------------
-    def sensor_stack(self, world, require_state, rgb, watch):
+    def sensor_stack(self, world, require_state, rgb, watch, clock_only=False, rgb_absence_monitor=False):
         receipt = strict_json(self.root / "state/p3-built.json")
+        if self.validation["rgb_absence_monitor"]["topic_marker"] in (self.run / "p3_sensor_bridge.yaml").read_text():
+            raise Abort("rgb_bridge_configured")  # v1.3: no process may bridge (consume) IMX214
         env = self.environment()
         sensor_env = self.environment({"FASTRTPS_DEFAULT_PROFILES_FILE": str(self.run / "p3_fastdds.xml")})
         # -s -P: no user site or cwd on sys.path, but keep the sourced ROS PYTHONPATH that
         # provides the vendored gz.transport13/gz.msgs10 bindings (-I would drop it).
         self.launch("source-probe", ["/usr/bin/python3", "-s", "-P", str(SIM / "validation/p3_source_probe.py"),
                                      str(self.run), world, self.sensors["model"]] + (["--rgb"] if rgb else [])
-                    + (["--watch"] + watch if watch else []), env)
+                    + (["--watch"] + watch if watch else []) + (["--clock-only"] if clock_only else [])
+                    + (["--rgb-absence-monitor"] if rgb_absence_monitor else []), env)
         self.clock_tail = Tail(self.run / "source/clock.jsonl")
         if self.scope == "fixture":
             clock = (SIM / "configs/p2_clock_bridge.yaml").read_text().replace("/world/default/clock",
@@ -487,7 +618,15 @@ class Runner:
         env = self.environment()
         self.launch("clock-bridge", [PARAMETER_BRIDGE, "--ros-args", "-p",
                                      "config_file:=" + str(SIM / "configs/p2_clock_bridge.yaml"), "-p", "use_sim_time:=true"], env)
-        self.sensor_stack("default", require_state=True, rgb=True, watch=[])
+        if self.scope == "diagnostic":
+            variant = self.args.variant
+            self.sensor_stack("default", require_state=True, rgb=variant not in ("no_rgb_observer", "no_probe"),
+                              watch=[], clock_only=variant == "no_probe")
+        else:
+            # Contract v1.3: RGB consumer by scope (readiness required, flight absent and verified).
+            rule = self.validation["rgb_consumer"][self.scope]
+            self.sensor_stack("default", require_state=True, rgb=rule == "required", watch=[],
+                              rgb_absence_monitor=rule == "absent_verified")
         from gwm_px4_control.execution_timing import controller_transport_env
         cenv = self.environment(controller_transport_env(timing))
         if self.scope == "flight":
@@ -499,6 +638,10 @@ class Runner:
         self.controller = self.launch("ros-controller", controller, cenv, stop_method="completes_own_work")
         self.summary["controller_transport_environment"] = controller_transport_env(timing)
         (self.run / "processes.txt").write_text(json.dumps(namespace_processes(), indent=1))
+        if self.scope == "flight" and self.validation["rgb_consumer"]["flight"] == "absent_verified":
+            self.snapshotter = RgbAbsenceSnapshotter(self.run, self.environment(),
+                                                     self.validation["rgb_absence_monitor"], self.owned)
+            self.snapshotter.start()
         return config
 
     def run_controller(self, config):
@@ -518,6 +661,20 @@ class Runner:
         else:
             end = self.sim_now()
             self.summary["sensor_window_sim_s"] = [end - self.validation["readiness_observation_sim_s"], end]
+        self.summary["status"] = "passed"
+
+    def diagnostic_window(self, config):
+        """Gate D: hold the unchanged readiness stack for a fixed wall window while sampling
+        Gazebo's threads; the controller observes and completes on its own. Never credit."""
+        self.thread_sampler = GazeboThreadSampler(self.run, self.gazebo.pid)
+        self.thread_sampler.start()
+        begin = time.monotonic()
+        self.wait_for(lambda: time.monotonic() >= begin + DIAGNOSTIC_WINDOW_WALL_S,
+                      begin + DIAGNOSTIC_WINDOW_WALL_S + 30, "diagnostic_window")
+        self.summary["diagnostic_window_monotonic_s"] = [begin, time.monotonic()]
+        self.wait_for(lambda: self.controller.poll() is not None, self.start + config["wall_deadline_s"] + 90,
+                      "controller")
+        self.summary["controller_exit_code"] = self.controller.record["exit_code"]
         self.summary["status"] = "passed"
 
     def ground_state(self):
@@ -548,6 +705,11 @@ class Runner:
 
     def shutdown(self):
         errors = []
+        snapshotter = getattr(self, "snapshotter", None)
+        if snapshotter is not None:
+            # Let a running end-of-window snapshot finish while every process is still up.
+            snapshotter.stop_event.set()
+            snapshotter.join(timeout=60)
 
         def attempt(label, action):
             try:
@@ -653,6 +815,9 @@ class Runner:
         return result
 
     def finalize(self):
+        if getattr(self, "thread_sampler", None) is not None:
+            self.thread_sampler.stop_event.set()
+            self.thread_sampler.join(timeout=3)
         if self.sampler is not None:
             self.sampler.stop_event.set()
             self.sampler.join(timeout=3)
@@ -685,7 +850,7 @@ class Runner:
     # ---- entry -----------------------------------------------------------------------------
     def execute(self):
         frozen, sha, authorization = self.preconditions()
-        label = self.args.fixture if self.scope == "fixture" else self.scope
+        label = {"fixture": self.args.fixture, "diagnostic": "diag-" + str(self.args.variant)}.get(self.scope, self.scope)
         self.run = self.root / "runs" / (time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-p3-" + label + "-"
                                          + uuid.uuid4().hex[:8])
         self.run.mkdir(parents=True)
@@ -693,6 +858,11 @@ class Runner:
         for name in ("p3_sensors.yaml", "p3_validation.yaml", "p3_sensor_bridge.yaml", "p3_fastdds.xml",
                      "p3_native_command_policy.json"):
             shutil.copyfile(SIM / "configs" / name, self.run / name)
+        if self.scope == "diagnostic" and self.args.variant == "recorder_none":
+            # Diagnostic only: run-local copy; every frame is still recorded and hashed.
+            local = strict_json(self.run / "p3_sensors.yaml")
+            local["recorder_compression"] = "none"
+            (self.run / "p3_sensors.yaml").write_text(json.dumps(local, indent=2) + "\n")
         print("P3 evidence: " + str(self.run), flush=True)
         self.summary = {"schema_version": 1, "contract": "p3-runtime-summary-v1", "run_id": self.run.name,
                         "p3_kind": self.scope, "gate": self.args.gate, "role": self.args.role,
@@ -702,13 +872,17 @@ class Runner:
                         "native_command_policy": frozen["runtime"]["native_command_policy"],
                         "project_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=SIM, text=True).strip(),
                         "isolation": "private user/mount/PID/network namespace, loopback only, exclusive workspace lock",
-                        "flight_commands_possible": self.scope == "flight", "finalized": False}
+                        "flight_commands_possible": self.scope == "flight", "finalized": False,
+                        "diagnostic_variant": self.args.variant if self.scope == "diagnostic" else None,
+                        "acceptance_credit_possible": self.args.gate in ("A", "B", "C")}
         self.sampler = ResourceSampler(self.run, self.owned, self.root)
         self.sampler.start()
         try:
             self.save()
             if self.scope == "fixture":
                 self.fixture()
+            elif self.scope == "diagnostic":
+                self.diagnostic_window(self.px4_stack(frozen))
             else:
                 config = self.px4_stack(frozen)
                 self.run_controller(config)
@@ -733,9 +907,10 @@ class Runner:
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", action="store_true", required=True)
-    parser.add_argument("--scope", choices=("readiness", "fixture", "flight"), required=True)
+    parser.add_argument("--scope", choices=("readiness", "fixture", "flight", "diagnostic"), required=True)
     parser.add_argument("--fixture")
-    parser.add_argument("--gate", choices=("A", "B", "C", "V"), required=True)
+    parser.add_argument("--variant", choices=DIAGNOSTIC_VARIANTS)
+    parser.add_argument("--gate", choices=("A", "B", "C", "V", "D", "N"), required=True)
     parser.add_argument("--role", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
@@ -743,6 +918,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if (args.scope == "fixture") != bool(args.fixture):
         parser.error("--fixture is required exactly for the fixture scope")
+    if (args.scope == "diagnostic") != bool(args.variant):
+        parser.error("--variant is required exactly for the diagnostic scope")
     return Runner(args).execute()
 
 

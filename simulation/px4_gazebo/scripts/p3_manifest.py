@@ -10,6 +10,8 @@ consumed once; a consumed scope is never retried automatically.
 """
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 import time
 
@@ -21,8 +23,13 @@ from p3_provenance import atomic_json, canonical_sha256, digest, strict_json  # 
 CONTRACT = "p3-candidate-manifest-v1"
 GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification",
          # Operator-authorized renderer evaluation: Gate A's ground plan on llvmpipe, never acceptance credit.
-         "V": "ground_validation_llvmpipe_no_credit"}
-GROUND_GATES = ("A", "V")
+         "V": "ground_validation_llvmpipe_no_credit",
+         # Operator-authorized stall attribution: fixed ground-only variants, never acceptance credit.
+         "D": "ground_stall_diagnostic_no_credit",
+         # Same two-start stall diagnostic on a native Ubuntu 24.04 + NVIDIA host; never credit.
+         "N": "native_gpu_stall_diagnostic_no_credit"}
+GROUND_GATES = ("A", "V", "D", "N")
+DIAGNOSTIC_GATES = ("D", "N")
 SOURCE_FOLDERS = ("scripts", "validation", "configs", "ros2_ws/src/gwm_px4_control", "ros2_ws/src/gwm_sensor_adapter")
 RUNTIME_LIBRARIES = ("/opt/ros/jazzy/lib/libfastrtps.so.2.14", "/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so",
                      "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py",
@@ -98,7 +105,43 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
             "qgc_unattended_elf_sha256": qgc["ELF_sha256"], "assets": assets,
             "runtime_libraries": {p: digest(p) for p in RUNTIME_LIBRARIES},
             "native_command_policy": policy,
-            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"]}
+            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"],
+            **({"d3d12_profile": d3d12_profile_identity()} if wsl_host() else
+               {"native_gpu_profile": native_gpu_profile_identity()})}
+
+
+def wsl_host():
+    """WSL2 exposes the paravirtual GPU as /dev/dxg; a native Linux host does not."""
+    return Path("/dev/dxg").exists()
+
+
+def native_gpu_profile_identity():
+    """Diagnostic gate N only: record (not pin) the native NVIDIA GL/EGL stack actually present."""
+    profile = strict_json(SIM / "configs/p3_native_gpu_profile.json")
+    missing = [path for path in profile["required_files"] if not Path(path).exists()]
+    if missing:
+        raise ValueError("Native NVIDIA GPU profile requirements absent: " + ", ".join(missing))
+    listing = subprocess.run(["ldconfig", "-p"], capture_output=True, text=True, check=True).stdout
+    libraries = {}
+    for soname in profile["recorded_library_sonames"]:
+        match = re.search(r"\s(" + re.escape(soname) + r"[^\s]*) \([^)]*x86-64[^)]*\) => (\S+)", listing)
+        if match:
+            libraries[match.group(2)] = digest(Path(match.group(2)).resolve())
+    return {"profile_sha256": digest(SIM / "configs/p3_native_gpu_profile.json"), "libraries": libraries,
+            "driver": Path("/proc/driver/nvidia/version").read_text().splitlines()[0].strip()}
+
+
+def d3d12_profile_identity():
+    """Contract v1.2: the D3D12/driver libraries must still be the pinned, verified ones."""
+    profile = strict_json(SIM / "configs/p3_d3d12_profile.json")
+    actual = {path: digest(path) for path in profile["pinned_libraries"]}
+    if actual != profile["pinned_libraries"]:
+        changed = sorted(p for p in actual if actual[p] != profile["pinned_libraries"][p])
+        raise ValueError("D3D12 runtime libraries differ from the approved profile: " + ", ".join(changed))
+    if profile["gz_sim_preload"] not in actual:
+        raise ValueError("The gz sim preload must be one of the pinned libraries")
+    return {"profile_sha256": digest(SIM / "configs/p3_d3d12_profile.json"), "libraries": actual,
+            "shim_sha256": digest(SIM / "scripts/p3_gz_shim/gz")}
 
 
 def candidate(root, **kwargs):

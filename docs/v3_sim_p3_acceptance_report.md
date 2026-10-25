@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A ACCEPTED (section R); Gate B FAILED on llvmpipe flight timing (section S); native Linux GPU host recommended — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A accepted, Gate B failed in evaluation with flight timing passed (section Z) — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -705,4 +705,174 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   Gazebo itself), then Policy A for the new commit, then a fresh Gate A. No environment
   update was made.
 
-Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**
+## U. Contract `p3-acceptance-v1.2` (D3D12 hardware profile) applied (2026-10-25)
+
+* **Approved** by Neura-Shadow as proposed in `743bbf7`.
+* **Applied:**
+  * `p3_validation.yaml`: `contract: p3-acceptance-v1.2`, `renderer_requirement: hardware:d3d12`;
+    every numeric limit unchanged (asserted by test).
+  * New `configs/p3_d3d12_profile.json`: the D3D12 environment, the declared renderer identity,
+    the `gz sim` preload `/usr/lib/wsl/lib/libd3d12core.so`, and the five pinned library
+    hashes.
+  * New `scripts/p3_gz_shim/gz` (LF, mode 755): first on the `PATH` of A/B/C owned processes,
+    including PX4, which starts Gazebo. It adds `LD_PRELOAD` only for `gz sim`, so PX4, ROS,
+    QGC and other gz subcommands run unchanged and inherited `LD_PRELOAD` never reaches owned
+    processes.
+  * The runner sets the profile environment for A/B/C; validation V stays llvmpipe with no shim.
+  * The manifest re-hashes the pinned libraries and records the profile and shim hashes; any
+    change blocks freezing or running.
+  * The evaluator requires the exact D3D12 RTX 4060 renderer identity for A/B/C.
+* **Unchanged:** P2 controller and mission, sensor rates and RGB workload, pins, freshness
+  limits (including the 2 s `vehicle_land_detected` wall limit), MC causality, policy A,
+  graceful cleanup, every earlier gate result and budget, and the llvmpipe candidate `764fcfd7`.
+* **Verification:** Linux P2 212, sensor 61, evaluators 35, runtime 67, MC 23. Windows (P3
+  suites) 148 passed, 15 POSIX-only skipped. Shellcheck is clean. The live WSL library
+  hashes match the profile. The shim passes `gz sim --versions` through to Gazebo 8.15.0.
+* Flight timing on D3D12 is still unproven; Gate B judges it unchanged.
+* **v1.2 candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `f76fbbb`
+  (receipt `55709675…b598`). Manifest `state/p3-candidate-f76fbbb.json`, canonical SHA-256
+  **`3302379cffc4a67e0df68d14f752cc350228df9fc8ee71d83e1610840a3c892f`**
+  (`renderer_requirement: hardware:d3d12`; profile `2e9e9ba1…`, shim `5c3cf88b…`, 5 pinned
+  libraries). `verify` reproduces it, the MC selection matches, and no Gate A artifacts
+  exist for it. Gate A has not been run.
+
+## V. Gate A of candidate `3302379c` (v1.2, D3D12) — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-3302379cffc4.json` `81d422f2…dbe8`, consumed.
+  Result `state/p3-gate-A-3302379c….result.json` `9eba398a…4eca`, `accepted: true`,
+  `acceptance_credit: true`. Run 09:48:03–09:55:15 UTC; no leftover processes.
+* **8/8 independent evaluations passed.** Renderer `D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`
+  in every run. **Gazebo exit 0 in all 8 runs**, so the libd3d12core lifetime fix held for 8
+  real shutdowns. Sensor adapter exit 0 in all 8.
+
+| Run | source Hz (≥25) | max gap s (≤0.12) | processed Hz (≥8) | max age s (≤0.25) | max stall s wall (≤1.0) |
+|---|---|---|---|---|---|
+| readiness `adc2a21a` | 30.30 | 0.036 | 10.0 | 0.072 | 0.082 |
+| plane2 `35eb96f4` | 30.30 | 0.036 | 10.0 | 0.064 | 0.054 |
+| plane4 `13bec8e5` | 30.30 | 0.036 | 10.0 | 0.060 | 0.054 |
+| plane6 `38cd08d1` | 30.30 | 0.036 | 10.0 | 0.060 | 0.049 |
+| oblique `a413e48a` | 30.30 | 0.036 | 10.0 | 0.060 | 0.053 |
+| asymmetric `e5acb438` | 30.30 | 0.036 | 10.0 | 0.056 | 0.049 |
+| out_of_range `1e633769` | 30.30 | 0.036 | 10.0 | 0.060 | 0.051 |
+| interruption `575b5bdb` | 30.31 | 0.036 | 10.0 | 0.056 | 0.058 |
+
+  Geometry, valid fraction, out-of-range, interruption detection, recorder, association,
+  policy A, MC causality, P2 ground timing and graceful cleanup also passed wherever they
+  applied.
+* **Flight-timing caution:** readiness RTF **0.647** (minimum interval 0.0092; wall delivery
+  19.1 Hz), lower than the 0.82 single sample of section L. At that average, PX4's 1.000 s
+  sim `vehicle_land_detected` interval is about 1.55 s wall against the unchanged 2 s limit.
+  Gate B judges it unchanged.
+
+## W. Gate B of candidate `3302379c` (v1.2, D3D12) — FAILED on flight timing (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-3302379cffc4.json` `77d97b69…51ae`, consumed.
+  Result `state/p3-gate-B-3302379c….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T100510Z-p3-flight-5a2b42b8` (SITL, unchanged P2 mission, renderer
+  `D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`): takeoff, reference lock, handover, hover, east
+  test and return completed. At sim 64.748 s in **NORTH_TEST** the unchanged controller entered
+  RECOVERY with **`stale_state:vehicle_land_detected`** (`Abort:controller_failed`).
+* **Graceful cleanup held:** every owned process, Gazebo included, exited 0, so the v1.2
+  libd3d12core fix held in flight as well.
+* **Measured cause:** PX4's sim interval was 1.000 s (86 receipts). The wall receipt gap
+  exceeded 1.8 s in 15 of 85 intervals and 2.0 s in 5, worst **2.725 s** (sim 63.916). That is
+  better than llvmpipe (65 over 1.8 s, worst 2.658 s) but still violates the unchanged 2 s
+  wall freshness limit. Real-time factor under the full depth+RGB+flight workload on this
+  WSL2 host is insufficient on either renderer.
+* **Decision rule (operator instruction, section N):** no relaxation. The 2 s limit, the P2
+  controller and every threshold stay unchanged.
+* **Recommendation:** run P3 Gates A–C on a **native Linux host with a hardware GPU**. On this
+  host both renderers now shut down cleanly, but neither sustains the real-time factor the
+  unchanged freshness limit needs in flight.
+
+## X. Contract `p3-acceptance-v1.3` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in `e18ed8c`, with no RGB observation-age
+  check added.
+* **Applied:**
+  * `p3_validation.yaml` adds the contract version, `rgb_consumer` {readiness required, fixture
+    absent, flight absent_verified} and `rgb_absence_monitor` (marker `/sensor/IMX214/`, control
+    `/depth_camera`, 0.5 s sampling, 1.0 s maximum gap). Every numeric limit is identical (test
+    asserts the complete set). `p3_sensors.yaml` `6c3038fe…`, the bridge, the D3D12 profile
+    `2e9e9ba1…`, the shim and `p2_control.yaml` `e50f824a…` are byte-identical.
+  * Runner: the probe gets `--rgb` only at readiness; flights get `--rgb-absence-monitor`. It
+    aborts if any bridge mapping carries IMX214. A background snapshotter records `gz topic -i`
+    for every IMX214 topic plus the depth positive control, and the namespace process set, at
+    the `PRESTREAM_SAFE_SETPOINTS` and `COMPLETE` transitions; shutdown waits for it first.
+  * Probe: flight mode samples IMX214 subscriber counts every 0.5 s (`topic_list` +
+    `topic_info`) into `source/imx214-subscribers.jsonl` and records `rgb_absence_monitor`,
+    `monitor_rows` and its own `subscribed_topics`.
+  * Evaluator: readiness keeps the unchanged `evaluate_rgb`. Fixtures add
+    `fixture:rgb_consumer_present`. Flights replace RGB throughput with `evaluate_rgb_absence`
+    (proposal §4.3, rules 1–6, fail closed) and are labelled `rgb_workload: depth_only_flight`.
+* **Tests:** passing RGB-free flight evidence; failures for `rgb_subscribed: true`, an IMX214
+  probe subscription, RGB rows in flight, start and end subscribers, a missing monitor, an
+  intermediate subscriber, a monitor gap, an unowned process, a lost positive control, missing
+  snapshots and a fixture with an RGB consumer; readiness without RGB fails; every numeric
+  limit is identical; diagnostic gates stay non-crediting. Linux: P2 212, sensor 61,
+  evaluators 49, runtime 78, MC 23. Windows (P3 suites): 170 passed, 18 POSIX-only skipped.
+* Nothing was frozen or run. Full-flight timing with RGB absent remains unproven until Gate B.
+* **v1.3 candidate:** preflight shows the sensor package receipt matching the current source
+  (`3a5bd685…`), the DDS agent binary and the QGC ELF intact with the owner bound, the five WSL
+  D3D12 libraries matching their pins, 793.8 GiB free and no simulation processes. Policy A
+  (unchanged) was re-approved by Neura-Shadow for `e2a91a6` (receipt `f74cd05d…9e4e`).
+  Manifest `state/p3-candidate-e2a91a6.json`, canonical SHA-256
+  **`06b3fa54851bc27c843cb125b2358c18adbcb6c5d5717cfbc156cbad9cb29c37`** (file `6c5d027e…a18d`):
+  `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build `7542919c…` (selection matches),
+  benchmark `20261025T051926Z-mc-trace-benchmark-e6000074`, QGC ELF `82994283…`,
+  `p3_validation.yaml` `83d27b26…`. `verify` reproduces it, and no authorization, consumption
+  or result artifact exists for it under any gate. Gate A has not been run.
+
+## Y. Gate A of v1.3 candidate `06b3fa54` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-06b3fa54851b.json` `4fc3004a…0bae`, consumed.
+  Result `state/p3-gate-A-06b3fa54….result.json` `7e578357…cc14`, `accepted: true`,
+  `acceptance_credit: true`. Run 11:26:19–11:33:28 UTC; no leftover processes.
+* **Readiness** `20261025T112631Z-p3-readiness-ff8a3401` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, with the mandatory RGB observer active (`rgb_subscribed: true`). The unchanged RGB
+  checks passed: 1920×1080, source 30.31 Hz sim (≥ 25), maximum source gap 0.036 s (≤ 0.12),
+  receipt stall 0.093 s wall (≤ 1.0), 454 frames, 0 late or unrendered. Depth: 30.31 Hz source,
+  10.0 Hz processed, maximum age 0.072 s. Native commands passed policy A (1 × 401, 34 × 512);
+  MC causality `verified`. Readiness RTF 0.603, with the RGB consumer active as v1.3 requires.
+  This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`. Source 30.30 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum stall ≤ 0.064 s.
+* Gazebo and the sensor adapter exited 0 in all 8 runs; every owned process shut down gracefully.
+* Flight timing with RGB absent is not yet measured; Gate B judges it against unchanged limits.
+
+## Z. Gate B of v1.3 candidate `06b3fa54` — FAILED in evaluation; flight timing passed (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-06b3fa54851b.json` `00cf4480…7064`, consumed.
+  Result `p3-gate-B-06b3fa54….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T123921Z-p3-flight-624dc8ae` (SITL, unchanged P2 mission, D3D12 RTX 4060,
+  depth-only flight): runtime exit 0. The controller completed the whole mission (`COMPLETE`),
+  P2 flight acceptance passed, MC causality was `verified`, and every owned process shut
+  down gracefully.
+* **Landing-state timing (depth-only workload):** 116 `vehicle_land_detected` intervals;
+  wall p50 **1.000 s**, p95 **1.003 s**, maximum **1.012 s**; 0 over 1.8 s, 0 over 2.0 s; no
+  stale-state event. Native RTF 0.997 (minimum interval 0.026).
+* **RGB absence:** the probe had `rgb_subscribed: false` with no IMX214 subscription; 0 RGB
+  metadata rows. The monitor recorded 205 rows (188 in the window span), maximum gap 0.50 s,
+  zero IMX214 subscribers and the positive control present throughout. The endpoint snapshots
+  are **missing** (see failure 1).
+* **Evaluator failures (first: `depth:state_association_incomplete`):**
+  1. `rgb_absence:snapshot_missing:window_start/window_end`, `snapshot_errors`:
+     **implementation defect**. `RgbAbsenceSnapshotter` stored its run directory in an
+     attribute named `run`, shadowing `threading.Thread.run`; the thread raised
+     `TypeError: 'PosixPath' object is not callable` and never took a snapshot. Fixed offline
+     (attribute renamed `run_dir`) with a regression test that executes the thread.
+  2. `depth:state_association_incomplete`: 930 of 931 window observations matched. One frame
+     (acquisition sim 22.180 s) was bracketed by a PX4 EKF attitude reset
+     (`quat_reset_counter` 1 → 2 at sim 22.192 s, during TAKEOFF) and correctly rejected as
+     `attitude:reset_epoch_bracket`. The rule that every observation must match makes any
+     mid-flight EKF reset fatal. **Operator decision required**; no rule changed.
+  3. `native_commands:vehicle_self_command_on_gcs_link`: six PX4-originated COMMAND_LONG frames
+     (gimbal manager 1001 ×5, 1000 ×1) from 72/1 to 72/0 on the GCS link at 0.1–2.3 s after
+     the P2 controller's `REQUEST_LAND` (phase `VERIFY_LANDED_AND_DISARMED`). They come from
+     PX4's land mode, not from QGC or the controller, and were never observed before because
+     no earlier P3 flight reached landing. **Operator decision required** on the native
+     command policy; no policy changed.
+* P3 remains INCOMPLETE; qualification 0/3. No further gate was started.
+
+Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A accepted; Gate B failed in evaluation (flight timing passed: land_detected maximum 1.012 s) on a snapshot defect, one reset-bracketed depth frame and PX4 landing self-commands — Qualification 0/3**

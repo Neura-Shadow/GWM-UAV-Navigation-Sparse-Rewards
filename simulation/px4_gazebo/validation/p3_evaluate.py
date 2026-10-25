@@ -22,7 +22,7 @@ sys.path.insert(0, str(VALIDATION))
 
 from p3_provenance import atomic_json, digest, strict_json  # noqa: E402
 from p3_process_exit import classify_all  # noqa: E402
-from p3_stream_eval import Failures, evaluate_rgb, evaluate_stream, native_rtf  # noqa: E402
+from p3_stream_eval import Failures, evaluate_rgb, evaluate_rgb_absence, evaluate_stream, native_rtf  # noqa: E402
 
 EVALUATOR_FILES = ("p3_evaluate.py", "p3_stream_eval.py", "p3_geometry_eval.py", "p3_process_exit.py",
                    "p3_mavlink.py", "p3_provenance.py", "collect_p2_evidence.py", "timing_evidence.py",
@@ -130,6 +130,9 @@ def evaluate(run):
         try:
             out["fixture"] = evaluate_fixture(run, validation, sensors)
             f.items += ["fixture:" + item for item in out["fixture"]["failures"]]
+            # Contract v1.3: fixtures are depth-only (rgb_consumer.fixture = absent).
+            f.check(strict_json(run / "source/probe-closed.json").get("rgb_subscribed") is False,
+                    "fixture:rgb_consumer_present")
         except (ValueError, KeyError, FileNotFoundError, StopIteration) as exc:
             f.check(False, "fixture_evaluation_error:" + type(exc).__name__ + ":" + str(exc))
     else:
@@ -145,8 +148,17 @@ def evaluate(run):
         try:
             out["depth_stream"] = evaluate_stream(run, window, validation, sensors, require_association=True)
             f.items += ["depth:" + item for item in out["depth_stream"]["failures"]]
-            out["rgb_stream"] = evaluate_rgb(run, window, validation, sensors["rgb_sensor"])
-            f.items += ["rgb:" + item for item in out["rgb_stream"]["failures"]]
+            if validation["rgb_consumer"][kind] == "absent_verified":
+                # Contract v1.3 flights: depth-only workload; RGB absence verified, no RGB throughput claim.
+                transitions = {t["to"]: t["monotonic_s"] for t in summary["controller_result"]["transitions"]}
+                out["rgb_workload"] = "depth_only_flight"
+                out["rgb_absence"] = evaluate_rgb_absence(
+                    run, (transitions["PRESTREAM_SAFE_SETPOINTS"], transitions["COMPLETE"]),
+                    validation["rgb_absence_monitor"], [p["pid"] for p in summary["processes"] if p.get("pid")])
+                f.items += ["rgb_absence:" + item for item in out["rgb_absence"]["failures"]]
+            else:
+                out["rgb_stream"] = evaluate_rgb(run, window, validation, sensors["rgb_sensor"])
+                f.items += ["rgb:" + item for item in out["rgb_stream"]["failures"]]
         except (ValueError, KeyError, FileNotFoundError) as exc:
             f.check(False, "sensor_evaluation_error:" + type(exc).__name__ + ":" + str(exc))
         try:
@@ -157,9 +169,15 @@ def evaluate(run):
         out["rtf"] = native_rtf(run)
         f.check(out["rtf"] is not None, "native_rtf_unmeasured")
         out["renderer"] = renderer = summary.get("renderer") or {}
-        # Contract v1.1: the declared renderer is Mesa llvmpipe for every gate; it must be recorded.
-        f.check(renderer.get("software") is True
-                and any("llvmpipe" in s for s in renderer.get("strings", [])), "renderer_not_declared_llvmpipe")
+        if summary.get("gate") == "V":
+            # Validation V measures Mesa llvmpipe; it must really be llvmpipe.
+            f.check(renderer.get("software") is True
+                    and any("llvmpipe" in s for s in renderer.get("strings", [])), "renderer_not_declared_llvmpipe")
+        else:
+            # Contract v1.2: A/B/C render on the declared D3D12 hardware adapter.
+            identity = strict_json(SIM / "configs/p3_d3d12_profile.json")["renderer_identity"]
+            f.check(renderer.get("identified") is True and renderer.get("software") is False
+                    and identity in renderer.get("strings", []), "renderer_not_declared_d3d12")
         out["resources"] = summary.get("resources")
         f.check(summary.get("controller_publishers_only_from_controller") is True, "competing_flight_publisher")
     out["failures"] = f.items
