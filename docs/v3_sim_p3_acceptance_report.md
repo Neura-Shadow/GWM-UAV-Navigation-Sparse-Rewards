@@ -522,4 +522,45 @@ shutdown is expected to end in SIGSEGV, so the strict cleanup rule cannot pass. 
 llvmpipe, cleanup can pass but the `hardware` renderer requirement fails. Resolving this
 needs an operator decision; nothing was changed.
 
+## N. Renderer decision: llvmpipe evidence assessment (2026-10-25)
+
+The D3D12 crash evidence (section M) is preserved. **Exact module attribution of
+`0x7fffa1041b10` is UNCONFIRMED.**
+
+The frozen `p3-acceptance-v1` contract sets no RTF threshold (RTF is measured only). The
+only admissible llvmpipe evidence for this implementation is readiness run
+`20261025T054510Z-p3-readiness-84dd7b19` (Gate A `8feaa076`; its failures were the since-fixed
+agent, group-member, boundary and association defects plus the renderer check):
+
+| Frozen limit | llvmpipe measured | D3D12 measured (`3a608df5`) |
+|---|---|---|
+| delivered ≥ 25 Hz | 30.31 Hz sim (17.55 Hz wall) | 30.31 Hz sim (24.95 Hz wall) |
+| source gap ≤ 0.12 s sim | 0.036 s | 0.036 s |
+| processed ≥ 8 Hz | 10.0 Hz | 9.93 Hz |
+| observation age ≤ 0.25 s sim | 0.072 s | 0.096 s |
+| stall ≤ 1.0 s wall | 0.096 s | 0.080 s |
+| recorded 1.0, lost 0 | 1.0, 0 of 455 | 1.0, 0 of 454 |
+| P2 ground timing (`p2-timing-v1`) | 20.0 Hz callback, 0.080 s maximum entry gap | 20.0 Hz, 0.060 s |
+| RTF (measured only) | 0.57 (minimum interval 0.021) | 0.82 (minimum interval 0.0051) |
+| Gazebo CPU | 142 s | 38 s |
+
+**Assessment: insufficient.** One 15 s readiness window passes every sensor and ground
+timing limit, but:
+
+1. No fixture geometry, scene-change or interruption result exists under llvmpipe for this
+   implementation. Archived llvmpipe fixtures predate it and are not admissible.
+2. Flight-phase P2 timing under the combined depth+RGB llvmpipe load is unproven. The
+   archived smoke failed at 2.008 s against the unchanged 2 s `vehicle_land_detected` wall
+   freshness limit; archived runs were llvmpipe, though that run's renderer was not recorded.
+3. The evidence is a single sample with 3.7 × the Gazebo CPU of D3D12 and low wall
+   delivery margin (17.55 Hz).
+
+**Selected path:** exactly one separately authorized, ground-only llvmpipe performance
+validation (readiness plus the seven fixtures, no flight, no gate credit). All sensor
+specifications, timing limits and graceful-cleanup rules stay unchanged. If every
+performance and cleanup check passes, a versioned renderer-contract revision allowing the
+measured software renderer will be proposed for approval, not applied. Flight timing would
+still be judged unchanged at Gate B/C. If any check fails, the recommendation is a native
+Linux GPU host, not a relaxation.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
