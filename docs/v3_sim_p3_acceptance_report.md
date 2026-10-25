@@ -604,4 +604,30 @@ Linux GPU host, not a relaxation.
   `renderer_requirement: software:llvmpipe`. `verify` reproduces it, the MC selection
   matches, and no Gate A artifacts exist for it. Gate A has not been run.
 
+## Q. Gate A of candidate `5e14e934` (v1.1) — FAILED at the last fixture (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-5e14e934f6b1.json` `01231ff1…881d`, consumed.
+  Result `p3-gate-A-5e14e934….result.json`, `accepted: false`; retained, not retried.
+* **7 of 8 runs passed:** readiness `ac6ccdf6`, plane2, plane4, plane6, oblique, asymmetric
+  and out_of_range, all on llvmpipe with every check passed and Gazebo exit 0.
+* **First failure:** `fixture-interruption:cleanup:sensor-adapter:nonzero_exit_3`, run
+  `20261025T084322Z-p3-interruption-ec038e97` (also `fixture:stream:adapter_result_not_passed`).
+  The adapter recorded `RuntimeError: Unable to convert call argument '0' to Python object`
+  from inside `rclpy.spin()` and exited 3. Its data path was complete and identical to the
+  passing V interruption run: 472/472 frames recorded, 156 processed, recorder complete,
+  source gap 0.036 s, maximum age 0.080 s. The bridge interruption exited gracefully (0).
+* **Root cause, reproduced offline:** rclpy's default SIGINT handler shuts the context down
+  while the adapter's 20 ms `poll` timer callback may still be executing. An adapter-only
+  stop smoke (private namespace, no inputs, randomized SIGINT 0.8–7 s) on the Gate A build
+  (`52024487…`) failed **4/40** with `RCLError … context is not valid … rcl_shutdown() was
+  called` (exit 3). Same defect class, timing-dependent, which is why V's run passed.
+* **Fix:** the adapter calls `rclpy.init(signal_handler_options=NO)` and installs its own
+  SIGINT/SIGTERM handler that only sets a stop event. It spins with
+  `SingleThreadedExecutor.spin_once(0.05)` until that event is set, then shuts down the
+  executor, node and context in order, after spinning has ended. Package rebuilt as
+  `3a5bd685…2a94` (colcon 2/2; `state/p3-built.json` `f34b6874…0f55`; previous receipt kept
+  as `state/archive/p3-built-52024487.json`). Same smoke on the fix: **100/100** passed.
+  Regression test added. No threshold, cleanup rule or evaluator check changed.
+* **Linux:** P2 212, sensor 61, evaluators 34, runtime 65, MC 23.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**

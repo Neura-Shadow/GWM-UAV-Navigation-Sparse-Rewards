@@ -37,9 +37,12 @@ def main(argv=None):
     folder = args.run_dir / "sensors"
     folder.mkdir(exist_ok=False)
 
+    import signal
+    import threading
+
     import rclpy
     from rclpy.clock import Clock, ClockType
-    from rclpy.executors import ExternalShutdownException
+    from rclpy.executors import ExternalShutdownException, SingleThreadedExecutor
     from rclpy.node import Node
     from rclpy.parameter import Parameter
     from rclpy.qos import DurabilityPolicy, HistoryPolicy, QoSProfile, ReliabilityPolicy
@@ -152,15 +155,27 @@ def main(argv=None):
             return {name: types for name, types in
                     self.get_publisher_names_and_types_by_node(self.get_name(), self.get_namespace())}
 
-    rclpy.init(args=None)
+    # rclpy's own SIGINT handler shuts the context down while a callback may still be running
+    # (Gate A 5e14e934 interruption: exit 3). Our handler only requests the stop; the context
+    # is shut down after spinning has ended, so no callback ever sees an invalid context.
+    from rclpy.signals import SignalHandlerOptions
+    stop_requested = threading.Event()
+    rclpy.init(args=None, signal_handler_options=SignalHandlerOptions.NO)
+    for stop_signal in (signal.SIGINT, signal.SIGTERM):
+        signal.signal(stop_signal, lambda *_: stop_requested.set())
     node = None
+    executor = None
     result = {"contract": "p3-depth-adapter-result-v1", "run_id": args.run_dir.name, "status": "failed",
               "error": None, "require_px4_state": args.require_px4_state, "pid": os.getpid()}
     try:
         node = DepthAdapter()
         result["declared_publications"] = node.publications
+        executor = SingleThreadedExecutor()
+        executor.add_node(node)
         try:
-            rclpy.spin(node)
+            while not stop_requested.is_set():
+                executor.spin_once(timeout_sec=0.05)
+            result["stop"] = "SIGINT"
         except (KeyboardInterrupt, ExternalShutdownException):
             result["stop"] = "SIGINT"
     except Exception as exc:  # recorded and returned as failure, never hidden
@@ -192,6 +207,8 @@ def main(argv=None):
             result["error"] = result["error"] or node.error
             if result["error"] is None and recorder["complete"]:
                 result["status"] = "passed"
+            if executor is not None:
+                executor.shutdown()
             node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()

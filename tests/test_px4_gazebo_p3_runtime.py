@@ -609,6 +609,15 @@ def test_every_gate_environment_has_no_d3d12_selection(monkeypatch, tmp_path):
         assert "GALLIUM_DRIVER" not in env and "MESA_D3D12_DEFAULT_ADAPTER_NAME" not in env
 
 
+def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
+    # Gate A 5e14e934 interruption: rclpy's SIGINT handler invalidated the context under a
+    # running callback (exit 3). The adapter must request the stop and shut down after spinning.
+    text = (SIM / "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/node.py").read_text()
+    assert "signal_handler_options=SignalHandlerOptions.NO" in text and "rclpy.spin(" not in text
+    assert "while not stop_requested.is_set():" in text and "executor.spin_once(timeout_sec=0.05)" in text
+    assert text.index("executor.shutdown()") < text.index("node.destroy_node()") < text.index("rclpy.shutdown()")
+
+
 def test_source_probe_keeps_the_sourced_ros_python_path():
     runner = (SIM / "scripts/p3_runner.py").read_text()
     launch = runner[runner.index('self.launch("source-probe"'):][:200]
