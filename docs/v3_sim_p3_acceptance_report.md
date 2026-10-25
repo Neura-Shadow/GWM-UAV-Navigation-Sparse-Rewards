@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.5 (recorder capacity 32) approved and applied offline (section AD); Policy A re-approval pending; no v1.5 candidate frozen — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3` frozen and verified (section AD); Gate A not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1006,7 +1006,18 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   passed, 19 POSIX-only skipped. The dry candidate dependency check resolves all six receipts.
 * **Still open (unchanged by v1.5):** a host slowdown like the one in section AC can still
   produce `pending_newer_state` associations that fail `state_association_incomplete`.
-* Nothing was frozen or run. Next: Policy A re-approval for the v1.5 commit, then freeze and
-  verify; Gates A, B and C each need separate authorization.
+* **v1.5 candidate:** Policy A (`bf1ef9b1…`, content unchanged) was re-approved by Neura-Shadow
+  for `a2d74bd` (receipt `state/p3-policy-A-approval-a2d74bd.json`, `be7dcfbb…c13d`). Preflight:
+  the sensor package receipt matches the current source (`c5d37413…`), the DDS agent binary and
+  QGC ELF are intact with the owner bound, the five WSL D3D12 libraries match their pins, 791.7 GiB
+  is free and no simulation processes are running. Manifest `state/p3-candidate-a2d74bd.json`,
+  canonical SHA-256 **`a0deb4d3f1f9624f0a38893303c6984eeae1e20094e186240fdd53f925e3d125`** (file
+  `3bf7c7d7…b75b`): contract v1.5, `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build
+  `7542919c…` (the runtime selection matches the frozen build), benchmark
+  `20261025T051926Z-mc-trace-benchmark-e6000074`, QGC ELF `82994283…`, `p3_sensors.yaml`
+  `e02ae2a4…`, `p3_validation.yaml` `2bb85189…`, policy file `7a7be282…`, sensor receipt canonical
+  `77f4fa34…`. `verify` and `verify_current` reproduce it, execution without authorization is
+  false, and no authorization, consumption, result or run artifact exists for it. Gate A has not
+  been run.
 
-Final status: **P3 INCOMPLETE — contract v1.5 approved and applied offline; Policy A re-approval pending; no v1.5 candidate frozen; no gate run — Qualification 0/3**
+Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3 frozen and verified; Gate A not run — Qualification 0/3**
