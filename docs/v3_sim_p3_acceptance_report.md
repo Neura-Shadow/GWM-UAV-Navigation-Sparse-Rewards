@@ -481,4 +481,45 @@ frozen manifest by the operator.
 * **Not changed:** SIGSEGV remains a cleanup failure. No check was weakened and no
   diagnostic runtime was started.
 
+## M. Gazebo shutdown diagnostic (operator-authorized, outside the gates, 2026-10-25)
+
+Gazebo only, with no PX4, QGC or flight, in a private user/net/mount/pid namespace. It used
+PX4's own server command and `gz_env.sh` (`gz sim --verbose=4 -r -s default.sdf`, spawn
+`x500_depth` through `/world/default/create`), subscribed to depth and RGB images, ran
+20 s, paused (`data: true`), then sent SIGINT to the server. The `ruby` server process ran
+under gdb, which passed SIGINT through and stopped on SIGSEGV. Two earlier harness attempts
+(`20261025T061410Z`, `20261025T061422Z`) failed before any Gazebo process existed (shell
+`set -u`, then gdb cannot load the Ruby `gz` script); they observed nothing.
+
+| Variant | Run | Renderer | Outcome |
+|---|---|---|---|
+| D3D12 | `20261025T065412Z-gz-shutdown-diag-d3d12` | D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU) | **SIGSEGV**, thread 8 (LWP 43) |
+| llvmpipe | `20261025T065459Z-gz-shutdown-diag-llvmpipe` | llvmpipe (LLVM 20.1.2) | **exited normally**: render thread stopped in 51 ms, then `Shutting down gz-sim-server` |
+
+**Backtrace (D3D12):**
+
+* Thread 1 (main): `SimulationRunner::Step` → `<signal handler>` →
+  `gz::common::SignalHandlerPrivate::OnSignal` → `SensorsPrivate::Stop()` →
+  `std::thread::join()` on LWP 43.
+* Thread 8 (LWP 43, the sensors render thread, already out of its loop):
+  `start_thread` → `__nptl_deallocate_tsd` → `0x7fffa1041b10 ??` → SIGSEGV.
+* Threads 28–31 (GPU-stack workers) are parked in `pthread_cond_wait`, returning into the
+  same unattributed region (`0x7fffa103d74f`, `0x7fffa138862b`). Thread 27 runs in the
+  NVIDIA WSL user-mode driver `libnvwgf2umx.so` (still mapped at `0x7fff8f…–0x7fff91…`).
+
+**Root cause:** when the render thread exits after `SensorsPrivate::Stop()`, glibc runs a
+pthread thread-specific-data destructor registered on that thread by the D3D12 GPU stack.
+The destructor's address is outside every loaded shared object at that moment, so executing
+it faults. This happens in the WSL D3D12/NVIDIA driver's thread teardown, not in P3 or P2
+code, and not in Gazebo's sensor logic (the render loop had already stopped). The exact
+owning module of `0x7fffa1041b10` is not established: no `/proc` maps were captured, and the
+region is either code from an unloaded module or anonymous executable memory. With llvmpipe
+the same sequence exits 0, consistent with Gate A `8feaa076`. The archived llvmpipe −11
+crashes (older runner, SIGTERM) were not reproduced and remain unexplained.
+
+**Implication:** with the D3D12 hardware renderer on this host, Gazebo's own SIGINT
+shutdown is expected to end in SIGSEGV, so the strict cleanup rule cannot pass. With
+llvmpipe, cleanup can pass but the `hardware` renderer requirement fails. Resolving this
+needs an operator decision; nothing was changed.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
