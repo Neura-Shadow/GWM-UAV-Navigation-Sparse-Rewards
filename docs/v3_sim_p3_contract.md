@@ -1,7 +1,8 @@
 # v3-SIM P3 — depth sensing and flight-control coexistence (contract and operation)
 
-Status: **implemented and verified offline; no runtime gate has been authorized or run.
-P3 INCOMPLETE — Qualification 0/3.** See the [acceptance report](v3_sim_p3_acceptance_report.md).
+Status: **P3 COMPLETE in SITL under `p3-acceptance-v1.6` — candidate `1e205fec`, Gates A, B and C
+accepted, qualification 3/3 (depth-only flights; no hardware).** See the
+[acceptance report](v3_sim_p3_acceptance_report.md), sections AI–AK.
 
 This slice starts from the accepted P2-R3 checkpoint `6204fedb9ac8a2b554ff825c93159a509a1b91ad`
 (nominal smoke `20260912T034917Z-p2-flight-c74f35ba`, fresh batch

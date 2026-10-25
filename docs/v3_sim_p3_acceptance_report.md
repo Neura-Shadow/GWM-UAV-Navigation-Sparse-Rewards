@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.6 (P2 evaluator duplicate-timestamp pairing) approved and applied offline (section AH); Policy A re-approval pending; no v1.6 candidate frozen — Qualification 0/3**
+**P3 COMPLETE — contract `p3-acceptance-v1.6`, candidate `1e205fec`: Gates A, B and C accepted (sections AI, AJ, AK) — Qualification 3/3 (SITL, depth-only flights; no hardware)**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1142,7 +1142,93 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   1.1e-6 m still fails; v1.6 contract identity. Linux: P2 suites 219, sensor 63, evaluators 63,
   runtime 89, MC 23. Windows (P3, MC and reference suites): 272 passed, 19 POSIX-only skipped. The
   dry candidate dependency check resolves all six receipts.
-* Nothing was frozen or run. Next: Policy A re-approval for the v1.6 commit, then freeze and
-  verify; Gates A, B and C each need separate authorization.
+* **v1.6 candidate:** Policy A (`bf1ef9b1…`, content unchanged) was re-approved by Neura-Shadow
+  for `087722b` (receipt `state/p3-policy-A-approval-087722b.json`, `75aa0d63…5265`). Preflight:
+  the sensor package receipt matches the current source (`c5d37413…`), the DDS agent binary and
+  QGC ELF are intact with the owner bound, the five WSL D3D12 libraries match their pins, 788.8 GiB
+  is free and no simulation processes are running. Manifest `state/p3-candidate-087722b.json`,
+  canonical SHA-256 **`1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c`** (file
+  `a38ce477…d3d9`): contract v1.6, `hardware:d3d12`, MC build `7542919c…` (the runtime selection
+  matches the frozen build), benchmark `20261025T051926Z-mc-trace-benchmark-e6000074`, QGC ELF
+  `82994283…`, `collect_p2_evidence.py` `3c794001…`, `p3_validation.yaml` `2d8510f7…`,
+  `p3_sensors.yaml` `e02ae2a4…`, policy file `7a7be282…`, sensor receipt canonical `77f4fa34…`.
+  `verify` and `verify_current` reproduce it, execution without authorization is false, and no
+  authorization, consumption, result or run artifact exists for it. Gate A has not been run.
 
-Final status: **P3 INCOMPLETE — contract v1.6 approved and applied offline; Policy A re-approval pending; no v1.6 candidate frozen; no gate run — Qualification 0/3**
+## AI. Gate A of v1.6 candidate `1e205fec` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-1e205feca482.json` `271a0761…369e`, consumed.
+  Result `state/p3-gate-A-1e205fec….result.json` `5d67e8f9…e99d`, `accepted: true`,
+  `acceptance_credit: true`. Run 16:00:23–16:07:35 UTC; no leftover processes.
+* **Readiness** `20261025T160037Z-p3-readiness-4c6b725c` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.077 s wall, 454 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.076 s, association 150/150
+  `matched`. Native commands passed policy A (1 × 401, 34 × 512); MC causality `verified`;
+  readiness RTF 0.803 with the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.060 s, maximum receipt stall ≤ 0.071 s.
+* **Recorder (capacity 32):** complete with 0 overflow in all 8 runs, maximum queue 1, maximum
+  write 0.014 s. Every owned process was classified graceful in all 8 runs.
+* The v1.6 position pairing applies to flights only (the P2 evaluator's readiness path returns
+  before that comparison), so Gate B is the first run that exercises it. Gate B needs a separate
+  authorization.
+
+## AJ. Gate B of v1.6 candidate `1e205fec` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-1e205feca482.json` `a74c875b…a638`, consumed
+  (marker `81c00bda…d0bf`). Result `state/p3-gate-B-1e205fec….result.json` `52cbd099…1e2a`,
+  `accepted: true`, `acceptance_credit: true`, no first failure, no automatic retry, next gate not
+  started. Run `20261025T160901Z-p3-flight-a8b0f181`, 16:08:46–16:11:30 UTC; runtime exit 0;
+  evaluation `58aeb104…` passed with no failures; no leftover processes.
+* **Flight:** the unchanged P2 mission reached `COMPLETE` (sim 105.56 s) on `D3D12 (NVIDIA GeForce
+  RTX 4060 Laptop GPU)`. P2 flight acceptance passed (landed and disarmed, commands
+  [176, 400, 21], no failsafe); yaw ownership passed. **v1.6 pairing exercised:** 5,017 ROS/ULog
+  position pairs, maximum difference 0, 0 duplicate timestamps. `vehicle_land_detected` wall gaps
+  p50 1.000 s, p95 1.001 s, maximum 1.008 s (0 above 1.8 s); RTF 0.998; MC causality verified.
+* **Depth:** source 30.30 Hz, maximum gap 0.036 s; 2,813/2,813 frames delivered and recorded;
+  maximum receipt gap 0.057 s wall; 928 observations at 10.00 Hz, maximum age 0.064 s;
+  association 928/928 `matched`, 0 reset-bracketed. Recorder complete, 0 overflow, maximum queue
+  1. RGB absent and verified (`depth_only_flight`; not RGB throughput evidence).
+* **Native commands:** policy A passed with 0 violations: 1 × 401, 34 × 512, and 6 v1.4 landing
+  self-commands (rows a 4, b 1, c 1).
+* Every owned process was classified graceful. Maximum 1-minute load 7.69 (higher than earlier
+  flights, 4.2–4.5), with no effect on any limit (recorder queue ≤ 1, maximum receipt gap 0.057 s).
+* Not exercised: no EKF reset bracket, no duplicate ULog timestamp, no host slowdown. Gate B is a
+  smoke flight and does not count toward qualification. Gate C (three consecutive qualification
+  flights) needs a separate authorization.
+
+## AK. Gate C of v1.6 candidate `1e205fec` — **ACCEPTED, qualification 3/3** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-C-1e205feca482.json` `50cf5f0f…e615`, consumed
+  (marker `efea2a9f…d33c`). Result `state/p3-gate-C-1e205fec….result.json` `f4599afb…45e4`,
+  `accepted: true`, `acceptance_credit: true`, no first failure, no automatic retry. Run
+  16:12:42–16:20:41 UTC; three consecutive flights; no leftover processes.
+* **All three flights** (unchanged P2 mission, D3D12 `NVIDIA GeForce RTX 4060 Laptop GPU`, RGB
+  absent and verified, `depth_only_flight`):
+
+  | Flight | Run | Evaluation | `COMPLETE` sim | land_detected max | RTF | Depth recorded / matched | P2 position pairs (dup.) |
+  |---|---|---|---|---|---|---|---|
+  | qualification-1 | `20261025T161256Z-p3-flight-fedc094c` | `fc199855…` passed | 105.60 s | 1.040 s | 0.997 | 2,820/2,820 · 931/931 | 5,025, Δ 0 (1) |
+  | qualification-2 | `20261025T161532Z-p3-flight-a10fef87` | `7122bbca…` passed | 105.68 s | 1.037 s | 0.998 | 2,818/2,818 · 929 + 1 bracketed | 5,019, Δ 0 (0) |
+  | qualification-3 | `20261025T161811Z-p3-flight-3e3b9ec1` | `55a9fc57…` passed | 105.62 s | 1.006 s | 0.998 | 2,813/2,813 · 928/928 | 4,949, Δ 0 (0) |
+
+  In every flight: P2 flight acceptance passed (landed and disarmed, commands [176, 400, 21], no
+  failsafe); yaw ownership passed; MC causality verified at 1e-5 rad; source 30.30 Hz with
+  maximum gap 0.036 s; processed 10.0 Hz with maximum age ≤ 0.068 s; maximum receipt gap
+  ≤ 0.065 s wall; recorder complete with 0 overflow (maximum queue 1); policy A with 0 violations
+  (1 × 401, 34 × 512, 6 landing self-commands); every owned process graceful.
+* **Rules exercised:** v1.6 pairing in qualification-1, where a duplicate ULog timestamp was
+  counted and paired correctly. v1.4 rule 1 in qualification-2: one observation (acquisition
+  22.212 s) was `attitude:reset_epoch_bracket` across `quat_reset_counter` 1→2 (bracket
+  22.200–22.216 s), corroborated by the controller ledger at 22.216 s, ≤ 1 per reset. v1.4 rule 2
+  in all three landings. Maximum 1-minute load 7.01, 3.17 and 4.67, with no host slowdown
+  observed.
+* **Scope of the claim:** P3 is complete in SITL (PX4 v1.17, Gazebo Harmonic, ROS 2 Jazzy on WSL2,
+  D3D12 renderer) under contract `p3-acceptance-v1.6`, with every numeric limit unchanged from
+  the frozen P3 thresholds. Flights are depth-only with verified RGB absence; RGB throughput is
+  evidenced at readiness only. No hardware flight was performed or claimed. The open risk noted
+  under v1.5 (a host slowdown can fail state association) did not occur in these runs.
+
+Final status: **P3 COMPLETE — contract p3-acceptance-v1.6, candidate 1e205fec: Gates A, B and C accepted — Qualification 3/3 (SITL, depth-only flights; no hardware)**
