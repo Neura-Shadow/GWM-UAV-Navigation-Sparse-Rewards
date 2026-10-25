@@ -566,10 +566,39 @@ def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
     assert main.index("pthread_sigmask") < main.index("agent_instance.create")
 
 
-def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
-    # Operator-approved v1.2 (proposal 743bbf7): only the renderer requirement and profile changed.
+V1_2_NUMERIC_LIMITS = {
+    "schema_version": 1, "ground_window_sim_s": 30, "settle_sim_s": 5, "readiness_observation_sim_s": 15,
+    "startup_wall_s": 75, "fixture_wall_deadline_s": 240, "valid_fraction_min": 0.95, "median_error_m": 0.05,
+    "median_error_fraction": 0.01, "p95_error_m": 0.1, "p95_error_fraction": 0.02, "source_gap_sim_s": 0.12,
+    "delivered_hz_min": 25, "processed_hz_min": 8, "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05,
+    "stall_wall_s": 1.0, "interruption_detect_wall_s": 1.2, "recorded_fraction_required": 1.0,
+    "recorder_overflow_allowed": 0, "disk_reserve_bytes": 21474836480, "geometry_pose_translation_drift_m": 0.005,
+    "geometry_pose_rotation_drift_rad": 0.005, "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0,
+    "qualification_flights": 3, "front_plane_center_height_m": 4}
+
+
+def test_contract_v1_3_rgb_consumer_by_scope_and_every_numeric_limit_identical():
+    # Operator-approved v1.3 (proposal e18ed8c): only the per-scope RGB consumer rule is new.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.2"
+    assert validation["contract"] == "p3-acceptance-v1.3"
+    assert validation["rgb_consumer"] == {"readiness": "required", "fixture": "absent", "flight": "absent_verified"}
+    assert validation["rgb_absence_monitor"] == {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera",
+                                                 "sample_period_wall_s": 0.5, "max_sample_gap_wall_s": 1.0}
+    numeric = {k: v for k, v in validation.items() if isinstance(v, (int, float)) and not isinstance(v, bool)}
+    assert numeric == V1_2_NUMERIC_LIMITS
+    assert validation["scene_change"] == {"fixture": "plane4", "to_distance_m": 5, "settle_sim_s": 2, "window_sim_s": 3}
+    p2 = json.loads((SIM / "configs/p2_control.yaml").read_text())
+    assert (p2["state_fresh_wall_s"], p2["flags_fresh_sim_s"], p2["clock_stall_wall_s"]) == (2.0, 1.5, 1.0)
+    sensors = json.loads((SIM / "configs/p3_sensors.yaml").read_text())
+    assert sensors["rgb_sensor"]["width"] == 1920 and sensors["rgb_sensor"]["height"] == 1080
+    assert sensors["rgb_sensor"]["sensor_hz"] == 30 and sensors["rgb_sensor"]["native_metadata_observer"] is True
+    assert "/sensor/IMX214/" not in (SIM / "configs/p3_sensor_bridge.yaml").read_text()
+
+
+def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
+    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3.
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.3"
     assert validation["renderer_requirement"] == "hardware:d3d12"
     profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
     assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}
@@ -725,6 +754,30 @@ def test_gate_n_environment_is_native_nvidia_and_host_guard(monkeypatch, tmp_pat
     assert not env.get("PATH", "").startswith(str(SIM / "scripts/p3_gz_shim"))
     source = (SIM / "scripts/p3_runner.py").read_text()
     assert 'if (self.args.gate == "N") == p3_manifest.wsl_host():' in source
+
+
+def test_source_probe_rgb_absence_monitor_excludes_rgb(tmp_path):
+    for extra in (["--rgb"], ["--clock-only"]):
+        with pytest.raises(ValueError, match="rgb_absence_monitor"):
+            p3_source_probe.main([str(tmp_path), "default", "x500_depth_71", "--rgb-absence-monitor"] + extra)
+
+
+def test_runner_rgb_consumer_by_scope_and_no_rgb_bridge():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'rule = self.validation["rgb_consumer"][self.scope]' in runner
+    assert 'rgb=rule == "required"' in runner and 'rgb_absence_monitor=rule == "absent_verified"' in runner
+    assert 'raise Abort("rgb_bridge_configured")' in runner
+    assert 'self.sensor_stack(GROUND_WORLD, require_state=False, rgb=False, watch=watch)' in runner  # fixtures
+
+
+@POSIX_ONLY
+def test_rgb_absence_snapshot_parser_counts_cli_subscribers():
+    import p3_runner
+    parse = p3_runner.RgbAbsenceSnapshotter.subscribers
+    assert parse("No publishers on topic [/t]\nNo subscribers on topic [/t]\n") == 0
+    assert parse("Publishers [Address, Message Type]:\n  tcp://a, x\nSubscribers [Address, Message Type]:\n"
+                 "  tcp://127.0.0.1:1, gz.msgs.Image\n  tcp://127.0.0.1:2, gz.msgs.Image\n") == 2
+    assert parse("garbled") is None  # unparseable output never counts as zero
 
 
 def test_source_probe_keeps_the_sourced_ros_python_path():

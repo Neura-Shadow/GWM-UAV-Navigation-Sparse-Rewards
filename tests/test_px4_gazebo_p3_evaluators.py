@@ -261,8 +261,10 @@ def test_scene_change_target_is_one_metre_further():
     assert math.isclose(pose["position_m"][0], 5 + OPTICAL[0] + 0.05)
 
 
-def finalize_synthetic(run, gazebo_exit=0, residual=None):
+def finalize_synthetic(run, gazebo_exit=0, residual=None, rgb_subscribed=False):
     import p3_provenance
+    # The real fixture probe always writes its close record; fixtures are depth-only.
+    (run / "source/probe-closed.json").write_text(json.dumps({"rgb_subscribed": rgb_subscribed, "error": None}))
     processes = [{"name": name, "stop_method": "SIGINT", "grace_s": 15, "graceful_codes": [0],
                   "exit_code": gazebo_exit if name == "gazebo" else 0, "reaped": True, "forced": False,
                   "remaining_group_members": [], "stop_requested_monotonic_s": 1.0, "exit_observed_monotonic_s": 1.5}
@@ -362,3 +364,87 @@ def test_missing_mc_trace_selection_cannot_pass():
     out = {}
     p3_evaluate.mc_component(None, {"identity": {}}, failures, out, True, None)
     assert failures.items == ["mc_causal_trace_not_selected"]
+
+
+# Contract v1.3: depth-only flights with verified RGB absence --------------------------------
+IMX = "/world/default/model/x500_depth_71/link/camera_link/sensor/IMX214/image"
+MONITOR = {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera",
+           "sample_period_wall_s": 0.5, "max_sample_gap_wall_s": 1.0}
+OWNED = [100, 200, 300]
+
+
+def rgb_absent_flight(tmp_path, closed=None, rgb_rows=0, start_subs=0, end_subs=0, monitor=True,
+                      intermediate_subscriber=False, monitor_gap=False, unowned=False, control=1):
+    run = tmp_path / "flight"
+    (run / "source").mkdir(parents=True)
+    probe = {"rgb_subscribed": False, "rgb_topic": None, "rgb_absence_monitor": True, "error": None,
+             "subscribed_topics": ["/camera_info", "/depth_camera", "/world/default/clock", "/world/default/pose/info"]}
+    probe.update(closed or {})
+    (run / "source/probe-closed.json").write_text(json.dumps(probe))
+    write_jsonl(run / "source/rgb-headers.jsonl", [{"id": i + 1, "width": 1920, "height": 1080} for i in range(rgb_rows)])
+    procs = [{"pid": p, "pgid": p, "ppid": 1, "cmdline": "owned", "state": "S"} for p in OWNED]
+    procs.append({"pid": 900, "pgid": 1, "ppid": 1, "cmdline": "gz topic -i -t " + IMX, "state": "S"})
+    if unowned:
+        procs.append({"pid": 901, "pgid": 901, "ppid": 1, "cmdline": "stranger", "state": "S"})
+
+    def snap(begin, subs):
+        return {"begin_monotonic_s": begin, "end_monotonic_s": begin + 2, "list_returncode": 0, "imx214_topics": [IMX],
+                "topics": {IMX: {"returncode": 0, "subscribers": subs}, "/depth_camera": {"returncode": 0, "subscribers": control}},
+                "processes": procs, "owned_pids": OWNED}
+    (run / "source/rgb-absence-snapshots.json").write_text(json.dumps(
+        {"runner_pgid": 1, "errors": [], "snapshots": {"window_start": snap(100.2, start_subs), "window_end": snap(200.3, end_subs)}}))
+    if monitor:
+        rows, t = [], 99.0
+        while t <= 201.0:
+            count = 1 if intermediate_subscriber and abs(t - 150.0) < 0.3 else 0
+            rows.append({"id": len(rows) + 1, "monotonic_ns": int(t * 1e9), "sim_s": t - 90, "topics": {IMX: count},
+                         "control_subscribers": control, "error": None})
+            t += 1.5 if monitor_gap and 140 < t < 145 else 0.5
+        write_jsonl(run / "source/imx214-subscribers.jsonl", rows)
+    return p3_stream_eval.evaluate_rgb_absence(run, (100.0, 200.0), MONITOR, OWNED)
+
+
+def test_fixture_with_an_rgb_consumer_fails(tmp_path):
+    import p3_evaluate
+    run = synthetic_run(tmp_path, "plane2")
+    finalize_synthetic(run, rgb_subscribed=True)
+    result = p3_evaluate.evaluate(run)
+    assert result["status"] == "failed" and "fixture:rgb_consumer_present" in result["failures"]
+
+
+def test_rgb_free_flight_evidence_passes(tmp_path):
+    result = rgb_absent_flight(tmp_path)
+    assert result["status"] == "passed", result["failures"]
+    assert result["rgb_workload"] == "depth_only_flight" and result["rgb_metadata_rows"] == 0
+    assert result["monitor"]["max_sample_gap_wall_s"] <= 1.0
+
+
+@pytest.mark.parametrize("kwargs,failure", [
+    ({"closed": {"rgb_subscribed": True}}, "probe_not_rgb_absent"),
+    ({"closed": {"subscribed_topics": [IMX]}}, "probe_subscribed_to_imx214"),
+    ({"rgb_rows": 3}, "rgb_metadata_rows_in_flight"),
+    ({"start_subs": 1}, "snapshot_subscriber:window_start"),
+    ({"end_subs": 2}, "snapshot_subscriber:window_end"),
+    ({"monitor": False}, "monitor_missing"),
+    ({"intermediate_subscriber": True}, "unexpected_subscriber"),
+    ({"monitor_gap": True}, "monitor_gap"),
+    ({"unowned": True}, "unowned_process:window_start"),
+    ({"control": 0}, "snapshot_control_failed:window_start")])
+def test_rgb_absence_failures(tmp_path, kwargs, failure):
+    result = rgb_absent_flight(tmp_path, **kwargs)
+    assert result["status"] == "failed" and failure in result["failures"], result["failures"]
+
+
+def test_missing_snapshots_fail_closed(tmp_path):
+    rgb_absent_flight(tmp_path)
+    (tmp_path / "flight/source/rgb-absence-snapshots.json").unlink()
+    result = p3_stream_eval.evaluate_rgb_absence(tmp_path / "flight", (100.0, 200.0), MONITOR, OWNED)
+    assert "snapshot_missing:window_start" in result["failures"] and "snapshot_errors" in result["failures"]
+
+
+def test_readiness_without_rgb_evidence_fails(tmp_path):
+    run = synthetic_run(tmp_path, "plane4")  # depth-only probe ledger: no RGB rows, observer inactive
+    (run / "source/probe-closed.json").write_text(json.dumps({"rgb_subscribed": False, "error": None}))
+    result = p3_stream_eval.evaluate_rgb(run, [1.5, 6.8], VALIDATION, SENSORS["rgb_sensor"])
+    assert result["status"] == "failed" and "rgb_observer_inactive" in result["failures"]
+    assert "rgb:no_source_frames_in_window" in result["failures"]

@@ -785,4 +785,32 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   host both renderers now shut down cleanly, but neither sustains the real-time factor the
   unchanged freshness limit needs in flight.
 
+## X. Contract `p3-acceptance-v1.3` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in `e18ed8c`, with no RGB observation-age
+  check added.
+* **Applied:**
+  * `p3_validation.yaml` adds the contract version, `rgb_consumer` {readiness required, fixture
+    absent, flight absent_verified} and `rgb_absence_monitor` (marker `/sensor/IMX214/`, control
+    `/depth_camera`, 0.5 s sampling, 1.0 s maximum gap). Every numeric limit is identical (test
+    asserts the complete set). `p3_sensors.yaml` `6c3038fe…`, the bridge, the D3D12 profile
+    `2e9e9ba1…`, the shim and `p2_control.yaml` `e50f824a…` are byte-identical.
+  * Runner: the probe gets `--rgb` only at readiness; flights get `--rgb-absence-monitor`. It
+    aborts if any bridge mapping carries IMX214. A background snapshotter records `gz topic -i`
+    for every IMX214 topic plus the depth positive control, and the namespace process set, at
+    the `PRESTREAM_SAFE_SETPOINTS` and `COMPLETE` transitions; shutdown waits for it first.
+  * Probe: flight mode samples IMX214 subscriber counts every 0.5 s (`topic_list` +
+    `topic_info`) into `source/imx214-subscribers.jsonl` and records `rgb_absence_monitor`,
+    `monitor_rows` and its own `subscribed_topics`.
+  * Evaluator: readiness keeps the unchanged `evaluate_rgb`. Fixtures add
+    `fixture:rgb_consumer_present`. Flights replace RGB throughput with `evaluate_rgb_absence`
+    (proposal §4.3, rules 1–6, fail closed) and are labelled `rgb_workload: depth_only_flight`.
+* **Tests:** passing RGB-free flight evidence; failures for `rgb_subscribed: true`, an IMX214
+  probe subscription, RGB rows in flight, start and end subscribers, a missing monitor, an
+  intermediate subscriber, a monitor gap, an unowned process, a lost positive control, missing
+  snapshots and a fixture with an RGB consumer; readiness without RGB fails; every numeric
+  limit is identical; diagnostic gates stay non-crediting. Linux: P2 212, sensor 61,
+  evaluators 49, runtime 78, MC 23. Windows (P3 suites): 170 passed, 18 POSIX-only skipped.
+* Nothing was frozen or run. Full-flight timing with RGB absent remains unproven until Gate B.
+
 Final status: **P3 INCOMPLETE — on this WSL2 host Gate A was accepted for both candidates (llvmpipe 764fcfd7, D3D12 3302379c) and Gate B failed for both on the unchanged 2 s vehicle_land_detected wall freshness; native Linux GPU host recommended — Qualification 0/3**

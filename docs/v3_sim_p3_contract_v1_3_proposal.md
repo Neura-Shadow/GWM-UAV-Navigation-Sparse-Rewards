@@ -1,8 +1,8 @@
 # P3 contract `p3-acceptance-v1.3` — proposal (RGB evidence at readiness, depth-only flights)
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED.** No source, configuration, build,
-manifest or runtime was changed or started for this proposal. P3 remains INCOMPLETE,
-qualification 0/3.
+**Status: APPROVED by operator Neura-Shadow on 2026-10-25 exactly as written (commit `e18ed8c`),
+with no RGB observation-age check added, and APPLIED** (acceptance report section X). P3
+remains INCOMPLETE, qualification 0/3.
 
 Operator direction: Neura-Shadow, 2026-10-25, direction B. Basis: HEAD `e1a207a`; the stall
 attribution and gate D evidence in [`v3_sim_p3_stall_attribution.md`](v3_sim_p3_stall_attribution.md);

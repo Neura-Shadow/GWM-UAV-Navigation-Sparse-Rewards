@@ -6,7 +6,7 @@ parser (pixels are never retained); the first message of each stream is also
 decoded with the installed protobuf class and must agree exactly.
 
 Ground-truth poses recorded here are for the offline evaluator only.
-Run: p3_source_probe.py RUN_DIR WORLD MODEL [--rgb] [--watch NAME ...]
+Run: p3_source_probe.py RUN_DIR WORLD MODEL [--rgb | --rgb-absence-monitor | --clock-only] [--watch NAME ...]
 """
 import argparse
 import json
@@ -130,9 +130,13 @@ def main(argv=None):
     parser.add_argument("--watch", nargs="*", default=[])
     # Diagnostic scope only: keep native sim time, drop every image/pose/camera_info subscription.
     parser.add_argument("--clock-only", action="store_true")
+    # Contract v1.3 flights: no RGB subscription; sample IMX214 subscriber presence every period.
+    parser.add_argument("--rgb-absence-monitor", action="store_true")
     args = parser.parse_args(argv)
     if args.clock_only and (args.rgb or args.watch):
         raise ValueError("source_probe_clock_only_excludes_other_subscriptions")
+    if args.rgb_absence_monitor and (args.rgb or args.clock_only):
+        raise ValueError("source_probe_rgb_absence_monitor_excludes_rgb")
     if os.environ.get("GZ_PARTITION") != args.run.name:
         raise ValueError("source_probe_partition_identity")
     for value in (args.world, args.model, *args.watch):
@@ -151,6 +155,8 @@ def main(argv=None):
              "last_pose_sim": None, "last_clock_wall": None}
     streams = {"depth": Stream(folder / "depth-headers.jsonl"), "rgb": Stream(folder / "rgb-headers.jsonl"),
                "pose": Stream(folder / "poses.jsonl"), "clock": Stream(folder / "clock.jsonl")}
+    if args.rgb_absence_monitor:
+        streams["imx214"] = Stream(folder / "imx214-subscribers.jsonl")
     costs = {"depth": 0, "rgb": 0}
     watched = {args.model, *args.watch}
 
@@ -214,6 +220,7 @@ def main(argv=None):
 
     def clock(msg):
         now = time.monotonic_ns()
+        state["last_sim"] = msg.sim.sec + msg.sim.nsec / 1e9
         if state["last_clock_wall"] is not None and now - state["last_clock_wall"] < 100_000_000:
             return
         state["last_clock_wall"] = now
@@ -242,7 +249,32 @@ def main(argv=None):
     signal.signal(signal.SIGINT, lambda *_: stopping.set())
     signal.signal(signal.SIGTERM, lambda *_: stopping.set())
     started = time.monotonic()
+    monitor = None
+    if args.rgb_absence_monitor:
+        settings = json.loads((args.run / "p3_validation.yaml").read_text())["rgb_absence_monitor"]
+
+        def sample_subscribers():
+            # Local discovery-cache lookups only; every failure is recorded in the row, never hidden.
+            while not stopping.wait(settings["sample_period_wall_s"]):
+                row = {"monotonic_ns": time.monotonic_ns(), "sim_s": state.get("last_sim"), "topics": {},
+                       "control_subscribers": None, "error": None}
+                try:
+                    for topic in node.topic_list():
+                        if settings["topic_marker"] in topic:
+                            row["topics"][topic] = len(node.topic_info(topic)[1])
+                    row["control_subscribers"] = len(node.topic_info(settings["control_topic"])[1])
+                except Exception as exc:
+                    row["error"] = type(exc).__name__ + ":" + str(exc)
+                try:
+                    streams["imx214"].write(row)
+                except Exception as exc:
+                    fail(exc)
+        monitor = threading.Thread(target=sample_subscribers, name="imx214-subscribers", daemon=True)
+        monitor.start()
     stopping.wait()
+    if monitor is not None:
+        monitor.join(timeout=5)
+    own_subscriptions = sorted(node.subscribed_topics())
     topics = [f"/world/{args.world}/clock"] if args.clock_only else [
         "/depth_camera", "/camera_info", f"/world/{args.world}/pose/info", f"/world/{args.world}/clock"]
     for topic in topics + ([rgb_topic] if args.rgb else []):
@@ -255,7 +287,9 @@ def main(argv=None):
               "rgb_topic": rgb_topic if args.rgb else None, "counts": {k: s.count for k, s in streams.items()},
               "camera_info_count": state["camera_info_count"], "camera_info_changed": state["camera_info_changed"],
               "max_callback_ns": costs, "error": state["error"], "wall_s": time.monotonic() - started,
-              "pixels_retained": False}
+              "pixels_retained": False, "rgb_absence_monitor": args.rgb_absence_monitor,
+              "monitor_rows": streams["imx214"].count if "imx214" in streams else 0,
+              "subscribed_topics": own_subscriptions}
     with (folder / "probe-closed.json").open("x") as stream:
         stream.write(json.dumps(closed, indent=2, allow_nan=False) + "\n")
         stream.flush()

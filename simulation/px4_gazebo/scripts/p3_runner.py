@@ -155,6 +155,74 @@ def namespace_processes():
     return rows
 
 
+def process_rows():
+    """Namespace processes with pgid/ppid for closed-process-set evidence."""
+    rows = []
+    for row in namespace_processes():
+        try:
+            fields = Path(f"/proc/{row['pid']}/stat").read_text().rsplit(")", 1)[1].split()
+        except OSError:
+            continue
+        rows.append(dict(row, ppid=int(fields[1]), pgid=int(fields[2])))
+    return rows
+
+
+class RgbAbsenceSnapshotter(threading.Thread):
+    """Contract v1.3 flights: `gz topic -i` subscriber snapshots of every IMX214 topic plus the
+    depth positive control, and the namespace process set, at the flight-window start
+    (PRESTREAM_SAFE_SETPOINTS) and end (COMPLETE). Off the control path; raw output retained."""
+
+    TRIGGERS = (("PRESTREAM_SAFE_SETPOINTS", "window_start"), ("COMPLETE", "window_end"))
+
+    def __init__(self, run, env, settings, owned):
+        super().__init__(name="p3-rgb-absence-snapshots", daemon=True)
+        self.run, self.env, self.settings, self.owned = run, env, settings, owned
+        self.path = run / "source/rgb-absence-snapshots.json"
+        self.stop_event = threading.Event()
+        self.record = {"contract": "p3-rgb-absence-snapshots-v1", "runner_pgid": os.getpgid(0),
+                       "snapshots": {}, "errors": []}
+
+    def gz(self, *args):
+        completed = subprocess.run(["gz", "topic", *args], env=self.env, capture_output=True, text=True, timeout=20)
+        return completed.returncode, completed.stdout, completed.stderr[-400:]
+
+    @staticmethod
+    def subscribers(stdout):
+        if "No subscribers on topic" in stdout:
+            return 0
+        lines = stdout.split("Subscribers [Address, Message Type]:", 1)
+        return len([line for line in lines[1].splitlines() if line.strip()]) if len(lines) == 2 else None
+
+    def snapshot(self, label):
+        begin = time.monotonic()
+        code, listing, err = self.gz("-l")
+        topics = sorted(t.strip() for t in listing.splitlines() if self.settings["topic_marker"] in t)
+        info = {}
+        for topic in topics + [self.settings["control_topic"]]:
+            rc, out, err = self.gz("-i", "-t", topic)
+            info[topic] = {"returncode": rc, "subscribers": self.subscribers(out), "stdout": out, "stderr": err}
+        self.record["snapshots"][label] = {
+            "begin_monotonic_s": begin, "end_monotonic_s": time.monotonic(), "list_returncode": code,
+            "imx214_topics": topics, "topics": info, "processes": process_rows(),
+            "owned_pids": [o.pid for o in list(self.owned)]}
+        atomic_json(self.path, self.record)
+
+    def run(self):
+        tail = Tail(self.run / "ros-events.jsonl")
+        pending = list(self.TRIGGERS)
+        try:
+            while pending:
+                stopping = self.stop_event.wait(0.1)
+                for row in tail.read():  # one final read after a stop request, so COMPLETE is never missed
+                    if pending and row.get("event") == "transition" and row.get("to") == pending[0][0]:
+                        self.snapshot(pending.pop(0)[1])
+                if stopping:
+                    break
+        except Exception as exc:  # recorded; the evaluator fails a flight without both snapshots
+            self.record["errors"].append(type(exc).__name__ + ":" + str(exc))
+        atomic_json(self.path, self.record)
+
+
 class ResourceSampler(threading.Thread):
     def __init__(self, run, owned, root):
         super().__init__(name="p3-resources", daemon=True)
@@ -383,15 +451,18 @@ class Runner:
         return self.clock_tail.last["sim_s"] if self.clock_tail.last else None
 
     # ---- shared sensor stack ---------------------------------------------------------------
-    def sensor_stack(self, world, require_state, rgb, watch, clock_only=False):
+    def sensor_stack(self, world, require_state, rgb, watch, clock_only=False, rgb_absence_monitor=False):
         receipt = strict_json(self.root / "state/p3-built.json")
+        if self.validation["rgb_absence_monitor"]["topic_marker"] in (self.run / "p3_sensor_bridge.yaml").read_text():
+            raise Abort("rgb_bridge_configured")  # v1.3: no process may bridge (consume) IMX214
         env = self.environment()
         sensor_env = self.environment({"FASTRTPS_DEFAULT_PROFILES_FILE": str(self.run / "p3_fastdds.xml")})
         # -s -P: no user site or cwd on sys.path, but keep the sourced ROS PYTHONPATH that
         # provides the vendored gz.transport13/gz.msgs10 bindings (-I would drop it).
         self.launch("source-probe", ["/usr/bin/python3", "-s", "-P", str(SIM / "validation/p3_source_probe.py"),
                                      str(self.run), world, self.sensors["model"]] + (["--rgb"] if rgb else [])
-                    + (["--watch"] + watch if watch else []) + (["--clock-only"] if clock_only else []), env)
+                    + (["--watch"] + watch if watch else []) + (["--clock-only"] if clock_only else [])
+                    + (["--rgb-absence-monitor"] if rgb_absence_monitor else []), env)
         self.clock_tail = Tail(self.run / "source/clock.jsonl")
         if self.scope == "fixture":
             clock = (SIM / "configs/p2_clock_bridge.yaml").read_text().replace("/world/default/clock",
@@ -546,9 +617,15 @@ class Runner:
         env = self.environment()
         self.launch("clock-bridge", [PARAMETER_BRIDGE, "--ros-args", "-p",
                                      "config_file:=" + str(SIM / "configs/p2_clock_bridge.yaml"), "-p", "use_sim_time:=true"], env)
-        variant = self.args.variant if self.scope == "diagnostic" else None
-        self.sensor_stack("default", require_state=True, rgb=variant not in ("no_rgb_observer", "no_probe"),
-                          watch=[], clock_only=variant == "no_probe")
+        if self.scope == "diagnostic":
+            variant = self.args.variant
+            self.sensor_stack("default", require_state=True, rgb=variant not in ("no_rgb_observer", "no_probe"),
+                              watch=[], clock_only=variant == "no_probe")
+        else:
+            # Contract v1.3: RGB consumer by scope (readiness required, flight absent and verified).
+            rule = self.validation["rgb_consumer"][self.scope]
+            self.sensor_stack("default", require_state=True, rgb=rule == "required", watch=[],
+                              rgb_absence_monitor=rule == "absent_verified")
         from gwm_px4_control.execution_timing import controller_transport_env
         cenv = self.environment(controller_transport_env(timing))
         if self.scope == "flight":
@@ -560,6 +637,10 @@ class Runner:
         self.controller = self.launch("ros-controller", controller, cenv, stop_method="completes_own_work")
         self.summary["controller_transport_environment"] = controller_transport_env(timing)
         (self.run / "processes.txt").write_text(json.dumps(namespace_processes(), indent=1))
+        if self.scope == "flight" and self.validation["rgb_consumer"]["flight"] == "absent_verified":
+            self.snapshotter = RgbAbsenceSnapshotter(self.run, self.environment(),
+                                                     self.validation["rgb_absence_monitor"], self.owned)
+            self.snapshotter.start()
         return config
 
     def run_controller(self, config):
@@ -623,6 +704,11 @@ class Runner:
 
     def shutdown(self):
         errors = []
+        snapshotter = getattr(self, "snapshotter", None)
+        if snapshotter is not None:
+            # Let a running end-of-window snapshot finish while every process is still up.
+            snapshotter.stop_event.set()
+            snapshotter.join(timeout=60)
 
         def attempt(label, action):
             try:

@@ -223,6 +223,74 @@ def evaluate_rgb(run, window, limits, rgb_config):
     return source
 
 
+def evaluate_rgb_absence(run, window_monotonic, settings, owned_pids):
+    """Contract v1.3 flights: verify that no process consumed IMX214 during the flight window.
+
+    Sampled discovery monitor plus endpoint `gz topic -i` snapshots with a depth positive
+    control and a closed process set. Not continuous observation (see the v1.3 proposal).
+    """
+    run = Path(run)
+    f = Failures()
+    begin, end = window_monotonic
+    marker, control = settings["topic_marker"], settings["control_topic"]
+    out = {"rgb_workload": "depth_only_flight", "window_monotonic_s": [begin, end]}
+    closed = strict_json(run / "source/probe-closed.json")
+    own = closed.get("subscribed_topics")
+    f.check(closed.get("rgb_subscribed") is False and closed.get("rgb_topic") is None
+            and closed.get("rgb_absence_monitor") is True and closed.get("error") is None, "probe_not_rgb_absent")
+    f.check(isinstance(own, list) and not any(marker in t for t in own), "probe_subscribed_to_imx214")
+    out["rgb_metadata_rows"] = len(source_ledger(run, "rgb-headers.jsonl"))
+    f.check(out["rgb_metadata_rows"] == 0, "rgb_metadata_rows_in_flight")
+
+    path = run / "source/rgb-absence-snapshots.json"
+    record = strict_json(path) if path.exists() else {"snapshots": {}, "errors": ["missing"]}
+    f.check(not record.get("errors"), "snapshot_errors")
+    allowed_groups = set(owned_pids)
+    for label, lower, upper in (("window_start", begin, end), ("window_end", end, math.inf)):
+        snap = record["snapshots"].get(label)
+        if not f.check(snap is not None, "snapshot_missing:" + label):
+            continue
+        f.check(lower <= snap["begin_monotonic_s"] <= upper, "snapshot_outside_window:" + label)
+        topics = snap["imx214_topics"]
+        f.check(any(t.endswith("/IMX214/image") for t in topics), "snapshot_image_topic_absent:" + label)
+        for topic in topics:
+            info = snap["topics"].get(topic, {})
+            f.check(info.get("returncode") == 0 and info.get("subscribers") == 0, "snapshot_subscriber:" + label)
+        ctrl = snap["topics"].get(control, {})
+        f.check(ctrl.get("returncode") == 0 and (ctrl.get("subscribers") or 0) >= 1, "snapshot_control_failed:" + label)
+        unknown = [p for p in snap["processes"] if p["pgid"] not in allowed_groups and not (
+            p["pgid"] == record.get("runner_pgid") and ("gz topic" in p["cmdline"] or "gz-transport-topic" in p["cmdline"]))]
+        f.check(not unknown, "unowned_process:" + label)
+        out[label] = {"imx214_topics": topics, "control_subscribers": ctrl.get("subscribers"),
+                      "unowned_processes": len(unknown)}
+
+    monitor_path = run / "source/imx214-subscribers.jsonl"
+    rows = strict_jsonl(monitor_path) if monitor_path.exists() else []
+    if not f.check(len(rows) >= 2, "monitor_missing"):
+        out["failures"], out["status"] = f.items, "failed"
+        return out
+    f.check([r["id"] for r in rows] == list(range(1, len(rows) + 1)), "monitor_ledger_identity")
+    times = [r["monotonic_ns"] / 1e9 for r in rows]
+    first = max((i for i, t in enumerate(times) if t <= begin), default=None)
+    last = min((i for i, t in enumerate(times) if t >= end), default=None)
+    if not f.check(first is not None and last is not None, "monitor_coverage"):
+        out["failures"], out["status"] = f.items, "failed"
+        return out
+    span = rows[first:last + 1]
+    gaps = [b - a for a, b in zip(times[first:last + 1], times[first + 1:last + 1])]
+    out["monitor"] = {"rows_total": len(rows), "rows_in_window_span": len(span),
+                      "max_sample_gap_wall_s": max(gaps) if gaps else None,
+                      "coverage_monotonic_s": [times[first], times[last]]}
+    f.check(not gaps or max(gaps) <= settings["max_sample_gap_wall_s"], "monitor_gap")
+    f.check(all(r["error"] is None for r in span), "monitor_error")
+    f.check(all(any(t.endswith("/IMX214/image") for t in r["topics"]) for r in span), "monitor_image_topic_absent")
+    f.check(all(count == 0 for r in span for count in r["topics"].values()), "unexpected_subscriber")
+    f.check(all((r["control_subscribers"] or 0) >= 1 for r in span), "monitor_control_lost")
+    out["failures"] = f.items
+    out["status"] = "passed" if not f.items else "failed"
+    return out
+
+
 def native_rtf(run):
     """Simulation progress per monotonic second from the probe's native clock samples."""
     rows = strict_jsonl(Path(run) / "source/clock.jsonl")

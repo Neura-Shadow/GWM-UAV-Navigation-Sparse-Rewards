@@ -108,7 +108,9 @@ stationarity is measured from native ground-truth poses (evaluator only).
   `configs/p3_d3d12_profile.json` pins the D3D12/driver library hashes, and the
   `scripts/p3_gz_shim/gz` shim preloads `libd3d12core.so` only into `gz sim`. Validation V
   stays llvmpipe. History: v1 `hardware`, then [v1.1](v3_sim_p3_renderer_contract_revision_proposal.md)
-  llvmpipe, then [v1.2](v3_sim_p3_hardware_renderer_profile_proposal.md)),
+  llvmpipe, then [v1.2](v3_sim_p3_hardware_renderer_profile_proposal.md); under
+  [v1.3](v3_sim_p3_contract_v1_3_proposal.md) the RGB consumer is required at readiness,
+  absent in fixtures and absent-verified in flights, which are depth-only workload),
   depth/RGB rates, adapter callback/poll costs, MC spans,
   per-process CPU and RSS, disk before/after (20 GiB reserve checked first), run bytes.
 
