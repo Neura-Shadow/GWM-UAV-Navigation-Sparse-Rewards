@@ -251,6 +251,21 @@ new `benchmark_mc_trace.py --measure` run is required before `p3_manifest.py fre
 is a native microbenchmark with no simulation, but it executes PX4 controller code, so it
 was not run here.
 
+**New run (operator-requested, 2026-10-25):** `20261025T051926Z-mc-trace-benchmark-e6000074`,
+`summary.json` SHA-256 `1c6af0c76c2d21b4484dfea3d40d0870006e040284c6295c4f6efd1467d2abd1`,
+status **passed**. One run with no retries; 0 simulation launches and 0 flight commands.
+
+| Item | Value |
+|---|---|
+| Harness / benchmark source | `benchmark_mc_trace.py` `0b9b43a1…8ba1` and `mc_trace_benchmark.cpp` `e713cf13…c4dc`, byte-identical to commit `2bb7bd0` |
+| Config | `p2_control.yaml` `e50f824a…7a4d` |
+| Build | instrumented PX4 `7542919c…a378a`, overlay `ecdf4eaa…0bf9` (= current MC build receipt) |
+| Executables | baseline `dbba6f66…5dfa`, instrumented `a46ae781…e900` |
+| Pairs 1–3 | output bits equal; trace acquisition `verified`; instrumented wall max 0.288 / 0.059 / 0.151 ms (limit 50 ms); added mean wall 5.4 / 4.8 / 5.3 µs |
+
+This run (not the earlier ones) is the `--mc-benchmark-run` input for `p3_manifest.py freeze`.
+It is build evidence only and carries no qualification credit.
+
 ### Native command policy
 
 The effective policy is still `strict_zero`, and stock QGC 401/512 start-up traffic is
@@ -279,8 +294,7 @@ frozen manifest by the operator.
 
 ### Blockers before Gate A
 
-1. New `benchmark_mc_trace.py --measure` run with the corrected harness, which needs an
-   operator decision because it executes PX4 controller code.
+1. ~~New MC benchmark run~~: done, `20261025T051926Z-mc-trace-benchmark-e6000074` passed.
 2. `build_p3.sh --build` (P3 build plus SDF extrinsic re-derivation) and the `p3-built.json`
    receipt for this candidate. `p3_build.py` overwrites `~/uav_autonomy/state/p3-built.json`,
    which currently holds the archived receipt from 2026-09-12, so preserve a copy first.
