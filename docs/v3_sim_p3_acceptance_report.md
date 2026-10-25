@@ -563,4 +563,23 @@ measured software renderer will be proposed for approval, not applied. Flight ti
 still be judged unchanged at Gate B/C. If any check fails, the recommendation is a native
 Linux GPU host, not a relaxation.
 
+## O. Validation V (llvmpipe, ground only, no credit) — PASSED (2026-10-25)
+
+* Gate `V` added in `6e80422`: Gate A's ground plan with no D3D12 variables. The evaluator
+  requires the renderer to be llvmpipe for V only. V never gives acceptance credit and can
+  never be Gate B's predecessor. Linux: P2 212, sensor 61, evaluators 33, runtime 64, MC 23.
+* Policy A (unchanged) re-approved by Neura-Shadow for `6e80422` (receipt `d7cf8acd…b2f`).
+  Candidate `state/p3-candidate-6e80422.json`, canonical SHA-256
+  `1e439b44caf24bdb4d1a5386046d84c3a9fb34da0a0bcf43d565b52461edc68f`. Authorization
+  `p3-auth-V-1e439b44caf2.json` `838ef041…39b8`, consumed.
+* Result `p3-gate-V-1e439b44….result.json`: `accepted: true`, `acceptance_credit: false`,
+  **8/8 runs passed** (readiness and plane2, plane4, plane6, oblique, asymmetric,
+  out_of_range, interruption). Every Gazebo exit was 0 and every process shut down
+  gracefully. All frozen sensor, geometry, freshness, recorder, command-policy, MC and P2
+  ground-timing checks passed. Measured margins are in the
+  [renderer revision proposal](v3_sim_p3_renderer_contract_revision_proposal.md).
+* **Proposed, not applied:** `p3-acceptance-v1.1` allowing exactly the measured llvmpipe
+  renderer, with every other limit unchanged. Flight timing remains unproven and is judged
+  unchanged at Gate B/C.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
