@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.6 candidate `1e205fec`: Gate A and Gate B ACCEPTED (sections AI, AJ); Gate C not run — Qualification 0/3**
+**P3 COMPLETE — contract `p3-acceptance-v1.6`, candidate `1e205fec`: Gates A, B and C accepted (sections AI, AJ, AK) — Qualification 3/3 (SITL, depth-only flights; no hardware)**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1199,4 +1199,36 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   smoke flight and does not count toward qualification. Gate C (three consecutive qualification
   flights) needs a separate authorization.
 
-Final status: **P3 INCOMPLETE — v1.6 candidate 1e205fec: Gate A and Gate B accepted; Gate C not run — Qualification 0/3**
+## AK. Gate C of v1.6 candidate `1e205fec` — **ACCEPTED, qualification 3/3** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-C-1e205feca482.json` `50cf5f0f…e615`, consumed
+  (marker `efea2a9f…d33c`). Result `state/p3-gate-C-1e205fec….result.json` `f4599afb…45e4`,
+  `accepted: true`, `acceptance_credit: true`, no first failure, no automatic retry. Run
+  16:12:42–16:20:41 UTC; three consecutive flights; no leftover processes.
+* **All three flights** (unchanged P2 mission, D3D12 `NVIDIA GeForce RTX 4060 Laptop GPU`, RGB
+  absent and verified, `depth_only_flight`):
+
+  | Flight | Run | Evaluation | `COMPLETE` sim | land_detected max | RTF | Depth recorded / matched | P2 position pairs (dup.) |
+  |---|---|---|---|---|---|---|---|
+  | qualification-1 | `20261025T161256Z-p3-flight-fedc094c` | `fc199855…` passed | 105.60 s | 1.040 s | 0.997 | 2,820/2,820 · 931/931 | 5,025, Δ 0 (1) |
+  | qualification-2 | `20261025T161532Z-p3-flight-a10fef87` | `7122bbca…` passed | 105.68 s | 1.037 s | 0.998 | 2,818/2,818 · 929 + 1 bracketed | 5,019, Δ 0 (0) |
+  | qualification-3 | `20261025T161811Z-p3-flight-3e3b9ec1` | `55a9fc57…` passed | 105.62 s | 1.006 s | 0.998 | 2,813/2,813 · 928/928 | 4,949, Δ 0 (0) |
+
+  In every flight: P2 flight acceptance passed (landed and disarmed, commands [176, 400, 21], no
+  failsafe); yaw ownership passed; MC causality verified at 1e-5 rad; source 30.30 Hz with
+  maximum gap 0.036 s; processed 10.0 Hz with maximum age ≤ 0.068 s; maximum receipt gap
+  ≤ 0.065 s wall; recorder complete with 0 overflow (maximum queue 1); policy A with 0 violations
+  (1 × 401, 34 × 512, 6 landing self-commands); every owned process graceful.
+* **Rules exercised:** v1.6 pairing in qualification-1, where a duplicate ULog timestamp was
+  counted and paired correctly. v1.4 rule 1 in qualification-2: one observation (acquisition
+  22.212 s) was `attitude:reset_epoch_bracket` across `quat_reset_counter` 1→2 (bracket
+  22.200–22.216 s), corroborated by the controller ledger at 22.216 s, ≤ 1 per reset. v1.4 rule 2
+  in all three landings. Maximum 1-minute load 7.01, 3.17 and 4.67, with no host slowdown
+  observed.
+* **Scope of the claim:** P3 is complete in SITL (PX4 v1.17, Gazebo Harmonic, ROS 2 Jazzy on WSL2,
+  D3D12 renderer) under contract `p3-acceptance-v1.6`, with every numeric limit unchanged from
+  the frozen P3 thresholds. Flights are depth-only with verified RGB absence; RGB throughput is
+  evidenced at readiness only. No hardware flight was performed or claimed. The open risk noted
+  under v1.5 (a host slowdown can fail state association) did not occur in these runs.
+
+Final status: **P3 COMPLETE — contract p3-acceptance-v1.6, candidate 1e205fec: Gates A, B and C accepted — Qualification 3/3 (SITL, depth-only flights; no hardware)**
