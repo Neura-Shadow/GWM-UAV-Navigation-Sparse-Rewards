@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A has not been authorized or executed (no runtime evidence exists for this implementation) — Qualification 0/3**
+**P3 INCOMPLETE — Gate A ACCEPTED for candidate `764fcfd7` (section R); Gate B/C not yet authorized — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -635,4 +635,30 @@ Linux GPU host, not a relaxation.
   (contract v1.1, llvmpipe). `verify` reproduces it, the MC selection matches, and no Gate A
   artifacts exist for it.
 
-Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
+## R. Gate A of candidate `764fcfd7` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-764fcfd7c39b.json` `ee471580…3e78`, consumed.
+  Result `state/p3-gate-A-764fcfd7….result.json` `53e49e31…a8e7`, `accepted: true`,
+  `acceptance_credit: true`. Run 08:59:34–09:06:25 UTC; no leftover processes.
+* **8/8 independent evaluations passed** on Mesa llvmpipe, with Gazebo exit 0 and sensor
+  adapter exit 0 in every run:
+
+| Run | source Hz (≥25) | max gap s (≤0.12) | processed Hz (≥8) | max age s (≤0.25) | max stall s wall (≤1.0) |
+|---|---|---|---|---|---|
+| readiness `93f53ed2` | 30.31 | 0.036 | 10.0 | 0.072 | 0.073 |
+| plane2 `cf862a33` | 30.30 | 0.036 | 10.0 | 0.060 | 0.061 |
+| plane4 `c2e7dae4` | 30.30 | 0.036 | 10.0 | 0.056 | 0.050 |
+| plane6 `3395c9ad` | 30.30 | 0.036 | 10.0 | 0.056 | 0.055 |
+| oblique `00288b55` | 30.30 | 0.036 | 10.0 | 0.056 | 0.050 |
+| asymmetric `f6ab7594` | 30.30 | 0.036 | 10.0 | 0.052 | 0.056 |
+| out_of_range `f8a109b4` | 30.30 | 0.036 | 10.0 | 0.060 | 0.058 |
+| interruption `de425bd9` | 30.31 | 0.036 | 10.0 | 0.052 | 0.049 |
+
+  Also passed in every applicable run: geometry accuracy, valid fraction, out-of-range,
+  interruption detection, recorder completeness, state association, policy A native
+  commands, MC causality, P2 ground timing and graceful cleanup of every owned process.
+  Readiness RTF was 0.554 (wall delivery 17.5 Hz).
+* **Not yet established:** flight-phase P2 timing on llvmpipe (Gate B, then Gate C), judged
+  against unchanged limits.
+
+Final status: **P3 INCOMPLETE — Gate A ACCEPTED (candidate 764fcfd7); Gate B not authorized — Qualification 0/3**
