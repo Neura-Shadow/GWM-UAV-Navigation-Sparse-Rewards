@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.6 candidate `1e205fec` frozen and verified (section AH); Gate A not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.6 candidate `1e205fec`: Gate A ACCEPTED (section AI); Gate B not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1155,4 +1155,24 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   `verify` and `verify_current` reproduce it, execution without authorization is false, and no
   authorization, consumption, result or run artifact exists for it. Gate A has not been run.
 
-Final status: **P3 INCOMPLETE — v1.6 candidate 1e205fec frozen and verified; Gate A not run — Qualification 0/3**
+## AI. Gate A of v1.6 candidate `1e205fec` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-1e205feca482.json` `271a0761…369e`, consumed.
+  Result `state/p3-gate-A-1e205fec….result.json` `5d67e8f9…e99d`, `accepted: true`,
+  `acceptance_credit: true`. Run 16:00:23–16:07:35 UTC; no leftover processes.
+* **Readiness** `20261025T160037Z-p3-readiness-4c6b725c` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.077 s wall, 454 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.076 s, association 150/150
+  `matched`. Native commands passed policy A (1 × 401, 34 × 512); MC causality `verified`;
+  readiness RTF 0.803 with the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.060 s, maximum receipt stall ≤ 0.071 s.
+* **Recorder (capacity 32):** complete with 0 overflow in all 8 runs, maximum queue 1, maximum
+  write 0.014 s. Every owned process was classified graceful in all 8 runs.
+* The v1.6 position pairing applies to flights only (the P2 evaluator's readiness path returns
+  before that comparison), so Gate B is the first run that exercises it. Gate B needs a separate
+  authorization.
+
+Final status: **P3 INCOMPLETE — v1.6 candidate 1e205fec: Gate A accepted; Gate B not run — Qualification 0/3**
