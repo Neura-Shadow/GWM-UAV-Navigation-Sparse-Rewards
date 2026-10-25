@@ -37,6 +37,9 @@ import p3_manifest  # noqa: E402
 GATES = ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH")
 PARAMETER_BRIDGE = "/opt/ros/jazzy/lib/ros_gz_bridge/parameter_bridge"
 SOFTWARE_RENDERERS = re.compile(r"llvmpipe|softpipe|swrast|software rasterizer", re.I)
+# Stall-attribution diagnostics (gate D only): one P3 consumer changed per variant.
+DIAGNOSTIC_VARIANTS = ("baseline", "no_rgb_observer", "recorder_none", "no_probe")
+DIAGNOSTIC_WINDOW_WALL_S = 120.0
 
 
 class Abort(RuntimeError):
@@ -181,6 +184,38 @@ class ResourceSampler(threading.Thread):
                 stream.write(json.dumps(row) + "\n")
 
 
+class GazeboThreadSampler(threading.Thread):
+    """Gate D only: 10 Hz passive /proc sample of every Gazebo thread (state, wait channel,
+    CPU ticks) plus the mean host CPU MHz. Separates kernel waits from running and sleeping."""
+
+    def __init__(self, run, pid):
+        super().__init__(name="p3-gazebo-threads", daemon=True)
+        self.path, self.pid = run / "diagnostic-gazebo-threads.jsonl", pid
+        self.stop_event = threading.Event()
+
+    def run(self):
+        with self.path.open("x", buffering=1) as stream:
+            while not self.stop_event.wait(0.1):
+                threads = []
+                try:
+                    tids = os.listdir(f"/proc/{self.pid}/task")
+                except OSError:
+                    break
+                for tid in tids:
+                    try:
+                        raw = Path(f"/proc/{self.pid}/task/{tid}/stat").read_text()
+                        wchan = Path(f"/proc/{self.pid}/task/{tid}/wchan").read_text().strip()
+                    except OSError:
+                        continue
+                    comm = raw[raw.index("(") + 1:raw.rindex(")")]
+                    fields = raw.rsplit(")", 1)[1].split()
+                    threads.append([int(tid), comm, fields[0], wchan, int(fields[11]) + int(fields[12])])
+                mhz = [float(line.split(":")[1]) for line in Path("/proc/cpuinfo").read_text().splitlines()
+                       if line.startswith("cpu MHz")]
+                stream.write(json.dumps({"monotonic_s": time.monotonic(), "cpu_mhz_mean": sum(mhz) / len(mhz)
+                                         if mhz else None, "threads": threads}) + "\n")
+
+
 class Tail:
     """Incremental JSONL reader for files written by owned processes."""
 
@@ -256,6 +291,8 @@ class Runner:
             raise PermissionError("Flights belong to Gate B or Gate C only")
         if self.scope != "flight" and self.args.gate not in p3_manifest.GROUND_GATES:
             raise PermissionError("Ground scopes belong to Gate A or validation V only")
+        if (self.args.gate == "D") != (self.scope == "diagnostic"):
+            raise PermissionError("The diagnostic scope belongs to diagnostic gate D only")
         return frozen, sha, authorization
 
     # ---- launching -----------------------------------------------------------------------
@@ -340,7 +377,7 @@ class Runner:
         return self.clock_tail.last["sim_s"] if self.clock_tail.last else None
 
     # ---- shared sensor stack ---------------------------------------------------------------
-    def sensor_stack(self, world, require_state, rgb, watch):
+    def sensor_stack(self, world, require_state, rgb, watch, clock_only=False):
         receipt = strict_json(self.root / "state/p3-built.json")
         env = self.environment()
         sensor_env = self.environment({"FASTRTPS_DEFAULT_PROFILES_FILE": str(self.run / "p3_fastdds.xml")})
@@ -348,7 +385,7 @@ class Runner:
         # provides the vendored gz.transport13/gz.msgs10 bindings (-I would drop it).
         self.launch("source-probe", ["/usr/bin/python3", "-s", "-P", str(SIM / "validation/p3_source_probe.py"),
                                      str(self.run), world, self.sensors["model"]] + (["--rgb"] if rgb else [])
-                    + (["--watch"] + watch if watch else []), env)
+                    + (["--watch"] + watch if watch else []) + (["--clock-only"] if clock_only else []), env)
         self.clock_tail = Tail(self.run / "source/clock.jsonl")
         if self.scope == "fixture":
             clock = (SIM / "configs/p2_clock_bridge.yaml").read_text().replace("/world/default/clock",
@@ -503,7 +540,9 @@ class Runner:
         env = self.environment()
         self.launch("clock-bridge", [PARAMETER_BRIDGE, "--ros-args", "-p",
                                      "config_file:=" + str(SIM / "configs/p2_clock_bridge.yaml"), "-p", "use_sim_time:=true"], env)
-        self.sensor_stack("default", require_state=True, rgb=True, watch=[])
+        variant = self.args.variant if self.scope == "diagnostic" else None
+        self.sensor_stack("default", require_state=True, rgb=variant not in ("no_rgb_observer", "no_probe"),
+                          watch=[], clock_only=variant == "no_probe")
         from gwm_px4_control.execution_timing import controller_transport_env
         cenv = self.environment(controller_transport_env(timing))
         if self.scope == "flight":
@@ -534,6 +573,20 @@ class Runner:
         else:
             end = self.sim_now()
             self.summary["sensor_window_sim_s"] = [end - self.validation["readiness_observation_sim_s"], end]
+        self.summary["status"] = "passed"
+
+    def diagnostic_window(self, config):
+        """Gate D: hold the unchanged readiness stack for a fixed wall window while sampling
+        Gazebo's threads; the controller observes and completes on its own. Never credit."""
+        self.thread_sampler = GazeboThreadSampler(self.run, self.gazebo.pid)
+        self.thread_sampler.start()
+        begin = time.monotonic()
+        self.wait_for(lambda: time.monotonic() >= begin + DIAGNOSTIC_WINDOW_WALL_S,
+                      begin + DIAGNOSTIC_WINDOW_WALL_S + 30, "diagnostic_window")
+        self.summary["diagnostic_window_monotonic_s"] = [begin, time.monotonic()]
+        self.wait_for(lambda: self.controller.poll() is not None, self.start + config["wall_deadline_s"] + 90,
+                      "controller")
+        self.summary["controller_exit_code"] = self.controller.record["exit_code"]
         self.summary["status"] = "passed"
 
     def ground_state(self):
@@ -669,6 +722,9 @@ class Runner:
         return result
 
     def finalize(self):
+        if getattr(self, "thread_sampler", None) is not None:
+            self.thread_sampler.stop_event.set()
+            self.thread_sampler.join(timeout=3)
         if self.sampler is not None:
             self.sampler.stop_event.set()
             self.sampler.join(timeout=3)
@@ -701,7 +757,7 @@ class Runner:
     # ---- entry -----------------------------------------------------------------------------
     def execute(self):
         frozen, sha, authorization = self.preconditions()
-        label = self.args.fixture if self.scope == "fixture" else self.scope
+        label = {"fixture": self.args.fixture, "diagnostic": "diag-" + str(self.args.variant)}.get(self.scope, self.scope)
         self.run = self.root / "runs" / (time.strftime("%Y%m%dT%H%M%SZ", time.gmtime()) + "-p3-" + label + "-"
                                          + uuid.uuid4().hex[:8])
         self.run.mkdir(parents=True)
@@ -709,6 +765,11 @@ class Runner:
         for name in ("p3_sensors.yaml", "p3_validation.yaml", "p3_sensor_bridge.yaml", "p3_fastdds.xml",
                      "p3_native_command_policy.json"):
             shutil.copyfile(SIM / "configs" / name, self.run / name)
+        if self.scope == "diagnostic" and self.args.variant == "recorder_none":
+            # Diagnostic only: run-local copy; every frame is still recorded and hashed.
+            local = strict_json(self.run / "p3_sensors.yaml")
+            local["recorder_compression"] = "none"
+            (self.run / "p3_sensors.yaml").write_text(json.dumps(local, indent=2) + "\n")
         print("P3 evidence: " + str(self.run), flush=True)
         self.summary = {"schema_version": 1, "contract": "p3-runtime-summary-v1", "run_id": self.run.name,
                         "p3_kind": self.scope, "gate": self.args.gate, "role": self.args.role,
@@ -718,13 +779,17 @@ class Runner:
                         "native_command_policy": frozen["runtime"]["native_command_policy"],
                         "project_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=SIM, text=True).strip(),
                         "isolation": "private user/mount/PID/network namespace, loopback only, exclusive workspace lock",
-                        "flight_commands_possible": self.scope == "flight", "finalized": False}
+                        "flight_commands_possible": self.scope == "flight", "finalized": False,
+                        "diagnostic_variant": self.args.variant if self.scope == "diagnostic" else None,
+                        "acceptance_credit_possible": self.args.gate in ("A", "B", "C")}
         self.sampler = ResourceSampler(self.run, self.owned, self.root)
         self.sampler.start()
         try:
             self.save()
             if self.scope == "fixture":
                 self.fixture()
+            elif self.scope == "diagnostic":
+                self.diagnostic_window(self.px4_stack(frozen))
             else:
                 config = self.px4_stack(frozen)
                 self.run_controller(config)
@@ -749,9 +814,10 @@ class Runner:
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", action="store_true", required=True)
-    parser.add_argument("--scope", choices=("readiness", "fixture", "flight"), required=True)
+    parser.add_argument("--scope", choices=("readiness", "fixture", "flight", "diagnostic"), required=True)
     parser.add_argument("--fixture")
-    parser.add_argument("--gate", choices=("A", "B", "C", "V"), required=True)
+    parser.add_argument("--variant", choices=DIAGNOSTIC_VARIANTS)
+    parser.add_argument("--gate", choices=("A", "B", "C", "V", "D"), required=True)
     parser.add_argument("--role", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)
@@ -759,6 +825,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if (args.scope == "fixture") != bool(args.fixture):
         parser.error("--fixture is required exactly for the fixture scope")
+    if (args.scope == "diagnostic") != bool(args.variant):
+        parser.error("--variant is required exactly for the diagnostic scope")
     return Runner(args).execute()
 
 

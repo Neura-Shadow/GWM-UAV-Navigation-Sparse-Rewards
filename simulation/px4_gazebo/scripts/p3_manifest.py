@@ -21,8 +21,10 @@ from p3_provenance import atomic_json, canonical_sha256, digest, strict_json  # 
 CONTRACT = "p3-candidate-manifest-v1"
 GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification",
          # Operator-authorized renderer evaluation: Gate A's ground plan on llvmpipe, never acceptance credit.
-         "V": "ground_validation_llvmpipe_no_credit"}
-GROUND_GATES = ("A", "V")
+         "V": "ground_validation_llvmpipe_no_credit",
+         # Operator-authorized stall attribution: fixed ground-only variants, never acceptance credit.
+         "D": "ground_stall_diagnostic_no_credit"}
+GROUND_GATES = ("A", "V", "D")
 SOURCE_FOLDERS = ("scripts", "validation", "configs", "ros2_ws/src/gwm_px4_control", "ros2_ws/src/gwm_sensor_adapter")
 RUNTIME_LIBRARIES = ("/opt/ros/jazzy/lib/libfastrtps.so.2.14", "/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so",
                      "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py",

@@ -28,6 +28,10 @@ PLAN = {"A": [("readiness", None, "readiness")] + [("fixture", name, "fixture-" 
         "B": [("flight", None, "smoke")],
         "C": [("flight", None, f"qualification-{n}") for n in (1, 2, 3)]}
 PLAN["V"] = list(PLAN["A"])  # same ground plan; llvmpipe; no acceptance credit, never a predecessor
+# Stall attribution (docs/v3_sim_p3_stall_attribution.md): fixed order, one start each, never credit.
+PLAN["D"] = [("diagnostic", variant, "diag-" + role) for variant, role in (
+    ("baseline", "baseline"), ("no_rgb_observer", "no_rgb_observer"), ("recorder_none", "recorder_none"),
+    ("no_probe", "no_probe"), ("baseline", "baseline_repeat"))]
 PREDECESSOR = {"B": "A", "C": "B"}
 
 
@@ -55,7 +59,7 @@ def execute_scope(scope, fixture, role, gate, manifest, authorization, flight):
     command = ["bash", str(SIM / "scripts/run_p3.sh"), "--run", "--scope", scope, "--gate", gate, "--role", role,
                "--manifest", str(manifest), "--authorization", str(authorization)]
     if fixture:
-        command += ["--fixture", fixture]
+        command += ["--variant" if scope == "diagnostic" else "--fixture", fixture]
     if flight:
         command.append("--allow-simulated-flight")
     completed = subprocess.run(command, text=True, capture_output=True)
@@ -105,7 +109,7 @@ def main(argv=None):
                                                          "authorized_by": authorization["authorized_by"]},
               "consumption_marker": str(marker), "predecessor": predecessor, "started_unix_ns": time.time_ns(),
               "planned": [role for _, _, role in PLAN[args.gate]], "runs": [], "first_failure": None,
-              "accepted": False, "acceptance_credit": args.gate != "V",
+              "accepted": False, "acceptance_credit": args.gate in ("A", "B", "C"),
               "automatic_retry": False, "next_gate_started": False}
     try:
         for scope, fixture, role in PLAN[args.gate]:
@@ -116,6 +120,12 @@ def main(argv=None):
             if run is None:
                 result["first_failure"] = role + ":runtime_did_not_create_evidence"
                 break
+            if args.gate == "D":
+                # Diagnostics are measured by p3_stall_diagnostic.py, not acceptance-evaluated.
+                if completed.returncode != 0:
+                    result["first_failure"] = role + ":runtime_failed"
+                    break
+                continue
             evaluated, evaluation = evaluate(run)
             row.update(evaluator_exit_code=evaluated.returncode,
                        evaluation_status=evaluation.get("status") if evaluation else None,

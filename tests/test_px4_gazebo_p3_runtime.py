@@ -623,7 +623,7 @@ def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
     with pytest.raises(PermissionError, match="requires an accepted Gate A"):
         run_p3_gates.require_predecessor(tmp_path, "B", "sha")
     source = (SIM / "scripts/run_p3_gates.py").read_text()
-    assert '"acceptance_credit": args.gate != "V"' in source
+    assert '"acceptance_credit": args.gate in ("A", "B", "C")' in source
 
 
 @POSIX_ONLY
@@ -656,6 +656,44 @@ def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
     assert "signal_handler_options=SignalHandlerOptions.NO" in text and "rclpy.spin(" not in text
     assert "while not stop_requested.is_set():" in text and "executor.spin_once(timeout_sec=0.05)" in text
     assert text.index("executor.shutdown()") < text.index("node.destroy_node()") < text.index("rclpy.shutdown()")
+
+
+def test_diagnostic_gate_d_is_fixed_ground_only_and_never_credit(tmp_path):
+    assert [(s, v, r) for s, v, r in run_p3_gates.PLAN["D"]] == [
+        ("diagnostic", "baseline", "diag-baseline"), ("diagnostic", "no_rgb_observer", "diag-no_rgb_observer"),
+        ("diagnostic", "recorder_none", "diag-recorder_none"), ("diagnostic", "no_probe", "diag-no_probe"),
+        ("diagnostic", "baseline", "diag-baseline_repeat")]
+    assert "D" not in run_p3_gates.PREDECESSOR.values() and "D" in p3_manifest.GROUND_GATES
+    assert p3_manifest.authorization_template("D", "s", "op")["excludes"] == ["flight"]
+    (tmp_path / "state").mkdir()
+    atomic_json(tmp_path / "state" / "p3-gate-D-sha.result.json", {"accepted": True, "manifest_sha256": "sha",
+                                                                      "runs": []})
+    with pytest.raises(PermissionError, match="requires an accepted Gate A"):
+        run_p3_gates.require_predecessor(tmp_path, "B", "sha")
+    assert '"acceptance_credit": args.gate in ("A", "B", "C")' in (SIM / "scripts/run_p3_gates.py").read_text()
+
+
+@POSIX_ONLY
+def test_runner_variant_is_exactly_for_the_diagnostic_scope(tmp_path):
+    import p3_runner
+    base = ["--run", "--gate", "D", "--role", "r", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")]
+    for extra in (["--scope", "diagnostic"], ["--scope", "readiness", "--variant", "baseline"],
+                  ["--scope", "diagnostic", "--variant", "something_else"]):
+        with pytest.raises(SystemExit):
+            p3_runner.main(base + extra)
+
+
+def test_source_probe_clock_only_excludes_image_subscriptions(tmp_path):
+    with pytest.raises(ValueError, match="clock_only"):
+        p3_source_probe.main([str(tmp_path), "default", "x500_depth_71", "--clock-only", "--rgb"])
+
+
+def test_stall_diagnostic_sim_second_crossings():
+    import p3_stall_diagnostic
+    points = [(0.0, 0.5), (1.0, 1.0), (3.0, 2.0), (4.0, 3.5)]  # 1 s sim takes 2 s wall in the middle
+    marks = p3_stall_diagnostic.crossings(points)
+    assert [round(m, 3) for m in marks] == [1.0, 3.0, 3.667]
+    assert [round(b - a, 3) for a, b in zip(marks, marks[1:])] == [2.0, 0.667]
 
 
 def test_source_probe_keeps_the_sourced_ros_python_path():

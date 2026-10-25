@@ -128,7 +128,11 @@ def main(argv=None):
     parser.add_argument("model")
     parser.add_argument("--rgb", action="store_true")
     parser.add_argument("--watch", nargs="*", default=[])
+    # Diagnostic scope only: keep native sim time, drop every image/pose/camera_info subscription.
+    parser.add_argument("--clock-only", action="store_true")
     args = parser.parse_args(argv)
+    if args.clock_only and (args.rgb or args.watch):
+        raise ValueError("source_probe_clock_only_excludes_other_subscriptions")
     if os.environ.get("GZ_PARTITION") != args.run.name:
         raise ValueError("source_probe_partition_identity")
     for value in (args.world, args.model, *args.watch):
@@ -221,12 +225,15 @@ def main(argv=None):
     node = Node()
     options = SubscribeOptions()
     rgb_topic = f"/world/{args.world}/model/{args.model}/link/camera_link/sensor/IMX214/image"
-    subscribed = {
-        "depth": bool(node.subscribe_raw("/depth_camera", image_receiver("depth", (640, 480), "camera_link"),
-                                         "gz.msgs.Image", options)),
-        "camera_info": bool(node.subscribe(CameraInfo, "/camera_info", camera_info)),
-        "pose": bool(node.subscribe(Pose_V, f"/world/{args.world}/pose/info", poses)),
-        "clock": bool(node.subscribe(Clock, f"/world/{args.world}/clock", clock))}
+    if args.clock_only:
+        subscribed = {"clock": bool(node.subscribe(Clock, f"/world/{args.world}/clock", clock))}
+    else:
+        subscribed = {
+            "depth": bool(node.subscribe_raw("/depth_camera", image_receiver("depth", (640, 480), "camera_link"),
+                                             "gz.msgs.Image", options)),
+            "camera_info": bool(node.subscribe(CameraInfo, "/camera_info", camera_info)),
+            "pose": bool(node.subscribe(Pose_V, f"/world/{args.world}/pose/info", poses)),
+            "clock": bool(node.subscribe(Clock, f"/world/{args.world}/clock", clock))}
     if args.rgb:
         subscribed["rgb"] = bool(node.subscribe_raw(rgb_topic, image_receiver("rgb", (1920, 1080), "camera_link"),
                                                     "gz.msgs.Image", options))
@@ -236,8 +243,9 @@ def main(argv=None):
     signal.signal(signal.SIGTERM, lambda *_: stopping.set())
     started = time.monotonic()
     stopping.wait()
-    for topic in ["/depth_camera", "/camera_info", f"/world/{args.world}/pose/info",
-                  f"/world/{args.world}/clock"] + ([rgb_topic] if args.rgb else []):
+    topics = [f"/world/{args.world}/clock"] if args.clock_only else [
+        "/depth_camera", "/camera_info", f"/world/{args.world}/pose/info", f"/world/{args.world}/clock"]
+    for topic in topics + ([rgb_topic] if args.rgb else []):
         node.unsubscribe(topic)
     time.sleep(0.2)  # let in-flight transport callbacks return before closing ledgers
     for stream in streams.values():
