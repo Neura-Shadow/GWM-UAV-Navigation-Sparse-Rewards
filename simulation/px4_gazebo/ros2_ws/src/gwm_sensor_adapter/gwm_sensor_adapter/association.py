@@ -1,8 +1,9 @@
 """Bounded PX4 state history and deterministic acquisition-time association.
 
 No interpolation or extrapolation. The closest strictly-recorded sample within
-the declared mismatch is used; ties, epoch-crossing brackets, empty history and
-out-of-tolerance requests are reported explicitly, never invented.
+the declared mismatch is used; an exact equidistant tie deterministically takes
+the earlier (causal) sample and is flagged. Epoch-crossing brackets, empty history
+and out-of-tolerance requests are reported explicitly, never invented.
 """
 from collections import deque
 import math
@@ -57,8 +58,8 @@ class StateHistory:
         if delta > self.mismatch_us:
             status = "pending_newer_state" if acquisition_us > newest else "no_state_within_tolerance"
             return {"status": status, "nearest_delta_s": delta / 1e6}
-        if tie:
-            return {"status": "ambiguous_equidistant", "nearest_delta_s": delta / 1e6}
+        # Samples are strictly increasing, so on a tie `best` is already the earlier sample;
+        # both candidates have the same |delta|, which is within the unchanged tolerance.
         # A bracket spanning a reset epoch cannot be associated with confidence.
         if self.epoch_keys:
             before = [v for s, v in self.samples if s <= acquisition_us][-1:]
@@ -68,7 +69,7 @@ class StateHistory:
         reused = self.last_used == stamp
         self.last_used = stamp
         return {"status": "matched", "timestamp_us": stamp, "delta_s": (stamp - acquisition_us) / 1e6,
-                "reused": reused, "value": value}
+                "reused": reused, "equidistant_tie_earlier": tie, "value": value}
 
 
 class Associator:

@@ -53,7 +53,11 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
     root = Path(root)
     px4 = root / "upstream/PX4-Autopilot"
     receipts = {name: strict_json(root / "state" / name) for name in
-                ("p0-built.json", "p2-built.json", "p3-built.json", "px4-mc-trace-built.json", "qgc-unattended-built.json")}
+                ("p0-built.json", "p2-built.json", "p3-built.json", "px4-mc-trace-built.json", "qgc-unattended-built.json",
+                 "p3-dds-agent-built.json")}
+    agent = receipts["p3-dds-agent-built.json"]
+    if agent.get("status") != "built" or digest(agent["binary"]) != agent["binary_sha256"]:
+        raise ValueError("P3 DDS agent build missing, failed or changed")
     sys.path.insert(0, str(SIM / "validation"))
     import mc_trace_runtime
     previous = os.environ.get("GWM_PX4_MC_TRACE")

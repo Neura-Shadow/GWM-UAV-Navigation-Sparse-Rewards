@@ -252,7 +252,10 @@ class Runner:
         env = {key: os.environ[key] for key in allowed if key in os.environ}
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
-                    "GWM_P3_OWNED_NAMESPACE": "1"})
+                    "GWM_P3_OWNED_NAMESPACE": "1",
+                    # WSLg hardware rendering: Mesa picks llvmpipe for headless EGL unless the
+                    # D3D12 driver and the discrete adapter are named (verified with an EGL probe).
+                    "GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"})
         env.update(extra or {})
         return env
 
@@ -453,8 +456,14 @@ class Runner:
             (SIM / "configs/qgc-monitor.ini").read_text().replace("@RUN_DATA@", str(self.run / "qgc-data")))
         self.qgc = self.launch("qgc-monitor", [str(Path(qgc["bundle"]) / "squashfs-root/AppRun")], qenv,
                                stop_method="SIGTERM", grace=self.validation["qgc_graceful_stop_wall_s"], cwd=work)
-        denv = self.environment({"LD_LIBRARY_PATH": str(self.root / "dds-install/lib") + ":" + os.environ.get("LD_LIBRARY_PATH", "")})
-        self.launch("dds-agent", [str(self.root / "dds-install/bin/MicroXRCEAgent"), "udp4", "-p", "8888", "-v", "4"], denv)
+        # P3 agent: pinned library, main() with a graceful SIGINT/SIGTERM stop (build_p3_agent.py).
+        agent = strict_json(self.root / "state/p3-dds-agent-built.json")
+        if agent.get("status") != "built" or digest(agent["binary"]) != agent["binary_sha256"]:
+            raise Abort("p3_dds_agent_build_invalid")
+        self.summary["identity"]["dds_agent"] = {"binary_sha256": agent["binary_sha256"],
+                                                 "p3_main_source_sha256": agent["p3_main_source_sha256"]}
+        denv = self.environment({"LD_LIBRARY_PATH": agent["library_dir"] + ":" + os.environ.get("LD_LIBRARY_PATH", "")})
+        self.launch("dds-agent", [agent["binary"], "udp4", "-p", "8888", "-v", "4"], denv)
         penv = self.environment({"PX4_SIM_MODEL": self.sensors["airframe"], "PX4_GZ_WORLD": "default",
                                  "PX4_UXRCE_DDS_NS": "px4_71", "PX4_UXRCE_DDS_PORT": "8888",
                                  "PX4_PARAM_UXRCE_DDS_SYNCT": "0", "PX4_PARAM_SDLOG_MODE": "1", "HEADLESS": "1",

@@ -16,7 +16,7 @@ check_root
 verify_checkout "$PX4_DIR" px4
 verify_checkout "$ROS_WS/src/px4_msgs" px4_msgs
 verify_checkout "$AGENT_DIR" dds_agent
-for receipt in p2-built.json p3-built.json px4-mc-trace-built.json qgc-unattended-built.json; do
+for receipt in p2-built.json p3-built.json px4-mc-trace-built.json qgc-unattended-built.json p3-dds-agent-built.json; do
   [[ -f $SIM_ROOT/state/$receipt ]] || fail "Missing build receipt: $receipt"
 done
 exec 9> "$SIM_ROOT/state/p1.lock"

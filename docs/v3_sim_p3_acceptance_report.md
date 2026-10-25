@@ -419,4 +419,34 @@ frozen manifest by the operator.
   leaves failures 1, 2 (raw record), 4 and 5. Linux: P2 212, sensor 61, evaluators 30,
   runtime 60, MC 23.
 
+## K. Operator decisions applied (2026-10-25, Neura-Shadow)
+
+* **DDS agent, patched (decision 1):** `validation/dds_agent_sigstop/microxrce_agent.cpp`
+  replaces only the pinned 11-line `main()` (`c3bdc86a…431e`). SIGINT/SIGTERM are blocked
+  before the agent thread starts and consumed with `sigwait()`, then the existing
+  `AgentInstance::stop()` ends the agent and `main` returns 0. `build_p3_agent.py` compiles
+  it with the pinned target's exact defines, includes, flags and link inputs against the
+  **unchanged** `dds-install/lib/libmicroxrcedds_agent.so.2.4.3`. P2 keeps the stock binary.
+  Binary `~/uav_autonomy/p3_agent/d6bad178d69ddbe5/bin/MicroXRCEAgent`
+  `2705cf213f1be55ab5aace3836dde7710624b9e77df07e30ecb3fd17c25b88b0`; receipt
+  `state/p3-dds-agent-built.json` `fc2ccb18…9e82`. Stop smoke (agent alone, private
+  user/network namespace): SIGINT → **0**, SIGTERM → **0**, "server stopped". The runner
+  verifies and launches this binary, and the manifest binds the receipt. The strict graceful
+  rule is unchanged.
+* **Association ties (decision 2):** an exact equidistant tie now takes the earlier (causal)
+  sample. Both candidates have the same |delta|, which must still be ≤ `state_mismatch_s`
+  (unchanged). Ties are flagged (`equidistant_tie_earlier`) and counted per window by the
+  evaluator. Reset-epoch bracket rejection is unchanged. Sensor package rebuilt:
+  `52024487…cdf40`, colcon 2/2, extrinsic matches; `state/p3-built.json` `2af49dea…79ef9`
+  (previous receipt kept in `state/archive/p3-built-f6605fb7.json`).
+* **Renderer (decision 3, GPU enabled):** an offscreen EGL probe (no simulator), run in the
+  runner's environment and namespaces, gives llvmpipe by default and **D3D12 (NVIDIA GeForce
+  RTX 4060 Laptop GPU)** with `GALLIUM_DRIVER=d3d12` and
+  `MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA` (Intel UHD is used if the adapter is not named).
+  The runner sets both for owned processes. The `hardware` requirement and the software
+  renderer rejection are unchanged; the actual Gazebo renderer is still verified from
+  `ogre2.log` at runtime.
+* **Linux:** P2 212, sensor 61, evaluators 30, runtime 62, MC 23, all passed. The manifest
+  dependency check binds 6 receipts.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**

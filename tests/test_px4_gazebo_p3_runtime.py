@@ -555,6 +555,23 @@ def test_pump_never_aborts_the_ordered_shutdown(monkeypatch):
     runner.pump()
 
 
+def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'state/p3-dds-agent-built.json' in runner and 'dds-install/bin/MicroXRCEAgent' not in runner
+    assert '"p3-dds-agent-built.json"' in (SIM / "scripts/p3_manifest.py").read_text()
+    assert "p3-dds-agent-built.json" in (SIM / "scripts/run_p3.sh").read_text()
+    assert 'dds-install/bin/MicroXRCEAgent' in (SIM / "scripts/p2_runner.py").read_text()
+    main = (SIM / "validation/dds_agent_sigstop/microxrce_agent.cpp").read_text()
+    assert "pthread_sigmask(SIG_BLOCK" in main and "sigwait(" in main and "agent_instance.stop();" in main
+    assert main.index("pthread_sigmask") < main.index("agent_instance.create")
+
+
+def test_runtime_environment_selects_wslg_hardware_renderer():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert '"GALLIUM_DRIVER": "d3d12"' in runner and '"MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"' in runner
+    assert 'SOFTWARE_RENDERERS = re.compile(r"llvmpipe|softpipe|swrast|software rasterizer", re.I)' in runner
+
+
 def test_source_probe_keeps_the_sourced_ros_python_path():
     runner = (SIM / "scripts/p3_runner.py").read_text()
     launch = runner[runner.index('self.launch("source-probe"'):][:200]

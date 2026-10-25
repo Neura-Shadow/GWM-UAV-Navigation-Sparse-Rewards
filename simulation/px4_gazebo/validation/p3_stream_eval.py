@@ -177,6 +177,9 @@ def evaluate_stream(run, window, limits, sensors_config, require_association=Fal
         for o in window_obs:
             statuses[o["association"]["status"]] = statuses.get(o["association"]["status"], 0) + 1
         out["association"] = statuses
+        out["association_equidistant_ties_earlier"] = {
+            part: sum(1 for o in window_obs if o["association"].get(part, {}).get("equidistant_tie_earlier"))
+            for part in ("position", "attitude")}
         f.check(window_obs and statuses.get("matched", 0) == len(window_obs), "state_association_incomplete")
         deltas = [abs(o["association"]["position"]["delta_s"]) for o in window_obs
                   if o["association"]["status"] == "matched"]
