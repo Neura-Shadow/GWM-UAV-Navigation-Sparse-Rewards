@@ -103,9 +103,12 @@ stationarity is measured from native ground-truth poses (evaluator only).
   Flights require `mc_trace_evidence.exact_flight` = verified at 1e-5 rad; readiness requires a
   verified acquisition. The P2 accepted baseline binary is not modified.
 * Recorded workload: native positive-clock RTF, Ogre2 GL renderer string (contract
-  `p3-acceptance-v1.1`, operator-approved 2026-10-25: the declared renderer is Mesa
-  **llvmpipe** for every gate and anything else fails `renderer_not_declared_llvmpipe`; v1
-  required `hardware`. See the [revision](v3_sim_p3_renderer_contract_revision_proposal.md)),
+  `p3-acceptance-v1.2`, operator-approved 2026-10-25: Gates A/B/C must render on
+  **`D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`**, otherwise `renderer_not_declared_d3d12`.
+  `configs/p3_d3d12_profile.json` pins the D3D12/driver library hashes, and the
+  `scripts/p3_gz_shim/gz` shim preloads `libd3d12core.so` only into `gz sim`. Validation V
+  stays llvmpipe. History: v1 `hardware`, then [v1.1](v3_sim_p3_renderer_contract_revision_proposal.md)
+  llvmpipe, then [v1.2](v3_sim_p3_hardware_renderer_profile_proposal.md)),
   depth/RGB rates, adapter callback/poll costs, MC spans,
   per-process CPU and RSS, disk before/after (20 GiB reserve checked first), run bytes.
 

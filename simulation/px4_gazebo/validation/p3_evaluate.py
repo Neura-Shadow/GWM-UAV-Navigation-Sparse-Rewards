@@ -157,9 +157,15 @@ def evaluate(run):
         out["rtf"] = native_rtf(run)
         f.check(out["rtf"] is not None, "native_rtf_unmeasured")
         out["renderer"] = renderer = summary.get("renderer") or {}
-        # Contract v1.1: the declared renderer is Mesa llvmpipe for every gate; it must be recorded.
-        f.check(renderer.get("software") is True
-                and any("llvmpipe" in s for s in renderer.get("strings", [])), "renderer_not_declared_llvmpipe")
+        if summary.get("gate") == "V":
+            # Validation V measures Mesa llvmpipe; it must really be llvmpipe.
+            f.check(renderer.get("software") is True
+                    and any("llvmpipe" in s for s in renderer.get("strings", [])), "renderer_not_declared_llvmpipe")
+        else:
+            # Contract v1.2: A/B/C render on the declared D3D12 hardware adapter.
+            identity = strict_json(SIM / "configs/p3_d3d12_profile.json")["renderer_identity"]
+            f.check(renderer.get("identified") is True and renderer.get("software") is False
+                    and identity in renderer.get("strings", []), "renderer_not_declared_d3d12")
         out["resources"] = summary.get("resources")
         f.check(summary.get("controller_publishers_only_from_controller") is True, "competing_flight_publisher")
     out["failures"] = f.items

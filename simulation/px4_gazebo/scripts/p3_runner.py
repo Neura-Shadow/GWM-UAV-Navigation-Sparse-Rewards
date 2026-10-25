@@ -111,6 +111,21 @@ class Owned:
             self.record["remaining_group_members"] = members
 
 
+def d3d12_environment(path):
+    """Contract v1.2 environment: D3D12 on the pinned adapter, gz shim first on PATH.
+
+    The shim adds the libd3d12core preload only to `gz sim` (also when PX4 starts it), so
+    PX4, ROS and QGC processes never load it. The real gz is resolved before the shim.
+    """
+    profile = strict_json(SIM / "configs/p3_d3d12_profile.json")
+    shim = SIM / "scripts/p3_gz_shim"
+    real = shutil.which("gz", path=path)
+    if real is None or Path(real).parent == shim:
+        raise Abort("real_gz_not_found_for_shim")
+    return dict(profile["environment"], PATH=str(shim) + ":" + path, GWM_P3_REAL_GZ=real,
+                GWM_P3_GZ_SIM_PRELOAD=profile["gz_sim_preload"])
+
+
 def group_members(pgid):
     members = []
     for entry in Path("/proc").iterdir():
@@ -253,8 +268,9 @@ class Runner:
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
                     "GWM_P3_OWNED_NAMESPACE": "1"})
-        # Contract v1.1: Mesa's default llvmpipe for every gate. No D3D12 variables are passed
-        # (the WSL D3D12 path faults in Gazebo shutdown; acceptance report sections L-O).
+        if getattr(getattr(self, "args", None), "gate", None) != "V":
+            env.update(d3d12_environment(env.get("PATH", "")))
+        # Validation V keeps Mesa's default llvmpipe: no D3D12 variables, no shim.
         env.update(extra or {})
         return env
 

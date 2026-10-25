@@ -278,8 +278,9 @@ def finalize_synthetic(run, gazebo_exit=0, residual=None):
 @pytest.mark.parametrize("gate,strings,software,failure", [
     ("V", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, None),
     ("V", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"], False, "renderer_not_declared_llvmpipe"),
-    ("A", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, None),
-    ("A", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"], False, "renderer_not_declared_llvmpipe")])
+    ("A", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)", "Microsoft Corporation"], False, None),
+    ("A", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, "renderer_not_declared_d3d12"),
+    ("A", ["D3D12 (Intel(R) UHD Graphics)"], False, "renderer_not_declared_d3d12")])
 def test_renderer_requirement_by_gate_and_validation_never_credits(monkeypatch, gate, strings, software, failure):
     import p3_evaluate
     summary = {"p3_kind": "readiness", "gate": gate, "status": "passed",

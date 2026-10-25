@@ -705,4 +705,29 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   Gazebo itself), then Policy A for the new commit, then a fresh Gate A. No environment
   update was made.
 
+## U. Contract `p3-acceptance-v1.2` (D3D12 hardware profile) applied (2026-10-25)
+
+* **Approved** by Neura-Shadow as proposed in `743bbf7`.
+* **Applied:**
+  * `p3_validation.yaml`: `contract: p3-acceptance-v1.2`, `renderer_requirement: hardware:d3d12`;
+    every numeric limit unchanged (asserted by test).
+  * New `configs/p3_d3d12_profile.json`: the D3D12 environment, the declared renderer identity,
+    the `gz sim` preload `/usr/lib/wsl/lib/libd3d12core.so`, and the five pinned library
+    hashes.
+  * New `scripts/p3_gz_shim/gz` (LF, mode 755): first on the `PATH` of A/B/C owned processes,
+    including PX4, which starts Gazebo. It adds `LD_PRELOAD` only for `gz sim`, so PX4, ROS,
+    QGC and other gz subcommands run unchanged and inherited `LD_PRELOAD` never reaches owned
+    processes.
+  * The runner sets the profile environment for A/B/C; validation V stays llvmpipe with no shim.
+  * The manifest re-hashes the pinned libraries and records the profile and shim hashes; any
+    change blocks freezing or running.
+  * The evaluator requires the exact D3D12 RTX 4060 renderer identity for A/B/C.
+* **Unchanged:** P2 controller and mission, sensor rates and RGB workload, pins, freshness
+  limits (including the 2 s `vehicle_land_detected` wall limit), MC causality, policy A,
+  graceful cleanup, every earlier gate result and budget, and the llvmpipe candidate `764fcfd7`.
+* **Verification:** Linux P2 212, sensor 61, evaluators 35, runtime 67, MC 23. Windows (P3
+  suites) 148 passed, 15 POSIX-only skipped. Shellcheck is clean. The live WSL library
+  hashes match the profile. The shim passes `gz sim --versions` through to Gazebo 8.15.0.
+* Flight timing on D3D12 is still unproven; Gate B judges it unchanged.
+
 Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**

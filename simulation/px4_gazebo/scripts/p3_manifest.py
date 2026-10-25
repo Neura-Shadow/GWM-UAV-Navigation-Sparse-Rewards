@@ -98,7 +98,21 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
             "qgc_unattended_elf_sha256": qgc["ELF_sha256"], "assets": assets,
             "runtime_libraries": {p: digest(p) for p in RUNTIME_LIBRARIES},
             "native_command_policy": policy,
-            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"]}
+            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"],
+            "d3d12_profile": d3d12_profile_identity()}
+
+
+def d3d12_profile_identity():
+    """Contract v1.2: the D3D12/driver libraries must still be the pinned, verified ones."""
+    profile = strict_json(SIM / "configs/p3_d3d12_profile.json")
+    actual = {path: digest(path) for path in profile["pinned_libraries"]}
+    if actual != profile["pinned_libraries"]:
+        changed = sorted(p for p in actual if actual[p] != profile["pinned_libraries"][p])
+        raise ValueError("D3D12 runtime libraries differ from the approved profile: " + ", ".join(changed))
+    if profile["gz_sim_preload"] not in actual:
+        raise ValueError("The gz sim preload must be one of the pinned libraries")
+    return {"profile_sha256": digest(SIM / "configs/p3_d3d12_profile.json"), "libraries": actual,
+            "shim_sha256": digest(SIM / "scripts/p3_gz_shim/gz")}
 
 
 def candidate(root, **kwargs):

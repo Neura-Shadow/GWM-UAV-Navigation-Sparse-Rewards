@@ -9,3 +9,4 @@ ros2_ws/src/gwm_sensor_adapter/** text eol=lf
 *.cpp text eol=lf
 *.qml text eol=lf
 *.sdf text eol=lf
+scripts/p3_gz_shim/* text eol=lf

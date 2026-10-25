@@ -566,19 +566,49 @@ def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
     assert main.index("pthread_sigmask") < main.index("agent_instance.create")
 
 
-def test_contract_v1_1_declares_llvmpipe_and_keeps_every_limit():
-    # Operator-approved v1.1 (proposal 8df667d): only the renderer requirement changed.
+def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
+    # Operator-approved v1.2 (proposal 743bbf7): only the renderer requirement and profile changed.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.1"
-    assert validation["renderer_requirement"] == "software:llvmpipe"
+    assert validation["contract"] == "p3-acceptance-v1.2"
+    assert validation["renderer_requirement"] == "hardware:d3d12"
+    profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
+    assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}
+    assert profile["gz_sim_preload"] == "/usr/lib/wsl/lib/libd3d12core.so" in profile["pinned_libraries"]
+    assert profile["renderer_identity"] == "D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"
     limits = {k: validation[k] for k in ("delivered_hz_min", "processed_hz_min", "source_gap_sim_s",
                                          "observation_age_sim_s", "state_mismatch_s", "stall_wall_s",
                                          "graceful_stop_wall_s", "qgc_graceful_stop_wall_s", "qualification_flights")}
     assert limits == {"delivered_hz_min": 25, "processed_hz_min": 8, "source_gap_sim_s": 0.12,
                       "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05, "stall_wall_s": 1.0,
                       "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0, "qualification_flights": 3}
-    runner = (SIM / "scripts/p3_runner.py").read_text()
-    assert "GALLIUM_DRIVER" not in runner and "MESA_D3D12" not in runner
+
+
+def test_manifest_rejects_a_changed_d3d12_library(monkeypatch):
+    real = p3_manifest.digest
+    pinned = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())["pinned_libraries"]
+    target = "/usr/lib/wsl/lib/libd3d12core.so"
+
+    def fake(path, changed=None):
+        path = str(path)
+        return (changed or {}).get(path, pinned[path]) if path in pinned else real(path)
+    monkeypatch.setattr(p3_manifest, "digest", fake)
+    assert p3_manifest.d3d12_profile_identity()["libraries"] == pinned
+    monkeypatch.setattr(p3_manifest, "digest", lambda p: fake(p, {target: "0" * 64}))
+    with pytest.raises(ValueError, match="libd3d12core.so"):
+        p3_manifest.d3d12_profile_identity()
+
+
+@POSIX_ONLY
+def test_gz_shim_preloads_only_gz_sim(tmp_path):
+    fake = tmp_path / "gz"
+    fake.write_text('#!/usr/bin/env bash\necho "ARGS=$* PRELOAD=${LD_PRELOAD:-}"\n')
+    fake.chmod(0o755)
+    shim = SIM / "scripts/p3_gz_shim/gz"
+    env = {"PATH": os.environ["PATH"], "GWM_P3_REAL_GZ": str(fake), "GWM_P3_GZ_SIM_PRELOAD": "/x/libd3d12core.so"}
+    sim = subprocess.run(["bash", str(shim), "sim", "-s", "w.sdf"], env=env, text=True, capture_output=True)
+    assert sim.stdout.strip() == "ARGS=sim -s w.sdf PRELOAD=/x/libd3d12core.so"
+    service = subprocess.run(["bash", str(shim), "service", "-l"], env=env, text=True, capture_output=True)
+    assert service.stdout.strip() == "ARGS=service -l PRELOAD="
 
 
 def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
@@ -597,16 +627,26 @@ def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
 
 
 @POSIX_ONLY
-def test_every_gate_environment_has_no_d3d12_selection(monkeypatch, tmp_path):
+def test_gate_environment_d3d12_with_shim_for_abc_and_llvmpipe_for_v(monkeypatch, tmp_path):
     import p3_runner
-    monkeypatch.setenv("GALLIUM_DRIVER", "d3d12")  # an inherited selection must not leak through
-    monkeypatch.setenv("MESA_D3D12_DEFAULT_ADAPTER_NAME", "NVIDIA")
+    bindir = tmp_path / "bin"
+    bindir.mkdir()
+    (bindir / "gz").write_text("#!/bin/sh\n")
+    (bindir / "gz").chmod(0o755)
+    monkeypatch.setenv("PATH", str(bindir) + ":/usr/bin:/bin")
+    monkeypatch.setenv("LD_PRELOAD", "/inherited.so")  # never passed to owned processes
     runner = p3_runner.Runner.__new__(p3_runner.Runner)
     runner.run = tmp_path
-    for gate in ("A", "B", "C", "V"):
+    shim = str(SIM / "scripts/p3_gz_shim")
+    for gate in ("A", "B", "C"):
         runner.args = p3_runner.argparse.Namespace(gate=gate)
         env = runner.environment()
-        assert "GALLIUM_DRIVER" not in env and "MESA_D3D12_DEFAULT_ADAPTER_NAME" not in env
+        assert env["GALLIUM_DRIVER"] == "d3d12" and env["MESA_D3D12_DEFAULT_ADAPTER_NAME"] == "NVIDIA"
+        assert env["PATH"].split(":")[0] == shim and env["GWM_P3_REAL_GZ"] == str(bindir / "gz")
+        assert env["GWM_P3_GZ_SIM_PRELOAD"] == "/usr/lib/wsl/lib/libd3d12core.so" and "LD_PRELOAD" not in env
+    runner.args = p3_runner.argparse.Namespace(gate="V")
+    env = runner.environment()
+    assert "GALLIUM_DRIVER" not in env and "GWM_P3_GZ_SIM_PRELOAD" not in env and not env["PATH"].startswith(shim)
 
 
 def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
