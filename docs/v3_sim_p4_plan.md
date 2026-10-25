@@ -178,23 +178,27 @@ Each control tick (20 Hz) runs on the newest snapshot no older than 0.25 sim s:
 
 * **Candidates.** Headings θ = ψ_path + k·10°, k = −6…6 (±60° about the path direction toward the
   current goal), each with length L ∈ {0.75, 1.5} m from the current target position, plus `HOLD`.
-* **Valid when all hold:**
-  1. every cell within `r_infl` (1.0 m) of the swept segment is `FREE`;
-  2. the segment and its inflation lie inside the P4 geofence;
-  3. the segment heading is within the observable cone (|θ − ψ_vehicle| ≤ 25°, so the vehicle
-     only translates toward space the camera currently or previously saw);
-  4. stopping is possible: the first `d_stop` (0.30 m) of the segment is free at full inflation;
-  5. the planned target stays within the tracking bound of the current position (≤ 0.30 m ahead
-     of the vehicle, enforced by the 0.3 m/s ramp).
-* **Score** (fixed weights in `p4_avoidance.yaml`): `+1.0·progress − 0.6·path_deviation −
-  0.2·|Δθ| + 0.3·min(clearance − r_infl, 1.0)`. Ties go to the smaller |k|, then to the left
-  (positive ENU y), then to the shorter L. Selection is deterministic: identical inputs give
-  identical output.
-* **Heading.** If the best direction lies outside the observable cone, the planner returns `YAW_TO`
-  (rotate in place at ≤ 10°/s toward θ) instead of translating, so space is always observed before it
-  is entered.
-* **Execution.** The P4 mission ramps the position target along the chosen segment at ≤ 0.3 m/s and
-  yaw at ≤ 10°/s (P2 limits), re-evaluating every tick.
+* **Collision validity** (contract L2) does not depend on the current heading. Every cell within
+  `r_infl` (1.0 m) of the swept segment is `FREE`; the inflated segment lies inside the geofence; the
+  first `d_stop` (0.30 m) is clear; and the snapshot is ≤ 0.25 s old. Cells remembered `FREE` from
+  earlier frames count (static world).
+* **Score** (contract L3, fixed weights in `p4_avoidance.yaml`): `+1.0·progress − 0.6·path_deviation
+  − 0.2·|Δθ| + 0.3·min(clearance − r_infl, 1.0)`, over collision-valid candidates only. Ties go to the
+  smaller |k|, then +y, then the shorter L. Identical inputs give identical output.
+* **Translation authority** (contract L4) is a separate check. The best candidate translates only if
+  |θ − ψ_vehicle| ≤ 25°. Otherwise the planner returns `YAW_TO(θ)`, so the camera always faces the
+  space being entered.
+* **In-place yaw** (contract L5). `YAW_TO`, `SCAN` and the initial `MAP_SCAN` freeze the position
+  target and need a fresh snapshot. They also need every cell within `R_body` of the target to be
+  `FREE` or traversed (the vehicle occupied it), and no `OCCUPIED` cell within 0.79 m
+  (`R_body` + 0.10 + `e_track`). Rotation is at ≤ 10°/s. A cylinder rotating about its axis sweeps
+  nothing new, so no unobserved space is entered. Translation authority is re-checked only on a snapshot acquired after the new heading is
+  reached.
+* **Observation acquisition** (contract L6). When candidates are blocked only by `UNKNOWN` cells,
+  `SCAN` yaws toward the most-unknown blocked heading, once per heading per `HOVER` episode.
+  Translation never enters `UNKNOWN` space.
+* **Execution.** The P4 mission ramps a translating target along the chosen segment at ≤ 0.3 m/s,
+  and yaw at ≤ 10°/s (P2 limits), re-validating every tick.
 
 ### 3.3 Supervisor (`supervisor.py`)
 
@@ -207,8 +211,9 @@ transition table in the contract (§5). Summary:
 * `AVOIDING` executes candidates. When the path segment is valid again, go to `RESUME`, which rejoins
   the path line (deviation-penalized candidates). When deviation ≤ 0.10 m and the path is valid, go
   back to `NORMAL`.
-* `HOVER` holds the current target, with optional deterministic yaw scans of ±30°. If no valid
-  progress candidate appears within 20 s sim, go to `ABORT`.
+* `HOVER` holds the current target and may run L6 `SCAN` yaws when the snapshot is fresh. If no
+  collision-valid progress candidate appears within 20 s sim, go to `ABORT`. In a stale-input
+  `HOVER`, yaw is frozen as well.
 * `ABORT` holds, then sends one LAND (21) in place, using P2's recovery rules.
 * **Immediate `HOVER`, never progress:** map snapshot older than 0.25 sim s, adapter health not
   `fresh`, calibration mismatch, unusable association for 3 consecutive frames, an estimator reset
@@ -257,7 +262,7 @@ recorded origin heading), a 5 s goal hover, then LAND. P4 geofence: x ∈ [−1.
 | S3 | Offset pillar | (4.0, +0.5); 0.4×0.4×4 m | detour toward −y (the larger free side), goal reached |
 | S4 | Two pillars | (3.5, 0.0) and (6.0, −1.4); 0.4×0.4×4 m | collision-free route, goal reached |
 | S5 | Blocked | wall (4.0, 0.0); 0.3×8.0×4 m | `HOVER` before the wall, then `ABORT` + LAND; outcome `safe_refusal` |
-| S6 | Depth interruption | S2 geometry; sensor bridge stopped once the vehicle is 2.0 m from origin | `HOVER` within 0.35 s sim of staleness, no progress while stale, `ABORT` + LAND |
+| S6 | Depth interruption | S2 geometry; the runner stops the sensor bridge once the vehicle is 2.0 m from origin | full P3 checks before injection; then `HOVER` within 0.35 s sim of the last usable snapshot, no motion while stale, `ABORT` + LAND (contract §9.1) |
 | S7 | Reset / stale pose | ground replay only (§6) | input rejected, `HOVER`, recovery on a fresh matched frame |
 
 ## 6. Runtime integration and fault handling
@@ -276,8 +281,21 @@ recorded origin heading), a 5 s goal hover, then LAND. P4 geofence: x ∈ [−1.
   applies it by passing that window to the unchanged `p3_mavlink.evaluate_policy`.
 * **MC causality.** Unchanged `mc_trace_evidence.exact_flight`, with the yaw-ownership window from
   the P4 controller's handover record (same v3 phases as P2).
+* **Fault injection (S6 only).** `P4Runner` tails `ros-events.jsonl`. On the first `TRANSIT`
+  sample ≥ 2.0 m from origin, it sends one SIGINT to the owned `sensor-bridge` and writes
+  `p4/fault_injection.json`. The evaluator splits the run at `t_inj`: unchanged P3 stream checks on
+  `W_pre` = [window start, `t_inj` − 0.12 s], and the attribution, detection and response checks
+  (F1–F4) on `W_fault` (contract §9.1). The native Gazebo depth ledger from the unchanged P3 source
+  probe proves that only the bridge was cut. Any other depth loss, or any loss in another scenario,
+  still fails.
+* **Runtime load.** `p4_perception` is a second subscriber to the 640×480 `32FC1` depth topic
+  (≈ 37 MB/s) and does about 19 k point transforms per processed frame (160 azimuths × ≈ 120 band
+  rows) at 10 Hz in NumPy. It records per-frame thread wall time, snapshot latency, receipt gaps and
+  skipped frames. Gate A part 2 runs the full P4 stack on the ground against every contract §6.1 limit
+  (P3 stream limits, P2 freshness and timing, P4 perception rate, latency and compute) before any
+  flight is authorized, and the same limits are evaluated in every flight.
 * **Faults.**
-  * Depth interruption (S6): adapter health stale, then `HOVER`, then `ABORT`.
+  * Depth interruption (S6): adapter health stale, then `HOVER` with yaw frozen, then `ABORT`.
   * State reset or stale pose: unusable association, so the supervisor holds `HOVER`. A SITL
     reset cannot be triggered without new PX4 commands, so S7 is verified by offline replay of
     retained P3 frames with injected reset brackets and stale stamps.
@@ -294,7 +312,7 @@ recorded origin heading), a 5 s goal hover, then LAND. P4 geofence: x ∈ [−1.
 | M3 | Planner and supervisor (pure Python); table-driven tests per state transition, determinism tests and S1–S7 decision fixtures on synthetic maps | expected decision for each fixture; identical outputs on reruns |
 | M4 | `P4Mission` (reuses P2 initialization, reference and handover via imports) and `control_node.py`; offline mission tests with simulated `StateCache` inputs | every transition and abort path covered; only 176/400/21 issued |
 | M5 | `p4_worlds.py`, scenario declarations, `p4_truth_observer.py` | generated worlds parse; geometry tests pass |
-| M6 | `p4_runner.py`, `run_p4_gates.py`, `p4_evaluate.py`, `p4_trajectory_eval.py`; synthetic run directories exercise every pass and fail rule | evaluator rejects collisions, low clearance, stale planning, competing publishers and P2 safety failures |
+| M6 | `p4_runner.py` (including the S6 injector), `run_p4_gates.py`, `p4_evaluate.py`, `p4_trajectory_eval.py`; synthetic run directories exercise every pass and fail rule | evaluator rejects collisions, low clearance, stale planning, translation into `UNKNOWN`, competing publishers, P2 safety failures, §6.1 breaches, and S6 cases (missing or duplicate injection, loss before `t_inj`, native-source stop, late `HOVER`, motion while stale, injection outside S6) |
 | M7 | `build_p4.sh` receipt and freeze tooling; full Linux and Windows regression | P2, P3, MC and P4 suites green; P3 still `1e205fec` |
 
 Then operator steps: Policy A approval for the P4 candidate, freeze, and Gate A, B, S and C
@@ -306,7 +324,8 @@ Each gate needs an explicit operator authorization bound to the P4 manifest SHA-
 its authorization once, stops at the first failure and never retries. P3 gate results grant no P4
 credit. The gate contents are in contract §8; in short:
 
-* **A** — ground: P3 readiness unchanged plus P4 ground fixtures.
+* **A** — ground: P3 readiness unchanged; P4 readiness under full P4 load against contract §6.1;
+  P4 obstacle and fault fixtures.
 * **B** — one avoidance smoke (S2).
 * **S** — safety flights (S1, S5, S6), if approved.
 * **C** — three consecutive qualification flights (S2, S3, S4).
