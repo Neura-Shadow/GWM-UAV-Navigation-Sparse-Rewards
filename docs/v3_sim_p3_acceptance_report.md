@@ -454,4 +454,31 @@ frozen manifest by the operator.
   **`123498cd468ddfe0e5fb57854e6d8ba175bd8800b4ce46a1270427728bf9acb0`**; `verify` reproduces
   it, the MC selection matches, and no Gate A artifacts exist for it.
 
+## L. Gate A of candidate `123498cd` — FAILED on Gazebo SIGSEGV (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-123498cd468d.json` `ff5b07ac…c4fa`, consumed.
+  Result `p3-gate-A-123498cd….result.json` `31551f65…cc66`, `accepted: false`; retained, not retried.
+* **Readiness run** `20261025T060854Z-p3-readiness-3a608df5`: the runtime `passed`; the
+  independent evaluation has exactly one failure, **`cleanup:gazebo:terminated_by_SIGSEGV`**
+  (exit −11, 0.43 s after the requested SIGINT, not forced, no group members left). The
+  fixtures never started.
+* **Everything else in readiness passed:**
+  * Patched DDS agent exit **0** (3.34 s); PX4 0 (Gazebo correctly set aside as separately
+    owned); QGC 0; bridges, probe and adapter 0.
+  * Renderer identified as **D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)**; RTF 0.82
+    (minimum interval 0.0051).
+  * Depth stream 0 failures; association 149/149 matched, with ties taken to the earlier
+    sample (position 33, attitude 39). RGB passed.
+  * Native commands passed policy A (1 × 401, 34 × 512). MC causality `verified`.
+* **Crash context (offline, `~/.gz/sim/log/2026-10-25T14:08:59…/server_console.log`):** the
+  world pause succeeded (`data: true`), the server received signal 2, `SensorsPrivate::Stop`
+  ran, and the render thread stopped after 272 ms. The log then ends before `Shutting down
+  gz-sim-server`. In the previous run (llvmpipe, exit 0) the same sequence took 51 ms and
+  continued to `Shutting down gz-sim-server` and orderly worker exits. The crash therefore
+  happens in server teardown after rendering stops. The archived −11 runs were llvmpipe, so
+  the GPU backend is not established as the cause (one sample each). No core dump or
+  backtrace exists.
+* **Not changed:** SIGSEGV remains a cleanup failure. No check was weakened and no
+  diagnostic runtime was started.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
