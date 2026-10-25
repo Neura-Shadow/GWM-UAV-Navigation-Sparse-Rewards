@@ -1,7 +1,7 @@
 # P4 contract `p4-acceptance-v1` — revision 3 proposal (initial planning feasibility)
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED.** It amends the approved
-[revision 2](v3_sim_p4_contract.md) (commit `d3c06b4`). No threshold, limit, speed, scenario or gate
+**Status: APPROVED by the operator (2026-10-26) exactly as written in `ea2c9e3`; APPLIED** to the
+[contract](v3_sim_p4_contract.md). It amends revision 2 (commit `d3c06b4`). No threshold, limit, speed, scenario or gate
 changes. Nothing was launched.
 
 ## Problem

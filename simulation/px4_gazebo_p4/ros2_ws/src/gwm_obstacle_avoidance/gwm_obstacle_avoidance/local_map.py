@@ -82,16 +82,21 @@ class Grid:
         t = np.clip(((cx - p0[0]) * dx + (cy - p0[1]) * dy) / denominator, 0.0, 1.0)
         return np.hypot(cx - (p0[0] + t * dx), cy - (p0[1] + t * dy))
 
-    def segment_states(self, p0, p1, radius):
-        """States of every cell whose centre lies within `radius` of segment p0-p1.
+    def segment_cells(self, p0, p1, radius):
+        """(i, j, states, inside) of every cell whose centre lies within `radius` of segment p0-p1.
 
-        Any part of that region outside the grid counts as UNKNOWN."""
+        `inside` is False when part of that region lies outside the grid (unknown space)."""
         window, inside = self._window((p0[0], p1[0]), (p0[1], p1[1]), radius)
         if window is None:
-            return np.array([UNKNOWN], dtype=np.uint8)
+            empty = np.array([], dtype=int)
+            return empty, empty, np.array([], dtype=np.uint8), False
         ii, jj, cx, cy = window
         mask = self._segment_distance(cx, cy, p0, p1) <= radius
-        states = self.cells[ii[mask], jj[mask]]
+        return ii[mask], jj[mask], self.cells[ii[mask], jj[mask]], inside
+
+    def segment_states(self, p0, p1, radius):
+        """States of the cells within `radius` of p0-p1; any part outside the grid counts as UNKNOWN."""
+        _, _, states, inside = self.segment_cells(p0, p1, radius)
         return states if inside else np.concatenate([states, np.array([UNKNOWN], dtype=np.uint8)])
 
     def occupied_distance(self, p0, p1, search):

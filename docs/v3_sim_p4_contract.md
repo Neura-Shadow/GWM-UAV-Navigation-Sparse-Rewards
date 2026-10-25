@@ -1,8 +1,10 @@
 # v3-SIM P4 contract `p4-acceptance-v1` — deterministic non-learning obstacle avoidance
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED** (revision 2: the S6 fault-injection window
+**Status: APPROVED — revision 2 (commit `d3c06b4`) plus revision 3 (commit `ea2c9e3`,
+[proposal](v3_sim_p4_contract_revision3_proposal.md)).** Revision 2 added the S6 fault-injection window
 in §9.1, the separation of collision validity from translation authority in §5 L2–L6, and the
-runtime-performance limits in §6.1 and Gate A). No P4 code exists yet. The design rationale
+runtime-performance limits in §6.1 and Gate A. Revision 3 makes the initial plan feasible: a 360°
+`MAP_SCAN`, traversed cells counting as free in L2, and free space observed only beyond the near clip. The design rationale
 and the verified integration facts are in the [P4 plan](v3_sim_p4_plan.md). Baseline: P3 COMPLETE
 under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiable unchanged.
 
@@ -61,7 +63,8 @@ under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiab
 
 * **Mission:**
   1. P2 initialization through `INITIAL_HOVER` at 2.0 m (same states and checks).
-  2. `MAP_SCAN`: yaw −30° → +30° → 0° at ≤ 10°/s.
+  2. `MAP_SCAN`: one full 360° in-place revolution, counter-clockwise in ENU, ending at the initial
+     heading, at ≤ 10°/s (≈ 36 s), executed as an L5 yaw (revision 3).
   3. `TRANSIT` under the supervisor to the goal (8.0, 0.0) m ENU from the recorded origin and heading.
   4. `GOAL_HOVER` 5 s (horizontal ≤ 0.30 m from the goal, speed ≤ 0.1 m/s).
   5. `REQUEST_LAND`, then P2 landing verification through `COMPLETE`.
@@ -82,7 +85,8 @@ under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiab
   column). Per azimuth: minimum horizontal range of `VALID` band points; all no-return gives free to
   4.0 m; otherwise unknown.
 * **P3.** Grid at 0.10 m over the geofence with `UNKNOWN` / `FREE` / `OCCUPIED`. A hit overrides free;
-  free never clears occupied. `UNKNOWN` is never free.
+  free never clears occupied. `UNKNOWN` is never free. Each ray marks `FREE` only from the camera's
+  near clip (`near_m` 0.2 m) outward; a too-close return is `OCCUPIED` at the near clip (revision 3).
 
 **Planner.** Whether a path is collision-free and whether the vehicle may translate along it now
 are separate tests. In-place yaw is the only way to acquire new observations; translation never
@@ -92,7 +96,9 @@ enters space that is not observed `FREE`.
   actions are `HOLD`, `YAW_TO(θ)` and `SCAN`.
 * **L2 — collision-valid** (independent of the current heading). A translation candidate is
   collision-valid only if:
-  * all cells within `r_infl` = 1.0 m of its swept segment are `FREE`;
+  * all cells within `r_infl` = 1.0 m of its swept segment are `FREE` or **traversed** (within
+    `R_body` of an earlier position estimate, as in L5). Traversed never overrides `OCCUPIED`, and
+    `UNKNOWN` cells outside the traversed region still invalidate the candidate (revision 3);
   * the segment and its inflation lie inside the geofence;
   * its first 0.30 m (`d_stop`) is clear;
   * it is evaluated on a snapshot no older than 0.25 s sim.

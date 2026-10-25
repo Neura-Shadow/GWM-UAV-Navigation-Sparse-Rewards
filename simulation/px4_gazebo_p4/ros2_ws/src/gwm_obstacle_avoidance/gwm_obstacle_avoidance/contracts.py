@@ -1,4 +1,4 @@
-"""Strict P4 configuration contract (p4-acceptance-v1 revision 2, §4–§6).
+"""Strict P4 configuration contract (p4-acceptance-v1 revisions 2 and 3, §4–§6).
 
 Every value the contract fixes is pinned here, so an edited configuration cannot
 silently drift from the approved numbers. P2 timing/freshness limits are read
@@ -39,6 +39,7 @@ PINNED = {
     ("supervisor", "transit_deadline_sim_s"): 150.0,
     ("supervisor", "min_clearance_margin_m"): 0.10,
     ("mission", "goal_enu_m"): [8.0, 0.0],
+    ("mission", "map_scan_deg"): 360.0,  # revision 3: one full in-place revolution
     ("mission", "height_m"): 2.0,
     ("mission", "goal_hover_sim_s"): 5.0,
     ("mission", "goal_tolerance_m"): 0.30,
@@ -60,9 +61,6 @@ def load_config(path):
     for (section, key), expected in PINNED.items():
         if config.get(section, {}).get(key) != expected:
             raise ValueError(f"P4 contract value changed: {section}.{key}")
-    scan = config["mission"].get("map_scan_deg")
-    if isinstance(scan, bool) or not isinstance(scan, (int, float)) or not 0 < scan <= 180:
-        raise ValueError("P4 map scan extent must be in (0, 180] degrees")
     for section in ("perception", "envelope", "planner", "supervisor", "mission", "geofence"):
         for key, value in config[section].items():
             if isinstance(value, float) and not math.isfinite(value):

@@ -1,6 +1,6 @@
 # v3-SIM P4 — deterministic non-learning obstacle avoidance: implementation plan
 
-**Status: PLAN ONLY — NOT APPROVED, NOT IMPLEMENTED.** Nothing was built, launched, frozen or
+**Status: contract approved (revisions 2 and 3); this plan records the design.** Nothing was built, launched, frozen or
 pushed for this plan. The normative rules (thresholds, scenarios, gates) are in the proposed
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
 an implementer follows.
@@ -251,7 +251,7 @@ Gaps narrower than 2·r_infl (2.0 m between obstacle surfaces) are treated as im
 P4 worlds are generated from the pinned `default.sdf` with the P3 generator pattern: static boxes,
 the `x500_depth` include and the gz `Contact` system, with a contact sensor on each obstacle (the
 vehicle SDF is untouched). Mission: takeoff to 2.0 m with P2 initialization and yaw handover, a
-deterministic ±30° map scan in `INITIAL_HOVER`, transit to a goal 8.0 m ahead (ENU +x of the
+deterministic 360° map scan after `INITIAL_HOVER` (revision 3), transit to a goal 8.0 m ahead (ENU +x of the
 recorded origin heading), a 5 s goal hover, then LAND. P4 geofence: x ∈ [−1.0, 9.5] m,
 |y| ≤ 3.0 m, height 1.0–3.0 m.
 

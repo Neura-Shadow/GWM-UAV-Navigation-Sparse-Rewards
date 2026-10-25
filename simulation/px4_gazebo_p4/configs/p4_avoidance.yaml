@@ -39,7 +39,7 @@
   "mission": {
     "goal_enu_m": [8.0, 0.0],
     "height_m": 2.0,
-    "map_scan_deg": 30.0,
+    "map_scan_deg": 360.0,
     "goal_hover_sim_s": 5.0,
     "goal_tolerance_m": 0.30,
     "settled_speed_m_s": 0.1
