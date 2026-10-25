@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A ACCEPTED for candidate `764fcfd7` (section R); Gate B/C not yet authorized — Qualification 0/3**
+**P3 INCOMPLETE — Gate A ACCEPTED (section R); Gate B FAILED on llvmpipe flight timing (section S); native Linux GPU host recommended — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -661,4 +661,30 @@ Linux GPU host, not a relaxation.
 * **Not yet established:** flight-phase P2 timing on llvmpipe (Gate B, then Gate C), judged
   against unchanged limits.
 
-Final status: **P3 INCOMPLETE — Gate A ACCEPTED (candidate 764fcfd7); Gate B not authorized — Qualification 0/3**
+## S. Gate B of candidate `764fcfd7` — FAILED on flight timing (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-764fcfd7c39b.json` `b8452179…df17`, consumed.
+  Result `state/p3-gate-B-764fcfd7….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T091152Z-p3-flight-c287b08f` (SITL, unchanged P2 mission, llvmpipe): arm,
+  takeoff, reference lock, yaw handover, initial hover, east test, return, north test and
+  return all completed. At sim 78.404 s in **YAW_TEST** the unchanged P2 controller entered
+  RECOVERY with **`stale_state:vehicle_land_detected`** and the runtime ended with
+  `Abort:controller_failed`. All owned processes, Gazebo included, shut down gracefully (exit 0).
+* **Measured cause:** PX4 publishes `vehicle_land_detected` at a steady 1.000 s **sim**
+  interval (97 receipts, maximum sim gap 1.004 s). The unchanged P2 limit is a 2 s **wall**
+  receipt age. On llvmpipe the wall-clock receipt gap exceeded 1.8 s in 65 of 96 intervals
+  and 2.0 s in 4, worst **2.658 s** (sim 77.644 → 78.644, local RTF ≈ 0.38, during the yaw
+  test). This is the same invariant the archived smoke missed at 2.008 s. It is a
+  real-time-factor limit of software rendering under the full depth+RGB+flight workload,
+  not a controller, sensor or command defect.
+* **Decision rule applied (operator instruction, section N):** llvmpipe fails a required
+  performance gate, so the performance requirement is **not** relaxed. The 2 s limit, the
+  P2 controller and every threshold stay unchanged.
+* **Recommendation:** run Gates A–C on a **native Linux host with a hardware GPU**. On this
+  WSL2 host the two renderers are each blocked: D3D12 gives RTF 0.82 but faults in Gazebo
+  shutdown (section M, module unconfirmed), and llvmpipe shuts down cleanly but cannot hold
+  the 2 s wall freshness in flight. The implementation, evaluators and P2 controller
+  carry over unchanged, but a native host needs its own build receipts, a new frozen
+  candidate and a fresh Gate A.
+
+Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**

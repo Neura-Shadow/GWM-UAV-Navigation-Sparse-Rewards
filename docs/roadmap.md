@@ -281,7 +281,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   strict cleanup, native-command policy and gated A/B/C orchestration are implemented and
   verified offline ([contract](v3_sim_p3_contract.md), [report](v3_sim_p3_acceptance_report.md)).
   **Gate A accepted** (candidate `764fcfd7`, contract v1.1 llvmpipe, 8/8 ground runs);
-  Gate B/C not yet run: **qualification 0/3**. The 27 earlier unaccepted P3 commits are
+  Gate B failed on llvmpipe flight timing (native Linux GPU host recommended): **qualification 0/3**. The 27 earlier unaccepted P3 commits are
   preserved on `archive/p3-history-39ba887`.
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
