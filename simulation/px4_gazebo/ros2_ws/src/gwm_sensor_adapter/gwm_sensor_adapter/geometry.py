@@ -111,11 +111,16 @@ def sdf_chain(load_model, root_model, base_link, sensor_name):
     def walk(model, model_pose):
         for element in model:
             if element.tag == "include":
+                uri = element.findtext("uri").strip()
+                included = load_model(uri)
+                # An <include> pose overrides the included model's own <pose>; without one,
+                # the model's pose applies (pinned x500_base carries its 0.24 m this way).
                 pose = element.find("pose")
+                if pose is None:
+                    pose = included.find("pose")
                 if pose is not None and pose.get("relative_to") not in (None, "__model__"):
                     raise ValueError("Unsupported include pose frame")
-                uri = element.findtext("uri").strip()
-                walk(load_model(uri), compose(model_pose, pose_from_text(pose.text if pose is not None else None)))
+                walk(included, compose(model_pose, pose_from_text(pose.text if pose is not None else None)))
             elif element.tag == "link":
                 pose = element.find("pose")
                 if pose is not None and pose.get("relative_to") not in (None, "__model__"):

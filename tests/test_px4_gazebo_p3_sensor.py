@@ -240,6 +240,24 @@ def test_sdf_chain_rederives_optical_offset():
     assert chain["all_rotations_identity"] and chain["sensor_link"] == "camera_link"
 
 
+def test_sdf_chain_applies_included_model_pose_like_pinned_px4():
+    # Pinned PX4 v1.17: x500_base puts .24 on <model><pose>, base_link has none; the
+    # OakD-Lite include pose must override that model's own <pose> (non-zero here on purpose).
+    models = {
+        "x500_depth": """<model name="x500_depth"><include merge="true"><uri>x500</uri></include>
+            <include merge="true"><uri>model://OakD-Lite</uri><pose>.12 .03 .242 0 0 0</pose></include></model>""",
+        "x500": """<model name="x500"><include merge="true"><uri>model://x500_base</uri></include></model>""",
+        "x500_base": """<model name="x500_base"><pose>0 0 .24 0 0 0</pose><link name="base_link"/></model>""",
+        "OakD-Lite": """<model name="OakD-Lite"><pose>5 5 5 0 0 0</pose><link name="camera_link">
+            <sensor name="StereoOV7251" type="depth_camera"><pose>0.01233 -0.03 0.01878 0 0 0</pose></sensor>
+            </link></model>"""}
+    chain = geometry.sdf_chain(lambda uri: ET.fromstring(models[uri.replace("model://", "")]),
+                               "x500_depth", "base_link", "StereoOV7251")
+    assert np.allclose(chain["base_origin_model_m"], [0, 0, 0.24])
+    assert np.allclose(chain["sensor_origin_model_m"], [0.13233, 0, 0.26078])
+    assert np.allclose(chain["optical_origin_base_flu_m"], [0.13233, 0, 0.02078])
+
+
 def test_sdf_chain_rejects_unknown_relative_frame():
     def load(uri):
         return ET.fromstring('<model name="m"><link name="base_link"><pose relative_to="other">0 0 0 0 0 0</pose>'
