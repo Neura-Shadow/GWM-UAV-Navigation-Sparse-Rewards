@@ -598,5 +598,10 @@ Linux GPU host, not a relaxation.
     recorder, policy and MC checks are untouched.
 * **Linux:** P2 212, sensor 61, evaluators 34, runtime 64, MC 23. Windows (P3 suites):
   145 passed, 14 POSIX-only skipped.
+* **v1.1 candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `7b7d7d8`
+  (receipt `ecec49ef…ab75`). Manifest `state/p3-candidate-7b7d7d8.json`, canonical SHA-256
+  **`5e14e934f6b15f6d37c769bc43d26b843383ccbdb03aa4b76e16a5f1100a1dac`**,
+  `renderer_requirement: software:llvmpipe`. `verify` reproduces it, the MC selection
+  matches, and no Gate A artifacts exist for it. Gate A has not been run.
 
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
