@@ -1,16 +1,13 @@
 # v3-SIM P3 — depth sensing and flight-control coexistence (contract and operation)
 
-Status: **P3 COMPLETE in SITL under `p3-acceptance-v1.6` — candidate `1e205fec`, Gates A, B and C
-accepted, qualification 3/3 (depth-only flights; no hardware).** See the
-[acceptance report](v3_sim_p3_acceptance_report.md), sections AI–AK.
+Status: **COMPLETE — Contract v1.6 — Qualification 3/3 PASSED** (PX4 SITL, depth-only flights;
+no hardware). Results, identities and the consolidated v1.6 rule set are in the [final acceptance report](v3_sim_p3_final_acceptance_v1_6.md);
+this document describes the design and how to operate it.
 
 This slice starts from the accepted P2-R3 checkpoint `6204fedb9ac8a2b554ff825c93159a509a1b91ad`
 (nominal smoke `20260912T034917Z-p2-flight-c74f35ba`, fresh batch
-`20260912T035329Z-p2-repeat-84bb288d`, 20/20). The 27 earlier, unaccepted P3 commits
-(`76f014d..39ba887`) and the stash of tracked P3 edits are preserved on
-`archive/p3-history-39ba887` and `archive/p3-stash-1db3574`. They are history: no historical
-run, report or pass is counted here. Thresholds, fixture geometry and proven design decisions
-reused from them are named explicitly below.
+`20260912T035329Z-p2-repeat-84bb288d`, 20/20). Thresholds and fixture geometry come from the
+frozen P3 threshold set (`p3_validation.yaml`, values unchanged since first frozen).
 
 ## 1. P2 is preserved byte-for-byte
 
@@ -22,7 +19,7 @@ reused from them are named explicitly below.
   20 Hz, 0.3 m/s and 10°/s ramps, 0.2 m / 0.3 m / 5° tolerances, 0.2 s sample gap,
   0.25 s / 1.5 s / 2 s / 1 s freshness, controller-only UDPv4, R2 yaw policy and 75 s startup.
 * `p2_runner.py`, P2 evaluators and P2 evidence are untouched, with one operator-approved
-  exception: under [v1.6](v3_sim_p3_p2_evaluator_duplicate_timestamp_v1_6_proposal.md),
+  exception: under v1.6 ([final acceptance report](v3_sim_p3_final_acceptance_v1_6.md), rule set),
   `collect_p2_evidence.verify()` pairs ROS/ULog `vehicle_local_position` by
   (`timestamp`, `timestamp_sample`) instead of `timestamp` alone (1e-6 m and 100 pairs unchanged;
   all 21 accepted P2-R3 reports reproduce identically). P3 has its own runner and re-uses that
@@ -55,7 +52,7 @@ The adapter (`gwm_sensor_adapter`) is pure-module plus a thin ROS node:
 | `geometry.py` | Explicit optical (X right, Y down, Z forward) → body FLU → FRD → local NED, Hamilton wxyz FRD→NED; depth is optical Z, not range; SDF include-chain resolver. |
 | `association.py` | 300-sample position/attitude histories; nearest PX4 `timestamp_sample` within 0.05 s, no interpolation; reports missing, older, pending, ambiguous ties, reset-epoch brackets, duplicates and reuse. |
 | `pipeline.py` | Separate accounting for receipt, decode, processing skip and recorder. Simulation-time 10 Hz phase accumulator; never republishes a frame; observations only while fresh. Health: unavailable / calibration_unavailable / stale (1.0 wall s receipt stall or 0.25 sim s source age) / fresh. |
-| `recorder.py` | Single-owner bounded queue (`recorder_capacity` 32 since [v1.5](v3_sim_p3_recorder_capacity_v1_5_proposal.md): the 1.0 s stall limit at 30.31 Hz plus the in-flight frame; previously 8); first overflow is sticky and fails the run (`recorder_overflow_allowed` 0); drain + fsync + close marker. |
+| `recorder.py` | Single-owner bounded queue (`recorder_capacity` 32 since v1.5: the 1.0 s stall limit at 30.31 Hz plus the in-flight frame; previously 8); first overflow is sticky and fails the run (`recorder_overflow_allowed` 0); drain + fsync + close marker. |
 
 ## 3. Geometry
 
@@ -100,7 +97,7 @@ stationarity is measured from native ground-truth poses (evaluator only).
   observed node graph); the P2 graph check rejects any competing publisher.
 * Six PX4 state families keep their P2 freshness rules; P3 adds sensor freshness separately.
 * State association: every window observation must be `matched` within `state_mismatch_s`.
-  Under [v1.4](v3_sim_p3_contract_v1_4_proposal.md) rule 1 the only exception is a
+  Under v1.4 rule 1 the only exception is a
   `reset_epoch_bracket` observation whose recorded bracket spans ≤ `state_mismatch_s`, crosses
   exactly one PX4 reset (+1 counter step or a `ref_timestamp` change), is corroborated by the
   controller's `ros-events.jsonl` on the same topic inside the bracket, and is at most one per
@@ -111,7 +108,7 @@ stationarity is measured from native ground-truth poses (evaluator only).
 * RGB: the IMX214 1920×1080 30 Hz workload is kept and measured by a passive native metadata
   observer (no RGB bridge, no pixels retained; ≥25 Hz, ≤0.12 s gap, ≤1 s receipt stall).
 * Exact MC yaw causality uses the explicitly selected, separately built and benchmarked
-  `px4-mc-causal-trace-v1` overlay (the untracked `mc_trace*` sources, consumed unchanged).
+  `px4-mc-causal-trace-v1` overlay (`validation/mc_trace*`, `scripts/*mc_trace*`).
   Flights require `mc_trace_evidence.exact_flight` = verified at 1e-5 rad; readiness requires a
   verified acquisition. The P2 accepted baseline binary is not modified.
 * Recorded workload: native positive-clock RTF, Ogre2 GL renderer string (contract
@@ -119,10 +116,8 @@ stationarity is measured from native ground-truth poses (evaluator only).
   **`D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`**, otherwise `renderer_not_declared_d3d12`.
   `configs/p3_d3d12_profile.json` pins the D3D12/driver library hashes, and the
   `scripts/p3_gz_shim/gz` shim preloads `libd3d12core.so` only into `gz sim`. Validation V
-  stays llvmpipe. History: v1 `hardware`, then [v1.1](v3_sim_p3_renderer_contract_revision_proposal.md)
-  llvmpipe, then [v1.2](v3_sim_p3_hardware_renderer_profile_proposal.md); under
-  [v1.3](v3_sim_p3_contract_v1_3_proposal.md) the RGB consumer is required at readiness,
-  absent in fixtures and absent-verified in flights, which are depth-only workload),
+  stays llvmpipe. Since v1.3 the RGB consumer is required at readiness, absent in fixtures
+  and absent-verified in flights, which are a depth-only workload),
   depth/RGB rates, adapter callback/poll costs, MC spans,
   per-process CPU and RSS, disk before/after (20 GiB reserve checked first), run bytes.
 
@@ -135,8 +130,8 @@ QGC; every frame is CRC-checked against the pinned MAVLink tables. Policy is dat
 * `strict_zero` (**default**): any command or active-control frame from a non-vehicle source fails.
 * `A`: stock QGC management only — COMMAND_LONG 255/190→72/1, ≤1×401 and ≤34×512 inside the
   original 75 s startup window, each payload one of the frozen patterns within its cap.
-  Requires an operator approval receipt bound to the policy's canonical SHA-256. The
-  historical approval of A belonged to the archived candidate and does **not** transfer.
+  Requires an operator approval receipt bound to the policy's canonical SHA-256, re-approved
+  per candidate; an approval never transfers between candidates.
   v1.4 rule 2 adds `vehicle_landing_self_commands` to A: PX4's own land-mode gimbal-neutral
   COMMAND_LONG frames 72/1→72/0 (1001 acquire, 1000 neutral, 1001 release, byte-exact
   payloads), only between the controller's `REQUEST_LAND` and `COMPLETE` transitions, at most
@@ -159,8 +154,9 @@ signal death fail, including the deliberately interrupted bridge. Shutdown order
 landed/disarmed independently → QGC unattended TERM → sensor bridge, adapter, probe, clock
 bridge (SIGINT) → `mc_pos_control stop` + trace drain → `logger stop` → PX4 `shutdown` →
 DDS Agent → pause the Gazebo world → SIGINT Gazebo → close capture → scan the namespace.
-Pausing and removing sensor consumers before Gazebo exits is a **mitigation hypothesis** for
-the archived −11 exits; it is unverified, and the classifier still requires exit 0.
+Pausing and removing sensor consumers before Gazebo exits, together with the
+`libd3d12core.so` preload in the `gz` shim, gives exit 0 for Gazebo in every accepted run; the
+classifier requires exit 0.
 
 ## 8. Runtime ownership and gates
 
@@ -194,11 +190,12 @@ Raw depth is ~37 MB per sim second before compression.
 
 ## 10. Known limits
 
-* No runtime has been executed for this implementation; every live claim is unproven.
-* The archived Gazebo −11 shutdown cause is unknown; the mitigation is untested.
-* `p3_source_probe.py`, `p3_runner.py`, the adapter node and `p3_build.py` use APIs that
-  are available only in the WSL runtime (gz-transport Python, rclpy, colcon); they are covered
-  offline only to the extent described in the report.
-* The untracked MC sources remain untracked; the manifest requires and hashes them.
-  `tests/test_px4_mc_trace_shutdown.py` targets functions from the stashed P2-runner edit and
-  fails to import against the accepted P2 runner.
+* Accepted in PX4 SITL only (WSL2, D3D12 on an RTX 4060 Laptop GPU). No hardware flight.
+* Flights are depth-only with verified RGB absence; RGB throughput is accepted at readiness only.
+* A host-wide slowdown can delay PX4 state messages and fail state association
+  (`pending_newer_state`); the adapter associates at processing time and does not wait. This did
+  not occur in the accepted runs (see the [final acceptance report](v3_sim_p3_final_acceptance_v1_6.md)).
+* `p3_source_probe.py`, `p3_runner.py`, the adapter node and `p3_build.py` use APIs available only
+  in the WSL runtime (gz-transport Python, rclpy, colcon); offline tests cover their logic only.
+* Two code comments (`run_p3_gates.py`, `p3_stall_diagnostic.py`) name a deleted diagnostic
+  document. They are left as they are because both files are hashed into the accepted manifest.
