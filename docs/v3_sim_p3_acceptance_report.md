@@ -687,4 +687,22 @@ Linux GPU host, not a relaxation.
   carry over unchanged, but a native host needs its own build receipts, a new frozen
   candidate and a fresh Gate A.
 
+## T. D3D12 shutdown crash — cause confirmed, Gazebo-only repair verified (2026-10-25)
+
+Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run.
+* **Cause (confirmed):** `libd3d12.so`'s destructor `dlclose`s and unmaps
+  **`/usr/lib/wsl/lib/libd3d12core.so`** on the sensors render thread. At that thread's exit,
+  glibc TSD cleanup calls into the unmapped `libd3d12core.so` text (faulting PC was at file
+  offset `0x2edb10` of that module before SIGINT). That the entry is a TSD key destructor
+  registered by `libd3d12core.so` is inferred, not read directly. This supersedes section M's
+  "unconfirmed" attribution. Run `20261025T093020Z-gz-d3d12-trace-baseline`.
+* **One repair variant:** `LD_PRELOAD=/usr/lib/wsl/lib/libd3d12core.so` for the Gazebo server
+  only. The module is no longer unloaded; Gazebo reaches `Shutting down gz-sim-server` and
+  **exits 0** with D3D12 (RTX 4060) active and no residual processes (one sample). Run
+  `20261025T093153Z-gz-d3d12-trace-preload-d3d12core`.
+* **Not applied:** the [v1.2 hardware-renderer profile proposal](v3_sim_p3_hardware_renderer_profile_proposal.md)
+  needs operator approval (contract change and Gazebo-only `gz` shim, because PX4 starts
+  Gazebo itself), then Policy A for the new commit, then a fresh Gate A. No environment
+  update was made.
+
 Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**
