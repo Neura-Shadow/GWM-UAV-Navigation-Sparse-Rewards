@@ -97,7 +97,8 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
                                                    "sha256": digest(Path(mc_benchmark_run) / "summary.json")},
             "qgc_unattended_elf_sha256": qgc["ELF_sha256"], "assets": assets,
             "runtime_libraries": {p: digest(p) for p in RUNTIME_LIBRARIES},
-            "native_command_policy": policy, "renderer_requirement": "hardware"}
+            "native_command_policy": policy,
+            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"]}
 
 
 def candidate(root, **kwargs):

@@ -582,4 +582,21 @@ Linux GPU host, not a relaxation.
   renderer, with every other limit unchanged. Flight timing remains unproven and is judged
   unchanged at Gate B/C.
 
+## P. Contract `p3-acceptance-v1.1` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow as proposed in `8df667d` (llvmpipe only, every other limit
+  unchanged).
+* **Applied:**
+  * `p3_validation.yaml` now has `contract: p3-acceptance-v1.1` and
+    `renderer_requirement: software:llvmpipe`; every numeric limit is unchanged and asserted
+    by a test.
+  * The manifest records the requirement from that file.
+  * The runner passes no D3D12 variables for any gate (inherited ones cannot leak through
+    the allowlist).
+  * The evaluator fails `renderer_not_declared_llvmpipe` for any other renderer.
+  * Gate V is unchanged and still never credits. Gazebo clean-shutdown, sensor, timing,
+    recorder, policy and MC checks are untouched.
+* **Linux:** P2 212, sensor 61, evaluators 34, runtime 64, MC 23. Windows (P3 suites):
+  145 passed, 14 POSIX-only skipped.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**

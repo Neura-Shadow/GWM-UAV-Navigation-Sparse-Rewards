@@ -1,7 +1,8 @@
 # P3 renderer contract revision — proposal `p3-acceptance-v1` → `p3-acceptance-v1.1`
 
-**Status: PROPOSAL ONLY — NOT APPLIED, NOT APPROVED.** P3 remains INCOMPLETE, qualification
-0/3. Validation V gives no acceptance credit.
+**Status: APPROVED by operator Neura-Shadow on 2026-10-25 ("llvmpipe only, every other limit
+unchanged") and APPLIED as proposed.** P3 remains INCOMPLETE, qualification 0/3. Validation V
+gives no acceptance credit.
 
 Date: 2026-10-25. Basis: the operator-authorized ground-only llvmpipe validation V of
 candidate `1e439b44caf24bdb4d1a5386046d84c3a9fb34da0a0bcf43d565b52461edc68f` (commit `6e80422`).

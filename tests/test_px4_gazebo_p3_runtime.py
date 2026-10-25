@@ -566,10 +566,19 @@ def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
     assert main.index("pthread_sigmask") < main.index("agent_instance.create")
 
 
-def test_runtime_environment_selects_wslg_hardware_renderer():
+def test_contract_v1_1_declares_llvmpipe_and_keeps_every_limit():
+    # Operator-approved v1.1 (proposal 8df667d): only the renderer requirement changed.
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.1"
+    assert validation["renderer_requirement"] == "software:llvmpipe"
+    limits = {k: validation[k] for k in ("delivered_hz_min", "processed_hz_min", "source_gap_sim_s",
+                                         "observation_age_sim_s", "state_mismatch_s", "stall_wall_s",
+                                         "graceful_stop_wall_s", "qgc_graceful_stop_wall_s", "qualification_flights")}
+    assert limits == {"delivered_hz_min": 25, "processed_hz_min": 8, "source_gap_sim_s": 0.12,
+                      "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05, "stall_wall_s": 1.0,
+                      "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0, "qualification_flights": 3}
     runner = (SIM / "scripts/p3_runner.py").read_text()
-    assert '"GALLIUM_DRIVER": "d3d12"' in runner and '"MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"' in runner
-    assert 'SOFTWARE_RENDERERS = re.compile(r"llvmpipe|softpipe|swrast|software rasterizer", re.I)' in runner
+    assert "GALLIUM_DRIVER" not in runner and "MESA_D3D12" not in runner
 
 
 def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
@@ -588,15 +597,16 @@ def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
 
 
 @POSIX_ONLY
-def test_validation_gate_v_leaves_d3d12_unset_and_gate_a_sets_it(monkeypatch, tmp_path):
+def test_every_gate_environment_has_no_d3d12_selection(monkeypatch, tmp_path):
     import p3_runner
+    monkeypatch.setenv("GALLIUM_DRIVER", "d3d12")  # an inherited selection must not leak through
+    monkeypatch.setenv("MESA_D3D12_DEFAULT_ADAPTER_NAME", "NVIDIA")
     runner = p3_runner.Runner.__new__(p3_runner.Runner)
     runner.run = tmp_path
-    for gate, expected in (("V", None), ("A", "d3d12")):
+    for gate in ("A", "B", "C", "V"):
         runner.args = p3_runner.argparse.Namespace(gate=gate)
         env = runner.environment()
-        assert env.get("GALLIUM_DRIVER") == expected
-        assert ("MESA_D3D12_DEFAULT_ADAPTER_NAME" in env) == (gate == "A")
+        assert "GALLIUM_DRIVER" not in env and "MESA_D3D12_DEFAULT_ADAPTER_NAME" not in env
 
 
 def test_source_probe_keeps_the_sourced_ros_python_path():

@@ -253,11 +253,8 @@ class Runner:
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
                     "GWM_P3_OWNED_NAMESPACE": "1"})
-        if getattr(getattr(self, "args", None), "gate", None) != "V":
-            # WSLg hardware rendering: Mesa picks llvmpipe for headless EGL unless the
-            # D3D12 driver and the discrete adapter are named (verified with an EGL probe).
-            # Validation V leaves them unset, so Mesa's default llvmpipe renders.
-            env.update({"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"})
+        # Contract v1.1: Mesa's default llvmpipe for every gate. No D3D12 variables are passed
+        # (the WSL D3D12 path faults in Gazebo shutdown; acceptance report sections L-O).
         env.update(extra or {})
         return env
 
