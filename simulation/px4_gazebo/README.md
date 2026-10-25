@@ -324,13 +324,14 @@ No older R2 pass carries into the new R3 streak.
 P3 adds the native OakD-Lite depth camera on `gz_x500_depth` without changing the
 accepted P2 controller (package hash `e1857b3f…` unchanged) or its mission. The
 [P3 contract](../../docs/v3_sim_p3_contract.md) defines the data path, frames,
-fixtures, thresholds, cleanup rules and gates; the
-[acceptance report](../../docs/v3_sim_p3_acceptance_report.md) states what has and
-has not been verified. **No P3 runtime gate has been authorized or executed.**
+fixtures, thresholds, cleanup rules and gates. **P3 is COMPLETE — Contract v1.6 —
+Qualification 3/3 PASSED** (SITL, depth-only flights; no hardware); identities, results and
+verification are in the [final acceptance report](../../docs/v3_sim_p3_final_acceptance_v1_6.md).
 
-Build (no runtime): `build_p3.sh --build`; the MC causal-trace overlay build and
-benchmark; and the unattended QGC build, which now binds `scripts/p3_namespace_owner.py`.
-Then freeze, obtain one explicit authorization per gate and run exactly one gate:
+To produce a new candidate: `build_p3.sh --build`, the MC causal-trace overlay build and
+benchmark, and the unattended QGC build (bound to `scripts/p3_namespace_owner.py`).
+Then freeze, obtain a Policy A approval for that commit and one explicit authorization per
+gate, and run exactly one gate:
 
 ```bash
 python3 simulation/px4_gazebo/scripts/p3_manifest.py freeze \
