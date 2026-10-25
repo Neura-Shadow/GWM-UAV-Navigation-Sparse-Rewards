@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0`: Gate A ACCEPTED (section AB); Gate B not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0`: Gate A accepted, Gate B FAILED on raw depth recorder overflow (section AC); v1.5 recorder-capacity proposal not applied — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -946,4 +946,42 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
 * The v1.4 rules are not exercised on the ground (no EKF reset bracket, no landing). Gate B is
   the first v1.4 flight and needs a separate authorization.
 
-Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0: Gate A accepted; Gate B not run — Qualification 0/3**
+## AC. Gate B of v1.4 candidate `6c00ecb0` — FAILED on raw depth recorder overflow (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-6c00ecb09f2a.json` `c6c000ed…c588`, consumed
+  (marker `601334f4…8193`). Result `state/p3-gate-B-6c00ecb0….result.json` `b94f39b1…f121`,
+  `accepted: false`, `first_failure: smoke:cleanup:sensor-adapter:nonzero_exit_3`, no automatic
+  retry, next gate not started. Run `20261025T133925Z-p3-flight-b4436533`, 13:39:12–13:41:55 UTC;
+  runtime exit 0, no leftover processes. Evaluation `08430a15…a781` failed.
+* **Flight:** unchanged P2 mission to `COMPLETE` (sim 105.51 s), on D3D12 with RGB absent and
+  verified (monitor and snapshots passed). P2 flight acceptance passed; `vehicle_land_detected`
+  wall gaps p50 1.000 s, p95 1.006 s, maximum 1.076 s (limit 2 s); RTF 0.995; MC causality
+  verified; native commands passed policy A (1 × 401, 34 × 512) with **v1.4 rule 2 exercised
+  for the first time**: 6 landing self-commands allowed (rows a 4, b 1, c 1) inside
+  `REQUEST_LAND`→`COMPLETE`. No EKF reset bracket occurred in the window (0 bracketed).
+* **Primary failure (sensor acquisition):** the adapter's raw recorder (queue capacity 8)
+  overflowed for **9 frames at sim 45.180–45.676 s** (`EAST_TEST`). One write took 0.209 s, and
+  receipt-to-write latency reached 0.544 s (p50 0.013 s over the run, the same as in v1.3).
+  `adapter-result.json`: `failed`, `raw_recorder_overflow`; recorder `overflow 9`, `max_queue 8`,
+  `complete: false`. Invariant: `recorder_overflow_allowed = 0`, `recorded_fraction_required = 1.0`
+  (measured 0.99681). ROS itself delivered all 3,301 frames (maximum receipt gap 0.139 s wall).
+* **Secondary consequences:** the adapter exits 3 when its result failed, by design, so
+  `cleanup:sensor-adapter:nonzero_exit_3` appears at shutdown, about 70 s later; it is listed
+  first but is not the cause. `adapter_result_not_passed`, `raw_recorder_incomplete`,
+  `source_to_ros_delivery_loss` and `ros_receipts_not_in_native_ledger` (2,815 of 2,824 window
+  frames) all count the same 9 frames. `state_association_incomplete`: 4 in-window observations
+  at sim 45.212–45.476 s were `pending_newer_state`, because the same stall delayed the PX4 state
+  messages.
+* **Context:** from monotonic 138811.3 to 138814.4 s, every owned process's CPU rate rose
+  1.5–1.8× together (Gazebo 1.0→1.8, adapter 0.8→1.65, PX4, controller, bridge, QGC, probe) on
+  24 cores, with no saturation and memory steady. This is consistent with a host-level slowdown;
+  its cause is not identifiable from run evidence. The v1.3 flight was flat at the same mission
+  point (recorder `max_queue` 1).
+* **Proposal (not applied):** [v1.5](v3_sim_p3_recorder_capacity_v1_5_proposal.md) raises
+  `recorder_capacity` 8 → 32, sized to the existing 1.0 s stall limit at 30.31 Hz, with
+  `recorder_overflow_allowed` kept at 0. It would not by itself have passed this run: the four
+  `pending_newer_state` observations remain an open operator decision.
+* The failed result and all evidence are preserved. This candidate cannot run Gate B again
+  (results are never overwritten). P3 remains INCOMPLETE; qualification 0/3.
+
+Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0: Gate A accepted; Gate B failed on raw depth recorder overflow during a host-level slowdown (flight, P2, timing, MC, RGB absence and policy A incl. v1.4 landing rule passed); v1.5 recorder-capacity proposal not applied — Qualification 0/3**
