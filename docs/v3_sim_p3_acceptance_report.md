@@ -304,4 +304,25 @@ frozen manifest by the operator.
    explicit Gate A authorization for that manifest SHA.
 5. Gazebo abnormal-exit risk stays open. A non-zero or signal exit fails Gate A cleanup.
 
+## G. Build, policy approval and frozen candidate (2026-10-25)
+
+* **Historical receipt preserved:** `state/archive/p3-built-20260912-historical.json` `214f1149…f355`.
+* **First `build_p3.sh --build`** refused: the SDF-derived base origin was z=0, but the config
+  says 0.24. `sdf_chain` ignored an included model's own `<pose>`, which pinned `x500_base`
+  uses. This was fixed in `0d38eec`; the config values were correct and are unchanged, and a
+  regression test now mirrors the pinned layout.
+* **Second build passed:** sensor package `f6605fb7…5944`, colcon tests 2/2, extrinsic
+  re-derived from the pinned SDF matches `p3_sensors.yaml`; `state/p3-built.json` `ae3ea317…804a`.
+* **Linux regressions on `0d38eec`:** P2 212, P3 sensor 61, evaluators 26, runtime 55, MC 23,
+  all passed.
+* **Policy A** approved by operator **Neura-Shadow** for this candidate only (policy
+  unchanged, `ea307bf5…1295`). Receipt `state/p3-policy-A-approval-0d38eec.json`
+  `0b24a8aa…26d4`, bound to commit `0d38eec` and QGC ELF `82994283…6d03`.
+* **Frozen candidate:** `state/p3-candidate-0d38eec.json`, canonical manifest SHA-256
+  **`c4b00bedf07b4c87867346b95ef3bc6d12ab28ec891e1f96ded99477fd73e3d1`** (file `f789d007…97bc`).
+  `p3_manifest.py verify` recomputes all inputs to the same SHA. It binds 96 source files,
+  8 MC sources, 5 build receipts, the QGC ELF, MC benchmark
+  `20261025T051926Z-mc-trace-benchmark-e6000074`, 44 pinned assets, 4 runtime libraries,
+  policy A and 3 qualification flights. Execution is not allowed without authorization.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
