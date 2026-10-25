@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.6 candidate `1e205fec`: Gate A ACCEPTED (section AI); Gate B not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.6 candidate `1e205fec`: Gate A and Gate B ACCEPTED (sections AI, AJ); Gate C not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1175,4 +1175,28 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   before that comparison), so Gate B is the first run that exercises it. Gate B needs a separate
   authorization.
 
-Final status: **P3 INCOMPLETE — v1.6 candidate 1e205fec: Gate A accepted; Gate B not run — Qualification 0/3**
+## AJ. Gate B of v1.6 candidate `1e205fec` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-1e205feca482.json` `a74c875b…a638`, consumed
+  (marker `81c00bda…d0bf`). Result `state/p3-gate-B-1e205fec….result.json` `52cbd099…1e2a`,
+  `accepted: true`, `acceptance_credit: true`, no first failure, no automatic retry, next gate not
+  started. Run `20261025T160901Z-p3-flight-a8b0f181`, 16:08:46–16:11:30 UTC; runtime exit 0;
+  evaluation `58aeb104…` passed with no failures; no leftover processes.
+* **Flight:** the unchanged P2 mission reached `COMPLETE` (sim 105.56 s) on `D3D12 (NVIDIA GeForce
+  RTX 4060 Laptop GPU)`. P2 flight acceptance passed (landed and disarmed, commands
+  [176, 400, 21], no failsafe); yaw ownership passed. **v1.6 pairing exercised:** 5,017 ROS/ULog
+  position pairs, maximum difference 0, 0 duplicate timestamps. `vehicle_land_detected` wall gaps
+  p50 1.000 s, p95 1.001 s, maximum 1.008 s (0 above 1.8 s); RTF 0.998; MC causality verified.
+* **Depth:** source 30.30 Hz, maximum gap 0.036 s; 2,813/2,813 frames delivered and recorded;
+  maximum receipt gap 0.057 s wall; 928 observations at 10.00 Hz, maximum age 0.064 s;
+  association 928/928 `matched`, 0 reset-bracketed. Recorder complete, 0 overflow, maximum queue
+  1. RGB absent and verified (`depth_only_flight`; not RGB throughput evidence).
+* **Native commands:** policy A passed with 0 violations: 1 × 401, 34 × 512, and 6 v1.4 landing
+  self-commands (rows a 4, b 1, c 1).
+* Every owned process was classified graceful. Maximum 1-minute load 7.69 (higher than earlier
+  flights, 4.2–4.5), with no effect on any limit (recorder queue ≤ 1, maximum receipt gap 0.057 s).
+* Not exercised: no EKF reset bracket, no duplicate ULog timestamp, no host slowdown. Gate B is a
+  smoke flight and does not count toward qualification. Gate C (three consecutive qualification
+  flights) needs a separate authorization.
+
+Final status: **P3 INCOMPLETE — v1.6 candidate 1e205fec: Gate A and Gate B accepted; Gate C not run — Qualification 0/3**
