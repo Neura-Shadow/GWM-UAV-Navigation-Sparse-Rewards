@@ -62,10 +62,14 @@ class StateHistory:
         # both candidates have the same |delta|, which is within the unchanged tolerance.
         # A bracket spanning a reset epoch cannot be associated with confidence.
         if self.epoch_keys:
-            before = [v for s, v in self.samples if s <= acquisition_us][-1:]
-            after = [v for s, v in self.samples if s >= acquisition_us][:1]
-            if before and after and self.epoch(before[0]) != self.epoch(after[0]):
-                return {"status": "reset_epoch_bracket"}
+            before = [(s, v) for s, v in self.samples if s <= acquisition_us][-1:]
+            after = [(s, v) for s, v in self.samples if s >= acquisition_us][:1]
+            if before and after and self.epoch(before[0][1]) != self.epoch(after[0][1]):
+                # Contract v1.4: record the bracketing samples so the evaluator can verify
+                # (and independently corroborate) the single PX4 reset; the decision is unchanged.
+                return {"status": "reset_epoch_bracket",
+                        "before": {"timestamp_us": before[0][0], "epoch": dict(zip(self.epoch_keys, self.epoch(before[0][1])))},
+                        "after": {"timestamp_us": after[0][0], "epoch": dict(zip(self.epoch_keys, self.epoch(after[0][1])))}}
         reused = self.last_used == stamp
         self.last_used = stamp
         return {"status": "matched", "timestamp_us": stamp, "delta_s": (stamp - acquisition_us) / 1e6,

@@ -66,7 +66,11 @@ def native_commands(run, summary, f, out):
     effective = summary["native_command_policy"]
     startup_end = summary["startup"]["origin_monotonic_ns"] + int(
         effective["policy"].get("startup_wall_s", 0) * 1e9)
-    result = evaluate_policy(closed, effective, startup_end)
+    # Contract v1.4 rule 2: the landing phase is the controller's own REQUEST_LAND..COMPLETE window.
+    transitions = {t["to"]: t["monotonic_s"] for t in (summary.get("controller_result") or {}).get("transitions", [])}
+    landing = ((int(transitions["REQUEST_LAND"] * 1e9), int(transitions["COMPLETE"] * 1e9))
+               if "REQUEST_LAND" in transitions and "COMPLETE" in transitions else None)
+    result = evaluate_policy(closed, effective, startup_end, landing)
     out["native_commands"] = result
     f.items += ["native_commands:" + item for item in result["failures"]]
 

@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import time
 import xml.etree.ElementTree as ET
 import zlib
 
@@ -306,6 +307,24 @@ def test_association_rejects_reset_epoch_bracket():
     assert a.associate(1_012_000)["status"] == "position:reset_epoch_bracket"
 
 
+def test_reset_epoch_bracket_records_the_bracketing_samples():
+    # Contract v1.4: the refusal itself is unchanged; the bracket is recorded for the evaluator.
+    a = associator_with([1_000_000, 1_020_000], heading_reset=lambda t: 0 if t < 1_010_000 else 1)
+    position = a.associate(1_012_000)["position"]
+    assert position["status"] == "reset_epoch_bracket" and "value" not in position
+    assert position["before"]["timestamp_us"] == 1_000_000 and position["after"]["timestamp_us"] == 1_020_000
+    assert position["before"]["epoch"]["heading_reset_counter"] == 0
+    assert position["after"]["epoch"]["heading_reset_counter"] == 1
+    assert set(position["after"]["epoch"]) == set(association.RESET_KEYS)
+    attitude = association.Associator(300, 0.05)
+    for t, counter in ((1_000_000, 1), (1_020_000, 2)):
+        attitude.add_attitude({"timestamp": t, "timestamp_sample": t, "q": yaw_quaternion(0.1),
+                               "quat_reset_counter": counter})
+    assert attitude.attitude.match(1_010_000) == {
+        "status": "reset_epoch_bracket", "before": {"timestamp_us": 1_000_000, "epoch": {"quat_reset_counter": 1}},
+        "after": {"timestamp_us": 1_020_000, "epoch": {"quat_reset_counter": 2}}}
+
+
 def test_association_duplicates_and_reuse_reported():
     a = associator_with([1_000_000, 1_000_000, 1_020_000])
     assert a.position.counts["duplicate"] == 1
@@ -351,6 +370,24 @@ def test_recorder_overflow_is_sticky_incomplete(tmp_path):
     gate.set()
     closed = rec.close(10)
     assert not closed["complete"] and closed["overflow"] >= 1
+
+
+def test_recorder_capacity_32_queues_32_frames_and_overflows_on_the_33rd(tmp_path, config):
+    # Contract v1.5: with the writer blocked on one in-flight frame, exactly recorder_capacity frames queue.
+    import threading
+    assert config["recorder_capacity"] == 32
+    gate = threading.Event()
+    rec = recorder.RawRecorder(tmp_path, config["recorder_capacity"], clock=lambda: (gate.wait(10), 0.0)[1])
+    assert rec.submit({"receipt_id": 0}, b"x" * 10)
+    deadline = time.monotonic() + 5
+    while rec.queue.qsize() and time.monotonic() < deadline:  # the writer takes the first frame and blocks
+        time.sleep(0.005)
+    assert all(rec.submit({"receipt_id": i}, b"x" * 10) for i in range(1, 33))
+    assert rec.max_queue == 32 and rec.overflow == 0
+    assert rec.submit({"receipt_id": 33}, b"x" * 10) is False and rec.overflow == 1
+    gate.set()
+    closed = rec.close(10)
+    assert closed["written"] == 33 and closed["overflow"] == 1 and not closed["complete"]
 
 
 # Pipeline ----------------------------------------------------------------------------------------

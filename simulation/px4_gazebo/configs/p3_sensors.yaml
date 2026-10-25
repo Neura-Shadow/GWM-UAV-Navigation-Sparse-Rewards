@@ -33,7 +33,7 @@
   "source_age_sim_s": 0.25,
   "stall_wall_s": 1.0,
   "poll_wall_s": 0.02,
-  "recorder_capacity": 8,
+  "recorder_capacity": 32,
   "recorder_compression": "zlib-1",
   "recorder_close_wall_s": 10.0,
   "state_capacity": 300,

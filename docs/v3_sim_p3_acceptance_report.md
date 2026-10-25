@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A accepted, Gate B failed in evaluation with flight timing passed (section Z) — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3`: Gates A and B accepted; Gate C FAILED at qualification-2 on a P2-evaluator duplicate-timestamp collision (section AG) — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -875,4 +875,238 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
      command policy; no policy changed.
 * P3 remains INCOMPLETE; qualification 0/3. No further gate was started.
 
-Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A accepted; Gate B failed in evaluation (flight timing passed: land_detected maximum 1.012 s) on a snapshot defect, one reset-bracketed depth frame and PX4 landing self-commands — Qualification 0/3**
+## AA. Contract `p3-acceptance-v1.4` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in `docs/v3_sim_p3_contract_v1_4_proposal.md`
+  (commit `26bf5f7`).
+* **Applied (offline only):**
+  * `p3_validation.yaml` (`2ce6bf22…`): contract `p3-acceptance-v1.4`, revision text, and
+    `state_association.reset_epoch_bracket` {allowed statuses `attitude:`/`position:reset_epoch_bracket`,
+    `max_per_reset_event` 1, span limit key `state_mismatch_s`, corroboration
+    `controller_ros_events_reset_counter_in_bracket`}. Every numeric limit is identical (test
+    asserts the complete set); `p3_sensors.yaml`, the bridge, the D3D12 profile, the shim,
+    `p2_control.yaml` and the P2 controller package are byte-identical.
+  * `p3_native_command_policy.json` (`7a7be282…`): policy A gains `vehicle_landing_self_commands`
+    (message 76, 72/1→72/0, phase `REQUEST_LAND`→`COMPLETE`, ≤4 per payload, rows a/b/c).
+    `strict_zero` and the GCS allowance (1×401, 34×512, 75 s) are unchanged. **New policy A
+    canonical SHA-256 `bf1ef9b1080a52eab1673ac2a1ac6e20d30cfa7fd85b703cae8433dc55f7b3b0`**; the
+    previous approval `ea307bf5…` does not cover it.
+  * Adapter (`association.py`): a `reset_epoch_bracket` refusal now also records `before`/`after`
+    `{timestamp_us, epoch}`; the decision is unchanged. Sensor package rebuilt:
+    **`c5d374137f6556df710c310f8eec994c778c297174b5407866c0d582f820c9b6`** (receipt
+    `41bf4f87…`); the previous receipt (`3a5bd685…`, `f34b6874…`) is preserved in
+    `state/archive/p3-built-3a5bd685.json`.
+  * Evaluators: `p3_stream_eval.evaluate_reset_brackets` implements rule 1 (recorded bracket,
+    single +1 reset, `ros-events.jsonl` corroboration, ≤1 per (state, reset), accounting);
+    `p3_mavlink.evaluate_policy` implements rule 2 with the landing window that
+    `p3_evaluate.native_commands` takes from `controller-result.json`.
+* **Tests:** rule 1 — a corroborated attitude or position bracket passes and is counted; an
+  uncorroborated bracket, a 0.051 s span, a +2 step, a multi-key change, two frames for one
+  reset, `estimate_invalid` and other non-matched statuses fail; a bracket fails without the v1.4
+  rule. Rule 2 — the observed landing sequence passes (6 frames); before `REQUEST_LAND`, after
+  `COMPLETE`, a wrong payload, a wrong target component, a fifth copy, no landing window and
+  `strict_zero` fail. Adapter bracket output; v1.4 config and policy identity. Linux: P2 212,
+  sensor 62, evaluators 63, runtime 87, MC 23. Windows (P3 + MC suites): 216 passed, 19
+  POSIX-only skipped. The dry candidate dependency check resolves all six receipts.
+* **Read-only diagnostic (not credited, run directory verified unchanged):** applied to the
+  retained v1.3 Gate B capture, rule 2 classifies the six landing frames as allowed (rows 4/1/1)
+  with the GCS allowance unchanged; the controller ledger records the 22.184 s attitude reset as
+  a single `quat_reset_counter` 1→2 step. That run's adapter predates the bracket output, so it
+  is not re-evaluated under rule 1 and stays failed.
+* **v1.4 candidate:** Policy A (`bf1ef9b1…`) was re-approved by Neura-Shadow for `5393103`
+  (receipt `state/p3-policy-A-approval-5393103.json`, `2974a296…7a28`). Preflight: sensor package
+  receipt matches the current source (`c5d37413…`), DDS agent binary and QGC ELF intact with the
+  owner bound, the five WSL D3D12 libraries match their pins, 792.8 GiB free, no simulation
+  processes. Manifest `state/p3-candidate-5393103.json`, canonical SHA-256
+  **`6c00ecb09f2a2c4bc684e323d2342ab2d33d2d838d2f1196b2b6c065252b70d2`** (file `15f5e16d…a3aa`):
+  contract v1.4, `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build `7542919c…` (the runtime
+  selection matches the frozen build), benchmark `20261025T051926Z-mc-trace-benchmark-e6000074`,
+  QGC ELF `82994283…`, `p3_validation.yaml` `2ce6bf22…`, policy file `7a7be282…`, sensor
+  receipt canonical `77f4fa34…`. `verify` and `verify_current` reproduce it, execution without
+  authorization is false, and no authorization, consumption, result or run artifact exists for
+  it. Gate A has not been run.
+
+## AB. Gate A of v1.4 candidate `6c00ecb0` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-6c00ecb09f2a.json` `ca22473f…2925`, consumed.
+  Result `state/p3-gate-A-6c00ecb0….result.json` `3d96d4da…d27b`, `accepted: true`,
+  `acceptance_credit: true`. Run 13:29:30–13:36:50 UTC; no leftover processes.
+* **Readiness** `20261025T132943Z-p3-readiness-53edf801` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.075 s wall, 454 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.072 s; association 150/150
+  `matched`, 0 reset-bracketed. Native commands passed policy A (1 × 401, 34 × 512; 0 landing
+  self-commands, as expected on the ground); MC causality `verified`. Readiness RTF 0.631 with
+  the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum receipt stall ≤ 0.069 s.
+* Every owned process (Gazebo, sensor bridge/adapter, probe, clock bridge; at readiness also PX4,
+  DDS agent, QGC and the controller) was classified graceful in all 8 runs.
+* The v1.4 rules are not exercised on the ground (no EKF reset bracket, no landing). Gate B is
+  the first v1.4 flight and needs a separate authorization.
+
+## AC. Gate B of v1.4 candidate `6c00ecb0` — FAILED on raw depth recorder overflow (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-6c00ecb09f2a.json` `c6c000ed…c588`, consumed
+  (marker `601334f4…8193`). Result `state/p3-gate-B-6c00ecb0….result.json` `b94f39b1…f121`,
+  `accepted: false`, `first_failure: smoke:cleanup:sensor-adapter:nonzero_exit_3`, no automatic
+  retry, next gate not started. Run `20261025T133925Z-p3-flight-b4436533`, 13:39:12–13:41:55 UTC;
+  runtime exit 0, no leftover processes. Evaluation `08430a15…a781` failed.
+* **Flight:** unchanged P2 mission to `COMPLETE` (sim 105.51 s), on D3D12 with RGB absent and
+  verified (monitor and snapshots passed). P2 flight acceptance passed; `vehicle_land_detected`
+  wall gaps p50 1.000 s, p95 1.006 s, maximum 1.076 s (limit 2 s); RTF 0.995; MC causality
+  verified; native commands passed policy A (1 × 401, 34 × 512) with **v1.4 rule 2 exercised
+  for the first time**: 6 landing self-commands allowed (rows a 4, b 1, c 1) inside
+  `REQUEST_LAND`→`COMPLETE`. No EKF reset bracket occurred in the window (0 bracketed).
+* **Primary failure (sensor acquisition):** the adapter's raw recorder (queue capacity 8)
+  overflowed for **9 frames at sim 45.180–45.676 s** (`EAST_TEST`). One write took 0.209 s, and
+  receipt-to-write latency reached 0.544 s (p50 0.013 s over the run, the same as in v1.3).
+  `adapter-result.json`: `failed`, `raw_recorder_overflow`; recorder `overflow 9`, `max_queue 8`,
+  `complete: false`. Invariant: `recorder_overflow_allowed = 0`, `recorded_fraction_required = 1.0`
+  (measured 0.99681). ROS itself delivered all 3,301 frames (maximum receipt gap 0.139 s wall).
+* **Secondary consequences:** the adapter exits 3 when its result failed, by design, so
+  `cleanup:sensor-adapter:nonzero_exit_3` appears at shutdown, about 70 s later; it is listed
+  first but is not the cause. `adapter_result_not_passed`, `raw_recorder_incomplete`,
+  `source_to_ros_delivery_loss` and `ros_receipts_not_in_native_ledger` (2,815 of 2,824 window
+  frames) all count the same 9 frames. `state_association_incomplete`: 4 in-window observations
+  at sim 45.212–45.476 s were `pending_newer_state`, because the same stall delayed the PX4 state
+  messages.
+* **Context:** from monotonic 138811.3 to 138814.4 s, every owned process's CPU rate rose
+  1.5–1.8× together (Gazebo 1.0→1.8, adapter 0.8→1.65, PX4, controller, bridge, QGC, probe) on
+  24 cores, with no saturation and memory steady. This is consistent with a host-level slowdown;
+  its cause is not identifiable from run evidence. The v1.3 flight was flat at the same mission
+  point (recorder `max_queue` 1).
+* **Proposal (not applied):** [v1.5](v3_sim_p3_recorder_capacity_v1_5_proposal.md) raises
+  `recorder_capacity` 8 → 32, sized to the existing 1.0 s stall limit at 30.31 Hz, with
+  `recorder_overflow_allowed` kept at 0. It would not by itself have passed this run: the four
+  `pending_newer_state` observations remain an open operator decision.
+* The failed result and all evidence are preserved. This candidate cannot run Gate B again
+  (results are never overwritten). P3 remains INCOMPLETE; qualification 0/3.
+
+## AD. Contract `p3-acceptance-v1.5` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in
+  `docs/v3_sim_p3_recorder_capacity_v1_5_proposal.md` (commit `3593ae5`).
+* **Applied (offline only):**
+  * `p3_sensors.yaml` (`6c3038fe…` → `e02ae2a4…`): `recorder_capacity` 8 → 32, the only edit.
+    Every other key is identical (a test pins the canonical hash of the file with the old value
+    restored).
+  * `p3_validation.yaml` (`2ce6bf22…` → `2bb85189…`): contract `p3-acceptance-v1.5` and the
+    revision sentence. Every numeric limit is identical, including `recorder_overflow_allowed` 0,
+    `recorded_fraction_required` 1.0 and `stall_wall_s` 1.0. The v1.4 rules are unchanged.
+  * `p3_native_command_policy.json` is unchanged, so the policy A canonical SHA-256 stays
+    `bf1ef9b1…`. Its approval is per candidate, so it still needs re-approval for the v1.5 commit.
+  * The sensor package is unchanged and not rebuilt: the receipt `c5d37413…` matches the current
+    source.
+* **Tests:** v1.5 contract identity; `recorder_capacity == 32 == ⌈1.0 s × 30.31 Hz⌉ + 1`;
+  `p3_sensors.yaml` is otherwise identical to v1.4; overflow allowance 0; with the writer blocked
+  on one frame, exactly 32 frames queue and the 33rd overflows (sticky, recording incomplete).
+  Linux: P2 212, sensor 63, evaluators 63, runtime 88, MC 23. Windows (P3 + MC suites): 218
+  passed, 19 POSIX-only skipped. The dry candidate dependency check resolves all six receipts.
+* **Still open (unchanged by v1.5):** a host slowdown like the one in section AC can still
+  produce `pending_newer_state` associations that fail `state_association_incomplete`.
+* **v1.5 candidate:** Policy A (`bf1ef9b1…`, content unchanged) was re-approved by Neura-Shadow
+  for `a2d74bd` (receipt `state/p3-policy-A-approval-a2d74bd.json`, `be7dcfbb…c13d`). Preflight:
+  the sensor package receipt matches the current source (`c5d37413…`), the DDS agent binary and
+  QGC ELF are intact with the owner bound, the five WSL D3D12 libraries match their pins, 791.7 GiB
+  is free and no simulation processes are running. Manifest `state/p3-candidate-a2d74bd.json`,
+  canonical SHA-256 **`a0deb4d3f1f9624f0a38893303c6984eeae1e20094e186240fdd53f925e3d125`** (file
+  `3bf7c7d7…b75b`): contract v1.5, `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build
+  `7542919c…` (the runtime selection matches the frozen build), benchmark
+  `20261025T051926Z-mc-trace-benchmark-e6000074`, QGC ELF `82994283…`, `p3_sensors.yaml`
+  `e02ae2a4…`, `p3_validation.yaml` `2bb85189…`, policy file `7a7be282…`, sensor receipt canonical
+  `77f4fa34…`. `verify` and `verify_current` reproduce it, execution without authorization is
+  false, and no authorization, consumption, result or run artifact exists for it. Gate A has not
+  been run.
+
+## AE. Gate A of v1.5 candidate `a0deb4d3` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-a0deb4d3f1f9.json` `0c8fdaf4…2820`, consumed.
+  Result `state/p3-gate-A-a0deb4d3….result.json` `c9a8d91e…5a19`, `accepted: true`,
+  `acceptance_credit: true`. Run 15:20:41–15:27:54 UTC; no leftover processes.
+* **Readiness** `20261025T152055Z-p3-readiness-3b929fe3` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.089 s wall, 455 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.076 s, association 150/150
+  `matched`. Native commands passed policy A (1 × 401, 34 × 512); MC causality `verified`;
+  readiness RTF 0.669 with the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum receipt stall ≤ 0.070 s.
+* **Recorder (v1.5 capacity 32):** complete with 0 overflow in all 8 runs; maximum queue depth 2
+  (readiness) or 1 (fixtures); maximum single write 0.030 s.
+* Every owned process was classified graceful in all 8 runs.
+* The v1.5 capacity and the v1.4 rules are not stressed on the ground. Gate B is the first v1.5
+  flight and needs a separate authorization.
+
+## AF. Gate B of v1.5 candidate `a0deb4d3` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-a0deb4d3f1f9.json` `c8e3bae6…61d1`, consumed
+  (marker `3d8d6db1…6153`). Result `state/p3-gate-B-a0deb4d3….result.json` `570828bd…6bb2`,
+  `accepted: true`, `acceptance_credit: true`, no first failure, no automatic retry, next gate not
+  started. Run `20261025T152928Z-p3-flight-6e322ae9`, 15:29:16–15:31:57 UTC; runtime exit 0;
+  evaluation `dd6872e8…` passed with no failures; no leftover processes.
+* **Flight:** the unchanged P2 mission reached `COMPLETE` (sim 105.94 s) on `D3D12 (NVIDIA GeForce
+  RTX 4060 Laptop GPU)`. P2 flight acceptance passed (landed and disarmed, commands
+  [176, 400, 21], no failsafe). `vehicle_land_detected` wall gaps p50 1.000 s, p95 1.001 s,
+  maximum 1.004 s (limit 2 s, 0 above 1.8 s); RTF 0.998. MC causality verified.
+* **Depth (flight window):** source 30.30 Hz, maximum gap 0.036 s; 2,828 of 2,828 frames delivered
+  and recorded (fraction 1.0); maximum receipt gap 0.085 s wall; 934 observations at 10.01 Hz,
+  maximum age 0.092 s; association 934/934 `matched`, 0 reset-bracketed. Recorder (capacity 32)
+  complete, 0 overflow, maximum queue 2, maximum write 0.046 s; adapter `passed`.
+* **RGB:** absent and verified (`rgb_workload: depth_only_flight`; the absence monitor and the
+  snapshots passed). This is not flight RGB throughput evidence.
+* **Native commands:** policy A passed with 0 violations: 1 × 401, 34 × 512, and 6 v1.4 landing
+  self-commands (rows a 4, b 1, c 1) inside `REQUEST_LAND`→`COMPLETE`.
+* Every owned process (QGC, DDS agent, PX4, Gazebo, both bridges, probe, adapter, controller) was
+  classified graceful. Maximum 1-minute load 4.17.
+* **Not exercised in this flight:** no host slowdown occurred (recorder queue ≤ 2), so the v1.5
+  headroom was not stressed; no EKF reset bracketed an observation, so v1.4 rule 1 was not
+  exercised. Gate B is a smoke flight and does not count toward qualification. Gate C (three
+  consecutive qualification flights) needs a separate authorization.
+
+## AG. Gate C of v1.5 candidate `a0deb4d3` — FAILED at qualification-2 (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-C-a0deb4d3f1f9.json` `27ac2ac6…cafa`, consumed
+  (marker `9c045653…1dc1`). Result `state/p3-gate-C-a0deb4d3….result.json` `601235d9…bf03`,
+  `accepted: false`, `first_failure: qualification-2:p2_evaluator_error:ValueError:ROS/ULog
+  estimator mismatch`, no automatic retry. Run 15:33:23–15:38:40 UTC; qualification-3 was not
+  started; no leftover processes. Qualification stays 0/3, because the three flights must be
+  consecutive within one Gate C.
+* **qualification-1** `20261025T153335Z-p3-flight-5f89e686`: **passed** (evaluation `5715a8dd…`).
+  `COMPLETE` at sim 105.40 s; P2 flight acceptance passed; `vehicle_land_detected` maximum gap
+  1.095 s; RTF 0.996; MC verified (13,805 paired updates, yaw error 0.0); depth 2,810/2,810
+  recorded, 928/928 matched; recorder overflow 0 (maximum queue 3); policy A with 6 landing
+  self-commands; RGB absence verified; all processes graceful.
+* **qualification-2** `20261025T153613Z-p3-flight-51e74376`: the flight reached `COMPLETE` (sim
+  105.83 s), with `vehicle_land_detected` maximum gap 1.005 s, RTF 0.998, depth 2,821/2,821
+  recorded, recorder overflow 0, policy A with 6 landing self-commands, RGB absence verified and
+  all processes graceful. **v1.4 rule 1 was exercised for the first time:** one observation
+  (acquisition 22.540 s) was `position:reset_epoch_bracket` across `heading_reset_counter` 1→2
+  (bracket 22.536–22.560 s), corroborated by the controller ledger at 22.560 s and correctly
+  accepted (930 matched + 1 bracketed).
+* **Primary failure (evaluation, accepted P2 evaluator):** `collect_p2_evidence.verify` indexes
+  ULog `vehicle_local_position` by `timestamp` alone (`u_by_t`) and requires |Δx, Δy, Δz| < 1e-6
+  for every ROS sample with the same `timestamp`. PX4 logged **two different estimates with the
+  same `timestamp` 15.680000 s** (ULog rows 1356/1357, `timestamp_sample` 15.644000 and
+  15.680000 s, during TAKEOFF). The dictionary kept the second one. ROS had received the first,
+  and it matches that ULog row bit-exactly (x, y, z and `timestamp_sample`); its difference from
+  the second row is 3.95e-4 m. The evaluator raised `ROS/ULog estimator mismatch`, but the
+  estimator data agree: this is a key collision in the evaluator. Invariant affected: P2
+  recording integrity (exact ROS/ULog epoch match).
+* **Secondary:** `mc_causal_yaw:failed` (`KeyError: 'handover_start_sim_s'`). `p3_evaluate`
+  takes the yaw-ownership handover window from the P2 report, which was never produced, so the MC
+  trace itself was not evaluated.
+* **Frequency (read-only check of retained ULogs, not credited):** a duplicate-`timestamp` pair
+  appears in 2 of the last 5 P3 flights: qualification-1 at 71.516 s (ROS did not receive that
+  sample, so no collision) and qualification-2. It appears in neither v1.4/v1.5 Gate B flight nor
+  in the v1.3 Gate B flight. ROS carries about 39 % of the ULog samples, so a collision occurs only
+  when the bridged sample is the earlier of the pair.
+* **Correction needed (not applied):** the defect is in the accepted P2 evaluator, so fixing it
+  requires an operator decision. The smallest change keys the ULog lookup by (`timestamp`,
+  `timestamp_sample`), or requires the ROS sample to match one of the ULog rows carrying its
+  `timestamp`, keeping the 1e-6 tolerance and the 100-sample minimum. The failed result and all
+  evidence are preserved. This candidate cannot run Gate C again.
+
+Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gates A and B accepted; Gate C failed at qualification-2 on a P2-evaluator duplicate-timestamp collision (qualification-1 passed) — Qualification 0/3**

@@ -180,7 +180,14 @@ def evaluate_stream(run, window, limits, sensors_config, require_association=Fal
         out["association_equidistant_ties_earlier"] = {
             part: sum(1 for o in window_obs if o["association"].get(part, {}).get("equidistant_tie_earlier"))
             for part in ("position", "attitude")}
-        f.check(window_obs and statuses.get("matched", 0) == len(window_obs), "state_association_incomplete")
+        bracket_rule = (limits.get("state_association") or {}).get("reset_epoch_bracket")
+        bracketed = [o for o in window_obs if bracket_rule
+                     and o["association"]["status"] in bracket_rule["allowed_statuses"]]
+        f.check(window_obs and statuses.get("matched", 0) + len(bracketed) == len(window_obs),
+                "state_association_incomplete")
+        if bracketed:
+            out["reset_bracketed"] = evaluate_reset_brackets(run, bracketed, bracket_rule, limits, f)
+        out["reset_bracketed_observations"] = len(bracketed)
         deltas = [abs(o["association"]["position"]["delta_s"]) for o in window_obs
                   if o["association"]["status"] == "matched"]
         f.check(not deltas or max(deltas) <= limits["state_mismatch_s"], "state_association_mismatch")
@@ -197,6 +204,85 @@ def evaluate_stream(run, window, limits, sensors_config, require_association=Fal
     out["failures"] = f.items
     out["status"] = "passed" if not f.items else "failed"
     return out
+
+
+RESET_EPOCHS = {"position": ("vehicle_local_position",
+                             ("xy_reset_counter", "z_reset_counter", "heading_reset_counter", "ref_timestamp")),
+                "attitude": ("vehicle_attitude", ("quat_reset_counter",))}
+
+
+def recorded_resets(run, topic_key, keys):
+    """Epoch steps on one PX4 topic, from the controller's own received-message ledger."""
+    steps, previous = [], None
+    for row in strict_jsonl(Path(run) / "ros-events.jsonl"):
+        if row.get("event") != "received" or row.get("topic_key") != topic_key:
+            continue
+        fields = row["fields"]
+        epoch = {key: fields.get(key) for key in keys}
+        if previous is not None and epoch != previous:
+            steps.append({"timestamp_sample_us": int(fields.get("timestamp_sample") or fields["timestamp"]),
+                          "before": previous, "after": epoch})
+        previous = epoch
+    return steps
+
+
+def single_reset_step(before, after, keys):
+    """The one changed epoch key, or None: counters must step by exactly +1, ref_timestamp may change."""
+    if set(before) != set(keys) or set(after) != set(keys):
+        return None
+    changed = [key for key in keys if before[key] != after[key]]
+    if len(changed) != 1:
+        return None
+    key = changed[0]
+    if key != "ref_timestamp":
+        b, a = before[key], after[key]
+        if not (isinstance(b, int) and isinstance(a, int) and not isinstance(b, bool)
+                and not isinstance(a, bool) and a == b + 1):
+            return None
+    return key
+
+
+def evaluate_reset_brackets(run, bracketed, rule, limits, f):
+    """Contract v1.4 rule 1: a reset_epoch_bracket observation is acceptable only at one recorded,
+    single-key, independently corroborated PX4 reset, at most once per (state, reset event)."""
+    span_us = int(round(limits[rule["bracket_span_limit_key"]] * 1e6))
+    ledgers = {state: recorded_resets(run, topic, keys) for state, (topic, keys) in RESET_EPOCHS.items()}
+    per_event, details = {}, []
+    for o in bracketed:
+        acquisition_us = int(o["acquisition_stamp_ns"] // 1000)
+        parts = {state: o["association"].get(state) or {} for state in RESET_EPOCHS}
+        record = {"observation_id": o["observation_id"], "acquisition_us": acquisition_us,
+                  "status": o["association"]["status"], "resets": []}
+        for state, part in parts.items():
+            if part.get("status") == "matched":
+                f.check(abs(part["delta_s"]) <= limits["state_mismatch_s"], "state_association_mismatch")
+                continue
+            if part.get("status") != "reset_epoch_bracket":
+                f.check(False, "state_association_incomplete")
+                continue
+            keys = RESET_EPOCHS[state][1]
+            before, after = part.get("before") or {}, part.get("after") or {}
+            b_us, a_us = before.get("timestamp_us"), after.get("timestamp_us")
+            recorded = (isinstance(b_us, int) and isinstance(a_us, int)
+                        and b_us <= acquisition_us <= a_us and a_us - b_us <= span_us)
+            key = single_reset_step(before.get("epoch") or {}, after.get("epoch") or {}, keys) if recorded else None
+            event = None
+            if key is not None:
+                matches = [step for step in ledgers[state]
+                           if b_us <= step["timestamp_sample_us"] <= a_us
+                           and step["before"][key] == before["epoch"][key] and step["after"][key] == after["epoch"][key]
+                           and single_reset_step(step["before"], step["after"], keys) == key]
+                event = (state, matches[0]["timestamp_sample_us"]) if len(matches) == 1 else None
+            if f.check(recorded, "reset_bracket_not_recorded") and f.check(key is not None, "reset_bracket_not_single_reset") \
+                    and f.check(event is not None, "reset_bracket_uncorroborated"):
+                per_event[event] = per_event.get(event, 0) + 1
+                record["resets"].append({"state": state, "key": key, "step": [before["epoch"][key], after["epoch"][key]],
+                                         "bracket_us": [b_us, a_us], "ledger_timestamp_sample_us": event[1]})
+        details.append(record)
+    f.check(all(count <= rule["max_per_reset_event"] for count in per_event.values()), "reset_bracket_bound")
+    f.check(len(bracketed) <= len(per_event), "reset_bracket_bound")
+    return {"observations": details, "corroborated_reset_events": len(per_event),
+            "per_event": {"%s@%d" % event: count for event, count in sorted(per_event.items())}}
 
 
 def evaluate_rgb(run, window, limits, rgb_config):
