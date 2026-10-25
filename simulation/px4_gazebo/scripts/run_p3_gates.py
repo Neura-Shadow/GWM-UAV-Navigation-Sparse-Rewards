@@ -86,7 +86,12 @@ def main(argv=None):
     if missing:
         raise SystemExit("Missing explicit gates: " + ", ".join(missing))
     root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home() / "uav_autonomy")))
-    _, sha = p3_manifest.verify_current(root, args.manifest)
+    frozen, sha = p3_manifest.verify_current(root, args.manifest)
+    # The runner refuses an MC build other than the frozen one; check the same explicit
+    # GWM_PX4_MC_TRACE selection here, before the authorization is consumed.
+    import mc_trace_runtime
+    if mc_trace_runtime.selected_build(root, SIM) != frozen["runtime"]["mc_trace_build"]:
+        raise SystemExit("GWM_PX4_MC_TRACE=%s must select the frozen MC trace build" % mc_trace_runtime.CONTRACT)
     authorization = p3_manifest.require_authorization(args.authorization, args.gate, sha)
     predecessor = require_predecessor(root, args.gate, sha)
     output = result_path(root, args.gate, sha)

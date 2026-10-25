@@ -173,7 +173,20 @@ def main(argv=None):
     output = args.run / "p3-evaluation.json"
     if output.exists():
         raise SystemExit("Evaluation already exists; the first evaluation is retained")
-    result = evaluate(args.run)
+    try:
+        result = evaluate(args.run)
+    except Exception as exc:  # incomplete evidence (e.g. early runtime abort) is recorded as failed, never missing
+        summary = {}
+        try:
+            summary = strict_json(args.run / "summary.json")
+        except Exception:
+            pass
+        result = {"contract": "p3-offline-evaluation-v1", "run_id": args.run.name, "gate": summary.get("gate"),
+                  "evaluator_sha256": evaluator_identity(), "runtime_status": summary.get("status"),
+                  "runtime_failure": summary.get("failure"),
+                  "failures": ["runtime_status:" + str(summary.get("failure")),
+                               "evaluator_incomplete_evidence:" + type(exc).__name__ + ":" + str(exc)],
+                  "status": "failed", "acceptance_credit": False}
     atomic_json(output, result, exclusive=True)
     print(result["status"], len(result["failures"]), "failures", flush=True)
     return 0 if result["status"] == "passed" else 1

@@ -318,6 +318,22 @@ def test_gate_sequencer_refuses_without_explicit_gates(monkeypatch, tmp_path):
         run_p3_gates.main(["--gate", "B", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")])
 
 
+def test_gate_sequencer_requires_frozen_mc_selection_before_consuming(monkeypatch, tmp_path):
+    # Gate A of c4b00bed consumed its authorization and then aborted on a missing
+    # GWM_PX4_MC_TRACE selection; the sequencer must refuse before consumption.
+    for key in ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH"):
+        monkeypatch.setenv(key, "1")
+    monkeypatch.delenv("GWM_PX4_MC_TRACE", raising=False)
+    monkeypatch.setenv("GWM_SIM_ROOT", str(tmp_path))
+    frozen = {"runtime": {"mc_trace_build": {"binary_sha256": "frozen"}}}
+    monkeypatch.setattr(run_p3_gates.p3_manifest, "verify_current", lambda root, path: (frozen, "sha"))
+    consumed = []
+    monkeypatch.setattr(run_p3_gates.p3_manifest, "consume", lambda *a: consumed.append(a))
+    with pytest.raises(SystemExit, match="GWM_PX4_MC_TRACE"):
+        run_p3_gates.main(["--gate", "A", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")])
+    assert consumed == []
+
+
 @POSIX_ONLY
 def test_runner_refuses_outside_owned_namespace(monkeypatch, tmp_path):
     import p3_runner

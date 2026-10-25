@@ -325,4 +325,27 @@ frozen manifest by the operator.
   `20261025T051926Z-mc-trace-benchmark-e6000074`, 44 pinned assets, 4 runtime libraries,
   policy A and 3 qualification flights. Execution is not allowed without authorization.
 
+## H. Gate A of candidate `c4b00bed` — FAILED (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-c4b00bedf07b.json` `07acc83e…72b4`, consumed
+  (`p3-gate-A-c4b00bed….consumed.json`). Result `p3-gate-A-c4b00bed….result.json` `1b9edcfb…aac1`,
+  `accepted: false`; it is retained and can never be retried or overwritten.
+* **First failure:** `readiness:runtime_failed`, run `20261025T053026Z-p3-readiness-49d0ca55`,
+  `Abort:mc_trace_build_differs_from_manifest`, 10 s after start. It aborted before PX4,
+  Gazebo, ROS or QGC were launched; there were no owned processes and nothing was left
+  behind. The six fixture runs never started.
+* **Cause:** the invocation lacked `GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1`.
+  `selected_build()` therefore returned the baseline (by design it never auto-selects),
+  which differs from the frozen instrumented build. The gate sequencer did not check this
+  before consuming the authorization, and the README command omitted it.
+* **Secondary:** the evaluator raised `KeyError: sensor_window_sim_s` on the aborted run and
+  wrote no `p3-evaluation.json` (`evaluation_missing`). The gate still failed closed.
+* **No sensor, timing, cleanup or Gazebo-shutdown result was measured.** The Gazebo risk is
+  untested, not resolved.
+* **Corrections (new candidate required):** `run_p3_gates.py` applies the runner's exact MC
+  selection check before consuming an authorization. `p3_evaluate.py` records incomplete
+  evidence as a `failed` evaluation and never leaves it missing. Both have regression tests.
+  The README gate command now sets `GWM_PX4_MC_TRACE`. No threshold, P2 file or sensor
+  package changed (package `f6605fb7…` and `p3-built.json` still valid).
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**

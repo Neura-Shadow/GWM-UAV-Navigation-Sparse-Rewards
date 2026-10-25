@@ -284,6 +284,19 @@ def test_full_offline_evaluation_passes_only_with_graceful_cleanup(tmp_path):
     assert result["acceptance_credit"] is True and len(result["evaluator_sha256"]) >= 8
 
 
+def test_early_runtime_abort_records_a_failed_evaluation(tmp_path):
+    """Gate A c4b00bed readiness aborted before any stack; the evaluator crashed and wrote nothing."""
+    import p3_evaluate
+    run = tmp_path / "20261025T053026Z-p3-readiness-test"
+    run.mkdir()
+    (run / "summary.json").write_text(json.dumps({"p3_kind": "readiness", "gate": "A", "status": "failed",
+                                                  "failure": "Abort:mc_trace_build_differs_from_manifest"}))
+    assert p3_evaluate.main([str(run)]) == 1
+    result = json.loads((run / "p3-evaluation.json").read_text())
+    assert result["status"] == "failed" and result["acceptance_credit"] is False
+    assert result["failures"][0] == "runtime_status:Abort:mc_trace_build_differs_from_manifest"
+
+
 def test_historical_gazebo_sigsegv_cannot_be_graceful(tmp_path):
     """Archived Gate A: every fixture's Gazebo exited -11 but generic cleanup said 'passed'."""
     import p3_evaluate
