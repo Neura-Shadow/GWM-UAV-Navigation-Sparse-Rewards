@@ -138,3 +138,63 @@ whether removing a specific P3 consumer restores RTF:
 * if it does, the result is **P3-load-bound** and an off-critical-path redesign is proposed;
 * if it does not, and threads sit in D-state on dxg, the result is **environment-bound** and
   a native Linux GPU host is recommended.
+
+## Step 2 results — labelled diagnostics (operator-authorized, run 2026-10-25)
+
+Gate `D` (commit `c9be22c`), diagnostic candidate `state/p3-candidate-c9be22c-diagnostic.json`,
+canonical SHA-256 `85bdd2a4b7538a89dcd777079170853908dfc125f0fc472a20482447a4d10559`, frozen with
+the default `strict_zero` policy because diagnostics are never acceptance-evaluated.
+Authorization `p3-auth-D-85bdd2a4b753.json` (Neura-Shadow), consumed. Result
+`p3-gate-D-85bdd2a4….result.json`: **5 of 5 starts completed**, none failed; the 6th
+(host-change) start was not used. D3D12 v1.2 profile (RTX 4060) in every run, vehicle on the
+ground and never armed, 120 s wall window each, `acceptance_credit: false`.
+Measurement: [`evidence/v3_sim_p3_stall_diagnostic.json`](evidence/v3_sim_p3_stall_diagnostic.json)
+(`p3_stall_diagnostic.py`, input hashes included).
+
+| Variant (run) | mean / p05 / min 1 s RTF | wall time per 1.000 s sim p50 / p95 / max | > 1.8 s / > 2.0 s | Gazebo CPU | total CPU |
+|---|---|---|---|---|---|
+| baseline `ac764f9f` | 0.572 / 0.422 / 0.255 | 1.695 / 2.186 / 2.891 | 15 / 5 | 1.33 | 2.84 |
+| **no RGB observer** `337a7122` | **1.000 / 0.999 / 0.988** | **1.000 / 1.001 / 1.010** | **0 / 0** | 1.03 | 2.85 |
+| recorder compression `none` `7aa47bb7` | 0.607 / 0.537 / 0.494 | 1.636 / 1.793 / 1.873 | 4 / 0 | 1.33 | 2.92 |
+| probe clock-only `a2044e0b` | 0.997 / 0.992 / 0.895 | 1.000 / 1.007 / 1.104 | 0 / 0 | 0.97 | 2.74 |
+| baseline repeat `5070451c` | 0.559 / 0.413 / 0.349 | 1.761 / 2.226 / 2.610 | 24 / 12 | 1.31 | 2.71 |
+
+* **Removing the single RGB subscriber restores real time.** The source-probe RGB observer is
+  the only subscriber of the 1920×1080 RGB topic; the sensor bridge carries depth only. With
+  it removed (variant 2, and variant 4, which also drops it), RTF is 1.0 and the 1 Hz family
+  sits at 1.000 s, matching P2. Both baselines reproduce the Gate B deficit.
+* **The observer's own work is not the cost** (about 0.13 cores). The recorder and adapter are
+  not the cost either: compression `none` gives a small, within-noise improvement (0.607 vs
+  0.559–0.572). The cost is Gazebo producing the 1080p RGB frames (render, readback,
+  serialise) inside its step, which Gazebo does only while the topic has a subscriber.
+* **Thread states:** Gazebo is not CPU-bound (1.3 of 24 cores, 2.3 GHz throughout). Over 95%
+  of its thread samples are sleeping (S) in both slow and normal seconds. D-state
+  (`dxgvmb_send_sync_msg`) is ≤ 0.06% of samples in every variant, including the real-time
+  ones. The step therefore *waits* while RGB is produced, consistent with GPU completion or
+  readback waits, which appear as S in user space. That cannot be proven here: all Gazebo
+  threads are named `ruby`, so the render thread cannot be isolated, and no GPU timing is
+  available.
+
+## Decision
+
+**P3-load-bound — specifically the frozen 1920×1080 @ 30 Hz RGB workload, produced inside
+Gazebo's simulation step whenever it is consumed.** It is not the P3 evidence-path CPU/IO
+(observer, recorder, adapter, probe ledgers, controller writes): removing that work
+separately does not restore real time, while removing the RGB consumer does.
+
+No reviewed change can move this work off the timing-critical path while keeping the frozen
+workload and evidence completeness. The work is Gazebo's own synchronous sensor rendering,
+not a P3 process; any RGB consumer, observer or not, triggers it; and the observer itself is
+already cheap. Two directions remain, and each needs an operator decision:
+
+1. **Keep the frozen workload; test the GPU path (recommended next step).** On this host the
+   RGB production cost behaves like a wait on the WSL D3D12 (and llvmpipe) render/readback
+   path. Run the identical two-start diagnostic (baseline, no RGB observer; 120 s, ground,
+   no credit) on a native Ubuntu 24.04 + NVIDIA host, for example an external-SSD install on
+   this laptop. If the baseline reaches RTF about 1.0 there, migrate: own build receipts,
+   GPU-library pins, a new candidate and a fresh Gate A. If it does not, direction 2 is the
+   only remaining path.
+2. **Revise the RGB workload in the contract** (rate, resolution or capture strategy). That
+   is a material acceptance change and is not proposed here without operator direction.
+
+No candidate, threshold, P2 file or earlier gate result was changed by this analysis.
