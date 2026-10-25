@@ -780,6 +780,29 @@ def test_rgb_absence_snapshot_parser_counts_cli_subscribers():
     assert parse("garbled") is None  # unparseable output never counts as zero
 
 
+@POSIX_ONLY
+def test_rgb_absence_snapshotter_thread_runs_and_records_both_windows(monkeypatch, tmp_path):
+    # Gate B 06b3fa54: an attribute named `run` shadowed Thread.run and no snapshot was taken.
+    import p3_runner
+    (tmp_path / "source").mkdir()
+    events = tmp_path / "ros-events.jsonl"
+    events.write_text("".join(json.dumps({"event": "transition", "to": to, "monotonic_s": t}) + "\n"
+                              for to, t in (("PRESTREAM_SAFE_SETPOINTS", 1.0), ("TAKEOFF", 2.0), ("COMPLETE", 3.0))))
+    settings = {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera"}
+    snap = p3_runner.RgbAbsenceSnapshotter(tmp_path, {}, settings, [])
+    assert callable(snap.run) and snap.run_dir == tmp_path
+    imx = "/world/default/model/x500_depth_71/link/camera_link/sensor/IMX214/image"
+    replies = {("-l",): imx + "\n/depth_camera\n", ("-i", "-t", imx): "No subscribers on topic [x]\n",
+               ("-i", "-t", "/depth_camera"): "Subscribers [Address, Message Type]:\n  tcp://127.0.0.1:1, gz.msgs.Image\n"}
+    monkeypatch.setattr(snap, "gz", lambda *args: (0, replies[args], ""))
+    snap.start()
+    snap.join(timeout=10)
+    record = json.loads((tmp_path / "source/rgb-absence-snapshots.json").read_text())
+    assert record["errors"] == [] and set(record["snapshots"]) == {"window_start", "window_end"}
+    assert record["snapshots"]["window_start"]["topics"][imx]["subscribers"] == 0
+    assert record["snapshots"]["window_end"]["topics"]["/depth_camera"]["subscribers"] == 1
+
+
 def test_source_probe_keeps_the_sourced_ros_python_path():
     runner = (SIM / "scripts/p3_runner.py").read_text()
     launch = runner[runner.index('self.launch("source-probe"'):][:200]

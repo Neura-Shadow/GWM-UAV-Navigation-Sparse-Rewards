@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A ACCEPTED (section Y), Gate B not yet authorized — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A accepted, Gate B failed in evaluation with flight timing passed (section Z) — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -841,4 +841,38 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
 * Gazebo and the sensor adapter exited 0 in all 8 runs; every owned process shut down gracefully.
 * Flight timing with RGB absent is not yet measured; Gate B judges it against unchanged limits.
 
-Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A ACCEPTED, Gate B not yet authorized — Qualification 0/3**
+## Z. Gate B of v1.3 candidate `06b3fa54` — FAILED in evaluation; flight timing passed (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-06b3fa54851b.json` `00cf4480…7064`, consumed.
+  Result `p3-gate-B-06b3fa54….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T123921Z-p3-flight-624dc8ae` (SITL, unchanged P2 mission, D3D12 RTX 4060,
+  depth-only flight): runtime exit 0. The controller completed the whole mission (`COMPLETE`),
+  P2 flight acceptance passed, MC causality was `verified`, and every owned process shut
+  down gracefully.
+* **Landing-state timing (depth-only workload):** 116 `vehicle_land_detected` intervals;
+  wall p50 **1.000 s**, p95 **1.003 s**, maximum **1.012 s**; 0 over 1.8 s, 0 over 2.0 s; no
+  stale-state event. Native RTF 0.997 (minimum interval 0.026).
+* **RGB absence:** the probe had `rgb_subscribed: false` with no IMX214 subscription; 0 RGB
+  metadata rows. The monitor recorded 205 rows (188 in the window span), maximum gap 0.50 s,
+  zero IMX214 subscribers and the positive control present throughout. The endpoint snapshots
+  are **missing** (see failure 1).
+* **Evaluator failures (first: `depth:state_association_incomplete`):**
+  1. `rgb_absence:snapshot_missing:window_start/window_end`, `snapshot_errors`:
+     **implementation defect**. `RgbAbsenceSnapshotter` stored its run directory in an
+     attribute named `run`, shadowing `threading.Thread.run`; the thread raised
+     `TypeError: 'PosixPath' object is not callable` and never took a snapshot. Fixed offline
+     (attribute renamed `run_dir`) with a regression test that executes the thread.
+  2. `depth:state_association_incomplete`: 930 of 931 window observations matched. One frame
+     (acquisition sim 22.180 s) was bracketed by a PX4 EKF attitude reset
+     (`quat_reset_counter` 1 → 2 at sim 22.192 s, during TAKEOFF) and correctly rejected as
+     `attitude:reset_epoch_bracket`. The rule that every observation must match makes any
+     mid-flight EKF reset fatal. **Operator decision required**; no rule changed.
+  3. `native_commands:vehicle_self_command_on_gcs_link`: six PX4-originated COMMAND_LONG frames
+     (gimbal manager 1001 ×5, 1000 ×1) from 72/1 to 72/0 on the GCS link at 0.1–2.3 s after
+     the P2 controller's `REQUEST_LAND` (phase `VERIFY_LANDED_AND_DISARMED`). They come from
+     PX4's land mode, not from QGC or the controller, and were never observed before because
+     no earlier P3 flight reached landing. **Operator decision required** on the native
+     command policy; no policy changed.
+* P3 remains INCOMPLETE; qualification 0/3. No further gate was started.
+
+Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A accepted; Gate B failed in evaluation (flight timing passed: land_detected maximum 1.012 s) on a snapshot defect, one reset-bracketed depth frame and PX4 landing self-commands — Qualification 0/3**

@@ -176,7 +176,8 @@ class RgbAbsenceSnapshotter(threading.Thread):
 
     def __init__(self, run, env, settings, owned):
         super().__init__(name="p3-rgb-absence-snapshots", daemon=True)
-        self.run, self.env, self.settings, self.owned = run, env, settings, owned
+        # Not `self.run`: that name is threading.Thread.run (Gate B 06b3fa54 lost both snapshots).
+        self.run_dir, self.env, self.settings, self.owned = run, env, settings, owned
         self.path = run / "source/rgb-absence-snapshots.json"
         self.stop_event = threading.Event()
         self.record = {"contract": "p3-rgb-absence-snapshots-v1", "runner_pgid": os.getpgid(0),
@@ -208,7 +209,7 @@ class RgbAbsenceSnapshotter(threading.Thread):
         atomic_json(self.path, self.record)
 
     def run(self):
-        tail = Tail(self.run / "ros-events.jsonl")
+        tail = Tail(self.run_dir / "ros-events.jsonl")
         pending = list(self.TRIGGERS)
         try:
             while pending:
