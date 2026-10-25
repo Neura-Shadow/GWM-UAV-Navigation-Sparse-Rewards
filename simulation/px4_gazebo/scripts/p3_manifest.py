@@ -19,7 +19,10 @@ sys.path.insert(0, str(SIM / "validation"))
 from p3_provenance import atomic_json, canonical_sha256, digest, strict_json  # noqa: E402
 
 CONTRACT = "p3-candidate-manifest-v1"
-GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification"}
+GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification",
+         # Operator-authorized renderer evaluation: Gate A's ground plan on llvmpipe, never acceptance credit.
+         "V": "ground_validation_llvmpipe_no_credit"}
+GROUND_GATES = ("A", "V")
 SOURCE_FOLDERS = ("scripts", "validation", "configs", "ros2_ws/src/gwm_px4_control", "ros2_ws/src/gwm_sensor_adapter")
 RUNTIME_LIBRARIES = ("/opt/ros/jazzy/lib/libfastrtps.so.2.14", "/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so",
                      "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py",
@@ -53,7 +56,11 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
     root = Path(root)
     px4 = root / "upstream/PX4-Autopilot"
     receipts = {name: strict_json(root / "state" / name) for name in
-                ("p0-built.json", "p2-built.json", "p3-built.json", "px4-mc-trace-built.json", "qgc-unattended-built.json")}
+                ("p0-built.json", "p2-built.json", "p3-built.json", "px4-mc-trace-built.json", "qgc-unattended-built.json",
+                 "p3-dds-agent-built.json")}
+    agent = receipts["p3-dds-agent-built.json"]
+    if agent.get("status") != "built" or digest(agent["binary"]) != agent["binary_sha256"]:
+        raise ValueError("P3 DDS agent build missing, failed or changed")
     sys.path.insert(0, str(SIM / "validation"))
     import mc_trace_runtime
     previous = os.environ.get("GWM_PX4_MC_TRACE")
@@ -90,7 +97,8 @@ def runtime_identity(root, policy_name=None, policy_approval=None, mc_benchmark_
                                                    "sha256": digest(Path(mc_benchmark_run) / "summary.json")},
             "qgc_unattended_elf_sha256": qgc["ELF_sha256"], "assets": assets,
             "runtime_libraries": {p: digest(p) for p in RUNTIME_LIBRARIES},
-            "native_command_policy": policy, "renderer_requirement": "hardware"}
+            "native_command_policy": policy,
+            "renderer_requirement": strict_json(SIM / "configs/p3_validation.yaml")["renderer_requirement"]}
 
 
 def candidate(root, **kwargs):
@@ -147,7 +155,8 @@ def consume(root, gate, sha, authorization_path):
 
 def authorization_template(gate, sha, operator):
     return {"contract": "p3-runtime-authorization-v1", "gate": gate, "scope": GATES[gate], "manifest_sha256": sha,
-            "max_attempts": 1, "authorized": True, "authorized_by": operator, "excludes": [] if gate != "A" else ["flight"],
+            "max_attempts": 1, "authorized": True, "authorized_by": operator,
+            "excludes": ["flight"] if gate in GROUND_GATES else [],
             "statement": f"I explicitly authorize exactly one P3 Gate {gate} ({GATES[gate]}) execution of manifest {sha}."}
 
 

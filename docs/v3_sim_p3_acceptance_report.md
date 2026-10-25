@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A has not been authorized or executed (no runtime evidence exists for this implementation) — Qualification 0/3**
+**P3 INCOMPLETE — Gate A ACCEPTED (section R); Gate B FAILED on llvmpipe flight timing (section S); native Linux GPU host recommended — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -304,4 +304,405 @@ frozen manifest by the operator.
    explicit Gate A authorization for that manifest SHA.
 5. Gazebo abnormal-exit risk stays open. A non-zero or signal exit fails Gate A cleanup.
 
-Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
+## G. Build, policy approval and frozen candidate (2026-10-25)
+
+* **Historical receipt preserved:** `state/archive/p3-built-20260912-historical.json` `214f1149…f355`.
+* **First `build_p3.sh --build`** refused: the SDF-derived base origin was z=0, but the config
+  says 0.24. `sdf_chain` ignored an included model's own `<pose>`, which pinned `x500_base`
+  uses. This was fixed in `0d38eec`; the config values were correct and are unchanged, and a
+  regression test now mirrors the pinned layout.
+* **Second build passed:** sensor package `f6605fb7…5944`, colcon tests 2/2, extrinsic
+  re-derived from the pinned SDF matches `p3_sensors.yaml`; `state/p3-built.json` `ae3ea317…804a`.
+* **Linux regressions on `0d38eec`:** P2 212, P3 sensor 61, evaluators 26, runtime 55, MC 23,
+  all passed.
+* **Policy A** approved by operator **Neura-Shadow** for this candidate only (policy
+  unchanged, `ea307bf5…1295`). Receipt `state/p3-policy-A-approval-0d38eec.json`
+  `0b24a8aa…26d4`, bound to commit `0d38eec` and QGC ELF `82994283…6d03`.
+* **Frozen candidate:** `state/p3-candidate-0d38eec.json`, canonical manifest SHA-256
+  **`c4b00bedf07b4c87867346b95ef3bc6d12ab28ec891e1f96ded99477fd73e3d1`** (file `f789d007…97bc`).
+  `p3_manifest.py verify` recomputes all inputs to the same SHA. It binds 96 source files,
+  8 MC sources, 5 build receipts, the QGC ELF, MC benchmark
+  `20261025T051926Z-mc-trace-benchmark-e6000074`, 44 pinned assets, 4 runtime libraries,
+  policy A and 3 qualification flights. Execution is not allowed without authorization.
+
+## H. Gate A of candidate `c4b00bed` — FAILED (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-c4b00bedf07b.json` `07acc83e…72b4`, consumed
+  (`p3-gate-A-c4b00bed….consumed.json`). Result `p3-gate-A-c4b00bed….result.json` `1b9edcfb…aac1`,
+  `accepted: false`; it is retained and can never be retried or overwritten.
+* **First failure:** `readiness:runtime_failed`, run `20261025T053026Z-p3-readiness-49d0ca55`,
+  `Abort:mc_trace_build_differs_from_manifest`, 10 s after start. It aborted before PX4,
+  Gazebo, ROS or QGC were launched; there were no owned processes and nothing was left
+  behind. The six fixture runs never started.
+* **Cause:** the invocation lacked `GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1`.
+  `selected_build()` therefore returned the baseline (by design it never auto-selects),
+  which differs from the frozen instrumented build. The gate sequencer did not check this
+  before consuming the authorization, and the README command omitted it.
+* **Secondary:** the evaluator raised `KeyError: sensor_window_sim_s` on the aborted run and
+  wrote no `p3-evaluation.json` (`evaluation_missing`). The gate still failed closed.
+* **No sensor, timing, cleanup or Gazebo-shutdown result was measured.** The Gazebo risk is
+  untested, not resolved.
+* **Corrections (new candidate required):** `run_p3_gates.py` applies the runner's exact MC
+  selection check before consuming an authorization. `p3_evaluate.py` records incomplete
+  evidence as a `failed` evaluation and never leaves it missing. Both have regression tests.
+  The README gate command now sets `GWM_PX4_MC_TRACE`. No threshold, P2 file or sensor
+  package changed (package `f6605fb7…` and `p3-built.json` still valid).
+* **Linux regressions on `966794b`:** P2 212, sensor 61, evaluators 27, runtime 56, MC 23,
+  all passed.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `966794b`.
+  Receipt `state/p3-policy-A-approval-966794b.json` `4787af49…084c`; the `0d38eec` receipt
+  stays with the failed candidate. Manifest `state/p3-candidate-966794b.json`, canonical SHA-256
+  **`8eaefbb63d3122f6e3373ae245de8c11af8aee029978d76ef111822529b2c11d`**; `verify` reproduces
+  it, the explicit MC selection matches the frozen build, and no Gate A artifacts exist for it.
+
+## I. Gate A of candidate `8eaefbb6` — FAILED (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-8eaefbb63d31.json` `31d3f0ea…c898`, consumed.
+  Result `p3-gate-A-8eaefbb6….result.json` `d99a6a10…acd9`, `accepted: false`; retained, not retried.
+* **First failure:** `readiness:runtime_status:Abort:owned_process_exited:source-probe`, run
+  `20261025T053935Z-p3-readiness-113a881c`, 15.8 s. The evaluator recorded a `failed`
+  evaluation (the section H fix works). The six fixtures never started. PX4 and the MC
+  selection came up (`mc_pos_control running`). No sensor, timing or Gazebo-shutdown result
+  was measured.
+* **Cause 1 (probe):** the runner launched `p3_source_probe.py` with `python3 -I`, which
+  ignores `PYTHONPATH`. The gz bindings exist only in the sourced Jazzy vendor tree
+  (`/opt/ros/jazzy/opt/gz_{transport,msgs}_vendor/lib/python`), so the import failed with
+  `ModuleNotFoundError: gz`. An import-only check in the runner environment reproduces this
+  with `-I` and passes with `-s -P`.
+* **Cause 2 (cleanup):** `shutdown()` began with an unguarded `wait_landed_disarmed()`, whose
+  `pump()` re-raised the same `owned_process_exited`. No ordered stop ran (`shutdown_exception`),
+  and every other owned process ended through the PID-namespace teardown, recorded as
+  unreaped. This correctly fails cleanup, but the shutdown it was meant to exercise never
+  happened.
+* **Corrections:** the probe now launches with `-s -P` (still no user site or cwd), and
+  `pump()` no longer aborts once shutdown has started. The landed-wait exception is recorded,
+  and every later stop still runs. Three regression tests were added. Linux: P2 212,
+  sensor 61, evaluators 27, runtime 59, MC 23. Windows runtime: 47 passed, 12 POSIX-only
+  skipped. All other launch targets (gz, parameter_bridge, sensor adapter, QGC AppRun,
+  MicroXRCEAgent) resolve in the runner environment. No threshold, P2 file or sensor package
+  changed.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `2f74b2c`.
+  Receipt `state/p3-policy-A-approval-2f74b2c.json` `e766373c…69a8`. Manifest
+  `state/p3-candidate-2f74b2c.json`, canonical SHA-256
+  **`8feaa0764c60ece888123b17af2971a5d52bb0e0aa5a70520ebb94c069eae11e`**; `verify` reproduces
+  it, the MC selection matches the frozen build, and no Gate A artifacts exist for it.
+
+## J. Gate A of candidate `8feaa076` — FAILED at readiness evaluation (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-8feaa0764c60.json` `0507a21f…6686`, consumed.
+  Result `p3-gate-A-8feaa076….result.json` `7f9a257c…32b4`, `accepted: false`; retained.
+* **Readiness run** `20261025T054510Z-p3-readiness-84dd7b19`: the runtime completed (`passed`),
+  but the independent evaluation `failed`. The fixtures never started. Nothing was left behind.
+* **Measured and passed:** Gazebo exited **0** within 0.14 s of pause + SIGINT (one sample;
+  the historical −11 risk is not closed). QGC 0, every bridge, probe and adapter 0. Native
+  commands matched policy A exactly (1 × 401, 34 × 512). RGB stream passed. MC causality was
+  acquired. RTF 0.57 (minimum interval RTF 0.021).
+* **Evaluator failures:**
+  1. `cleanup:dds-agent:terminated_by_SIGINT` (exit −2). The pinned MicroXRCEAgent v2.4.3
+     (`73622810`) installs no SIGINT/SIGTERM handler; its only clean exit is
+     `AgentInstance::stop()`, which no signal reaches. Accepted P2 recorded −15 for it without
+     judging it. Under P3's strict rule it can never pass: **operator decision**.
+  2. `cleanup:px4:process_group_members_remained` [1288]. That PID is the owned Gazebo, which
+     PX4 spawns into its group and which is stopped (exit 0) after PX4 by design. **Fixed:** a
+     member that is itself an owned, reaped process is set aside, the raw list is kept, and any
+     other leftover still fails.
+  3. `depth:adapter_publication_boundary`: the observed `/rosout` and `/parameter_events` are
+     created by every rclpy node. **Fixed:** exactly these two topics with their exact types
+     are allowed; anything else still fails.
+  4. `depth:state_association_incomplete`: 103 matched, 33 position and 14 attitude
+     `ambiguous_equidistant` (two state samples exactly equally close to the image stamp,
+     structural with quantized sim time). **Operator decision.**
+  5. `renderer_unidentified`: Gazebo rendered with Mesa **llvmpipe** (software) although
+     `/dev/dxg` and `libd3d12` exist. Archived P3 runs were llvmpipe too; hardware rendering
+     has never been active here. The manifest requires `hardware`. **Operator decision.**
+* In-memory re-evaluation of the retained run with the fixed evaluator (nothing written)
+  leaves failures 1, 2 (raw record), 4 and 5. Linux: P2 212, sensor 61, evaluators 30,
+  runtime 60, MC 23.
+
+## K. Operator decisions applied (2026-10-25, Neura-Shadow)
+
+* **DDS agent, patched (decision 1):** `validation/dds_agent_sigstop/microxrce_agent.cpp`
+  replaces only the pinned 11-line `main()` (`c3bdc86a…431e`). SIGINT/SIGTERM are blocked
+  before the agent thread starts and consumed with `sigwait()`, then the existing
+  `AgentInstance::stop()` ends the agent and `main` returns 0. `build_p3_agent.py` compiles
+  it with the pinned target's exact defines, includes, flags and link inputs against the
+  **unchanged** `dds-install/lib/libmicroxrcedds_agent.so.2.4.3`. P2 keeps the stock binary.
+  Binary `~/uav_autonomy/p3_agent/d6bad178d69ddbe5/bin/MicroXRCEAgent`
+  `2705cf213f1be55ab5aace3836dde7710624b9e77df07e30ecb3fd17c25b88b0`; receipt
+  `state/p3-dds-agent-built.json` `fc2ccb18…9e82`. Stop smoke (agent alone, private
+  user/network namespace): SIGINT → **0**, SIGTERM → **0**, "server stopped". The runner
+  verifies and launches this binary, and the manifest binds the receipt. The strict graceful
+  rule is unchanged.
+* **Association ties (decision 2):** an exact equidistant tie now takes the earlier (causal)
+  sample. Both candidates have the same |delta|, which must still be ≤ `state_mismatch_s`
+  (unchanged). Ties are flagged (`equidistant_tie_earlier`) and counted per window by the
+  evaluator. Reset-epoch bracket rejection is unchanged. Sensor package rebuilt:
+  `52024487…cdf40`, colcon 2/2, extrinsic matches; `state/p3-built.json` `2af49dea…79ef9`
+  (previous receipt kept in `state/archive/p3-built-f6605fb7.json`).
+* **Renderer (decision 3, GPU enabled):** an offscreen EGL probe (no simulator), run in the
+  runner's environment and namespaces, gives llvmpipe by default and **D3D12 (NVIDIA GeForce
+  RTX 4060 Laptop GPU)** with `GALLIUM_DRIVER=d3d12` and
+  `MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA` (Intel UHD is used if the adapter is not named).
+  The runner sets both for owned processes. The `hardware` requirement and the software
+  renderer rejection are unchanged; the actual Gazebo renderer is still verified from
+  `ogre2.log` at runtime.
+* **Linux:** P2 212, sensor 61, evaluators 30, runtime 62, MC 23, all passed. The manifest
+  dependency check binds 6 receipts.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `1873c23`.
+  Receipt `state/p3-policy-A-approval-1873c23.json` `927fd2f3…b112`. Manifest
+  `state/p3-candidate-1873c23.json`, canonical SHA-256
+  **`123498cd468ddfe0e5fb57854e6d8ba175bd8800b4ce46a1270427728bf9acb0`**; `verify` reproduces
+  it, the MC selection matches, and no Gate A artifacts exist for it.
+
+## L. Gate A of candidate `123498cd` — FAILED on Gazebo SIGSEGV (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-123498cd468d.json` `ff5b07ac…c4fa`, consumed.
+  Result `p3-gate-A-123498cd….result.json` `31551f65…cc66`, `accepted: false`; retained, not retried.
+* **Readiness run** `20261025T060854Z-p3-readiness-3a608df5`: the runtime `passed`; the
+  independent evaluation has exactly one failure, **`cleanup:gazebo:terminated_by_SIGSEGV`**
+  (exit −11, 0.43 s after the requested SIGINT, not forced, no group members left). The
+  fixtures never started.
+* **Everything else in readiness passed:**
+  * Patched DDS agent exit **0** (3.34 s); PX4 0 (Gazebo correctly set aside as separately
+    owned); QGC 0; bridges, probe and adapter 0.
+  * Renderer identified as **D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)**; RTF 0.82
+    (minimum interval 0.0051).
+  * Depth stream 0 failures; association 149/149 matched, with ties taken to the earlier
+    sample (position 33, attitude 39). RGB passed.
+  * Native commands passed policy A (1 × 401, 34 × 512). MC causality `verified`.
+* **Crash context (offline, `~/.gz/sim/log/2026-10-25T14:08:59…/server_console.log`):** the
+  world pause succeeded (`data: true`), the server received signal 2, `SensorsPrivate::Stop`
+  ran, and the render thread stopped after 272 ms. The log then ends before `Shutting down
+  gz-sim-server`. In the previous run (llvmpipe, exit 0) the same sequence took 51 ms and
+  continued to `Shutting down gz-sim-server` and orderly worker exits. The crash therefore
+  happens in server teardown after rendering stops. The archived −11 runs were llvmpipe, so
+  the GPU backend is not established as the cause (one sample each). No core dump or
+  backtrace exists.
+* **Not changed:** SIGSEGV remains a cleanup failure. No check was weakened and no
+  diagnostic runtime was started.
+
+## M. Gazebo shutdown diagnostic (operator-authorized, outside the gates, 2026-10-25)
+
+Gazebo only, with no PX4, QGC or flight, in a private user/net/mount/pid namespace. It used
+PX4's own server command and `gz_env.sh` (`gz sim --verbose=4 -r -s default.sdf`, spawn
+`x500_depth` through `/world/default/create`), subscribed to depth and RGB images, ran
+20 s, paused (`data: true`), then sent SIGINT to the server. The `ruby` server process ran
+under gdb, which passed SIGINT through and stopped on SIGSEGV. Two earlier harness attempts
+(`20261025T061410Z`, `20261025T061422Z`) failed before any Gazebo process existed (shell
+`set -u`, then gdb cannot load the Ruby `gz` script); they observed nothing.
+
+| Variant | Run | Renderer | Outcome |
+|---|---|---|---|
+| D3D12 | `20261025T065412Z-gz-shutdown-diag-d3d12` | D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU) | **SIGSEGV**, thread 8 (LWP 43) |
+| llvmpipe | `20261025T065459Z-gz-shutdown-diag-llvmpipe` | llvmpipe (LLVM 20.1.2) | **exited normally**: render thread stopped in 51 ms, then `Shutting down gz-sim-server` |
+
+**Backtrace (D3D12):**
+
+* Thread 1 (main): `SimulationRunner::Step` → `<signal handler>` →
+  `gz::common::SignalHandlerPrivate::OnSignal` → `SensorsPrivate::Stop()` →
+  `std::thread::join()` on LWP 43.
+* Thread 8 (LWP 43, the sensors render thread, already out of its loop):
+  `start_thread` → `__nptl_deallocate_tsd` → `0x7fffa1041b10 ??` → SIGSEGV.
+* Threads 28–31 (GPU-stack workers) are parked in `pthread_cond_wait`, returning into the
+  same unattributed region (`0x7fffa103d74f`, `0x7fffa138862b`). Thread 27 runs in the
+  NVIDIA WSL user-mode driver `libnvwgf2umx.so` (still mapped at `0x7fff8f…–0x7fff91…`).
+
+**Root cause:** when the render thread exits after `SensorsPrivate::Stop()`, glibc runs a
+pthread thread-specific-data destructor registered on that thread by the D3D12 GPU stack.
+The destructor's address is outside every loaded shared object at that moment, so executing
+it faults. This happens in the WSL D3D12/NVIDIA driver's thread teardown, not in P3 or P2
+code, and not in Gazebo's sensor logic (the render loop had already stopped). The exact
+owning module of `0x7fffa1041b10` is not established: no `/proc` maps were captured, and the
+region is either code from an unloaded module or anonymous executable memory. With llvmpipe
+the same sequence exits 0, consistent with Gate A `8feaa076`. The archived llvmpipe −11
+crashes (older runner, SIGTERM) were not reproduced and remain unexplained.
+
+**Implication:** with the D3D12 hardware renderer on this host, Gazebo's own SIGINT
+shutdown is expected to end in SIGSEGV, so the strict cleanup rule cannot pass. With
+llvmpipe, cleanup can pass but the `hardware` renderer requirement fails. Resolving this
+needs an operator decision; nothing was changed.
+
+## N. Renderer decision: llvmpipe evidence assessment (2026-10-25)
+
+The D3D12 crash evidence (section M) is preserved. **Exact module attribution of
+`0x7fffa1041b10` is UNCONFIRMED.**
+
+The frozen `p3-acceptance-v1` contract sets no RTF threshold (RTF is measured only). The
+only admissible llvmpipe evidence for this implementation is readiness run
+`20261025T054510Z-p3-readiness-84dd7b19` (Gate A `8feaa076`; its failures were the since-fixed
+agent, group-member, boundary and association defects plus the renderer check):
+
+| Frozen limit | llvmpipe measured | D3D12 measured (`3a608df5`) |
+|---|---|---|
+| delivered ≥ 25 Hz | 30.31 Hz sim (17.55 Hz wall) | 30.31 Hz sim (24.95 Hz wall) |
+| source gap ≤ 0.12 s sim | 0.036 s | 0.036 s |
+| processed ≥ 8 Hz | 10.0 Hz | 9.93 Hz |
+| observation age ≤ 0.25 s sim | 0.072 s | 0.096 s |
+| stall ≤ 1.0 s wall | 0.096 s | 0.080 s |
+| recorded 1.0, lost 0 | 1.0, 0 of 455 | 1.0, 0 of 454 |
+| P2 ground timing (`p2-timing-v1`) | 20.0 Hz callback, 0.080 s maximum entry gap | 20.0 Hz, 0.060 s |
+| RTF (measured only) | 0.57 (minimum interval 0.021) | 0.82 (minimum interval 0.0051) |
+| Gazebo CPU | 142 s | 38 s |
+
+**Assessment: insufficient.** One 15 s readiness window passes every sensor and ground
+timing limit, but:
+
+1. No fixture geometry, scene-change or interruption result exists under llvmpipe for this
+   implementation. Archived llvmpipe fixtures predate it and are not admissible.
+2. Flight-phase P2 timing under the combined depth+RGB llvmpipe load is unproven. The
+   archived smoke failed at 2.008 s against the unchanged 2 s `vehicle_land_detected` wall
+   freshness limit; archived runs were llvmpipe, though that run's renderer was not recorded.
+3. The evidence is a single sample with 3.7 × the Gazebo CPU of D3D12 and low wall
+   delivery margin (17.55 Hz).
+
+**Selected path:** exactly one separately authorized, ground-only llvmpipe performance
+validation (readiness plus the seven fixtures, no flight, no gate credit). All sensor
+specifications, timing limits and graceful-cleanup rules stay unchanged. If every
+performance and cleanup check passes, a versioned renderer-contract revision allowing the
+measured software renderer will be proposed for approval, not applied. Flight timing would
+still be judged unchanged at Gate B/C. If any check fails, the recommendation is a native
+Linux GPU host, not a relaxation.
+
+## O. Validation V (llvmpipe, ground only, no credit) — PASSED (2026-10-25)
+
+* Gate `V` added in `6e80422`: Gate A's ground plan with no D3D12 variables. The evaluator
+  requires the renderer to be llvmpipe for V only. V never gives acceptance credit and can
+  never be Gate B's predecessor. Linux: P2 212, sensor 61, evaluators 33, runtime 64, MC 23.
+* Policy A (unchanged) re-approved by Neura-Shadow for `6e80422` (receipt `d7cf8acd…b2f`).
+  Candidate `state/p3-candidate-6e80422.json`, canonical SHA-256
+  `1e439b44caf24bdb4d1a5386046d84c3a9fb34da0a0bcf43d565b52461edc68f`. Authorization
+  `p3-auth-V-1e439b44caf2.json` `838ef041…39b8`, consumed.
+* Result `p3-gate-V-1e439b44….result.json`: `accepted: true`, `acceptance_credit: false`,
+  **8/8 runs passed** (readiness and plane2, plane4, plane6, oblique, asymmetric,
+  out_of_range, interruption). Every Gazebo exit was 0 and every process shut down
+  gracefully. All frozen sensor, geometry, freshness, recorder, command-policy, MC and P2
+  ground-timing checks passed. Measured margins are in the
+  [renderer revision proposal](v3_sim_p3_renderer_contract_revision_proposal.md).
+* **Proposed, not applied:** `p3-acceptance-v1.1` allowing exactly the measured llvmpipe
+  renderer, with every other limit unchanged. Flight timing remains unproven and is judged
+  unchanged at Gate B/C.
+
+## P. Contract `p3-acceptance-v1.1` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow as proposed in `8df667d` (llvmpipe only, every other limit
+  unchanged).
+* **Applied:**
+  * `p3_validation.yaml` now has `contract: p3-acceptance-v1.1` and
+    `renderer_requirement: software:llvmpipe`; every numeric limit is unchanged and asserted
+    by a test.
+  * The manifest records the requirement from that file.
+  * The runner passes no D3D12 variables for any gate (inherited ones cannot leak through
+    the allowlist).
+  * The evaluator fails `renderer_not_declared_llvmpipe` for any other renderer.
+  * Gate V is unchanged and still never credits. Gazebo clean-shutdown, sensor, timing,
+    recorder, policy and MC checks are untouched.
+* **Linux:** P2 212, sensor 61, evaluators 34, runtime 64, MC 23. Windows (P3 suites):
+  145 passed, 14 POSIX-only skipped.
+* **v1.1 candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `7b7d7d8`
+  (receipt `ecec49ef…ab75`). Manifest `state/p3-candidate-7b7d7d8.json`, canonical SHA-256
+  **`5e14e934f6b15f6d37c769bc43d26b843383ccbdb03aa4b76e16a5f1100a1dac`**,
+  `renderer_requirement: software:llvmpipe`. `verify` reproduces it, the MC selection
+  matches, and no Gate A artifacts exist for it. Gate A has not been run.
+
+## Q. Gate A of candidate `5e14e934` (v1.1) — FAILED at the last fixture (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-5e14e934f6b1.json` `01231ff1…881d`, consumed.
+  Result `p3-gate-A-5e14e934….result.json`, `accepted: false`; retained, not retried.
+* **7 of 8 runs passed:** readiness `ac6ccdf6`, plane2, plane4, plane6, oblique, asymmetric
+  and out_of_range, all on llvmpipe with every check passed and Gazebo exit 0.
+* **First failure:** `fixture-interruption:cleanup:sensor-adapter:nonzero_exit_3`, run
+  `20261025T084322Z-p3-interruption-ec038e97` (also `fixture:stream:adapter_result_not_passed`).
+  The adapter recorded `RuntimeError: Unable to convert call argument '0' to Python object`
+  from inside `rclpy.spin()` and exited 3. Its data path was complete and identical to the
+  passing V interruption run: 472/472 frames recorded, 156 processed, recorder complete,
+  source gap 0.036 s, maximum age 0.080 s. The bridge interruption exited gracefully (0).
+* **Root cause, reproduced offline:** rclpy's default SIGINT handler shuts the context down
+  while the adapter's 20 ms `poll` timer callback may still be executing. An adapter-only
+  stop smoke (private namespace, no inputs, randomized SIGINT 0.8–7 s) on the Gate A build
+  (`52024487…`) failed **4/40** with `RCLError … context is not valid … rcl_shutdown() was
+  called` (exit 3). Same defect class, timing-dependent, which is why V's run passed.
+* **Fix:** the adapter calls `rclpy.init(signal_handler_options=NO)` and installs its own
+  SIGINT/SIGTERM handler that only sets a stop event. It spins with
+  `SingleThreadedExecutor.spin_once(0.05)` until that event is set, then shuts down the
+  executor, node and context in order, after spinning has ended. Package rebuilt as
+  `3a5bd685…2a94` (colcon 2/2; `state/p3-built.json` `f34b6874…0f55`; previous receipt kept
+  as `state/archive/p3-built-52024487.json`). Same smoke on the fix: **100/100** passed.
+  Regression test added. No threshold, cleanup rule or evaluator check changed.
+* **Linux:** P2 212, sensor 61, evaluators 34, runtime 65, MC 23.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `4bb06f4`
+  (receipt `49c719a5…671f`). Manifest `state/p3-candidate-4bb06f4.json`, canonical SHA-256
+  **`764fcfd7c39b8a75042fa0ca9de3721397dc214735eb030e4cc14c72ae8958d5`**
+  (contract v1.1, llvmpipe). `verify` reproduces it, the MC selection matches, and no Gate A
+  artifacts exist for it.
+
+## R. Gate A of candidate `764fcfd7` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-764fcfd7c39b.json` `ee471580…3e78`, consumed.
+  Result `state/p3-gate-A-764fcfd7….result.json` `53e49e31…a8e7`, `accepted: true`,
+  `acceptance_credit: true`. Run 08:59:34–09:06:25 UTC; no leftover processes.
+* **8/8 independent evaluations passed** on Mesa llvmpipe, with Gazebo exit 0 and sensor
+  adapter exit 0 in every run:
+
+| Run | source Hz (≥25) | max gap s (≤0.12) | processed Hz (≥8) | max age s (≤0.25) | max stall s wall (≤1.0) |
+|---|---|---|---|---|---|
+| readiness `93f53ed2` | 30.31 | 0.036 | 10.0 | 0.072 | 0.073 |
+| plane2 `cf862a33` | 30.30 | 0.036 | 10.0 | 0.060 | 0.061 |
+| plane4 `c2e7dae4` | 30.30 | 0.036 | 10.0 | 0.056 | 0.050 |
+| plane6 `3395c9ad` | 30.30 | 0.036 | 10.0 | 0.056 | 0.055 |
+| oblique `00288b55` | 30.30 | 0.036 | 10.0 | 0.056 | 0.050 |
+| asymmetric `f6ab7594` | 30.30 | 0.036 | 10.0 | 0.052 | 0.056 |
+| out_of_range `f8a109b4` | 30.30 | 0.036 | 10.0 | 0.060 | 0.058 |
+| interruption `de425bd9` | 30.31 | 0.036 | 10.0 | 0.052 | 0.049 |
+
+  Also passed in every applicable run: geometry accuracy, valid fraction, out-of-range,
+  interruption detection, recorder completeness, state association, policy A native
+  commands, MC causality, P2 ground timing and graceful cleanup of every owned process.
+  Readiness RTF was 0.554 (wall delivery 17.5 Hz).
+* **Not yet established:** flight-phase P2 timing on llvmpipe (Gate B, then Gate C), judged
+  against unchanged limits.
+
+## S. Gate B of candidate `764fcfd7` — FAILED on flight timing (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-B-764fcfd7c39b.json` `b8452179…df17`, consumed.
+  Result `state/p3-gate-B-764fcfd7….result.json`, `accepted: false`; retained, never retried.
+* **Run** `20261025T091152Z-p3-flight-c287b08f` (SITL, unchanged P2 mission, llvmpipe): arm,
+  takeoff, reference lock, yaw handover, initial hover, east test, return, north test and
+  return all completed. At sim 78.404 s in **YAW_TEST** the unchanged P2 controller entered
+  RECOVERY with **`stale_state:vehicle_land_detected`** and the runtime ended with
+  `Abort:controller_failed`. All owned processes, Gazebo included, shut down gracefully (exit 0).
+* **Measured cause:** PX4 publishes `vehicle_land_detected` at a steady 1.000 s **sim**
+  interval (97 receipts, maximum sim gap 1.004 s). The unchanged P2 limit is a 2 s **wall**
+  receipt age. On llvmpipe the wall-clock receipt gap exceeded 1.8 s in 65 of 96 intervals
+  and 2.0 s in 4, worst **2.658 s** (sim 77.644 → 78.644, local RTF ≈ 0.38, during the yaw
+  test). This is the same invariant the archived smoke missed at 2.008 s. It is a
+  real-time-factor limit of software rendering under the full depth+RGB+flight workload,
+  not a controller, sensor or command defect.
+* **Decision rule applied (operator instruction, section N):** llvmpipe fails a required
+  performance gate, so the performance requirement is **not** relaxed. The 2 s limit, the
+  P2 controller and every threshold stay unchanged.
+* **Recommendation:** run Gates A–C on a **native Linux host with a hardware GPU**. On this
+  WSL2 host the two renderers are each blocked: D3D12 gives RTF 0.82 but faults in Gazebo
+  shutdown (section M, module unconfirmed), and llvmpipe shuts down cleanly but cannot hold
+  the 2 s wall freshness in flight. The implementation, evaluators and P2 controller
+  carry over unchanged, but a native host needs its own build receipts, a new frozen
+  candidate and a fresh Gate A.
+
+## T. D3D12 shutdown crash — cause confirmed, Gazebo-only repair verified (2026-10-25)
+
+Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run.
+* **Cause (confirmed):** `libd3d12.so`'s destructor `dlclose`s and unmaps
+  **`/usr/lib/wsl/lib/libd3d12core.so`** on the sensors render thread. At that thread's exit,
+  glibc TSD cleanup calls into the unmapped `libd3d12core.so` text (faulting PC was at file
+  offset `0x2edb10` of that module before SIGINT). That the entry is a TSD key destructor
+  registered by `libd3d12core.so` is inferred, not read directly. This supersedes section M's
+  "unconfirmed" attribution. Run `20261025T093020Z-gz-d3d12-trace-baseline`.
+* **One repair variant:** `LD_PRELOAD=/usr/lib/wsl/lib/libd3d12core.so` for the Gazebo server
+  only. The module is no longer unloaded; Gazebo reaches `Shutting down gz-sim-server` and
+  **exits 0** with D3D12 (RTX 4060) active and no residual processes (one sample). Run
+  `20261025T093153Z-gz-d3d12-trace-preload-d3d12core`.
+* **Not applied:** the [v1.2 hardware-renderer profile proposal](v3_sim_p3_hardware_renderer_profile_proposal.md)
+  needs operator approval (contract change and Gazebo-only `gz` shim, because PX4 starts
+  Gazebo itself), then Policy A for the new commit, then a fresh Gate A. No environment
+  update was made.
+
+Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**

@@ -318,6 +318,22 @@ def test_gate_sequencer_refuses_without_explicit_gates(monkeypatch, tmp_path):
         run_p3_gates.main(["--gate", "B", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")])
 
 
+def test_gate_sequencer_requires_frozen_mc_selection_before_consuming(monkeypatch, tmp_path):
+    # Gate A of c4b00bed consumed its authorization and then aborted on a missing
+    # GWM_PX4_MC_TRACE selection; the sequencer must refuse before consumption.
+    for key in ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH"):
+        monkeypatch.setenv(key, "1")
+    monkeypatch.delenv("GWM_PX4_MC_TRACE", raising=False)
+    monkeypatch.setenv("GWM_SIM_ROOT", str(tmp_path))
+    frozen = {"runtime": {"mc_trace_build": {"binary_sha256": "frozen"}}}
+    monkeypatch.setattr(run_p3_gates.p3_manifest, "verify_current", lambda root, path: (frozen, "sha"))
+    consumed = []
+    monkeypatch.setattr(run_p3_gates.p3_manifest, "consume", lambda *a: consumed.append(a))
+    with pytest.raises(SystemExit, match="GWM_PX4_MC_TRACE"):
+        run_p3_gates.main(["--gate", "A", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")])
+    assert consumed == []
+
+
 @POSIX_ONLY
 def test_runner_refuses_outside_owned_namespace(monkeypatch, tmp_path):
     import p3_runner
@@ -489,6 +505,123 @@ def test_shutdown_order_after_controller_failure_drains_before_px4_exit(monkeypa
     assert order.index("mc_drain") < order.index("write:shutdown") < order.index("stop:dds-agent")
     assert order.index("write:shutdown") < order.index("pause_world") < order.index("stop:gazebo")
     assert "console:logger stop" in calls
+
+
+@POSIX_ONLY
+def test_unexpected_exit_during_landed_wait_still_runs_ordered_stop(monkeypatch):
+    # Gate A 8eaefbb6: the probe exited, the landed wait re-raised owned_process_exited
+    # and no owned process was stopped. The ordered stop must still run.
+    import p3_runner
+    runner, calls = ordered_runner(monkeypatch)
+
+    def landed(limit):
+        raise p3_runner.Abort("owned_process_exited:source-probe")
+    monkeypatch.setattr(runner, "wait_landed_disarmed", landed, raising=False)
+    errors = runner.shutdown()
+    assert errors[0] == "final_landed_disarmed_wait:Abort:owned_process_exited:source-probe"
+    assert "final_landed_disarmed_not_independently_observed" in errors
+    for name in ("sensor-bridge", "source-probe", "dds-agent", "gazebo"):
+        assert "stop:" + name in calls
+    assert "write:shutdown" in calls and "qgc_unattended" not in calls and "mc_drain" not in calls
+
+
+@POSIX_ONLY
+def test_px4_group_member_that_is_owned_gazebo_is_judged_by_its_own_record(monkeypatch):
+    # Gate A 8feaa076: PX4's group still held Gazebo (pid 1288) at PX4 exit; Gazebo is owned,
+    # stopped later and exited 0. An unowned leftover must still fail.
+    runner, _ = ordered_runner(monkeypatch)
+
+    def owned(name, pid, members):
+        return type("O", (), {"name": name, "pid": pid, "poll": lambda self: 0,
+                              "record": {"reaped": True, "remaining_group_members": members}})()
+    px4, gazebo = owned("px4", 972, [1288, 4444]), owned("gazebo", 1288, [])
+    runner.owned = [px4, gazebo]
+    runner.shutdown()
+    assert px4.record["remaining_group_members"] == [4444]
+    assert px4.record["group_members_at_exit_raw"] == [1288, 4444]
+    assert px4.record["group_members_owned_separately"] == [1288]
+
+
+@POSIX_ONLY
+def test_pump_never_aborts_the_ordered_shutdown(monkeypatch):
+    import p3_runner
+    runner, _ = ordered_runner(monkeypatch)
+    exited = type("O", (), {"name": "source-probe", "poll": lambda self: 1,
+                            "record": {"stop_requested_monotonic_s": None, "stop_method": "SIGINT"}})()
+    runner.owned, runner.console, runner.shutting_down = [exited], None, False
+    with pytest.raises(p3_runner.Abort, match="owned_process_exited:source-probe"):
+        runner.pump()
+    runner.shutting_down = True
+    runner.pump()
+
+
+def test_p3_dds_agent_is_the_bound_sigstop_build_and_p2_keeps_the_stock_agent():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert 'state/p3-dds-agent-built.json' in runner and 'dds-install/bin/MicroXRCEAgent' not in runner
+    assert '"p3-dds-agent-built.json"' in (SIM / "scripts/p3_manifest.py").read_text()
+    assert "p3-dds-agent-built.json" in (SIM / "scripts/run_p3.sh").read_text()
+    assert 'dds-install/bin/MicroXRCEAgent' in (SIM / "scripts/p2_runner.py").read_text()
+    main = (SIM / "validation/dds_agent_sigstop/microxrce_agent.cpp").read_text()
+    assert "pthread_sigmask(SIG_BLOCK" in main and "sigwait(" in main and "agent_instance.stop();" in main
+    assert main.index("pthread_sigmask") < main.index("agent_instance.create")
+
+
+def test_contract_v1_1_declares_llvmpipe_and_keeps_every_limit():
+    # Operator-approved v1.1 (proposal 8df667d): only the renderer requirement changed.
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.1"
+    assert validation["renderer_requirement"] == "software:llvmpipe"
+    limits = {k: validation[k] for k in ("delivered_hz_min", "processed_hz_min", "source_gap_sim_s",
+                                         "observation_age_sim_s", "state_mismatch_s", "stall_wall_s",
+                                         "graceful_stop_wall_s", "qgc_graceful_stop_wall_s", "qualification_flights")}
+    assert limits == {"delivered_hz_min": 25, "processed_hz_min": 8, "source_gap_sim_s": 0.12,
+                      "observation_age_sim_s": 0.25, "state_mismatch_s": 0.05, "stall_wall_s": 1.0,
+                      "graceful_stop_wall_s": 15.0, "qgc_graceful_stop_wall_s": 5.0, "qualification_flights": 3}
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    assert "GALLIUM_DRIVER" not in runner and "MESA_D3D12" not in runner
+
+
+def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
+    assert run_p3_gates.PLAN["V"] == run_p3_gates.PLAN["A"] and "V" not in run_p3_gates.PREDECESSOR.values()
+    assert p3_manifest.authorization_template("V", "s", "op")["excludes"] == ["flight"]
+    assert p3_manifest.authorization_template("A", "s", "op")["excludes"] == ["flight"]
+    assert p3_manifest.authorization_template("B", "s", "op")["excludes"] == []
+    # A V result can never satisfy Gate B's predecessor requirement.
+    (tmp_path / "state").mkdir()
+    atomic_json(tmp_path / "state" / "p3-gate-V-sha.result.json", {"accepted": True, "manifest_sha256": "sha",
+                                                                      "runs": []})
+    with pytest.raises(PermissionError, match="requires an accepted Gate A"):
+        run_p3_gates.require_predecessor(tmp_path, "B", "sha")
+    source = (SIM / "scripts/run_p3_gates.py").read_text()
+    assert '"acceptance_credit": args.gate != "V"' in source
+
+
+@POSIX_ONLY
+def test_every_gate_environment_has_no_d3d12_selection(monkeypatch, tmp_path):
+    import p3_runner
+    monkeypatch.setenv("GALLIUM_DRIVER", "d3d12")  # an inherited selection must not leak through
+    monkeypatch.setenv("MESA_D3D12_DEFAULT_ADAPTER_NAME", "NVIDIA")
+    runner = p3_runner.Runner.__new__(p3_runner.Runner)
+    runner.run = tmp_path
+    for gate in ("A", "B", "C", "V"):
+        runner.args = p3_runner.argparse.Namespace(gate=gate)
+        env = runner.environment()
+        assert "GALLIUM_DRIVER" not in env and "MESA_D3D12_DEFAULT_ADAPTER_NAME" not in env
+
+
+def test_sensor_adapter_stops_without_rclpy_signal_shutdown_race():
+    # Gate A 5e14e934 interruption: rclpy's SIGINT handler invalidated the context under a
+    # running callback (exit 3). The adapter must request the stop and shut down after spinning.
+    text = (SIM / "ros2_ws/src/gwm_sensor_adapter/gwm_sensor_adapter/node.py").read_text()
+    assert "signal_handler_options=SignalHandlerOptions.NO" in text and "rclpy.spin(" not in text
+    assert "while not stop_requested.is_set():" in text and "executor.spin_once(timeout_sec=0.05)" in text
+    assert text.index("executor.shutdown()") < text.index("node.destroy_node()") < text.index("rclpy.shutdown()")
+
+
+def test_source_probe_keeps_the_sourced_ros_python_path():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    launch = runner[runner.index('self.launch("source-probe"'):][:200]
+    assert '"-s", "-P"' in launch and '"-I"' not in launch
 
 
 @POSIX_ONLY

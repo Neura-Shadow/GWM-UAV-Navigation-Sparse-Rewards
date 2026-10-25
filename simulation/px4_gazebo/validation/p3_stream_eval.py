@@ -111,7 +111,12 @@ def evaluate_stream(run, window, limits, sensors_config, require_association=Fal
     f.check(closed == adapter.get("recorder"), "recorder_close_marker_differs")
     f.check(closed.get("complete") is True and closed.get("overflow") == limits["recorder_overflow_allowed"]
             and closed.get("accepted") == closed.get("written") == len(index), "raw_recorder_incomplete")
-    publications = adapter.get("observed_own_publications") or {}
+    publications = dict(adapter.get("observed_own_publications") or {})
+    # Every rclpy node publishes these two ROS infrastructure topics; exact types only.
+    infrastructure = {"/rosout": ["rcl_interfaces/msg/Log"], "/parameter_events": ["rcl_interfaces/msg/ParameterEvent"]}
+    for topic, types in infrastructure.items():
+        if publications.get(topic) == types:
+            del publications[topic]
     allowed = {sensors_config["observation_topic"], sensors_config["health_topic"]}
     f.check(bool(publications) and set(publications) <= allowed
             and all(types == ["std_msgs/msg/String"] for types in publications.values()),
@@ -172,6 +177,9 @@ def evaluate_stream(run, window, limits, sensors_config, require_association=Fal
         for o in window_obs:
             statuses[o["association"]["status"]] = statuses.get(o["association"]["status"], 0) + 1
         out["association"] = statuses
+        out["association_equidistant_ties_earlier"] = {
+            part: sum(1 for o in window_obs if o["association"].get(part, {}).get("equidistant_tie_earlier"))
+            for part in ("position", "attitude")}
         f.check(window_obs and statuses.get("matched", 0) == len(window_obs), "state_association_incomplete")
         deltas = [abs(o["association"]["position"]["delta_s"]) for o in window_obs
                   if o["association"]["status"] == "matched"]

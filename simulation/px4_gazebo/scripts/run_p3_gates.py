@@ -27,6 +27,7 @@ from p3_fixtures import FIXTURES  # noqa: E402
 PLAN = {"A": [("readiness", None, "readiness")] + [("fixture", name, "fixture-" + name) for name in FIXTURES],
         "B": [("flight", None, "smoke")],
         "C": [("flight", None, f"qualification-{n}") for n in (1, 2, 3)]}
+PLAN["V"] = list(PLAN["A"])  # same ground plan; llvmpipe; no acceptance credit, never a predecessor
 PREDECESSOR = {"B": "A", "C": "B"}
 
 
@@ -86,7 +87,12 @@ def main(argv=None):
     if missing:
         raise SystemExit("Missing explicit gates: " + ", ".join(missing))
     root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home() / "uav_autonomy")))
-    _, sha = p3_manifest.verify_current(root, args.manifest)
+    frozen, sha = p3_manifest.verify_current(root, args.manifest)
+    # The runner refuses an MC build other than the frozen one; check the same explicit
+    # GWM_PX4_MC_TRACE selection here, before the authorization is consumed.
+    import mc_trace_runtime
+    if mc_trace_runtime.selected_build(root, SIM) != frozen["runtime"]["mc_trace_build"]:
+        raise SystemExit("GWM_PX4_MC_TRACE=%s must select the frozen MC trace build" % mc_trace_runtime.CONTRACT)
     authorization = p3_manifest.require_authorization(args.authorization, args.gate, sha)
     predecessor = require_predecessor(root, args.gate, sha)
     output = result_path(root, args.gate, sha)
@@ -99,7 +105,8 @@ def main(argv=None):
                                                          "authorized_by": authorization["authorized_by"]},
               "consumption_marker": str(marker), "predecessor": predecessor, "started_unix_ns": time.time_ns(),
               "planned": [role for _, _, role in PLAN[args.gate]], "runs": [], "first_failure": None,
-              "accepted": False, "automatic_retry": False, "next_gate_started": False}
+              "accepted": False, "acceptance_credit": args.gate != "V",
+              "automatic_retry": False, "next_gate_started": False}
     try:
         for scope, fixture, role in PLAN[args.gate]:
             completed, run = execute_scope(scope, fixture, role, args.gate, args.manifest, args.authorization, flight)

@@ -156,13 +156,15 @@ def evaluate(run):
         mc_component(run, summary, f, out, flight, p2)
         out["rtf"] = native_rtf(run)
         f.check(out["rtf"] is not None, "native_rtf_unmeasured")
-        out["renderer"] = summary.get("renderer")
-        f.check(bool(summary.get("renderer", {}).get("identified")), "renderer_unidentified")
+        out["renderer"] = renderer = summary.get("renderer") or {}
+        # Contract v1.1: the declared renderer is Mesa llvmpipe for every gate; it must be recorded.
+        f.check(renderer.get("software") is True
+                and any("llvmpipe" in s for s in renderer.get("strings", [])), "renderer_not_declared_llvmpipe")
         out["resources"] = summary.get("resources")
         f.check(summary.get("controller_publishers_only_from_controller") is True, "competing_flight_publisher")
     out["failures"] = f.items
     out["status"] = "passed" if not f.items else "failed"
-    out["acceptance_credit"] = out["status"] == "passed"
+    out["acceptance_credit"] = out["status"] == "passed" and summary.get("gate") != "V"
     return out
 
 
@@ -173,7 +175,20 @@ def main(argv=None):
     output = args.run / "p3-evaluation.json"
     if output.exists():
         raise SystemExit("Evaluation already exists; the first evaluation is retained")
-    result = evaluate(args.run)
+    try:
+        result = evaluate(args.run)
+    except Exception as exc:  # incomplete evidence (e.g. early runtime abort) is recorded as failed, never missing
+        summary = {}
+        try:
+            summary = strict_json(args.run / "summary.json")
+        except Exception:
+            pass
+        result = {"contract": "p3-offline-evaluation-v1", "run_id": args.run.name, "gate": summary.get("gate"),
+                  "evaluator_sha256": evaluator_identity(), "runtime_status": summary.get("status"),
+                  "runtime_failure": summary.get("failure"),
+                  "failures": ["runtime_status:" + str(summary.get("failure")),
+                               "evaluator_incomplete_evidence:" + type(exc).__name__ + ":" + str(exc)],
+                  "status": "failed", "acceptance_credit": False}
     atomic_json(output, result, exclusive=True)
     print(result["status"], len(result["failures"]), "failures", flush=True)
     return 0 if result["status"] == "passed" else 1

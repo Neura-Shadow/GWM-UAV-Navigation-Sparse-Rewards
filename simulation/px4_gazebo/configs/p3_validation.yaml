@@ -1,7 +1,9 @@
 {
   "schema_version": 1,
-  "contract": "p3-acceptance-v1",
+  "contract": "p3-acceptance-v1.1",
   "threshold_source": "p3_validation.yaml at archived P3 commit 76f014d (frozen before any P3 runtime); values unchanged",
+  "contract_revision": "v1.1 (operator-approved 2026-10-25, proposal commit 8df667d): renderer requirement hardware -> software:llvmpipe only; every limit unchanged",
+  "renderer_requirement": "software:llvmpipe",
   "ground_window_sim_s": 30,
   "settle_sim_s": 5,
   "readiness_observation_sim_s": 15,

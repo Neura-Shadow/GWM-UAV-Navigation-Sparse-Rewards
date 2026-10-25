@@ -275,6 +275,29 @@ def finalize_synthetic(run, gazebo_exit=0, residual=None):
     (run / "summary.json").write_text(json.dumps(summary))
 
 
+@pytest.mark.parametrize("gate,strings,software,failure", [
+    ("V", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, None),
+    ("V", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"], False, "renderer_not_declared_llvmpipe"),
+    ("A", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, None),
+    ("A", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"], False, "renderer_not_declared_llvmpipe")])
+def test_renderer_requirement_by_gate_and_validation_never_credits(monkeypatch, gate, strings, software, failure):
+    import p3_evaluate
+    summary = {"p3_kind": "readiness", "gate": gate, "status": "passed",
+               "renderer": {"identified": not software, "software": software, "strings": strings}}
+    real = p3_evaluate.strict_json
+    monkeypatch.setattr(p3_evaluate, "strict_json",
+                        lambda path: summary if Path(path).name == "summary.json" else real(path))
+    for name in ("common", "mandatory_artifacts", "p2_component", "native_commands", "mc_component"):
+        monkeypatch.setattr(p3_evaluate, name, lambda *a, **k: None)
+    monkeypatch.setattr(p3_evaluate, "evaluate_stream", lambda *a, **k: {"failures": []})
+    monkeypatch.setattr(p3_evaluate, "evaluate_rgb", lambda *a, **k: {"failures": []})
+    monkeypatch.setattr(p3_evaluate, "native_rtf", lambda run: {"rtf": 0.5})
+    summary.update(sensor_window_sim_s=[1, 2], controller_publishers_only_from_controller=True)
+    result = p3_evaluate.evaluate("/tmp/x")
+    assert (failure in result["failures"]) if failure else (result["status"] == "passed")
+    assert result["acceptance_credit"] is (gate == "A" and result["status"] == "passed")
+
+
 def test_full_offline_evaluation_passes_only_with_graceful_cleanup(tmp_path):
     import p3_evaluate
     run = synthetic_run(tmp_path, "plane2")
@@ -282,6 +305,34 @@ def test_full_offline_evaluation_passes_only_with_graceful_cleanup(tmp_path):
     result = p3_evaluate.evaluate(run)
     assert result["status"] == "passed", result["failures"]
     assert result["acceptance_credit"] is True and len(result["evaluator_sha256"]) >= 8
+
+
+@pytest.mark.parametrize("extra,ok", [
+    ({"/rosout": ["rcl_interfaces/msg/Log"], "/parameter_events": ["rcl_interfaces/msg/ParameterEvent"]}, True),
+    ({"/rosout": ["std_msgs/msg/String"]}, False),
+    ({"/fmu/in/trajectory_setpoint": ["px4_msgs/msg/TrajectorySetpoint"]}, False)])
+def test_adapter_publication_boundary_allows_only_exact_ros_infrastructure(tmp_path, extra, ok):
+    run = synthetic_run(tmp_path, "plane4")
+    path = run / "sensors/adapter-result.json"
+    adapter = json.loads(path.read_text())
+    adapter["observed_own_publications"].update(extra)
+    path.write_text(json.dumps(adapter))
+    summary = json.loads((run / "summary.json").read_text())
+    result = p3_stream_eval.evaluate_stream(run, summary["measurement_window_sim_s"], VALIDATION, SENSORS)
+    assert ("adapter_publication_boundary" not in result["failures"]) == ok
+
+
+def test_early_runtime_abort_records_a_failed_evaluation(tmp_path):
+    """Gate A c4b00bed readiness aborted before any stack; the evaluator crashed and wrote nothing."""
+    import p3_evaluate
+    run = tmp_path / "20261025T053026Z-p3-readiness-test"
+    run.mkdir()
+    (run / "summary.json").write_text(json.dumps({"p3_kind": "readiness", "gate": "A", "status": "failed",
+                                                  "failure": "Abort:mc_trace_build_differs_from_manifest"}))
+    assert p3_evaluate.main([str(run)]) == 1
+    result = json.loads((run / "p3-evaluation.json").read_text())
+    assert result["status"] == "failed" and result["acceptance_credit"] is False
+    assert result["failures"][0] == "runtime_status:Abort:mc_trace_build_differs_from_manifest"
 
 
 def test_historical_gazebo_sigsegv_cannot_be_graceful(tmp_path):

@@ -338,6 +338,7 @@ python3 simulation/px4_gazebo/scripts/p3_manifest.py freeze \
 python3 simulation/px4_gazebo/scripts/p3_manifest.py authorize "$HOME/uav_autonomy/state/p3-candidate.json" \
   --gate A --operator NAME --confirm "authorize Gate A <manifest-sha>" --output "$HOME/uav_autonomy/state/p3-auth-A.json"
 GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 GWM_ALLOW_PX4_LAUNCH=1 \
+GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 \
   /usr/bin/python3 simulation/px4_gazebo/scripts/run_p3_gates.py --gate A \
   --manifest "$HOME/uav_autonomy/state/p3-candidate.json" --authorization "$HOME/uav_autonomy/state/p3-auth-A.json"
 ```

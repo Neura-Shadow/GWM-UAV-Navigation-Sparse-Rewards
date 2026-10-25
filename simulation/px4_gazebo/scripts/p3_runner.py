@@ -199,6 +199,7 @@ class Runner:
         self.streams = []
         self.console = None
         self.capture = None
+        self.shutting_down = False
         self.sampler = None
         self.start = time.monotonic()
         self.summary = None
@@ -238,8 +239,8 @@ class Runner:
             raise PermissionError("Gate authorization was not consumed by the gate sequencer")
         if self.scope == "flight" and self.args.gate not in ("B", "C"):
             raise PermissionError("Flights belong to Gate B or Gate C only")
-        if self.scope != "flight" and self.args.gate != "A":
-            raise PermissionError("Ground scopes belong to Gate A only")
+        if self.scope != "flight" and self.args.gate not in p3_manifest.GROUND_GATES:
+            raise PermissionError("Ground scopes belong to Gate A or validation V only")
         return frozen, sha, authorization
 
     # ---- launching -----------------------------------------------------------------------
@@ -252,6 +253,8 @@ class Runner:
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
                     "GWM_P3_OWNED_NAMESPACE": "1"})
+        # Contract v1.1: Mesa's default llvmpipe for every gate. No D3D12 variables are passed
+        # (the WSL D3D12 path faults in Gazebo shutdown; acceptance report sections L-O).
         env.update(extra or {})
         return env
 
@@ -299,6 +302,8 @@ class Runner:
             self.px4_log.flush()
             if self.console.process.poll() is not None:
                 raise Abort("px4_process_exited")
+        if self.shutting_down:
+            return  # the unexpected exit is already the recorded failure; never abort the ordered stop
         for item in self.owned:
             if item.poll() is not None and item.record["stop_requested_monotonic_s"] is None \
                     and item.record["stop_method"] != "completes_own_work":
@@ -323,7 +328,9 @@ class Runner:
         receipt = strict_json(self.root / "state/p3-built.json")
         env = self.environment()
         sensor_env = self.environment({"FASTRTPS_DEFAULT_PROFILES_FILE": str(self.run / "p3_fastdds.xml")})
-        self.launch("source-probe", ["/usr/bin/python3", "-I", str(SIM / "validation/p3_source_probe.py"),
+        # -s -P: no user site or cwd on sys.path, but keep the sourced ROS PYTHONPATH that
+        # provides the vendored gz.transport13/gz.msgs10 bindings (-I would drop it).
+        self.launch("source-probe", ["/usr/bin/python3", "-s", "-P", str(SIM / "validation/p3_source_probe.py"),
                                      str(self.run), world, self.sensors["model"]] + (["--rgb"] if rgb else [])
                     + (["--watch"] + watch if watch else []), env)
         self.clock_tail = Tail(self.run / "source/clock.jsonl")
@@ -448,8 +455,14 @@ class Runner:
             (SIM / "configs/qgc-monitor.ini").read_text().replace("@RUN_DATA@", str(self.run / "qgc-data")))
         self.qgc = self.launch("qgc-monitor", [str(Path(qgc["bundle"]) / "squashfs-root/AppRun")], qenv,
                                stop_method="SIGTERM", grace=self.validation["qgc_graceful_stop_wall_s"], cwd=work)
-        denv = self.environment({"LD_LIBRARY_PATH": str(self.root / "dds-install/lib") + ":" + os.environ.get("LD_LIBRARY_PATH", "")})
-        self.launch("dds-agent", [str(self.root / "dds-install/bin/MicroXRCEAgent"), "udp4", "-p", "8888", "-v", "4"], denv)
+        # P3 agent: pinned library, main() with a graceful SIGINT/SIGTERM stop (build_p3_agent.py).
+        agent = strict_json(self.root / "state/p3-dds-agent-built.json")
+        if agent.get("status") != "built" or digest(agent["binary"]) != agent["binary_sha256"]:
+            raise Abort("p3_dds_agent_build_invalid")
+        self.summary["identity"]["dds_agent"] = {"binary_sha256": agent["binary_sha256"],
+                                                 "p3_main_source_sha256": agent["p3_main_source_sha256"]}
+        denv = self.environment({"LD_LIBRARY_PATH": agent["library_dir"] + ":" + os.environ.get("LD_LIBRARY_PATH", "")})
+        self.launch("dds-agent", [agent["binary"], "udp4", "-p", "8888", "-v", "4"], denv)
         penv = self.environment({"PX4_SIM_MODEL": self.sensors["airframe"], "PX4_GZ_WORLD": "default",
                                  "PX4_UXRCE_DDS_NS": "px4_71", "PX4_UXRCE_DDS_PORT": "8888",
                                  "PX4_PARAM_UXRCE_DDS_SYNCT": "0", "PX4_PARAM_SDLOG_MODE": "1", "HEADLESS": "1",
@@ -542,10 +555,14 @@ class Runner:
             except Exception as exc:  # recorded; later drains still run
                 errors.append(label + ":" + type(exc).__name__ + ":" + str(exc))
 
+        self.shutting_down = True
         ground = None
         if self.console is not None and self.console.process.poll() is None:
             limit = strict_json(SIM / "configs/p2_control.yaml")["recovery_wall_s"]
-            ground = self.wait_landed_disarmed(limit)
+            try:
+                ground = self.wait_landed_disarmed(limit)
+            except Exception as exc:
+                errors.append("final_landed_disarmed_wait:" + type(exc).__name__ + ":" + str(exc))
             self.summary["final_console_state"] = ground
             if ground is None:
                 errors.append("final_landed_disarmed_not_independently_observed")
@@ -571,6 +588,15 @@ class Runner:
         for item in self.owned:
             if item.poll() is None:
                 item.force()
+        # PX4 spawns Gazebo into its own process group; Gazebo is owned and judged by its own
+        # record. Only a member that is itself an owned, reaped process is set aside (raw kept).
+        reaped = {o.pid for o in self.owned if o.record["reaped"]}
+        for item in self.owned:
+            raw = item.record["remaining_group_members"] or []
+            separate = [pid for pid in raw if pid in reaped and pid != item.pid]
+            if separate:
+                item.record.update(group_members_at_exit_raw=raw, group_members_owned_separately=separate,
+                                   remaining_group_members=[pid for pid in raw if pid not in separate])
         if self.capture is not None:
             attempt("mavlink_capture_close", self.capture.close)
         residual = [row for row in namespace_processes() if row["state"] != "Z"]
@@ -709,7 +735,7 @@ def main(argv=None):
     parser.add_argument("--run", action="store_true", required=True)
     parser.add_argument("--scope", choices=("readiness", "fixture", "flight"), required=True)
     parser.add_argument("--fixture")
-    parser.add_argument("--gate", choices=("A", "B", "C"), required=True)
+    parser.add_argument("--gate", choices=("A", "B", "C", "V"), required=True)
     parser.add_argument("--role", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)

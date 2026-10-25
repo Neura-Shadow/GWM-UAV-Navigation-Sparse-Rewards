@@ -290,10 +290,13 @@ def test_association_nearest_within_tolerance_without_interpolation():
     assert result["position_ned"] == [1.0, 2.0, -3.0]
 
 
-def test_association_reports_missing_ambiguous_and_pending():
+def test_association_reports_missing_and_pending_and_breaks_ties_to_earlier():
     assert association.Associator(300, 0.05).associate(1_000_000)["status"] == "position:missing_history"
     a = associator_with([1_000_000, 1_020_000])
-    assert a.associate(1_010_000)["status"] == "position:ambiguous_equidistant"
+    tie = a.associate(1_010_000)  # operator decision 2026-10-25: exact tie -> earlier (causal) sample
+    assert tie["status"] == "matched" and tie["position"]["timestamp_us"] == 1_000_000
+    assert tie["position"]["equidistant_tie_earlier"] is True and tie["position"]["delta_s"] == -0.01
+    assert a.associate(1_004_000)["position"]["equidistant_tie_earlier"] is False
     assert a.associate(1_200_000)["status"] == "position:pending_newer_state"
     assert a.associate(100_000)["status"] == "position:older_than_history"
 
