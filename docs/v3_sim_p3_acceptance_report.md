@@ -448,5 +448,10 @@ frozen manifest by the operator.
   `ogre2.log` at runtime.
 * **Linux:** P2 212, sensor 61, evaluators 30, runtime 62, MC 23, all passed. The manifest
   dependency check binds 6 receipts.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `1873c23`.
+  Receipt `state/p3-policy-A-approval-1873c23.json` `927fd2f3…b112`. Manifest
+  `state/p3-candidate-1873c23.json`, canonical SHA-256
+  **`123498cd468ddfe0e5fb57854e6d8ba175bd8800b4ce46a1270427728bf9acb0`**; `verify` reproduces
+  it, the MC selection matches, and no Gate A artifacts exist for it.
 
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
