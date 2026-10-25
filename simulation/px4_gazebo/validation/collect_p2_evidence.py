@@ -227,12 +227,22 @@ def verify(run):
     report["failsafe_observed"] = any(s["failsafe"] for s in status)
     report["observed_nav_states"] = sorted({s["nav_state"] for s in status})
     # Exact timestamp/float comparison proves shared PX4 epoch independently of controller receipts.
-    u_by_t = {p["timestamp"]: p for p in ulog["vehicle_local_position"]}
-    matching = [p for p in streams["vehicle_local_position"] if p["timestamp"] in u_by_t]
+    # PX4 can log two estimates with one publication timestamp; timestamp_sample identifies the sample.
+    u_by_t, ambiguous = {}, set()
+    for p in ulog["vehicle_local_position"]:
+        key = (p["timestamp"], p["timestamp_sample"])
+        if key in u_by_t and any(u_by_t[key][k] != p[k] for k in ("x", "y", "z")):
+            ambiguous.add(key)
+        u_by_t[key] = p
+    key = lambda p: (p["timestamp"], p["timestamp_sample"])
+    matching = [p for p in streams["vehicle_local_position"] if key(p) in u_by_t]
+    require(not any(key(p) in ambiguous for p in matching), "Ambiguous ULog position sample")
     require(len(matching) >= 100, "Insufficient overlapping ROS/ULog positions")
-    max_delta = max(abs(p[k]-u_by_t[p["timestamp"]][k]) for p in matching for k in ("x", "y", "z"))
+    max_delta = max(abs(p[k]-u_by_t[key(p)][k]) for p in matching for k in ("x", "y", "z"))
     require(max_delta < 1e-6, "ROS/ULog estimator mismatch")
-    report["estimator_correlation"] = {"exact_timestamp_pairs": len(matching), "max_position_difference_m": max_delta}
+    published = Counter(p["timestamp"] for p in ulog["vehicle_local_position"])
+    report["estimator_correlation"] = {"exact_timestamp_pairs": len(matching), "max_position_difference_m": max_delta,
+                                       "duplicate_ulog_timestamps": sum(1 for n in published.values() if n > 1)}
     offsets = [r["ros_sim_s"]-r["fields"]["timestamp"]/1e6 for r in json_events
                if r.get("topic_key") == "vehicle_local_position" and r["ros_sim_s"] > 0]
     report["position_receipt_clock_age_s"] = {"min": min(offsets), "max": max(offsets)}

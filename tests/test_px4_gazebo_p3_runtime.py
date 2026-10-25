@@ -650,10 +650,21 @@ V1_2_NUMERIC_LIMITS = {
     "qualification_flights": 3, "front_plane_center_height_m": 4}
 
 
+def test_contract_v1_6_changes_only_the_p2_position_pairing():
+    # Operator-approved v1.6 (proposal b9ccf70): ROS/ULog positions paired by (timestamp, timestamp_sample).
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.6"
+    source = (SIM / "validation/collect_p2_evidence.py").read_text()
+    assert 'key = (p["timestamp"], p["timestamp_sample"])' in source
+    assert "require(max_delta < 1e-6, \"ROS/ULog estimator mismatch\")" in source
+    assert "require(len(matching) >= 100, \"Insufficient overlapping ROS/ULog positions\")" in source
+    assert 'u_by_t = {p["timestamp"]: p for p' not in source
+
+
 def test_contract_v1_5_changes_only_the_recorder_capacity():
     # Operator-approved v1.5 (proposal 3593ae5): recorder_capacity 8 -> 32, sized to stall_wall_s at 30.31 Hz.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.5"
+    assert validation["contract"] == "p3-acceptance-v1.6"
     assert (validation["recorder_overflow_allowed"], validation["recorded_fraction_required"],
             validation["stall_wall_s"]) == (0, 1.0, 1.0)
     sensors = json.loads((SIM / "configs/p3_sensors.yaml").read_text())
@@ -666,7 +677,7 @@ def test_contract_v1_4_keeps_v1_3_rgb_scope_and_every_numeric_limit_identical():
     # Operator-approved v1.4 (proposal 26bf5f7) adds only the reset-bracket and landing self-command rules;
     # the v1.3 per-scope RGB consumer rule (proposal e18ed8c) and every number are unchanged.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.5"
+    assert validation["contract"] == "p3-acceptance-v1.6"
     assert validation["state_association"]["reset_epoch_bracket"]["max_per_reset_event"] == 1
     assert validation["state_association"]["reset_epoch_bracket"]["bracket_span_limit_key"] == "state_mismatch_s"
     assert validation["rgb_consumer"] == {"readiness": "required", "fixture": "absent", "flight": "absent_verified"}
@@ -686,7 +697,7 @@ def test_contract_v1_4_keeps_v1_3_rgb_scope_and_every_numeric_limit_identical():
 def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
     # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3, v1.4 and v1.5.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.5"
+    assert validation["contract"] == "p3-acceptance-v1.6"
     assert validation["renderer_requirement"] == "hardware:d3d12"
     profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
     assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}
