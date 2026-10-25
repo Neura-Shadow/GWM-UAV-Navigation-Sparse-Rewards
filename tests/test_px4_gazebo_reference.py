@@ -356,3 +356,86 @@ def test_offline_ground_abort_is_failed_without_invented_flight(config,tmp_path,
         report=offline.verify(tmp_path)
         assert report['recording_integrity']=='passed' and report['flight_acceptance']=='failed'
         assert report['command_ids']==[] and report['observed_recovery']=='remained_grounded'
+
+
+# Contract p3-acceptance-v1.6: ROS/ULog positions are paired by (timestamp, timestamp_sample).
+def position(timestamp, sample, x):
+    return {'timestamp':timestamp,'timestamp_sample':sample,'x':x,'y':0.0,'z':-1.0,'xy_reset_counter':0,
+            'z_reset_counter':0,'heading_reset_counter':0,'vxy_reset_counter':0,'vz_reset_counter':0,
+            'ref_timestamp':0,'delta_heading':0.0}
+
+
+BASE_POSITIONS=[position(1_000_000+i*10_000,1_000_000+i*10_000-4_000,i*0.01) for i in range(120)]
+DUP_T=1_600_000  # Gate C qualification-2 pattern: two estimates logged with one publication timestamp
+DUP_FIRST,DUP_SECOND=position(DUP_T,DUP_T-36_000,0.5),position(DUP_T,DUP_T,0.5004)
+
+
+def verify_positions(config,tmp_path,monkeypatch,ros,ulog_positions):
+    """Commanded flight that aborts after the estimator check, so verify() returns its report."""
+    sys.path.insert(0,str(SIM/'validation'))
+    import collect_p2_evidence as offline
+    from types import SimpleNamespace
+    first=5_000_000
+    abort={'event':'abort','reason':'observation_gap','sim_s':6.0}
+    command={'command':176,'timestamp':first,'target_system':72,'target_component':1}
+    ack={'command':176,'timestamp':first+10_000,'target_system':201,'target_component':191,'from_external':False,'result':0}
+    streams={key:[{}] for key in timing.STATE_TOPICS}
+    streams.update(vehicle_local_position=[dict(p) for p in ros],vehicle_command=[command],vehicle_command_ack=[ack],
+                   trajectory_setpoint=[{'timestamp':first-2_100_000,'position':[0.0,0.0,0.0]}])
+    events=[{'event':'received','topic_key':key,'ros_sim_s':1.0,'fields':p} for key in timing.STATE_TOPICS
+            for p in streams[key]]+[abort]
+    (tmp_path/'ros-events.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in events))
+    (tmp_path/'summary.json').write_text(json.dumps({
+        'run_id':'positions','kind':'flight','controller_result':{'final_state':'RECOVERY','origin_ned':[0.0,0.0,0.0]},
+        'config':config,'ulog_files':[{'path':'fixture','sha256':'fixture'}],'rosbag_files':[]}))
+    ulog={'vehicle_command':[dict(command,source_system=config['source_system'],source_component=config['source_component'])],
+          'vehicle_command_ack':[ack],'vehicle_status':[{'arming_state':2,'failsafe':False,'nav_state':14},
+                                                       {'arming_state':1,'failsafe':False,'nav_state':18}],
+          'vehicle_land_detected':[{'landed':False},{'landed':True}],'vehicle_local_position':[dict(p) for p in ulog_positions]}
+    monkeypatch.setattr(offline,'digest',lambda path:'fixture')
+    monkeypatch.setattr(offline,'read_bag',lambda run:(streams,{},[abort]))
+    monkeypatch.setattr(offline,'read_ulog',lambda *args:(SimpleNamespace(dropouts=[]),ulog))
+    monkeypatch.setattr(offline,'wire_checks',lambda *args:{})
+    return offline.verify(tmp_path)
+
+
+@pytest.mark.parametrize("carried",[DUP_FIRST,DUP_SECOND])
+def test_duplicate_ulog_timestamp_pairs_by_timestamp_sample(config,tmp_path,monkeypatch,carried):
+    ulog=sorted(BASE_POSITIONS+[DUP_FIRST,DUP_SECOND],key=lambda p:p['timestamp'])
+    report=verify_positions(config,tmp_path,monkeypatch,BASE_POSITIONS+[carried],ulog)
+    assert report['estimator_correlation']=={'exact_timestamp_pairs':121,'max_position_difference_m':0.0,
+                                             'duplicate_ulog_timestamps':1}
+
+
+def test_ros_sample_matching_neither_duplicate_is_an_estimator_mismatch(config,tmp_path,monkeypatch):
+    ulog=BASE_POSITIONS+[DUP_FIRST,DUP_SECOND]
+    with pytest.raises(ValueError,match='ROS/ULog estimator mismatch'):
+        verify_positions(config,tmp_path,monkeypatch,BASE_POSITIONS+[dict(DUP_FIRST,x=0.5002)],ulog)
+
+
+def test_unpaired_timestamp_samples_count_against_the_100_pair_minimum(config,tmp_path,monkeypatch):
+    ros=[dict(p,timestamp_sample=p['timestamp_sample']+1) if i>=99 else p for i,p in enumerate(BASE_POSITIONS)]
+    with pytest.raises(ValueError,match='Insufficient overlapping ROS/ULog positions'):
+        verify_positions(config,tmp_path,monkeypatch,ros,BASE_POSITIONS)
+
+
+def test_ambiguous_ulog_sample_key_fails_closed(config,tmp_path,monkeypatch):
+    ulog=BASE_POSITIONS+[DUP_FIRST,dict(DUP_FIRST,x=0.6)]
+    with pytest.raises(ValueError,match='Ambiguous ULog position sample'):
+        verify_positions(config,tmp_path,monkeypatch,BASE_POSITIONS+[DUP_FIRST],ulog)
+
+
+def test_without_duplicates_the_correlation_is_unchanged(config,tmp_path,monkeypatch):
+    report=verify_positions(config,tmp_path,monkeypatch,BASE_POSITIONS,BASE_POSITIONS)
+    assert report['estimator_correlation']=={'exact_timestamp_pairs':120,'max_position_difference_m':0.0,
+                                             'duplicate_ulog_timestamps':0}
+    assert report['flight_acceptance']=='failed' and report['controller_failure']=='observation_gap'
+
+
+def test_estimator_tolerance_is_unchanged(config,tmp_path,monkeypatch):
+    ros=BASE_POSITIONS[:-1]+[dict(BASE_POSITIONS[-1],x=BASE_POSITIONS[-1]['x']+1.1e-6)]
+    with pytest.raises(ValueError,match='ROS/ULog estimator mismatch'):
+        verify_positions(config,tmp_path,monkeypatch,ros,BASE_POSITIONS)
+    ros=BASE_POSITIONS[:-1]+[dict(BASE_POSITIONS[-1],x=BASE_POSITIONS[-1]['x']+0.9e-6)]
+    assert verify_positions(config,tmp_path,monkeypatch,ros,BASE_POSITIONS)['estimator_correlation'][
+        'max_position_difference_m']<1e-6

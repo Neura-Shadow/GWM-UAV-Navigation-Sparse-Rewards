@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3`: Gates A and B accepted; Gate C FAILED at qualification-2 on a P2-evaluator duplicate-timestamp collision (section AG) — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.6 (P2 evaluator duplicate-timestamp pairing) approved and applied offline (section AH); Policy A re-approval pending; no v1.6 candidate frozen — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1110,4 +1110,39 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   [v1.6](v3_sim_p3_p2_evaluator_duplicate_timestamp_v1_6_proposal.md) (keyed form, not applied).
   The failed result and all evidence are preserved. This candidate cannot run Gate C again.
 
-Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gates A and B accepted; Gate C failed at qualification-2 on a P2-evaluator duplicate-timestamp collision (qualification-1 passed) — Qualification 0/3**
+## AH. Contract `p3-acceptance-v1.6` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in
+  `docs/v3_sim_p3_p2_evaluator_duplicate_timestamp_v1_6_proposal.md` (commit `b9ccf70`).
+* **Applied (offline only):**
+  * `validation/collect_p2_evidence.py` (`a6acfd2d…` → `3c794001…`): only the ROS/ULog position
+    comparison in `verify()` changes. ULog rows are keyed by (`timestamp`, `timestamp_sample`); a
+    key carrying different x/y/z fails closed (`Ambiguous ULog position sample`); the 1e-6 m
+    tolerance and the 100-pair minimum are unchanged; `estimator_correlation` gains
+    `duplicate_ulog_timestamps`.
+  * `configs/p3_validation.yaml` (`2bb85189…` → `2d8510f7…`): contract `p3-acceptance-v1.6` and the
+    revision sentence. Every numeric limit is identical. The sensor config, command policy
+    (`bf1ef9b1…`), sensor package and P2 controller are unchanged.
+* **Offline P2 confirmation (read-only; every run directory verified unchanged):** the accepted
+  P2-R3 nominal smoke `20260912T034917Z-p2-flight-c74f35ba` and all 20 trials of
+  `20260912T035329Z-p2-repeat-84bb288d` were evaluated in memory with the accepted evaluator
+  (`a6acfd2d…`, from git) and the v1.6 evaluator. **21/21 reports are identical** apart from the new
+  count, which is 0 in every run. Every `estimator_correlation` equals the stored acceptance
+  report (4,915–4,950 pairs, maximum difference 0), and every flight acceptance still passes. The
+  P2 acceptance record is unchanged. Its batch `frozen_inputs` still pin `a6acfd2d…`, so that
+  frozen P2 batch cannot be re-run with the new file; no P2 re-run is planned.
+* **Retained v1.5 Gate C runs (read-only, not credited):** qualification-2 — the accepted evaluator
+  stops at `ROS/ULog estimator mismatch`; v1.6 completes the full P2 evaluation (5,011 pairs,
+  maximum difference 0, 1 duplicate timestamp, flight acceptance passed, yaw ownership passed with
+  handover at 28.64 s, so the MC window would be available). qualification-1 — identical reports
+  (1 duplicate timestamp counted). The failed Gate C result stays failed.
+* **Tests:** a duplicate timestamp with ROS carrying the first or the second row passes; ROS
+  matching neither row fails; unpaired `timestamp_sample` values count against the 100-pair
+  minimum; an ambiguous key fails closed; without duplicates the correlation is unchanged;
+  1.1e-6 m still fails; v1.6 contract identity. Linux: P2 suites 219, sensor 63, evaluators 63,
+  runtime 89, MC 23. Windows (P3, MC and reference suites): 272 passed, 19 POSIX-only skipped. The
+  dry candidate dependency check resolves all six receipts.
+* Nothing was frozen or run. Next: Policy A re-approval for the v1.6 commit, then freeze and
+  verify; Gates A, B and C each need separate authorization.
+
+Final status: **P3 INCOMPLETE — contract v1.6 approved and applied offline; Policy A re-approval pending; no v1.6 candidate frozen; no gate run — Qualification 0/3**

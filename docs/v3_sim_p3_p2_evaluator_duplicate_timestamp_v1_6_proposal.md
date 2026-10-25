@@ -1,7 +1,8 @@
 # P3 contract `p3-acceptance-v1.6` — proposal (P2 evaluator: duplicate ULog timestamps)
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED.** Nothing was changed, built, frozen or
-run for this proposal. P3 remains INCOMPLETE, qualification 0/3.
+**Status: APPROVED by Neura-Shadow (2026-10-25) exactly as written in `b9ccf70`; APPLIED offline
+(acceptance report section AH).** Nothing was frozen or run. Policy A (content unchanged) must be
+re-approved for the v1.6 candidate commit. P3 remains INCOMPLETE, qualification 0/3.
 
 Basis: HEAD `d2285b4` and the retained v1.5 Gate C runs (acceptance report section AG).
 

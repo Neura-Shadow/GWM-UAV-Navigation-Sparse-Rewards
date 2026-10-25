@@ -20,8 +20,12 @@ reused from them are named explicitly below.
   mission (2 m, 10 s hover, ±1 m E, ±1 m N, +30° ENU yaw, 5 s dwells, 5 s final hover, LAND),
   20 Hz, 0.3 m/s and 10°/s ramps, 0.2 m / 0.3 m / 5° tolerances, 0.2 s sample gap,
   0.25 s / 1.5 s / 2 s / 1 s freshness, controller-only UDPv4, R2 yaw policy and 75 s startup.
-* `p2_runner.py`, P2 evaluators and P2 evidence are untouched. P3 has its own runner and
-  re-uses `collect_p2_evidence.verify()` unchanged on every P3 readiness and flight directory.
+* `p2_runner.py`, P2 evaluators and P2 evidence are untouched, with one operator-approved
+  exception: under [v1.6](v3_sim_p3_p2_evaluator_duplicate_timestamp_v1_6_proposal.md),
+  `collect_p2_evidence.verify()` pairs ROS/ULog `vehicle_local_position` by
+  (`timestamp`, `timestamp_sample`) instead of `timestamp` alone (1e-6 m and 100 pairs unchanged;
+  all 21 accepted P2-R3 reports reproduce identically). P3 has its own runner and re-uses that
+  `verify()` on every P3 readiness and flight directory.
 * The only physical change is the vehicle model, `gz_x500_depth` (+0.061 kg OakD-Lite), which
   is the point of P3. The controller's `model` field is P2 identity metadata; the P3 runner
   independently verifies that PX4 booted `x500_depth_71`.

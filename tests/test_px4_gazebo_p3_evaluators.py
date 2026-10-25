@@ -520,7 +520,7 @@ def attitude_bracket(tmp_path, span_us=20_000, after_count=2, corroborate=True):
 
 
 def test_v1_4_config_declares_the_bracket_rule():
-    assert VALIDATION["contract"] == "p3-acceptance-v1.5"  # v1.5 keeps the v1.4 rule unchanged
+    assert VALIDATION["contract"] == "p3-acceptance-v1.6"  # v1.5 and v1.6 keep the v1.4 rule unchanged
     assert VALIDATION["state_association"]["reset_epoch_bracket"] == {
         "allowed_statuses": ["attitude:reset_epoch_bracket", "position:reset_epoch_bracket"],
         "max_per_reset_event": 1, "bracket_span_limit_key": "state_mismatch_s",
