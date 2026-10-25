@@ -381,5 +381,10 @@ frozen manifest by the operator.
   skipped. All other launch targets (gz, parameter_bridge, sensor adapter, QGC AppRun,
   MicroXRCEAgent) resolve in the runner environment. No threshold, P2 file or sensor package
   changed.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for commit `2f74b2c`.
+  Receipt `state/p3-policy-A-approval-2f74b2c.json` `e766373c…69a8`. Manifest
+  `state/p3-candidate-2f74b2c.json`, canonical SHA-256
+  **`8feaa0764c60ece888123b17af2971a5d52bb0e0aa5a70520ebb94c069eae11e`**; `verify` reproduces
+  it, the MC selection matches the frozen build, and no Gate A artifacts exist for it.
 
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
