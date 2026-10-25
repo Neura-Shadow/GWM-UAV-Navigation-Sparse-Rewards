@@ -812,5 +812,15 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   limit is identical; diagnostic gates stay non-crediting. Linux: P2 212, sensor 61,
   evaluators 49, runtime 78, MC 23. Windows (P3 suites): 170 passed, 18 POSIX-only skipped.
 * Nothing was frozen or run. Full-flight timing with RGB absent remains unproven until Gate B.
+* **v1.3 candidate:** preflight shows the sensor package receipt matching the current source
+  (`3a5bd685…`), the DDS agent binary and the QGC ELF intact with the owner bound, the five WSL
+  D3D12 libraries matching their pins, 793.8 GiB free and no simulation processes. Policy A
+  (unchanged) was re-approved by Neura-Shadow for `e2a91a6` (receipt `f74cd05d…9e4e`).
+  Manifest `state/p3-candidate-e2a91a6.json`, canonical SHA-256
+  **`06b3fa54851bc27c843cb125b2358c18adbcb6c5d5717cfbc156cbad9cb29c37`** (file `6c5d027e…a18d`):
+  `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build `7542919c…` (selection matches),
+  benchmark `20261025T051926Z-mc-trace-benchmark-e6000074`, QGC ELF `82994283…`,
+  `p3_validation.yaml` `83d27b26…`. `verify` reproduces it, and no authorization, consumption
+  or result artifact exists for it under any gate. Gate A has not been run.
 
 Final status: **P3 INCOMPLETE — on this WSL2 host Gate A was accepted for both candidates (llvmpipe 764fcfd7, D3D12 3302379c) and Gate B failed for both on the unchanged 2 s vehicle_land_detected wall freshness; native Linux GPU host recommended — Qualification 0/3**
