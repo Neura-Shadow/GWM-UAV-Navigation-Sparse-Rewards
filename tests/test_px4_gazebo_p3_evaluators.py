@@ -448,3 +448,165 @@ def test_readiness_without_rgb_evidence_fails(tmp_path):
     result = p3_stream_eval.evaluate_rgb(run, [1.5, 6.8], VALIDATION, SENSORS["rgb_sensor"])
     assert result["status"] == "failed" and "rgb_observer_inactive" in result["failures"]
     assert "rgb:no_source_frames_in_window" in result["failures"]
+
+
+# Contract v1.4 rule 1: reset_epoch_bracket at one corroborated PX4 EKF reset -------------------
+
+MATCHED_PART = {"status": "matched", "delta_s": 0.0, "reused": False, "equidistant_tie_earlier": False}
+POSITION_EPOCH = {"xy_reset_counter": 0, "z_reset_counter": 0, "heading_reset_counter": 1, "ref_timestamp": 5000}
+
+
+def bracket_part(before_us, after_us, before_epoch, after_epoch):
+    return {"status": "reset_epoch_bracket", "before": {"timestamp_us": before_us, "epoch": before_epoch},
+            "after": {"timestamp_us": after_us, "epoch": after_epoch}}
+
+
+def ros_events(run, resets=()):
+    """Controller ledger: 20 ms attitude/position samples; each reset (us, state, key, to) lands on a sample."""
+    epochs = {"attitude": {"quat_reset_counter": 1}, "position": dict(POSITION_EPOCH)}
+    stamps = sorted(set(range(1_000_000, 7_200_000, 20_000)) | {r[0] for r in resets})
+    rows = []
+    for us in stamps:
+        for _, state, key, to in [r for r in resets if r[0] == us]:
+            epochs[state][key] = to
+        for topic, state in (("vehicle_attitude", "attitude"), ("vehicle_local_position", "position")):
+            rows.append({"event": "received", "topic_key": topic, "ros_sim_s": us / 1e6, "monotonic_s": 100 + us / 1e6,
+                         "fields": {"timestamp": us + 300, "timestamp_sample": us, **epochs[state]}})
+    write_jsonl(run / "ros-events.jsonl", rows)
+
+
+def associated_run(tmp_path, brackets=None, status_override=None):
+    """Synthetic stream with every observation matched, except `brackets` {window index: (status, parts)}."""
+    run = synthetic_run(tmp_path, "plane4")
+    window = json.loads((run / "summary.json").read_text())["measurement_window_sim_s"]
+    path = run / "sensors/observations.jsonl"
+    observations = [json.loads(line) for line in path.read_text().splitlines()]
+    in_window = [o for o in observations if window[0] <= o["acquisition_sim_s"] <= window[1]]
+    for o in observations:
+        o["association"] = {"status": "matched", "position": dict(MATCHED_PART), "attitude": dict(MATCHED_PART)}
+    for index, (status, parts) in (brackets or {}).items():
+        in_window[index]["association"] = {"status": status, "position": dict(MATCHED_PART),
+                                           "attitude": dict(MATCHED_PART), **parts}
+    if status_override:
+        in_window[0]["association"]["status"] = status_override
+    write_jsonl(path, observations)
+    return run, window, in_window
+
+
+def acquisition_us(observation):
+    return observation["acquisition_stamp_ns"] // 1000
+
+
+def stream(run, window, limits=VALIDATION):
+    return p3_stream_eval.evaluate_stream(run, window, limits, SENSORS, require_association=True)
+
+
+def bracketed_run(tmp_path, state, make_part, resets):
+    """One bracket at the middle window observation; make_part(acq_us) -> part, resets(acq_us) -> ledger steps."""
+    _, _, obs = associated_run(tmp_path / "probe")
+    i = len(obs) // 2
+    acq = acquisition_us(obs[i])
+    run, window, _ = associated_run(tmp_path, {i: (state + ":reset_epoch_bracket", {state: make_part(acq)})})
+    ros_events(run, resets(acq))
+    return run, window
+
+
+def attitude_bracket(tmp_path, span_us=20_000, after_count=2, corroborate=True):
+    return bracketed_run(
+        tmp_path, "attitude",
+        lambda acq: bracket_part(acq + 4_000 - span_us, acq + 4_000, {"quat_reset_counter": 1},
+                                 {"quat_reset_counter": after_count}),
+        lambda acq: [(acq + 4_000, "attitude", "quat_reset_counter", after_count)] if corroborate else [])
+
+
+def test_v1_4_config_declares_the_bracket_rule():
+    assert VALIDATION["contract"] == "p3-acceptance-v1.4"
+    assert VALIDATION["state_association"]["reset_epoch_bracket"] == {
+        "allowed_statuses": ["attitude:reset_epoch_bracket", "position:reset_epoch_bracket"],
+        "max_per_reset_event": 1, "bracket_span_limit_key": "state_mismatch_s",
+        "corroboration": "controller_ros_events_reset_counter_in_bracket"}
+    assert VALIDATION["state_mismatch_s"] == 0.05
+
+
+def test_all_matched_stream_passes_with_zero_brackets(tmp_path):
+    run, window, _ = associated_run(tmp_path)
+    ros_events(run)
+    result = stream(run, window)
+    assert result["status"] == "passed", result["failures"]
+    assert result["reset_bracketed_observations"] == 0
+
+
+def test_single_corroborated_attitude_bracket_is_counted_not_fatal(tmp_path):
+    result = stream(*attitude_bracket(tmp_path))
+    assert result["status"] == "passed", result["failures"]
+    assert result["reset_bracketed_observations"] == 1
+    assert result["association"]["attitude:reset_epoch_bracket"] == 1
+    record = result["reset_bracketed"]["observations"][0]["resets"][0]
+    assert record["state"] == "attitude" and record["key"] == "quat_reset_counter" and record["step"] == [1, 2]
+    assert result["reset_bracketed"]["corroborated_reset_events"] == 1
+
+
+@pytest.mark.parametrize("kwargs,failure", [
+    ({"corroborate": False}, "reset_bracket_uncorroborated"),
+    ({"span_us": 51_000}, "reset_bracket_not_recorded"),
+    ({"after_count": 3}, "reset_bracket_not_single_reset")])
+def test_unverifiable_attitude_bracket_fails(tmp_path, kwargs, failure):
+    result = stream(*attitude_bracket(tmp_path, **kwargs))
+    assert result["status"] == "failed" and failure in result["failures"], result["failures"]
+
+
+def test_single_corroborated_position_bracket_passes(tmp_path):
+    result = stream(*bracketed_run(
+        tmp_path, "position",
+        lambda acq: bracket_part(acq - 10_000, acq + 4_000, dict(POSITION_EPOCH),
+                                 dict(POSITION_EPOCH, heading_reset_counter=2)),
+        lambda acq: [(acq + 4_000, "position", "heading_reset_counter", 2)]))
+    assert result["status"] == "passed", result["failures"]
+    assert result["reset_bracketed_observations"] == 1
+
+
+def test_multi_key_position_bracket_fails(tmp_path):
+    result = stream(*bracketed_run(
+        tmp_path, "position",
+        lambda acq: bracket_part(acq - 10_000, acq + 4_000, dict(POSITION_EPOCH),
+                                 dict(POSITION_EPOCH, xy_reset_counter=1, heading_reset_counter=2)),
+        lambda acq: [(acq + 4_000, "position", "xy_reset_counter", 1),
+                     (acq + 4_000, "position", "heading_reset_counter", 2)]))
+    assert result["status"] == "failed" and "reset_bracket_not_single_reset" in result["failures"]
+
+
+def test_two_observations_for_one_reset_fail_the_bound(tmp_path):
+    # Real processed observations are >= 64 ms apart, so this cannot arise from the synthetic stream;
+    # the bound is exercised on the bracket evaluator with two frames 40 ms apart around one reset.
+    tmp_path.mkdir(exist_ok=True)
+    reset = 3_000_000
+    ros_events(tmp_path, [(reset, "attitude", "quat_reset_counter", 2)])
+    observations = []
+    for n, (acq, before, after) in enumerate(((2_980_000, 2_975_000, reset), (3_020_000, reset - 20_000, 3_025_000))):
+        part = bracket_part(before, after, {"quat_reset_counter": 1}, {"quat_reset_counter": 2})
+        observations.append({"observation_id": n + 1, "acquisition_stamp_ns": acq * 1000,
+                             "association": {"status": "attitude:reset_epoch_bracket",
+                                             "position": dict(MATCHED_PART), "attitude": part}})
+    rule = VALIDATION["state_association"]["reset_epoch_bracket"]
+    f = p3_stream_eval.Failures()
+    report = p3_stream_eval.evaluate_reset_brackets(tmp_path, observations, rule, VALIDATION, f)
+    assert f.items == ["reset_bracket_bound", "reset_bracket_bound"]
+    assert report["per_event"] == {"attitude@3000000": 2}
+    f = p3_stream_eval.Failures()
+    p3_stream_eval.evaluate_reset_brackets(tmp_path, observations[:1], rule, VALIDATION, f)
+    assert f.items == []
+
+
+@pytest.mark.parametrize("status", ["estimate_invalid", "attitude:no_state_within_tolerance",
+                                    "position:pending_newer_state", "attitude:missing_history"])
+def test_other_non_matched_statuses_still_fail(tmp_path, status):
+    run, window, _ = associated_run(tmp_path, status_override=status)
+    ros_events(run)
+    result = stream(run, window)
+    assert result["status"] == "failed" and "state_association_incomplete" in result["failures"]
+
+
+def test_bracket_without_the_v1_4_rule_is_still_fatal(tmp_path):
+    run, window = attitude_bracket(tmp_path)
+    limits = {k: v for k, v in VALIDATION.items() if k != "state_association"}
+    assert "state_association_incomplete" in stream(run, window, limits)["failures"]

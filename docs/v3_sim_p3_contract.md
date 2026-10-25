@@ -94,6 +94,13 @@ stationarity is measured from native ground-truth poses (evaluator only).
 * One controller: the unchanged P2 node. The adapter has no flight publisher (guard plus
   observed node graph); the P2 graph check rejects any competing publisher.
 * Six PX4 state families keep their P2 freshness rules; P3 adds sensor freshness separately.
+* State association: every window observation must be `matched` within `state_mismatch_s`.
+  Under [v1.4](v3_sim_p3_contract_v1_4_proposal.md) rule 1 the only exception is a
+  `reset_epoch_bracket` observation whose recorded bracket spans ≤ `state_mismatch_s`, crosses
+  exactly one PX4 reset (+1 counter step or a `ref_timestamp` change), is corroborated by the
+  controller's `ros-events.jsonl` on the same topic inside the bracket, and is at most one per
+  (state, reset event). Such observations are counted (`reset_bracketed_observations`),
+  reported and excluded from the matched-delta statistics; every other status still fails.
   The independent stream evaluator separates source gaps (native sequence/stamps), delivery
   loss (native ledger vs ROS receipts), recording loss and intentional processing skips.
 * RGB: the IMX214 1920×1080 30 Hz workload is kept and measured by a passive native metadata
@@ -125,6 +132,11 @@ QGC; every frame is CRC-checked against the pinned MAVLink tables. Policy is dat
   original 75 s startup window, each payload one of the frozen patterns within its cap.
   Requires an operator approval receipt bound to the policy's canonical SHA-256. The
   historical approval of A belonged to the archived candidate and does **not** transfer.
+  v1.4 rule 2 adds `vehicle_landing_self_commands` to A: PX4's own land-mode gimbal-neutral
+  COMMAND_LONG frames 72/1→72/0 (1001 acquire, 1000 neutral, 1001 release, byte-exact
+  payloads), only between the controller's `REQUEST_LAND` and `COMPLETE` transitions, at most
+  4 per payload, reported as `allowed_vehicle_landing_self_commands`. Any other vehicle
+  self-command is still `vehicle_self_command_on_gcs_link`; `strict_zero` is unchanged.
 
 Graceful QGC exit uses the restored, reviewed unattended-shutdown overlay
 (`validation/qgc_unattended_v1`), which keeps unsaved-mission, pending-write and reentrancy

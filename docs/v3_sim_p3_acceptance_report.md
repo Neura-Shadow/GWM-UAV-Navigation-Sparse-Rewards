@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.3 candidate `06b3fa54`: Gate A accepted, Gate B failed in evaluation with flight timing passed (section Z) — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.4 approved and applied offline (section AA); Policy A re-approval pending; no v1.4 candidate frozen — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -875,4 +875,45 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
      command policy; no policy changed.
 * P3 remains INCOMPLETE; qualification 0/3. No further gate was started.
 
-Final status: **P3 INCOMPLETE — v1.3 candidate 06b3fa54: Gate A accepted; Gate B failed in evaluation (flight timing passed: land_detected maximum 1.012 s) on a snapshot defect, one reset-bracketed depth frame and PX4 landing self-commands — Qualification 0/3**
+## AA. Contract `p3-acceptance-v1.4` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in `docs/v3_sim_p3_contract_v1_4_proposal.md`
+  (commit `26bf5f7`).
+* **Applied (offline only):**
+  * `p3_validation.yaml` (`2ce6bf22…`): contract `p3-acceptance-v1.4`, revision text, and
+    `state_association.reset_epoch_bracket` {allowed statuses `attitude:`/`position:reset_epoch_bracket`,
+    `max_per_reset_event` 1, span limit key `state_mismatch_s`, corroboration
+    `controller_ros_events_reset_counter_in_bracket`}. Every numeric limit is identical (test
+    asserts the complete set); `p3_sensors.yaml`, the bridge, the D3D12 profile, the shim,
+    `p2_control.yaml` and the P2 controller package are byte-identical.
+  * `p3_native_command_policy.json` (`7a7be282…`): policy A gains `vehicle_landing_self_commands`
+    (message 76, 72/1→72/0, phase `REQUEST_LAND`→`COMPLETE`, ≤4 per payload, rows a/b/c).
+    `strict_zero` and the GCS allowance (1×401, 34×512, 75 s) are unchanged. **New policy A
+    canonical SHA-256 `bf1ef9b1080a52eab1673ac2a1ac6e20d30cfa7fd85b703cae8433dc55f7b3b0`**; the
+    previous approval `ea307bf5…` does not cover it.
+  * Adapter (`association.py`): a `reset_epoch_bracket` refusal now also records `before`/`after`
+    `{timestamp_us, epoch}`; the decision is unchanged. Sensor package rebuilt:
+    **`c5d374137f6556df710c310f8eec994c778c297174b5407866c0d582f820c9b6`** (receipt
+    `41bf4f87…`); the previous receipt (`3a5bd685…`, `f34b6874…`) is preserved in
+    `state/archive/p3-built-3a5bd685.json`.
+  * Evaluators: `p3_stream_eval.evaluate_reset_brackets` implements rule 1 (recorded bracket,
+    single +1 reset, `ros-events.jsonl` corroboration, ≤1 per (state, reset), accounting);
+    `p3_mavlink.evaluate_policy` implements rule 2 with the landing window that
+    `p3_evaluate.native_commands` takes from `controller-result.json`.
+* **Tests:** rule 1 — a corroborated attitude or position bracket passes and is counted; an
+  uncorroborated bracket, a 0.051 s span, a +2 step, a multi-key change, two frames for one
+  reset, `estimate_invalid` and other non-matched statuses fail; a bracket fails without the v1.4
+  rule. Rule 2 — the observed landing sequence passes (6 frames); before `REQUEST_LAND`, after
+  `COMPLETE`, a wrong payload, a wrong target component, a fifth copy, no landing window and
+  `strict_zero` fail. Adapter bracket output; v1.4 config and policy identity. Linux: P2 212,
+  sensor 62, evaluators 63, runtime 87, MC 23. Windows (P3 + MC suites): 216 passed, 19
+  POSIX-only skipped. The dry candidate dependency check resolves all six receipts.
+* **Read-only diagnostic (not credited, run directory verified unchanged):** applied to the
+  retained v1.3 Gate B capture, rule 2 classifies the six landing frames as allowed (rows 4/1/1)
+  with the GCS allowance unchanged; the controller ledger records the 22.184 s attitude reset as
+  a single `quat_reset_counter` 1→2 step. That run's adapter predates the bracket output, so it
+  is not re-evaluated under rule 1 and stays failed.
+* Nothing was frozen or run. Next: Policy A re-approval for the new hash, then freeze and verify
+  the v1.4 candidate; Gates A, B and C each need separate authorization.
+
+Final status: **P3 INCOMPLETE — contract v1.4 approved and applied offline; Policy A re-approval pending; no v1.4 candidate frozen; no gate run — Qualification 0/3**

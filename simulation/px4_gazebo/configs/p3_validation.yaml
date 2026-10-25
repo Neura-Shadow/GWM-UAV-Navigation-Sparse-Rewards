@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "contract": "p3-acceptance-v1.3",
+  "contract": "p3-acceptance-v1.4",
   "threshold_source": "p3_validation.yaml at archived P3 commit 76f014d (frozen before any P3 runtime); values unchanged",
-  "contract_revision": "v1.3 (operator-approved 2026-10-25, proposal commit e18ed8c): RGB consumer by scope (readiness required, fixture absent, flight absent_verified); renderer hardware:d3d12 and every limit unchanged",
+  "contract_revision": "v1.4 (operator-approved 2026-10-25, proposal commit 26bf5f7): a reset_epoch_bracket observation at a single corroborated PX4 EKF reset is counted and bounded (max 1 per reset); PX4 landing gimbal-neutral self-commands enumerated in policy A; v1.3 RGB scope, renderer hardware:d3d12 and every limit unchanged",
   "renderer_requirement": "hardware:d3d12",
   "rgb_consumer": {"readiness": "required", "fixture": "absent", "flight": "absent_verified"},
   "rgb_absence_monitor": {
@@ -10,6 +10,14 @@
     "control_topic": "/depth_camera",
     "sample_period_wall_s": 0.5,
     "max_sample_gap_wall_s": 1.0
+  },
+  "state_association": {
+    "reset_epoch_bracket": {
+      "allowed_statuses": ["attitude:reset_epoch_bracket", "position:reset_epoch_bracket"],
+      "max_per_reset_event": 1,
+      "bracket_span_limit_key": "state_mismatch_s",
+      "corroboration": "controller_ros_events_reset_counter_in_bracket"
+    }
   },
   "ground_window_sim_s": 30,
   "settle_sim_s": 5,

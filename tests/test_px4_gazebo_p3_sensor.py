@@ -306,6 +306,24 @@ def test_association_rejects_reset_epoch_bracket():
     assert a.associate(1_012_000)["status"] == "position:reset_epoch_bracket"
 
 
+def test_reset_epoch_bracket_records_the_bracketing_samples():
+    # Contract v1.4: the refusal itself is unchanged; the bracket is recorded for the evaluator.
+    a = associator_with([1_000_000, 1_020_000], heading_reset=lambda t: 0 if t < 1_010_000 else 1)
+    position = a.associate(1_012_000)["position"]
+    assert position["status"] == "reset_epoch_bracket" and "value" not in position
+    assert position["before"]["timestamp_us"] == 1_000_000 and position["after"]["timestamp_us"] == 1_020_000
+    assert position["before"]["epoch"]["heading_reset_counter"] == 0
+    assert position["after"]["epoch"]["heading_reset_counter"] == 1
+    assert set(position["after"]["epoch"]) == set(association.RESET_KEYS)
+    attitude = association.Associator(300, 0.05)
+    for t, counter in ((1_000_000, 1), (1_020_000, 2)):
+        attitude.add_attitude({"timestamp": t, "timestamp_sample": t, "q": yaw_quaternion(0.1),
+                               "quat_reset_counter": counter})
+    assert attitude.attitude.match(1_010_000) == {
+        "status": "reset_epoch_bracket", "before": {"timestamp_us": 1_000_000, "epoch": {"quat_reset_counter": 1}},
+        "after": {"timestamp_us": 1_020_000, "epoch": {"quat_reset_counter": 2}}}
+
+
 def test_association_duplicates_and_reuse_reported():
     a = associator_with([1_000_000, 1_000_000, 1_020_000])
     assert a.position.counts["duplicate"] == 1

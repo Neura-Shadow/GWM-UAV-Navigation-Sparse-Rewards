@@ -198,7 +198,40 @@
       }
      ]
     }
-   ]
+   ],
+   "vehicle_landing_self_commands": {
+    "message_id": 76,
+    "source": [
+     72,
+     1
+    ],
+    "target": [
+     72,
+     0
+    ],
+    "phase": [
+     "REQUEST_LAND",
+     "COMPLETE"
+    ],
+    "max_frames_per_payload": 4,
+    "payload_patterns": [
+     {
+      "row": "a",
+      "command": 1001,
+      "seven_float32_le_hex": "000090420000803f000080bf000080bf000000000000000000000000"
+     },
+     {
+      "row": "b",
+      "command": 1000,
+      "seven_float32_le_hex": "0000c07f0000c07f0000c07f0000c07f000000400000000000000000"
+     },
+     {
+      "row": "c",
+      "command": 1001,
+      "seven_float32_le_hex": "000040c0000040c0000080bf000080bf000000000000000000000000"
+     }
+    ]
+   }
   }
  }
 }

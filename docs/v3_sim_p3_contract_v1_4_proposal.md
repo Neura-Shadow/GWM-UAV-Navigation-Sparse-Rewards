@@ -1,7 +1,8 @@
 # P3 contract `p3-acceptance-v1.4` — proposal (EKF reset brackets, PX4 landing gimbal self-commands)
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED.** Nothing was changed, built, frozen or
-run for this proposal. P3 remains INCOMPLETE, qualification 0/3.
+**Status: APPROVED by Neura-Shadow (2026-10-25) exactly as written in `26bf5f7`; APPLIED offline
+(acceptance report section AA).** Nothing was frozen or run. Policy A must be re-approved for
+the v1.4 candidate. P3 remains INCOMPLETE, qualification 0/3.
 
 Basis: HEAD `5ceb6c7` (v1.3 plus the snapshotter fix) and the retained v1.3 Gate B run
 `20261025T123921Z-p3-flight-624dc8ae` (acceptance report section Z). Pinned PX4 v1.17.0

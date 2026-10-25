@@ -226,11 +226,32 @@ def load_policy(path, selected, approval_path=None):
             "approval_path": str(approval_path) if approval is not None else None}
 
 
-def evaluate_policy(closed, effective, startup_window_end_ns=None):
+def landing_self_command(frame, rule, landing_window_ns, counts):
+    """Contract v1.4 rule 2: None if this vehicle self-command is an enumerated PX4 landing
+    gimbal-neutral frame inside the controller's REQUEST_LAND..COMPLETE window, else the violation reason."""
+    if rule is None or landing_window_ns is None:
+        return "vehicle_self_command_on_gcs_link"
+    match = next((p for p in rule["payload_patterns"] if p["command"] == frame.get("command")
+                  and p["seven_float32_le_hex"] == frame.get("params_float32_le_hex")), None)
+    begin, end = landing_window_ns
+    if (match is None or frame["message_id"] != rule["message_id"]
+            or (frame["source_system"], frame["source_component"]) != tuple(rule["source"])
+            or (frame["target_system"], frame["target_component"]) != tuple(rule["target"])
+            or not begin <= frame["monotonic_ns"] <= end):
+        return "vehicle_self_command_on_gcs_link"
+    key = str(match["command"]) + ":" + match["seven_float32_le_hex"]
+    counts[key] = counts.get(key, 0) + 1
+    if counts[key] > rule["max_frames_per_payload"]:
+        return "vehicle_landing_self_command_cap_exceeded"
+    return None
+
+
+def evaluate_policy(closed, effective, startup_window_end_ns=None, landing_window_ns=None):
     """Classify every captured command/control frame. Unknown traffic is a violation."""
     policy = effective["policy"]
     violations, allowed, heartbeats = [], [], 0
     pattern_counts, command_counts = {}, {}
+    landing_allowed, landing_counts = [], {}
     for frame in closed["frames_of_interest"]:
         origin = (frame["source_system"], frame["source_component"])
         if frame["message_id"] == 0:
@@ -238,7 +259,12 @@ def evaluate_policy(closed, effective, startup_window_end_ns=None):
             continue
         if origin == VEHICLE:
             if "command" in frame and frame["target_system"] == VEHICLE[0]:
-                violations.append(dict(frame, reason="vehicle_self_command_on_gcs_link"))
+                reason = landing_self_command(frame, policy.get("vehicle_landing_self_commands"),
+                                              landing_window_ns, landing_counts)
+                if reason is None:
+                    landing_allowed.append(frame)
+                else:
+                    violations.append(dict(frame, reason=reason))
             continue
         if frame.get("active_control_message"):
             violations.append(dict(frame, reason="active_control_message_from_non_vehicle"))
@@ -276,8 +302,12 @@ def evaluate_policy(closed, effective, startup_window_end_ns=None):
         failures.append("gcs_heartbeat_not_observed")
     return {"policy": effective["name"], "policy_sha256": effective["policy_sha256"],
             "approval": effective["approval"], "gcs_heartbeats": heartbeats, "allowed_frames": len(allowed),
-            "allowed_by_command": command_counts, "violations": violations[:200], "violation_count": len(violations),
-            "global_zero_native_commands": not allowed and not violations, "failures": sorted(set(failures)),
+            "allowed_by_command": command_counts,
+            "allowed_vehicle_landing_self_commands": {"frames": len(landing_allowed), "by_payload": landing_counts,
+                                                      "landing_window_ns": list(landing_window_ns) if landing_window_ns else None},
+            "violations": violations[:200], "violation_count": len(violations),
+            "global_zero_native_commands": not allowed and not landing_allowed and not violations,
+            "failures": sorted(set(failures)),
             "status": "passed" if not failures else "failed"}
 
 

@@ -233,6 +233,78 @@ def test_policy_a_bounds(tmp_path):
         assert "command_not_permitted_by_policy" in result["failures"], name
 
 
+# Contract v1.4 rule 2: PX4 landing gimbal-neutral self-commands (rows a/b/c), landing phase only.
+LANDING_ROWS = {"a": (1001, "000090420000803f000080bf000080bf000000000000000000000000"),
+                "b": (1000, "0000c07f0000c07f0000c07f0000c07f000000400000000000000000"),
+                "c": (1001, "000040c0000040c0000080bf000080bf000000000000000000000000")}
+LANDING_WINDOW = (50_000_000_000, 60_000_000_000)
+
+
+def self_command(row, stamp_ns=50_300_000_000, target_component=0, payload=None):
+    command, hex_ = LANDING_ROWS[row]
+    return {"message_id": 76, "message": "COMMAND_LONG", "command": command, "source_system": 72,
+            "source_component": 1, "target_system": 72, "target_component": target_component,
+            "params_float32_le_hex": payload or hex_, "monotonic_ns": stamp_ns}
+
+
+def with_self_commands(*commands):
+    capture = frames("heartbeat-v2.bin")
+    capture["frames_of_interest"] += list(commands)
+    return capture
+
+
+def test_policy_a_declares_exactly_the_proposed_landing_allowance():
+    document = json.loads(policy_file().read_text())
+    assert "vehicle_landing_self_commands" not in document["policies"]["strict_zero"]
+    rule = document["policies"]["A"]["vehicle_landing_self_commands"]
+    assert (rule["message_id"], rule["source"], rule["target"], rule["phase"], rule["max_frames_per_payload"]) == (
+        76, [72, 1], [72, 0], ["REQUEST_LAND", "COMPLETE"], 4)
+    assert {p["row"]: (p["command"], p["seven_float32_le_hex"]) for p in rule["payload_patterns"]} == LANDING_ROWS
+    # The GCS allowance is unchanged: 1 x 401 and 34 x 512 inside the 75 s startup window.
+    allowed = {r["command"]: r["maximum_frames"] for r in document["policies"]["A"]["allowed_commands"]}
+    assert allowed == {401: 1, 512: 34} and document["policies"]["A"]["startup_wall_s"] == 75
+
+
+def test_policy_a_allows_the_observed_landing_sequence(tmp_path):
+    effective = approved_policy_a(tmp_path)
+    observed = [self_command("a", 50_279_000_000), self_command("b", 50_280_000_000),
+                self_command("c", 50_280_500_000)] + [self_command("a", 50_000_000_000 + t)
+                                                     for t in (1_286_000_000, 1_794_000_000, 2_303_000_000)]
+    result = p3_mavlink.evaluate_policy(with_self_commands(*observed), effective, 2_000_000_000, LANDING_WINDOW)
+    assert result["status"] == "passed", result["failures"]
+    assert result["allowed_vehicle_landing_self_commands"]["frames"] == 6
+    assert result["allowed_frames"] == 0 and result["global_zero_native_commands"] is False
+
+
+@pytest.mark.parametrize("command,reason", [
+    (dict(stamp_ns=49_999_999_999), "vehicle_self_command_on_gcs_link"),
+    (dict(stamp_ns=60_000_000_001), "vehicle_self_command_on_gcs_link"),
+    (dict(payload="0000803f" + "00" * 24), "vehicle_self_command_on_gcs_link"),
+    (dict(target_component=1), "vehicle_self_command_on_gcs_link")])
+def test_policy_a_rejects_landing_self_commands_outside_the_enumeration(tmp_path, command, reason):
+    effective = approved_policy_a(tmp_path)
+    result = p3_mavlink.evaluate_policy(with_self_commands(self_command("a", **command)), effective,
+                                        2_000_000_000, LANDING_WINDOW)
+    assert result["status"] == "failed" and reason in result["failures"]
+
+
+def test_policy_a_caps_each_landing_payload_at_four(tmp_path):
+    effective = approved_policy_a(tmp_path)
+    capture = with_self_commands(*[self_command("b", 50_300_000_000 + n) for n in range(5)])
+    result = p3_mavlink.evaluate_policy(capture, effective, 2_000_000_000, LANDING_WINDOW)
+    assert result["failures"] == ["vehicle_landing_self_command_cap_exceeded"]
+    assert result["allowed_vehicle_landing_self_commands"]["frames"] == 4
+
+
+def test_landing_self_commands_fail_without_a_landing_window_or_under_strict_zero(tmp_path):
+    capture = with_self_commands(self_command("a"))
+    no_window = p3_mavlink.evaluate_policy(capture, approved_policy_a(tmp_path), 2_000_000_000)
+    assert "vehicle_self_command_on_gcs_link" in no_window["failures"]
+    strict = p3_mavlink.evaluate_policy(capture, p3_mavlink.load_policy(policy_file(), None), 2_000_000_000,
+                                        LANDING_WINDOW)
+    assert "vehicle_self_command_on_gcs_link" in strict["failures"]
+
+
 def test_incomplete_capture_never_passes():
     effective = p3_mavlink.load_policy(policy_file(), None)
     capture = frames("heartbeat-v2.bin")
@@ -577,10 +649,13 @@ V1_2_NUMERIC_LIMITS = {
     "qualification_flights": 3, "front_plane_center_height_m": 4}
 
 
-def test_contract_v1_3_rgb_consumer_by_scope_and_every_numeric_limit_identical():
-    # Operator-approved v1.3 (proposal e18ed8c): only the per-scope RGB consumer rule is new.
+def test_contract_v1_4_keeps_v1_3_rgb_scope_and_every_numeric_limit_identical():
+    # Operator-approved v1.4 (proposal 26bf5f7) adds only the reset-bracket and landing self-command rules;
+    # the v1.3 per-scope RGB consumer rule (proposal e18ed8c) and every number are unchanged.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.3"
+    assert validation["contract"] == "p3-acceptance-v1.4"
+    assert validation["state_association"]["reset_epoch_bracket"]["max_per_reset_event"] == 1
+    assert validation["state_association"]["reset_epoch_bracket"]["bracket_span_limit_key"] == "state_mismatch_s"
     assert validation["rgb_consumer"] == {"readiness": "required", "fixture": "absent", "flight": "absent_verified"}
     assert validation["rgb_absence_monitor"] == {"topic_marker": "/sensor/IMX214/", "control_topic": "/depth_camera",
                                                  "sample_period_wall_s": 0.5, "max_sample_gap_wall_s": 1.0}
@@ -596,9 +671,9 @@ def test_contract_v1_3_rgb_consumer_by_scope_and_every_numeric_limit_identical()
 
 
 def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
-    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3.
+    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3 and v1.4.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.3"
+    assert validation["contract"] == "p3-acceptance-v1.4"
     assert validation["renderer_requirement"] == "hardware:d3d12"
     profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
     assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}
