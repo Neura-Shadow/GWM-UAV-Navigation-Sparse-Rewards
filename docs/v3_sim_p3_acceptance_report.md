@@ -1106,7 +1106,8 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
 * **Correction needed (not applied):** the defect is in the accepted P2 evaluator, so fixing it
   requires an operator decision. The smallest change keys the ULog lookup by (`timestamp`,
   `timestamp_sample`), or requires the ROS sample to match one of the ULog rows carrying its
-  `timestamp`, keeping the 1e-6 tolerance and the 100-sample minimum. The failed result and all
-  evidence are preserved. This candidate cannot run Gate C again.
+  `timestamp`, keeping the 1e-6 tolerance and the 100-sample minimum. Drafted as
+  [v1.6](v3_sim_p3_p2_evaluator_duplicate_timestamp_v1_6_proposal.md) (keyed form, not applied).
+  The failed result and all evidence are preserved. This candidate cannot run Gate C again.
 
 Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gates A and B accepted; Gate C failed at qualification-2 on a P2-evaluator duplicate-timestamp collision (qualification-1 passed) — Qualification 0/3**
