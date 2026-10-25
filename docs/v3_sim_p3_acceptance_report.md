@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3` frozen and verified (section AD); Gate A not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3`: Gate A ACCEPTED (section AE); Gate B not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1020,4 +1020,24 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   false, and no authorization, consumption, result or run artifact exists for it. Gate A has not
   been run.
 
-Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3 frozen and verified; Gate A not run — Qualification 0/3**
+## AE. Gate A of v1.5 candidate `a0deb4d3` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-a0deb4d3f1f9.json` `0c8fdaf4…2820`, consumed.
+  Result `state/p3-gate-A-a0deb4d3….result.json` `c9a8d91e…5a19`, `accepted: true`,
+  `acceptance_credit: true`. Run 15:20:41–15:27:54 UTC; no leftover processes.
+* **Readiness** `20261025T152055Z-p3-readiness-3b929fe3` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.089 s wall, 455 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.076 s, association 150/150
+  `matched`. Native commands passed policy A (1 × 401, 34 × 512); MC causality `verified`;
+  readiness RTF 0.669 with the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum receipt stall ≤ 0.070 s.
+* **Recorder (v1.5 capacity 32):** complete with 0 overflow in all 8 runs; maximum queue depth 2
+  (readiness) or 1 (fixtures); maximum single write 0.030 s.
+* Every owned process was classified graceful in all 8 runs.
+* The v1.5 capacity and the v1.4 rules are not stressed on the ground. Gate B is the first v1.5
+  flight and needs a separate authorization.
+
+Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gate A accepted; Gate B not run — Qualification 0/3**
