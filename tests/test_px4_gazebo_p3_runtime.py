@@ -508,6 +508,43 @@ def test_shutdown_order_after_controller_failure_drains_before_px4_exit(monkeypa
 
 
 @POSIX_ONLY
+def test_unexpected_exit_during_landed_wait_still_runs_ordered_stop(monkeypatch):
+    # Gate A 8eaefbb6: the probe exited, the landed wait re-raised owned_process_exited
+    # and no owned process was stopped. The ordered stop must still run.
+    import p3_runner
+    runner, calls = ordered_runner(monkeypatch)
+
+    def landed(limit):
+        raise p3_runner.Abort("owned_process_exited:source-probe")
+    monkeypatch.setattr(runner, "wait_landed_disarmed", landed, raising=False)
+    errors = runner.shutdown()
+    assert errors[0] == "final_landed_disarmed_wait:Abort:owned_process_exited:source-probe"
+    assert "final_landed_disarmed_not_independently_observed" in errors
+    for name in ("sensor-bridge", "source-probe", "dds-agent", "gazebo"):
+        assert "stop:" + name in calls
+    assert "write:shutdown" in calls and "qgc_unattended" not in calls and "mc_drain" not in calls
+
+
+@POSIX_ONLY
+def test_pump_never_aborts_the_ordered_shutdown(monkeypatch):
+    import p3_runner
+    runner, _ = ordered_runner(monkeypatch)
+    exited = type("O", (), {"name": "source-probe", "poll": lambda self: 1,
+                            "record": {"stop_requested_monotonic_s": None, "stop_method": "SIGINT"}})()
+    runner.owned, runner.console, runner.shutting_down = [exited], None, False
+    with pytest.raises(p3_runner.Abort, match="owned_process_exited:source-probe"):
+        runner.pump()
+    runner.shutting_down = True
+    runner.pump()
+
+
+def test_source_probe_keeps_the_sourced_ros_python_path():
+    runner = (SIM / "scripts/p3_runner.py").read_text()
+    launch = runner[runner.index('self.launch("source-probe"'):][:200]
+    assert '"-s", "-P"' in launch and '"-I"' not in launch
+
+
+@POSIX_ONLY
 def test_unconfirmed_landing_skips_qgc_receipt_and_trace_stop(monkeypatch):
     runner, calls = ordered_runner(monkeypatch, landed=False)
     errors = runner.shutdown()

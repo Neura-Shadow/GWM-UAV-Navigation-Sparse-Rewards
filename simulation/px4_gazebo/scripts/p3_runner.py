@@ -199,6 +199,7 @@ class Runner:
         self.streams = []
         self.console = None
         self.capture = None
+        self.shutting_down = False
         self.sampler = None
         self.start = time.monotonic()
         self.summary = None
@@ -299,6 +300,8 @@ class Runner:
             self.px4_log.flush()
             if self.console.process.poll() is not None:
                 raise Abort("px4_process_exited")
+        if self.shutting_down:
+            return  # the unexpected exit is already the recorded failure; never abort the ordered stop
         for item in self.owned:
             if item.poll() is not None and item.record["stop_requested_monotonic_s"] is None \
                     and item.record["stop_method"] != "completes_own_work":
@@ -323,7 +326,9 @@ class Runner:
         receipt = strict_json(self.root / "state/p3-built.json")
         env = self.environment()
         sensor_env = self.environment({"FASTRTPS_DEFAULT_PROFILES_FILE": str(self.run / "p3_fastdds.xml")})
-        self.launch("source-probe", ["/usr/bin/python3", "-I", str(SIM / "validation/p3_source_probe.py"),
+        # -s -P: no user site or cwd on sys.path, but keep the sourced ROS PYTHONPATH that
+        # provides the vendored gz.transport13/gz.msgs10 bindings (-I would drop it).
+        self.launch("source-probe", ["/usr/bin/python3", "-s", "-P", str(SIM / "validation/p3_source_probe.py"),
                                      str(self.run), world, self.sensors["model"]] + (["--rgb"] if rgb else [])
                     + (["--watch"] + watch if watch else []), env)
         self.clock_tail = Tail(self.run / "source/clock.jsonl")
@@ -542,10 +547,14 @@ class Runner:
             except Exception as exc:  # recorded; later drains still run
                 errors.append(label + ":" + type(exc).__name__ + ":" + str(exc))
 
+        self.shutting_down = True
         ground = None
         if self.console is not None and self.console.process.poll() is None:
             limit = strict_json(SIM / "configs/p2_control.yaml")["recovery_wall_s"]
-            ground = self.wait_landed_disarmed(limit)
+            try:
+                ground = self.wait_landed_disarmed(limit)
+            except Exception as exc:
+                errors.append("final_landed_disarmed_wait:" + type(exc).__name__ + ":" + str(exc))
             self.summary["final_console_state"] = ground
             if ground is None:
                 errors.append("final_landed_disarmed_not_independently_observed")

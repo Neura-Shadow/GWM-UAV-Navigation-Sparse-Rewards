@@ -355,4 +355,31 @@ frozen manifest by the operator.
   **`8eaefbb63d3122f6e3373ae245de8c11af8aee029978d76ef111822529b2c11d`**; `verify` reproduces
   it, the explicit MC selection matches the frozen build, and no Gate A artifacts exist for it.
 
+## I. Gate A of candidate `8eaefbb6` — FAILED (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-8eaefbb63d31.json` `31d3f0ea…c898`, consumed.
+  Result `p3-gate-A-8eaefbb6….result.json` `d99a6a10…acd9`, `accepted: false`; retained, not retried.
+* **First failure:** `readiness:runtime_status:Abort:owned_process_exited:source-probe`, run
+  `20261025T053935Z-p3-readiness-113a881c`, 15.8 s. The evaluator recorded a `failed`
+  evaluation (the section H fix works). The six fixtures never started. PX4 and the MC
+  selection came up (`mc_pos_control running`). No sensor, timing or Gazebo-shutdown result
+  was measured.
+* **Cause 1 (probe):** the runner launched `p3_source_probe.py` with `python3 -I`, which
+  ignores `PYTHONPATH`. The gz bindings exist only in the sourced Jazzy vendor tree
+  (`/opt/ros/jazzy/opt/gz_{transport,msgs}_vendor/lib/python`), so the import failed with
+  `ModuleNotFoundError: gz`. An import-only check in the runner environment reproduces this
+  with `-I` and passes with `-s -P`.
+* **Cause 2 (cleanup):** `shutdown()` began with an unguarded `wait_landed_disarmed()`, whose
+  `pump()` re-raised the same `owned_process_exited`. No ordered stop ran (`shutdown_exception`),
+  and every other owned process ended through the PID-namespace teardown, recorded as
+  unreaped. This correctly fails cleanup, but the shutdown it was meant to exercise never
+  happened.
+* **Corrections:** the probe now launches with `-s -P` (still no user site or cwd), and
+  `pump()` no longer aborts once shutdown has started. The landed-wait exception is recorded,
+  and every later stop still runs. Three regression tests were added. Linux: P2 212,
+  sensor 61, evaluators 27, runtime 59, MC 23. Windows runtime: 47 passed, 12 POSIX-only
+  skipped. All other launch targets (gz, parameter_bridge, sensor adapter, QGC AppRun,
+  MicroXRCEAgent) resolve in the runner environment. No threshold, P2 file or sensor package
+  changed.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
