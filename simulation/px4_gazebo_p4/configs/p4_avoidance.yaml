@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "contract": "p4-avoidance-config-v1",
+  "enabled": false,
+  "perception": {
+    "column_stride": 4,
+    "band_below_m": 0.38,
+    "band_above_m": 0.22,
+    "free_cap_m": 4.0,
+    "max_hit_range_m": 8.0,
+    "grid_resolution_m": 0.1,
+    "grid_margin_m": 2.0,
+    "ground_exclusion_m": 0.15,
+    "snapshot_max_age_sim_s": 0.25,
+    "unusable_frames_to_hover": 3
+  },
+  "envelope": {"r_body_m": 0.39, "z_min_m": -0.23, "z_max_m": 0.07},
+  "planner": {
+    "r_infl_m": 1.0,
+    "d_stop_m": 0.30,
+    "heading_step_deg": 10.0,
+    "heading_steps": 6,
+    "lengths_m": [0.75, 1.5],
+    "observable_half_angle_deg": 25.0,
+    "trigger_range_m": 3.0,
+    "min_progress_m": 0.05,
+    "weights": {"progress": 1.0, "deviation": 0.6, "turn": 0.2, "clearance": 0.3},
+    "clearance_cap_m": 1.0,
+    "yaw_disc_margin_m": 0.10,
+    "tracking_m": 0.30
+  },
+  "supervisor": {
+    "resume_deviation_m": 0.10,
+    "hover_timeout_sim_s": 20.0,
+    "stale_abort_sim_s": 10.0,
+    "transit_deadline_sim_s": 150.0,
+    "min_clearance_margin_m": 0.10
+  },
+  "mission": {
+    "goal_enu_m": [8.0, 0.0],
+    "height_m": 2.0,
+    "map_scan_deg": 30.0,
+    "goal_hover_sim_s": 5.0,
+    "goal_tolerance_m": 0.30,
+    "settled_speed_m_s": 0.1
+  },
+  "geofence": {"x_min_m": -1.0, "x_max_m": 9.5, "y_abs_max_m": 3.0, "height_min_m": 1.0, "height_max_m": 3.0},
+  "topics": {"local_map": "/gwm/p4/local_map", "adapter_health": "/gwm/sensors/front_depth/health"}
+}
