@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0` frozen and verified (section AA); Gate A not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0`: Gate A ACCEPTED (section AB); Gate B not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -926,4 +926,24 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   authorization is false, and no authorization, consumption, result or run artifact exists for
   it. Gate A has not been run.
 
-Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0 frozen and verified; Gate A not run — Qualification 0/3**
+## AB. Gate A of v1.4 candidate `6c00ecb0` — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-6c00ecb09f2a.json` `ca22473f…2925`, consumed.
+  Result `state/p3-gate-A-6c00ecb0….result.json` `3d96d4da…d27b`, `accepted: true`,
+  `acceptance_credit: true`. Run 13:29:30–13:36:50 UTC; no leftover processes.
+* **Readiness** `20261025T132943Z-p3-readiness-53edf801` on `D3D12 (NVIDIA GeForce RTX 4060 Laptop
+  GPU)`, mandatory RGB observer active (`rgb_subscribed: true`). RGB (unchanged checks): source
+  30.31 Hz sim, maximum gap 0.036 s, receipt stall 0.075 s wall, 454 frames, 0 late or
+  unrendered. Depth: 30.31 Hz source, 10.0 Hz processed, maximum age 0.072 s; association 150/150
+  `matched`, 0 reset-bracketed. Native commands passed policy A (1 × 401, 34 × 512; 0 landing
+  self-commands, as expected on the ground); MC causality `verified`. Readiness RTF 0.631 with
+  the RGB consumer active. This is readiness RGB evidence only.
+* **Seven depth-only fixtures** (plane2, plane4, plane6, oblique, asymmetric, out_of_range,
+  interruption) passed with `rgb_subscribed: false`: source 30.30–30.31 Hz, maximum gap 0.036 s,
+  processed 10.0 Hz, maximum age ≤ 0.064 s, maximum receipt stall ≤ 0.069 s.
+* Every owned process (Gazebo, sensor bridge/adapter, probe, clock bridge; at readiness also PX4,
+  DDS agent, QGC and the controller) was classified graceful in all 8 runs.
+* The v1.4 rules are not exercised on the ground (no EKF reset bracket, no landing). Gate B is
+  the first v1.4 flight and needs a separate authorization.
+
+Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0: Gate A accepted; Gate B not run — Qualification 0/3**

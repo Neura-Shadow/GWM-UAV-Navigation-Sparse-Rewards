@@ -281,7 +281,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   strict cleanup, native-command policy and gated A/B/C orchestration are implemented and
   verified offline ([contract](v3_sim_p3_contract.md), [report](v3_sim_p3_acceptance_report.md)).
   **Gate A accepted** (candidate `764fcfd7`, contract v1.1 llvmpipe, 8/8 ground runs);
-  D3D12 v1.2 candidate `3302379c` Gate A accepted (8/8, Gazebo exit 0); Gate B failed on both renderers with the RGB consumer active (2 s `vehicle_land_detected` wall freshness). Contract v1.3 (RGB at readiness, depth-only verified flights): candidate `06b3fa54` Gate A accepted 8/8, Gate B failed in evaluation with flight timing passed. Contract v1.4 (bounded, corroborated EKF reset brackets; enumerated PX4 landing gimbal self-commands) approved and applied; candidate `6c00ecb0` frozen and verified, Gate A awaiting authorization: **qualification 0/3**. The 27 earlier unaccepted P3 commits are
+  D3D12 v1.2 candidate `3302379c` Gate A accepted (8/8, Gazebo exit 0); Gate B failed on both renderers with the RGB consumer active (2 s `vehicle_land_detected` wall freshness). Contract v1.3 (RGB at readiness, depth-only verified flights): candidate `06b3fa54` Gate A accepted 8/8, Gate B failed in evaluation with flight timing passed. Contract v1.4 (bounded, corroborated EKF reset brackets; enumerated PX4 landing gimbal self-commands) approved and applied; candidate `6c00ecb0` Gate A accepted 8/8, Gate B awaiting authorization: **qualification 0/3**. The 27 earlier unaccepted P3 commits are
   preserved on `archive/p3-history-39ba887`.
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
