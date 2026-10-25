@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "contract": "p4-scenarios-v1",
+  "frame": "world ENU metres; vehicle spawns at the world origin facing +x; every box is static and 4 m tall, centred at height 2 m",
+  "scenarios": {
+    "S1": {"boxes": [], "outcome": "goal_reached", "fault": null},
+    "S2": {"boxes": [{"name": "pillar_a", "center": [4.0, 0.0], "size": [0.4, 0.4]}],
+           "outcome": "goal_reached_with_detour", "fault": null},
+    "S3": {"boxes": [{"name": "pillar_a", "center": [4.0, 0.5], "size": [0.4, 0.4]}],
+           "outcome": "goal_reached_with_detour", "fault": null, "detour_side": "negative_y"},
+    "S4": {"boxes": [{"name": "pillar_a", "center": [3.5, 0.0], "size": [0.4, 0.4]},
+                     {"name": "pillar_b", "center": [6.0, -1.4], "size": [0.4, 0.4]}],
+           "outcome": "goal_reached_with_detour", "fault": null},
+    "S5": {"boxes": [{"name": "wall", "center": [4.0, 0.0], "size": [0.3, 8.0]}],
+           "outcome": "safe_refusal", "fault": null},
+    "S6": {"boxes": [{"name": "pillar_a", "center": [4.0, 0.0], "size": [0.4, 0.4]}],
+           "outcome": "safe_stop_on_sensor_loss", "fault": "bridge_stop_at_distance"}
+  },
+  "ground_fixtures": {
+    "G2": {"boxes": [{"name": "pillar_a", "center": [2.0, 0.0], "size": [0.4, 0.4]}], "expected_trigger": "obstacle_in_trigger_range"},
+    "G4": {"boxes": [{"name": "pillar_a", "center": [4.0, 0.0], "size": [0.4, 0.4]},
+                     {"name": "pillar_b", "center": [6.5, -1.4], "size": [0.4, 0.4]}], "expected_trigger": "no_obstacle_in_trigger_range"},
+    "G6": {"boxes": [{"name": "wall", "center": [6.0, 0.0], "size": [0.3, 8.0]}], "expected_trigger": "no_obstacle_in_trigger_range"}
+  },
+  "box_height_m": 4.0,
+  "box_center_height_m": 2.0
+}
