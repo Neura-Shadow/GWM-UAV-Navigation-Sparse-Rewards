@@ -629,5 +629,10 @@ Linux GPU host, not a relaxation.
   as `state/archive/p3-built-52024487.json`). Same smoke on the fix: **100/100** passed.
   Regression test added. No threshold, cleanup rule or evaluator check changed.
 * **Linux:** P2 212, sensor 61, evaluators 34, runtime 65, MC 23.
+* **New candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `4bb06f4`
+  (receipt `49c719a5…671f`). Manifest `state/p3-candidate-4bb06f4.json`, canonical SHA-256
+  **`764fcfd7c39b8a75042fa0ca9de3721397dc214735eb030e4cc14c72ae8958d5`**
+  (contract v1.1, llvmpipe). `verify` reproduces it, the MC selection matches, and no Gate A
+  artifacts exist for it.
 
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
