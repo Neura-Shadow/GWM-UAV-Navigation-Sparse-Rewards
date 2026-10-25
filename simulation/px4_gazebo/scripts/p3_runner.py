@@ -580,6 +580,15 @@ class Runner:
         for item in self.owned:
             if item.poll() is None:
                 item.force()
+        # PX4 spawns Gazebo into its own process group; Gazebo is owned and judged by its own
+        # record. Only a member that is itself an owned, reaped process is set aside (raw kept).
+        reaped = {o.pid for o in self.owned if o.record["reaped"]}
+        for item in self.owned:
+            raw = item.record["remaining_group_members"] or []
+            separate = [pid for pid in raw if pid in reaped and pid != item.pid]
+            if separate:
+                item.record.update(group_members_at_exit_raw=raw, group_members_owned_separately=separate,
+                                   remaining_group_members=[pid for pid in raw if pid not in separate])
         if self.capture is not None:
             attempt("mavlink_capture_close", self.capture.close)
         residual = [row for row in namespace_processes() if row["state"] != "Z"]

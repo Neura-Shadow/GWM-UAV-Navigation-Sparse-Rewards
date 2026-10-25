@@ -526,6 +526,23 @@ def test_unexpected_exit_during_landed_wait_still_runs_ordered_stop(monkeypatch)
 
 
 @POSIX_ONLY
+def test_px4_group_member_that_is_owned_gazebo_is_judged_by_its_own_record(monkeypatch):
+    # Gate A 8feaa076: PX4's group still held Gazebo (pid 1288) at PX4 exit; Gazebo is owned,
+    # stopped later and exited 0. An unowned leftover must still fail.
+    runner, _ = ordered_runner(monkeypatch)
+
+    def owned(name, pid, members):
+        return type("O", (), {"name": name, "pid": pid, "poll": lambda self: 0,
+                              "record": {"reaped": True, "remaining_group_members": members}})()
+    px4, gazebo = owned("px4", 972, [1288, 4444]), owned("gazebo", 1288, [])
+    runner.owned = [px4, gazebo]
+    runner.shutdown()
+    assert px4.record["remaining_group_members"] == [4444]
+    assert px4.record["group_members_at_exit_raw"] == [1288, 4444]
+    assert px4.record["group_members_owned_separately"] == [1288]
+
+
+@POSIX_ONLY
 def test_pump_never_aborts_the_ordered_shutdown(monkeypatch):
     import p3_runner
     runner, _ = ordered_runner(monkeypatch)

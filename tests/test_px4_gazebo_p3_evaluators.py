@@ -284,6 +284,21 @@ def test_full_offline_evaluation_passes_only_with_graceful_cleanup(tmp_path):
     assert result["acceptance_credit"] is True and len(result["evaluator_sha256"]) >= 8
 
 
+@pytest.mark.parametrize("extra,ok", [
+    ({"/rosout": ["rcl_interfaces/msg/Log"], "/parameter_events": ["rcl_interfaces/msg/ParameterEvent"]}, True),
+    ({"/rosout": ["std_msgs/msg/String"]}, False),
+    ({"/fmu/in/trajectory_setpoint": ["px4_msgs/msg/TrajectorySetpoint"]}, False)])
+def test_adapter_publication_boundary_allows_only_exact_ros_infrastructure(tmp_path, extra, ok):
+    run = synthetic_run(tmp_path, "plane4")
+    path = run / "sensors/adapter-result.json"
+    adapter = json.loads(path.read_text())
+    adapter["observed_own_publications"].update(extra)
+    path.write_text(json.dumps(adapter))
+    summary = json.loads((run / "summary.json").read_text())
+    result = p3_stream_eval.evaluate_stream(run, summary["measurement_window_sim_s"], VALIDATION, SENSORS)
+    assert ("adapter_publication_boundary" not in result["failures"]) == ok
+
+
 def test_early_runtime_abort_records_a_failed_evaluation(tmp_path):
     """Gate A c4b00bed readiness aborted before any stack; the evaluator crashed and wrote nothing."""
     import p3_evaluate

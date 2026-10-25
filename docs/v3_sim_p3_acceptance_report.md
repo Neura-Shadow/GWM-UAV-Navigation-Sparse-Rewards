@@ -387,4 +387,36 @@ frozen manifest by the operator.
   **`8feaa0764c60ece888123b17af2971a5d52bb0e0aa5a70520ebb94c069eae11e`**; `verify` reproduces
   it, the MC selection matches the frozen build, and no Gate A artifacts exist for it.
 
+## J. Gate A of candidate `8feaa076` — FAILED at readiness evaluation (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-8feaa0764c60.json` `0507a21f…6686`, consumed.
+  Result `p3-gate-A-8feaa076….result.json` `7f9a257c…32b4`, `accepted: false`; retained.
+* **Readiness run** `20261025T054510Z-p3-readiness-84dd7b19`: the runtime completed (`passed`),
+  but the independent evaluation `failed`. The fixtures never started. Nothing was left behind.
+* **Measured and passed:** Gazebo exited **0** within 0.14 s of pause + SIGINT (one sample;
+  the historical −11 risk is not closed). QGC 0, every bridge, probe and adapter 0. Native
+  commands matched policy A exactly (1 × 401, 34 × 512). RGB stream passed. MC causality was
+  acquired. RTF 0.57 (minimum interval RTF 0.021).
+* **Evaluator failures:**
+  1. `cleanup:dds-agent:terminated_by_SIGINT` (exit −2). The pinned MicroXRCEAgent v2.4.3
+     (`73622810`) installs no SIGINT/SIGTERM handler; its only clean exit is
+     `AgentInstance::stop()`, which no signal reaches. Accepted P2 recorded −15 for it without
+     judging it. Under P3's strict rule it can never pass: **operator decision**.
+  2. `cleanup:px4:process_group_members_remained` [1288]. That PID is the owned Gazebo, which
+     PX4 spawns into its group and which is stopped (exit 0) after PX4 by design. **Fixed:** a
+     member that is itself an owned, reaped process is set aside, the raw list is kept, and any
+     other leftover still fails.
+  3. `depth:adapter_publication_boundary`: the observed `/rosout` and `/parameter_events` are
+     created by every rclpy node. **Fixed:** exactly these two topics with their exact types
+     are allowed; anything else still fails.
+  4. `depth:state_association_incomplete`: 103 matched, 33 position and 14 attitude
+     `ambiguous_equidistant` (two state samples exactly equally close to the image stamp,
+     structural with quantized sim time). **Operator decision.**
+  5. `renderer_unidentified`: Gazebo rendered with Mesa **llvmpipe** (software) although
+     `/dev/dxg` and `libd3d12` exist. Archived P3 runs were llvmpipe too; hardware rendering
+     has never been active here. The manifest requires `hardware`. **Operator decision.**
+* In-memory re-evaluation of the retained run with the fixed evaluator (nothing written)
+  leaves failures 1, 2 (raw record), 4 and 5. Linux: P2 212, sensor 61, evaluators 30,
+  runtime 60, MC 23.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**
