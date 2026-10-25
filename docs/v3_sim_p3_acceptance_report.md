@@ -729,5 +729,11 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   suites) 148 passed, 15 POSIX-only skipped. Shellcheck is clean. The live WSL library
   hashes match the profile. The shim passes `gz sim --versions` through to Gazebo 8.15.0.
 * Flight timing on D3D12 is still unproven; Gate B judges it unchanged.
+* **v1.2 candidate:** Policy A (unchanged) re-approved by Neura-Shadow for `f76fbbb`
+  (receipt `55709675…b598`). Manifest `state/p3-candidate-f76fbbb.json`, canonical SHA-256
+  **`3302379cffc4a67e0df68d14f752cc350228df9fc8ee71d83e1610840a3c892f`**
+  (`renderer_requirement: hardware:d3d12`; profile `2e9e9ba1…`, shim `5c3cf88b…`, 5 pinned
+  libraries). `verify` reproduces it, the MC selection matches, and no Gate A artifacts
+  exist for it. Gate A has not been run.
 
 Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**
