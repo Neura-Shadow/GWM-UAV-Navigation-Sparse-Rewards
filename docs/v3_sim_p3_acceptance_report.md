@@ -736,4 +736,32 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   libraries). `verify` reproduces it, the MC selection matches, and no Gate A artifacts
   exist for it. Gate A has not been run.
 
+## V. Gate A of candidate `3302379c` (v1.2, D3D12) — **ACCEPTED** (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-A-3302379cffc4.json` `81d422f2…dbe8`, consumed.
+  Result `state/p3-gate-A-3302379c….result.json` `9eba398a…4eca`, `accepted: true`,
+  `acceptance_credit: true`. Run 09:48:03–09:55:15 UTC; no leftover processes.
+* **8/8 independent evaluations passed.** Renderer `D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)`
+  in every run. **Gazebo exit 0 in all 8 runs**, so the libd3d12core lifetime fix held for 8
+  real shutdowns. Sensor adapter exit 0 in all 8.
+
+| Run | source Hz (≥25) | max gap s (≤0.12) | processed Hz (≥8) | max age s (≤0.25) | max stall s wall (≤1.0) |
+|---|---|---|---|---|---|
+| readiness `adc2a21a` | 30.30 | 0.036 | 10.0 | 0.072 | 0.082 |
+| plane2 `35eb96f4` | 30.30 | 0.036 | 10.0 | 0.064 | 0.054 |
+| plane4 `13bec8e5` | 30.30 | 0.036 | 10.0 | 0.060 | 0.054 |
+| plane6 `38cd08d1` | 30.30 | 0.036 | 10.0 | 0.060 | 0.049 |
+| oblique `a413e48a` | 30.30 | 0.036 | 10.0 | 0.060 | 0.053 |
+| asymmetric `e5acb438` | 30.30 | 0.036 | 10.0 | 0.056 | 0.049 |
+| out_of_range `1e633769` | 30.30 | 0.036 | 10.0 | 0.060 | 0.051 |
+| interruption `575b5bdb` | 30.31 | 0.036 | 10.0 | 0.056 | 0.058 |
+
+  Geometry, valid fraction, out-of-range, interruption detection, recorder, association,
+  policy A, MC causality, P2 ground timing and graceful cleanup also passed wherever they
+  applied.
+* **Flight-timing caution:** readiness RTF **0.647** (minimum interval 0.0092; wall delivery
+  19.1 Hz), lower than the 0.82 single sample of section L. At that average, PX4's 1.000 s
+  sim `vehicle_land_detected` interval is about 1.55 s wall against the unchanged 2 s limit.
+  Gate B judges it unchanged.
+
 Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**
