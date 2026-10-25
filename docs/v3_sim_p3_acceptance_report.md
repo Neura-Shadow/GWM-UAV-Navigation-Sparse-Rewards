@@ -176,4 +176,118 @@ cleanup evidence.
 4. **Gazebo shutdown** — the archived −11 (SIGSEGV) exit after TERM is unexplained; the new
    pause + SIGINT shutdown is an untested mitigation and any non-zero exit still fails cleanup.
 
+## F. Offline preflight closure (2026-10-25, on top of `d05e95e`)
+
+No PX4 SITL, Gazebo, ROS node, bridge, QGC application, benchmark run, gate or flight was
+started. Accepted P2 sources and thresholds are untouched (P2 package hash test passes).
+
+### Changes
+
+| File | Change | Why |
+|---|---|---|
+| `validation/p3_process_exit.py` | Signal names come from a fixed Linux x86_64 table instead of the host `signal` module | Exit codes are recorded on Linux; on Windows −9 was named `signal_9`. Still a failure on every host; only the label becomes host-independent |
+| `tests/test_px4_gazebo_p3_runtime.py` | `POSIX_ONLY` skip marker (with reason) on 10 tests that import `p3_runner` (`fcntl`, process groups) or run `run_p3.sh` through bash; new benchmark-config test | Windows cannot run them; they are reported as skipped, and all of them pass on Linux |
+| `tests/test_px4_gazebo_p3_evaluators.py` | Synthetic harness waits for the recorder writer to drain before `close(10)`, then asserts `complete` | The order-dependent failure was host load: the faster-than-real-time synthetic producer missed the 10 s wall deadline, and the harness never checked `complete`. Production recorder and deadline unchanged |
+| `scripts/benchmark_mc_trace.py` | Validates the trace against `configs/p2_control.yaml` instead of the archived `p3_control.yaml` | See MC benchmark below |
+| `docs/v3_sim_p3_policy_a_proposal.md` | New: narrowly scoped policy A approval proposal | Proposal only; `strict_zero` remains the default |
+
+### Windows results (Python 3.13.5, pytest 9, no `GWM_*` variables)
+
+| Suite | Result |
+|---|---|
+| P2/P1 accepted (5 files) | 212 passed |
+| P3 sensor | 60 passed |
+| P3 evaluators | 26 passed (repeated: stable) |
+| P3 runtime | 45 passed, **10 skipped** (POSIX-only, reason printed; not counted as passed) |
+| MC causal-trace | 23 passed |
+| Full ordinary suite (`--continue-on-collection-errors`, torch available) | 1166 passed, 22 skipped (10 are the P3 POSIX-only tests), 1 collection error: the untracked `test_px4_mc_trace_shutdown.py` |
+
+### Linux results (WSL2 Ubuntu 24.04.3, kernel 6.18.40.1, Python 3.12.3, pytest 7.4.4)
+
+| Suite | Result |
+|---|---|
+| P2/P1 accepted (5 files) | **212 passed** |
+| P3 sensor | **60 passed** |
+| P3 evaluators | **26 passed** |
+| P3 runtime | **55 passed** (includes the 10 Windows-skipped tests) |
+| MC causal-trace | **23 passed** |
+| `colcon build` + `colcon test` of `gwm_sensor_adapter` (Jazzy, scratch workspace in `/tmp`) | build OK; **2 tests, 0 failures** (real `sensor_msgs`/`rclpy` serialization; no node) |
+| Full ordinary suite (`--continue-on-collection-errors`) | **883 passed, 1 skipped, 1 failed, 24 collection errors** — 21 errors and the failure are `torch` absent in WSL; 3 errors are `src.ros2_bridge` failing to import because of `torch`; 1 is the untracked `test_px4_mc_trace_shutdown.py` (stash-only functions). P3 touches none of these files |
+| `py_compile` (38 P3/MC Python files), `bash -n` + `shellcheck -S warning` (3 scripts), JSON/YAML (6), `xmllint` (2) | all clean |
+| Owned processes after the runs | none |
+
+Still not verified: every native sensor, timing, resource, RTF, renderer, MC causality, LAND,
+MAVLink capture and cleanup result; the SDF re-derivation in `build_p3.sh --build`.
+
+### QGC unattended build (offline; QGC application never executed)
+
+| Item | Value |
+|---|---|
+| Pinned source | `4568b585648e8c6065cca6c650b52731c1d3baa3` (`~/uav_autonomy/qgc_closure_v1/source`), Qt 6.11.1 gcc_64, Release, `GWM_QGC_SITL_SHUTDOWN_BUILD=ON` |
+| Owner bound | `p3_namespace_owner.py` `0d1c2d27c330260475f3f17892f9e4b2612678e9abbdf8301a7a4aa25ce8eb74` (previous build bound `2d765506…`, now invalid) |
+| Overlay | re-applied to clean source; only `GwmSitlBuildIdentity.h` differs from the previous overlay; receipt `overlay-owner-0d1c2d27-20261025T050446Z.json` `e2312969…de33` |
+| Previous overlay state | preserved: `source-overlay-backups/owner-2d765506-20261025T050446Z.tar` `855c7bdd…01fa` (+ `.diff`); previous ELF `34c39a80…0a71` kept in `bundles/` |
+| Offscreen Qt component tests | **passed 8/8** (qml, interactive-default and opt-in guard, signal fixture); receipt `8bfabafb…051f`; `live_graceful_shutdown_proven = false` |
+| **New ELF** | **`829942834b71bbd7f30967cb32151e7a32bc1a7fbb9609fd15e2f4dde3e46d03`** (owner hash embedded once); bundle `bundles/829942…6d03`; `ldd -r` clean; 695 native files hashed |
+| Receipt for the manifest | `~/uav_autonomy/state/qgc-unattended-built.json` `0c836b52211213a2bddcf549ec62ab29f7982f05d6c42e2241c662e4baf98263`, status `built_offline_not_runtime_verified` |
+| Interactive behavior | unchanged: the opt-in CMake option defaults OFF, the guard arms only after an owner-verified TERM, and the stock AppImage `2600af0f…f3ae` is untouched |
+
+### MC benchmark compatibility
+
+`benchmark_mc_trace.py` was written while `configs/p3_control.yaml` existed (archived P3
+history). It reads that file only to pass `max_sample_gap_sim_s` and `position_fresh_sim_s`
+to `mc_trace_evidence.validate_records`. Those are the only `config[...]` keys that module
+reads, and both have identical values in the accepted `p2_control.yaml` (0.2 s and 0.25 s).
+`p3_runner` already passes `p2_control.yaml` for flight acquisition. The benchmark now does
+the same. The binary, workload (3 pairs × 10 000 iterations), 50 ms wall limit,
+output-bit equality, causality checks and the 1e-5 rad yaw tolerance are unchanged.
+
+Reuse decision: both earlier passed runs (`20260912T154212Z-…-0ef339f6`,
+`20261024T071853Z-…-e32a9d00`) match the current MC build (instrumented binary `7542919c…`,
+overlay `ecdf4eaa…`, benchmark `.cpp` `e713cf13…`, identical executables and libraries).
+They were produced by the pre-correction harness, and no harness hash was recorded. The
+implementation is therefore **not demonstrably identical**, so they are **not reused**. A
+new `benchmark_mc_trace.py --measure` run is required before `p3_manifest.py freeze`. It
+is a native microbenchmark with no simulation, but it executes PX4 controller code, so it
+was not run here.
+
+### Native command policy
+
+The effective policy is still `strict_zero`, and stock QGC 401/512 start-up traffic is
+expected to fail it. Policy A (canonical SHA-256 `ea307bf5…1295`: 1 × 401 + 34 × 512,
+startup ≤ 75 s, GCS 255/190 → 72/1 only) is described in the
+[approval proposal](v3_sim_p3_policy_a_proposal.md). It is not approved. The receipt
+loader binds only the policy hash, not a candidate, so an approval must be tied to one
+frozen manifest by the operator.
+
+### Gazebo shutdown risk (offline review only)
+
+* Retained evidence: `docs/evidence/v3_sim_p3_gate_A_e1a674c.json` on
+  `archive/p3-history-39ba887`. The `gazebo` process (pid 525, process name `ruby`, the
+  `gz` CLI frontend) exited −11 0.67 s after the single requested SIGTERM, not forced,
+  with no group members left. Legacy cleanup marked it `passed`. That label is wrong and
+  was never reused. The same archive records −11 "in every fixture, beginning with plane2".
+* The older WSL run summaries from Sep 12 use a schema with no stop method or forced flag
+  (mostly 0, −9 in `20260912T111419Z-p3-plane2` and `20260912T160921Z-p3-plane6`). They
+  cannot show what the stop signal was and are not counter-evidence.
+* No core dump, backtrace or Gazebo crash log was retained, so the root cause remains
+  unknown.
+* The new runner pauses the world and sends SIGINT. This is an untested mitigation.
+  `p3_process_exit` classifies SIGSEGV, SIGKILL, unexpected SIGTERM, forced kill, a missed
+  deadline, leftover group members and an unreaped process as failures, and this is
+  covered by tests on both hosts.
+
+### Blockers before Gate A
+
+1. New `benchmark_mc_trace.py --measure` run with the corrected harness, which needs an
+   operator decision because it executes PX4 controller code.
+2. `build_p3.sh --build` (P3 build plus SDF extrinsic re-derivation) and the `p3-built.json`
+   receipt for this candidate. `p3_build.py` overwrites `~/uav_autonomy/state/p3-built.json`,
+   which currently holds the archived receipt from 2026-09-12, so preserve a copy first.
+3. Native command policy: keep `strict_zero` (expected Gate A failure on stock traffic) or
+   issue a policy A approval receipt tied to one manifest.
+4. `p3_manifest.py freeze` with the new benchmark run and the QGC receipt above, then one
+   explicit Gate A authorization for that manifest SHA.
+5. Gazebo abnormal-exit risk stays open. A non-zero or signal exit fails Gate A cleanup.
+
 Final status: **P3 INCOMPLETE — runtime acceptance not authorized/executed (first invariant: Gate A readiness unproven) — Qualification 0/3**

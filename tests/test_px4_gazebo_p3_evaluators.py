@@ -9,6 +9,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import time
 
 import numpy as np
 import pytest
@@ -96,7 +97,13 @@ def synthetic_run(tmp_path, fixture="plane4", bias=0.0, drop=None, move_vehicle=
             poses.append({"id": len(poses) + 1, "stamp_ns": stamp, "receipt_monotonic_ns": int((100 + t) * 1e9),
                           "poses": {"x500_depth_71": moved,
                                     "front_plane": {"position": plane["center_m"], "q_wxyz": [1, 0, 0, 0]}}})
+    # The synthetic producer outruns real time, so the production close deadline would
+    # measure host load, not the recorder. Let the writer drain first; close then has no
+    # backlog and the recording must be complete, or the harness itself fails.
+    while rec.written < rec.accepted and rec.error is None and rec.thread.is_alive():
+        time.sleep(0.01)
     closed = rec.close(10)
+    assert closed["complete"], closed
     write_jsonl(run / "sensors/observations.jsonl", observations)
     write_jsonl(run / "sensors/health.jsonl", health)
     write_jsonl(run / "source/depth-headers.jsonl", headers)

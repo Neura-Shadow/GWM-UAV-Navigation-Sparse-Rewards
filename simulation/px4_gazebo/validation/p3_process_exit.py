@@ -7,16 +7,20 @@ no member of its process group behind. Reaped is not graceful; signal deaths
 (SIGTERM, SIGKILL, SIGSEGV, ...) are never graceful, including for an
 intentionally interrupted producer.
 """
-import signal
-
 STOP_METHODS = ("SIGINT", "SIGTERM", "console_shutdown", "completes_own_work")
+
+# Exit codes are recorded on Linux (x86_64); name them by that table, not by the
+# evaluating host's signal module, so offline re-evaluation is host-independent.
+LINUX_SIGNALS = {1: "SIGHUP", 2: "SIGINT", 3: "SIGQUIT", 4: "SIGILL", 5: "SIGTRAP", 6: "SIGABRT",
+                 7: "SIGBUS", 8: "SIGFPE", 9: "SIGKILL", 10: "SIGUSR1", 11: "SIGSEGV", 12: "SIGUSR2",
+                 13: "SIGPIPE", 14: "SIGALRM", 15: "SIGTERM", 16: "SIGSTKFLT", 17: "SIGCHLD",
+                 18: "SIGCONT", 19: "SIGSTOP", 20: "SIGTSTP", 21: "SIGTTIN", 22: "SIGTTOU", 23: "SIGURG",
+                 24: "SIGXCPU", 25: "SIGXFSZ", 26: "SIGVTALRM", 27: "SIGPROF", 28: "SIGWINCH", 29: "SIGIO",
+                 30: "SIGPWR", 31: "SIGSYS"}
 
 
 def signal_name(code):
-    try:
-        return signal.Signals(-code).name
-    except ValueError:
-        return "signal_" + str(-code)
+    return LINUX_SIGNALS.get(-code, "signal_" + str(-code))
 
 
 def classify(record):

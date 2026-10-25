@@ -7,6 +7,7 @@ processes exercise exit classification only.
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import struct
 import subprocess
@@ -25,6 +26,11 @@ import p3_source_probe  # noqa: E402
 import run_p3_gates  # noqa: E402
 from p3_provenance import atomic_json, canonical_sha256, digest  # noqa: E402
 
+# p3_runner (fcntl, process groups) and run_p3.sh run only in the Linux runtime host.
+# These tests are reported as skipped on Windows, never as passed.
+POSIX_ONLY = pytest.mark.skipif(sys.platform == "win32",
+                                reason="POSIX-only: p3_runner/run_p3.sh target the Linux runtime host")
+
 FIXTURES = REPO / "tests/fixtures/p3_mavlink"
 ACCEPTED_P2_PACKAGE = "e1857b3fc0a5678c0789b39860ba36cae5193b8daa83a20c246a02f49bb431af"
 
@@ -42,6 +48,17 @@ def test_p3_flight_uses_the_unchanged_p2_mission_configuration():
     config = json.loads((SIM / "configs/p2_control.yaml").read_text())
     assert (config["height_m"], config["east_m"], config["north_m"], config["yaw_enu_deg"]) == (2.0, 1.0, 1.0, 30.0)
     assert (config["ramp_m_s"], config["yaw_ramp_deg_s"], config["max_sample_gap_sim_s"]) == (0.3, 10.0, 0.2)
+
+
+def test_mc_benchmark_validates_against_the_accepted_control_config():
+    # The archived p3_control.yaml supplied the same two MC limits; the benchmark must
+    # use the accepted config the runner binds, with the limits unchanged.
+    bench = (SIM / "scripts/benchmark_mc_trace.py").read_text()
+    assert "configs/p2_control.yaml" in bench and "p3_control" not in bench
+    evidence = (SIM / "validation/mc_trace_evidence.py").read_text()
+    assert set(re.findall(r"config\['(\w+)'\]", evidence)) == {"max_sample_gap_sim_s", "position_fresh_sim_s"}
+    config = json.loads((SIM / "configs/p2_control.yaml").read_text())
+    assert (config["max_sample_gap_sim_s"], config["position_fresh_sim_s"]) == (0.2, 0.25)
 
 
 @pytest.mark.parametrize("forbidden", ["commander arm", "arm -f", "force", "param set", "COM_ARM", "CBRK_",
@@ -103,6 +120,7 @@ CHILD = {"graceful": "import signal,sys,time\nsignal.signal(signal.SIGINT,lambda
          "default": "import time\nprint('ready',flush=True)\ntime.sleep(30)"}
 
 
+@POSIX_ONLY
 @pytest.mark.parametrize("kind,expected", [("graceful", None), ("ignores", "forced_kill_after_grace"),
                                            ("segfault", "terminated_by_SIGSEGV"), ("default", "nonzero_exit_1")])
 def test_owned_process_with_real_children(kind, expected):
@@ -300,6 +318,7 @@ def test_gate_sequencer_refuses_without_explicit_gates(monkeypatch, tmp_path):
         run_p3_gates.main(["--gate", "B", "--manifest", str(tmp_path / "m"), "--authorization", str(tmp_path / "a")])
 
 
+@POSIX_ONLY
 def test_runner_refuses_outside_owned_namespace(monkeypatch, tmp_path):
     import p3_runner
     for key in p3_runner.GATES:
@@ -310,6 +329,7 @@ def test_runner_refuses_outside_owned_namespace(monkeypatch, tmp_path):
         p3_runner.Runner(args).preconditions()
 
 
+@POSIX_ONLY
 def test_runner_flight_requires_flight_gates(monkeypatch, tmp_path):
     import p3_runner
     for key in p3_runner.GATES:
@@ -321,6 +341,7 @@ def test_runner_flight_requires_flight_gates(monkeypatch, tmp_path):
         p3_runner.Runner(args).preconditions()
 
 
+@POSIX_ONLY
 def test_no_runtime_on_default_invocation():
     completed = subprocess.run(["bash", str(SIM / "scripts/run_p3.sh")], text=True, capture_output=True)
     assert completed.returncode == 0 and "No runtime started" in completed.stdout
@@ -415,6 +436,7 @@ def test_probe_wire_parser_rejects_inconsistent_payload():
         p3_source_probe.decode_image(image_bytes()[:-5])
 
 
+@POSIX_ONLY
 def test_runner_tail_reads_only_complete_lines(tmp_path):
     from p3_runner import Tail
     path = tmp_path / "x.jsonl"
@@ -457,6 +479,7 @@ def ordered_runner(monkeypatch, landed=True):
     return runner, calls
 
 
+@POSIX_ONLY
 def test_shutdown_order_after_controller_failure_drains_before_px4_exit(monkeypatch):
     runner, calls = ordered_runner(monkeypatch)
     errors = runner.shutdown()
@@ -468,6 +491,7 @@ def test_shutdown_order_after_controller_failure_drains_before_px4_exit(monkeypa
     assert "console:logger stop" in calls
 
 
+@POSIX_ONLY
 def test_unconfirmed_landing_skips_qgc_receipt_and_trace_stop(monkeypatch):
     runner, calls = ordered_runner(monkeypatch, landed=False)
     errors = runner.shutdown()

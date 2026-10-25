@@ -75,8 +75,10 @@ def main():
                     mean=float(timings[:,i].mean()),total=float(timings[:,i].sum())) for i,clock in enumerate(('wall_s','thread_cpu_s'))}
                 entry[label]=dict(metrics=metrics,output_sha256=digest(folder/'outputs.bin'),schema=native)
                 if label=='instrumented':
+                    # Same accepted control config the P3 runner binds for flight acquisition;
+                    # only max_sample_gap_sim_s/position_fresh_sim_s are read (unchanged values).
                     summary=dict(run_id=folder.name,identity=dict(mc_trace=receipt,binary_sha256=receipt['binary_sha256']),
-                        config=strict_json(SIM/'configs/p3_control.yaml'))
+                        config=strict_json(SIM/'configs/p2_control.yaml'))
                     entry[label]['acquisition']=acquisition(folder,summary)
                     if entry[label]['acquisition']['status']!='verified': raise ValueError('Benchmark trace contradicted')
             if entry['baseline']['output_sha256']!=entry['instrumented']['output_sha256']:
