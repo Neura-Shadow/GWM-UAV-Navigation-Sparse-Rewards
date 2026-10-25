@@ -275,6 +275,28 @@ def finalize_synthetic(run, gazebo_exit=0, residual=None):
     (run / "summary.json").write_text(json.dumps(summary))
 
 
+@pytest.mark.parametrize("gate,strings,software,failure", [
+    ("V", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, None),
+    ("V", ["D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)"], False, "validation_renderer_not_llvmpipe"),
+    ("A", ["Mesa", "llvmpipe (LLVM 20.1.2, 256 bits)"], True, "renderer_unidentified")])
+def test_renderer_requirement_by_gate_and_validation_never_credits(monkeypatch, gate, strings, software, failure):
+    import p3_evaluate
+    summary = {"p3_kind": "readiness", "gate": gate, "status": "passed",
+               "renderer": {"identified": not software, "software": software, "strings": strings}}
+    real = p3_evaluate.strict_json
+    monkeypatch.setattr(p3_evaluate, "strict_json",
+                        lambda path: summary if Path(path).name == "summary.json" else real(path))
+    for name in ("common", "mandatory_artifacts", "p2_component", "native_commands", "mc_component"):
+        monkeypatch.setattr(p3_evaluate, name, lambda *a, **k: None)
+    monkeypatch.setattr(p3_evaluate, "evaluate_stream", lambda *a, **k: {"failures": []})
+    monkeypatch.setattr(p3_evaluate, "evaluate_rgb", lambda *a, **k: {"failures": []})
+    monkeypatch.setattr(p3_evaluate, "native_rtf", lambda run: {"rtf": 0.5})
+    summary.update(sensor_window_sim_s=[1, 2], controller_publishers_only_from_controller=True)
+    result = p3_evaluate.evaluate("/tmp/x")
+    assert (failure in result["failures"]) if failure else (result["status"] == "passed")
+    assert result["acceptance_credit"] is (gate == "A" and result["status"] == "passed")
+
+
 def test_full_offline_evaluation_passes_only_with_graceful_cleanup(tmp_path):
     import p3_evaluate
     run = synthetic_run(tmp_path, "plane2")

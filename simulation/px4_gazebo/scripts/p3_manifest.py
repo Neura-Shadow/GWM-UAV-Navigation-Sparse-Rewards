@@ -19,7 +19,10 @@ sys.path.insert(0, str(SIM / "validation"))
 from p3_provenance import atomic_json, canonical_sha256, digest, strict_json  # noqa: E402
 
 CONTRACT = "p3-candidate-manifest-v1"
-GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification"}
+GATES = {"A": "ground_readiness_and_sensor_matrix", "B": "p3_nominal_flight_smoke", "C": "p3_qualification",
+         # Operator-authorized renderer evaluation: Gate A's ground plan on llvmpipe, never acceptance credit.
+         "V": "ground_validation_llvmpipe_no_credit"}
+GROUND_GATES = ("A", "V")
 SOURCE_FOLDERS = ("scripts", "validation", "configs", "ros2_ws/src/gwm_px4_control", "ros2_ws/src/gwm_sensor_adapter")
 RUNTIME_LIBRARIES = ("/opt/ros/jazzy/lib/libfastrtps.so.2.14", "/opt/ros/jazzy/lib/librmw_fastrtps_shared_cpp.so",
                      "/opt/ros/jazzy/lib/python3.12/site-packages/rclpy/publisher.py",
@@ -151,7 +154,8 @@ def consume(root, gate, sha, authorization_path):
 
 def authorization_template(gate, sha, operator):
     return {"contract": "p3-runtime-authorization-v1", "gate": gate, "scope": GATES[gate], "manifest_sha256": sha,
-            "max_attempts": 1, "authorized": True, "authorized_by": operator, "excludes": [] if gate != "A" else ["flight"],
+            "max_attempts": 1, "authorized": True, "authorized_by": operator,
+            "excludes": ["flight"] if gate in GROUND_GATES else [],
             "statement": f"I explicitly authorize exactly one P3 Gate {gate} ({GATES[gate]}) execution of manifest {sha}."}
 
 

@@ -156,13 +156,18 @@ def evaluate(run):
         mc_component(run, summary, f, out, flight, p2)
         out["rtf"] = native_rtf(run)
         f.check(out["rtf"] is not None, "native_rtf_unmeasured")
-        out["renderer"] = summary.get("renderer")
-        f.check(bool(summary.get("renderer", {}).get("identified")), "renderer_unidentified")
+        out["renderer"] = renderer = summary.get("renderer") or {}
+        if summary.get("gate") == "V":
+            # Validation V measures the declared software renderer; it must really be llvmpipe.
+            f.check(renderer.get("software") is True
+                    and any("llvmpipe" in s for s in renderer.get("strings", [])), "validation_renderer_not_llvmpipe")
+        else:
+            f.check(bool(renderer.get("identified")), "renderer_unidentified")
         out["resources"] = summary.get("resources")
         f.check(summary.get("controller_publishers_only_from_controller") is True, "competing_flight_publisher")
     out["failures"] = f.items
     out["status"] = "passed" if not f.items else "failed"
-    out["acceptance_credit"] = out["status"] == "passed"
+    out["acceptance_credit"] = out["status"] == "passed" and summary.get("gate") != "V"
     return out
 
 

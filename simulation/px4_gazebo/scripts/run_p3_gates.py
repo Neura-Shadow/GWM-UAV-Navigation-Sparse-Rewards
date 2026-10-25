@@ -27,6 +27,7 @@ from p3_fixtures import FIXTURES  # noqa: E402
 PLAN = {"A": [("readiness", None, "readiness")] + [("fixture", name, "fixture-" + name) for name in FIXTURES],
         "B": [("flight", None, "smoke")],
         "C": [("flight", None, f"qualification-{n}") for n in (1, 2, 3)]}
+PLAN["V"] = list(PLAN["A"])  # same ground plan; llvmpipe; no acceptance credit, never a predecessor
 PREDECESSOR = {"B": "A", "C": "B"}
 
 
@@ -104,7 +105,8 @@ def main(argv=None):
                                                          "authorized_by": authorization["authorized_by"]},
               "consumption_marker": str(marker), "predecessor": predecessor, "started_unix_ns": time.time_ns(),
               "planned": [role for _, _, role in PLAN[args.gate]], "runs": [], "first_failure": None,
-              "accepted": False, "automatic_retry": False, "next_gate_started": False}
+              "accepted": False, "acceptance_credit": args.gate != "V",
+              "automatic_retry": False, "next_gate_started": False}
     try:
         for scope, fixture, role in PLAN[args.gate]:
             completed, run = execute_scope(scope, fixture, role, args.gate, args.manifest, args.authorization, flight)

@@ -239,8 +239,8 @@ class Runner:
             raise PermissionError("Gate authorization was not consumed by the gate sequencer")
         if self.scope == "flight" and self.args.gate not in ("B", "C"):
             raise PermissionError("Flights belong to Gate B or Gate C only")
-        if self.scope != "flight" and self.args.gate != "A":
-            raise PermissionError("Ground scopes belong to Gate A only")
+        if self.scope != "flight" and self.args.gate not in p3_manifest.GROUND_GATES:
+            raise PermissionError("Ground scopes belong to Gate A or validation V only")
         return frozen, sha, authorization
 
     # ---- launching -----------------------------------------------------------------------
@@ -252,10 +252,12 @@ class Runner:
         env = {key: os.environ[key] for key in allowed if key in os.environ}
         env.update({"TMPDIR": str(self.run / "tmp"), "ROS_DOMAIN_ID": "71", "GZ_PARTITION": self.run.name,
                     "GZ_IP": "127.0.0.1", "GZ_DISTRO": "harmonic", "RMW_IMPLEMENTATION": "rmw_fastrtps_cpp",
-                    "GWM_P3_OWNED_NAMESPACE": "1",
-                    # WSLg hardware rendering: Mesa picks llvmpipe for headless EGL unless the
-                    # D3D12 driver and the discrete adapter are named (verified with an EGL probe).
-                    "GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"})
+                    "GWM_P3_OWNED_NAMESPACE": "1"})
+        if getattr(getattr(self, "args", None), "gate", None) != "V":
+            # WSLg hardware rendering: Mesa picks llvmpipe for headless EGL unless the
+            # D3D12 driver and the discrete adapter are named (verified with an EGL probe).
+            # Validation V leaves them unset, so Mesa's default llvmpipe renders.
+            env.update({"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"})
         env.update(extra or {})
         return env
 
@@ -736,7 +738,7 @@ def main(argv=None):
     parser.add_argument("--run", action="store_true", required=True)
     parser.add_argument("--scope", choices=("readiness", "fixture", "flight"), required=True)
     parser.add_argument("--fixture")
-    parser.add_argument("--gate", choices=("A", "B", "C"), required=True)
+    parser.add_argument("--gate", choices=("A", "B", "C", "V"), required=True)
     parser.add_argument("--role", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--authorization", type=Path, required=True)

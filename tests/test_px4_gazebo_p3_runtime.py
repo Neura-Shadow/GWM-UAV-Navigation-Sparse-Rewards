@@ -572,6 +572,33 @@ def test_runtime_environment_selects_wslg_hardware_renderer():
     assert 'SOFTWARE_RENDERERS = re.compile(r"llvmpipe|softpipe|swrast|software rasterizer", re.I)' in runner
 
 
+def test_validation_gate_v_is_ground_only_llvmpipe_and_never_credit(tmp_path):
+    assert run_p3_gates.PLAN["V"] == run_p3_gates.PLAN["A"] and "V" not in run_p3_gates.PREDECESSOR.values()
+    assert p3_manifest.authorization_template("V", "s", "op")["excludes"] == ["flight"]
+    assert p3_manifest.authorization_template("A", "s", "op")["excludes"] == ["flight"]
+    assert p3_manifest.authorization_template("B", "s", "op")["excludes"] == []
+    # A V result can never satisfy Gate B's predecessor requirement.
+    (tmp_path / "state").mkdir()
+    atomic_json(tmp_path / "state" / "p3-gate-V-sha.result.json", {"accepted": True, "manifest_sha256": "sha",
+                                                                      "runs": []})
+    with pytest.raises(PermissionError, match="requires an accepted Gate A"):
+        run_p3_gates.require_predecessor(tmp_path, "B", "sha")
+    source = (SIM / "scripts/run_p3_gates.py").read_text()
+    assert '"acceptance_credit": args.gate != "V"' in source
+
+
+@POSIX_ONLY
+def test_validation_gate_v_leaves_d3d12_unset_and_gate_a_sets_it(monkeypatch, tmp_path):
+    import p3_runner
+    runner = p3_runner.Runner.__new__(p3_runner.Runner)
+    runner.run = tmp_path
+    for gate, expected in (("V", None), ("A", "d3d12")):
+        runner.args = p3_runner.argparse.Namespace(gate=gate)
+        env = runner.environment()
+        assert env.get("GALLIUM_DRIVER") == expected
+        assert ("MESA_D3D12_DEFAULT_ADAPTER_NAME" in env) == (gate == "A")
+
+
 def test_source_probe_keeps_the_sourced_ros_python_path():
     runner = (SIM / "scripts/p3_runner.py").read_text()
     launch = runner[runner.index('self.launch("source-probe"'):][:200]
