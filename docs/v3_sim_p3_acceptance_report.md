@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3`: Gate A and Gate B ACCEPTED (sections AE, AF); Gate C not run — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.5 candidate `a0deb4d3`: Gates A and B accepted; Gate C FAILED at qualification-2 on a P2-evaluator duplicate-timestamp collision (section AG) — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -1066,4 +1066,47 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   exercised. Gate B is a smoke flight and does not count toward qualification. Gate C (three
   consecutive qualification flights) needs a separate authorization.
 
-Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gate A and Gate B accepted; Gate C not run — Qualification 0/3**
+## AG. Gate C of v1.5 candidate `a0deb4d3` — FAILED at qualification-2 (2026-10-25)
+
+* **Authorization:** Neura-Shadow, `state/p3-auth-C-a0deb4d3f1f9.json` `27ac2ac6…cafa`, consumed
+  (marker `9c045653…1dc1`). Result `state/p3-gate-C-a0deb4d3….result.json` `601235d9…bf03`,
+  `accepted: false`, `first_failure: qualification-2:p2_evaluator_error:ValueError:ROS/ULog
+  estimator mismatch`, no automatic retry. Run 15:33:23–15:38:40 UTC; qualification-3 was not
+  started; no leftover processes. Qualification stays 0/3, because the three flights must be
+  consecutive within one Gate C.
+* **qualification-1** `20261025T153335Z-p3-flight-5f89e686`: **passed** (evaluation `5715a8dd…`).
+  `COMPLETE` at sim 105.40 s; P2 flight acceptance passed; `vehicle_land_detected` maximum gap
+  1.095 s; RTF 0.996; MC verified (13,805 paired updates, yaw error 0.0); depth 2,810/2,810
+  recorded, 928/928 matched; recorder overflow 0 (maximum queue 3); policy A with 6 landing
+  self-commands; RGB absence verified; all processes graceful.
+* **qualification-2** `20261025T153613Z-p3-flight-51e74376`: the flight reached `COMPLETE` (sim
+  105.83 s), with `vehicle_land_detected` maximum gap 1.005 s, RTF 0.998, depth 2,821/2,821
+  recorded, recorder overflow 0, policy A with 6 landing self-commands, RGB absence verified and
+  all processes graceful. **v1.4 rule 1 was exercised for the first time:** one observation
+  (acquisition 22.540 s) was `position:reset_epoch_bracket` across `heading_reset_counter` 1→2
+  (bracket 22.536–22.560 s), corroborated by the controller ledger at 22.560 s and correctly
+  accepted (930 matched + 1 bracketed).
+* **Primary failure (evaluation, accepted P2 evaluator):** `collect_p2_evidence.verify` indexes
+  ULog `vehicle_local_position` by `timestamp` alone (`u_by_t`) and requires |Δx, Δy, Δz| < 1e-6
+  for every ROS sample with the same `timestamp`. PX4 logged **two different estimates with the
+  same `timestamp` 15.680000 s** (ULog rows 1356/1357, `timestamp_sample` 15.644000 and
+  15.680000 s, during TAKEOFF). The dictionary kept the second one. ROS had received the first,
+  and it matches that ULog row bit-exactly (x, y, z and `timestamp_sample`); its difference from
+  the second row is 3.95e-4 m. The evaluator raised `ROS/ULog estimator mismatch`, but the
+  estimator data agree: this is a key collision in the evaluator. Invariant affected: P2
+  recording integrity (exact ROS/ULog epoch match).
+* **Secondary:** `mc_causal_yaw:failed` (`KeyError: 'handover_start_sim_s'`). `p3_evaluate`
+  takes the yaw-ownership handover window from the P2 report, which was never produced, so the MC
+  trace itself was not evaluated.
+* **Frequency (read-only check of retained ULogs, not credited):** a duplicate-`timestamp` pair
+  appears in 2 of the last 5 P3 flights: qualification-1 at 71.516 s (ROS did not receive that
+  sample, so no collision) and qualification-2. It appears in neither v1.4/v1.5 Gate B flight nor
+  in the v1.3 Gate B flight. ROS carries about 39 % of the ULog samples, so a collision occurs only
+  when the bridged sample is the earlier of the pair.
+* **Correction needed (not applied):** the defect is in the accepted P2 evaluator, so fixing it
+  requires an operator decision. The smallest change keys the ULog lookup by (`timestamp`,
+  `timestamp_sample`), or requires the ROS sample to match one of the ULog rows carrying its
+  `timestamp`, keeping the 1e-6 tolerance and the 100-sample minimum. The failed result and all
+  evidence are preserved. This candidate cannot run Gate C again.
+
+Final status: **P3 INCOMPLETE — v1.5 candidate a0deb4d3: Gates A and B accepted; Gate C failed at qualification-2 on a P2-evaluator duplicate-timestamp collision (qualification-1 passed) — Qualification 0/3**
