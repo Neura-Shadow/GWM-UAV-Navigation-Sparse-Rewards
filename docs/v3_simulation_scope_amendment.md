@@ -68,8 +68,18 @@ its one passed trial remain historical and contribute no R2 credit. All
 original numeric flight limits, dependency pins and control ownership remain
 unchanged; this authorization does not extend to P3 or AgentOps work.
 
-P3 depth sensing, P4 non-learning avoidance, P5 fixed-weight inference, P6
-failure validation, and P7 batch evaluation remain unimplemented. Micro
+The operator's P3 request authorizes implementing native depth sensing and
+sensor/controller coexistence on the pinned `x500_depth` model, restarting from the
+accepted P2 checkpoint. It adds no flight authority: the sensor adapter cannot create
+PX4 input publishers and the unchanged P2 controller remains the only flight owner.
+The request itself authorizes **no runtime**: Gate A (ground readiness and seven
+fixtures), Gate B (one flight smoke) and Gate C (three qualification flights) each need
+a distinct explicit operator authorization bound to one frozen candidate manifest, run
+in order, stop at the first failure and are never retried automatically. A native GCS
+command policy other than strict zero needs its own operator approval receipt.
+
+P4 non-learning avoidance, P5 fixed-weight inference, P6 failure validation, and P7
+batch evaluation remain unimplemented. Micro
 XRCE-DDS Agent is middleware, not an AgentOps reasoning agent.
 
 ## Workspace and sources

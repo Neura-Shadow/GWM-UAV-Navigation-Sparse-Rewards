@@ -277,7 +277,11 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   **20/20** consecutive batch passed, including independent timing, reference,
   motion and LAND checks. R2 yaw policy and all original limits are unchanged.
   Strict-v1, R1 and R2 failures remain preserved. P3 is eligible as the next slice.
-- [ ] P3 Depth sensing
+- [ ] P3 Depth sensing: native depth adapter, independent evaluators, seven fixtures,
+  strict cleanup, native-command policy and gated A/B/C orchestration are implemented and
+  verified offline ([contract](v3_sim_p3_contract.md), [report](v3_sim_p3_acceptance_report.md)).
+  No runtime gate has been authorized or run: **qualification 0/3**. The 27 earlier
+  unaccepted P3 commits are preserved on `archive/p3-history-39ba887`.
 - [ ] P4 Non-learning obstacle avoidance
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
