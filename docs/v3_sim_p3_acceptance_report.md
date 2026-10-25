@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — Gate A ACCEPTED (section R); Gate B FAILED on llvmpipe flight timing (section S); native Linux GPU host recommended — Qualification 0/3**
+**P3 INCOMPLETE — D3D12 v1.2 candidate `3302379c`: Gate A ACCEPTED (section V), Gate B not yet authorized; llvmpipe candidate `764fcfd7`: Gate B failed (section S) — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -764,4 +764,4 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   sim `vehicle_land_detected` interval is about 1.55 s wall against the unchanged 2 s limit.
   Gate B judges it unchanged.
 
-Final status: **P3 INCOMPLETE — Gate A ACCEPTED, Gate B FAILED (flight timing on llvmpipe, candidate 764fcfd7) — Qualification 0/3**
+Final status: **P3 INCOMPLETE — llvmpipe candidate 764fcfd7: Gate A accepted, Gate B failed; D3D12 v1.2 candidate 3302379c: Gate A ACCEPTED, Gate B not yet authorized — Qualification 0/3**
