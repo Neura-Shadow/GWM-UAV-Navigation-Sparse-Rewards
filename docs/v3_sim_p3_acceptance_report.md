@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.4 approved and applied offline (section AA); Policy A re-approval pending; no v1.4 candidate frozen — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0` frozen and verified (section AA); Gate A not run — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -913,7 +913,17 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
   with the GCS allowance unchanged; the controller ledger records the 22.184 s attitude reset as
   a single `quat_reset_counter` 1→2 step. That run's adapter predates the bracket output, so it
   is not re-evaluated under rule 1 and stays failed.
-* Nothing was frozen or run. Next: Policy A re-approval for the new hash, then freeze and verify
-  the v1.4 candidate; Gates A, B and C each need separate authorization.
+* **v1.4 candidate:** Policy A (`bf1ef9b1…`) was re-approved by Neura-Shadow for `5393103`
+  (receipt `state/p3-policy-A-approval-5393103.json`, `2974a296…7a28`). Preflight: sensor package
+  receipt matches the current source (`c5d37413…`), DDS agent binary and QGC ELF intact with the
+  owner bound, the five WSL D3D12 libraries match their pins, 792.8 GiB free, no simulation
+  processes. Manifest `state/p3-candidate-5393103.json`, canonical SHA-256
+  **`6c00ecb09f2a2c4bc684e323d2342ab2d33d2d838d2f1196b2b6c065252b70d2`** (file `15f5e16d…a3aa`):
+  contract v1.4, `hardware:d3d12`, D3D12 profile `2e9e9ba1…`, MC build `7542919c…` (the runtime
+  selection matches the frozen build), benchmark `20261025T051926Z-mc-trace-benchmark-e6000074`,
+  QGC ELF `82994283…`, `p3_validation.yaml` `2ce6bf22…`, policy file `7a7be282…`, sensor
+  receipt canonical `77f4fa34…`. `verify` and `verify_current` reproduce it, execution without
+  authorization is false, and no authorization, consumption, result or run artifact exists for
+  it. Gate A has not been run.
 
-Final status: **P3 INCOMPLETE — contract v1.4 approved and applied offline; Policy A re-approval pending; no v1.4 candidate frozen; no gate run — Qualification 0/3**
+Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0 frozen and verified; Gate A not run — Qualification 0/3**
