@@ -5,6 +5,7 @@ No PX4, Gazebo, ROS, QGC or flight is started. Real short-lived Python child
 processes exercise exit classification only.
 """
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -649,11 +650,23 @@ V1_2_NUMERIC_LIMITS = {
     "qualification_flights": 3, "front_plane_center_height_m": 4}
 
 
+def test_contract_v1_5_changes_only_the_recorder_capacity():
+    # Operator-approved v1.5 (proposal 3593ae5): recorder_capacity 8 -> 32, sized to stall_wall_s at 30.31 Hz.
+    validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
+    assert validation["contract"] == "p3-acceptance-v1.5"
+    assert (validation["recorder_overflow_allowed"], validation["recorded_fraction_required"],
+            validation["stall_wall_s"]) == (0, 1.0, 1.0)
+    sensors = json.loads((SIM / "configs/p3_sensors.yaml").read_text())
+    assert sensors["recorder_capacity"] == 32 == math.ceil(validation["stall_wall_s"] * 30.31) + 1
+    # Every other key is the v1.4 p3_sensors.yaml (file 6c3038fe...) exactly.
+    assert canonical_sha256(dict(sensors, recorder_capacity=8)) ==         "c20fc96747d9eea0b3bb9072af4f079ed8d03f5fd48405dd8cc5c979b7b1a154"
+
+
 def test_contract_v1_4_keeps_v1_3_rgb_scope_and_every_numeric_limit_identical():
     # Operator-approved v1.4 (proposal 26bf5f7) adds only the reset-bracket and landing self-command rules;
     # the v1.3 per-scope RGB consumer rule (proposal e18ed8c) and every number are unchanged.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.4"
+    assert validation["contract"] == "p3-acceptance-v1.5"
     assert validation["state_association"]["reset_epoch_bracket"]["max_per_reset_event"] == 1
     assert validation["state_association"]["reset_epoch_bracket"]["bracket_span_limit_key"] == "state_mismatch_s"
     assert validation["rgb_consumer"] == {"readiness": "required", "fixture": "absent", "flight": "absent_verified"}
@@ -671,9 +684,9 @@ def test_contract_v1_4_keeps_v1_3_rgb_scope_and_every_numeric_limit_identical():
 
 
 def test_contract_v1_2_declares_d3d12_and_keeps_every_limit():
-    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3 and v1.4.
+    # v1.2 renderer/profile (proposal 743bbf7), retained unchanged under v1.3, v1.4 and v1.5.
     validation = json.loads((SIM / "configs/p3_validation.yaml").read_text())
-    assert validation["contract"] == "p3-acceptance-v1.4"
+    assert validation["contract"] == "p3-acceptance-v1.5"
     assert validation["renderer_requirement"] == "hardware:d3d12"
     profile = json.loads((SIM / "configs/p3_d3d12_profile.json").read_text())
     assert profile["environment"] == {"GALLIUM_DRIVER": "d3d12", "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"}

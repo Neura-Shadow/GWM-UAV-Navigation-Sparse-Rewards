@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import time
 import xml.etree.ElementTree as ET
 import zlib
 
@@ -369,6 +370,24 @@ def test_recorder_overflow_is_sticky_incomplete(tmp_path):
     gate.set()
     closed = rec.close(10)
     assert not closed["complete"] and closed["overflow"] >= 1
+
+
+def test_recorder_capacity_32_queues_32_frames_and_overflows_on_the_33rd(tmp_path, config):
+    # Contract v1.5: with the writer blocked on one in-flight frame, exactly recorder_capacity frames queue.
+    import threading
+    assert config["recorder_capacity"] == 32
+    gate = threading.Event()
+    rec = recorder.RawRecorder(tmp_path, config["recorder_capacity"], clock=lambda: (gate.wait(10), 0.0)[1])
+    assert rec.submit({"receipt_id": 0}, b"x" * 10)
+    deadline = time.monotonic() + 5
+    while rec.queue.qsize() and time.monotonic() < deadline:  # the writer takes the first frame and blocks
+        time.sleep(0.005)
+    assert all(rec.submit({"receipt_id": i}, b"x" * 10) for i in range(1, 33))
+    assert rec.max_queue == 32 and rec.overflow == 0
+    assert rec.submit({"receipt_id": 33}, b"x" * 10) is False and rec.overflow == 1
+    gate.set()
+    closed = rec.close(10)
+    assert closed["written"] == 33 and closed["overflow"] == 1 and not closed["complete"]
 
 
 # Pipeline ----------------------------------------------------------------------------------------

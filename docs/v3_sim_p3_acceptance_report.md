@@ -1,6 +1,6 @@
 # v3-SIM P3 consolidated acceptance report
 
-**P3 INCOMPLETE — contract v1.4 candidate `6c00ecb0`: Gate A accepted, Gate B FAILED on raw depth recorder overflow (section AC); v1.5 recorder-capacity proposal not applied — Qualification 0/3**
+**P3 INCOMPLETE — contract v1.5 (recorder capacity 32) approved and applied offline (section AD); Policy A re-approval pending; no v1.5 candidate frozen — Qualification 0/3**
 
 Date: 2026-10-25. Scope of this work: Steps 1–7 of the P3 implementation brief (audit,
 implementation, offline verification, offline source freeze). Step 8 (Gates A/B/C) needs
@@ -984,4 +984,29 @@ Operator-authorized Gazebo-only diagnostics; no PX4, QGC, flight or gate was run
 * The failed result and all evidence are preserved. This candidate cannot run Gate B again
   (results are never overwritten). P3 remains INCOMPLETE; qualification 0/3.
 
-Final status: **P3 INCOMPLETE — v1.4 candidate 6c00ecb0: Gate A accepted; Gate B failed on raw depth recorder overflow during a host-level slowdown (flight, P2, timing, MC, RGB absence and policy A incl. v1.4 landing rule passed); v1.5 recorder-capacity proposal not applied — Qualification 0/3**
+## AD. Contract `p3-acceptance-v1.5` applied (2026-10-25)
+
+* **Approved** by Neura-Shadow exactly as written in
+  `docs/v3_sim_p3_recorder_capacity_v1_5_proposal.md` (commit `3593ae5`).
+* **Applied (offline only):**
+  * `p3_sensors.yaml` (`6c3038fe…` → `e02ae2a4…`): `recorder_capacity` 8 → 32, the only edit.
+    Every other key is identical (a test pins the canonical hash of the file with the old value
+    restored).
+  * `p3_validation.yaml` (`2ce6bf22…` → `2bb85189…`): contract `p3-acceptance-v1.5` and the
+    revision sentence. Every numeric limit is identical, including `recorder_overflow_allowed` 0,
+    `recorded_fraction_required` 1.0 and `stall_wall_s` 1.0. The v1.4 rules are unchanged.
+  * `p3_native_command_policy.json` is unchanged, so the policy A canonical SHA-256 stays
+    `bf1ef9b1…`. Its approval is per candidate, so it still needs re-approval for the v1.5 commit.
+  * The sensor package is unchanged and not rebuilt: the receipt `c5d37413…` matches the current
+    source.
+* **Tests:** v1.5 contract identity; `recorder_capacity == 32 == ⌈1.0 s × 30.31 Hz⌉ + 1`;
+  `p3_sensors.yaml` is otherwise identical to v1.4; overflow allowance 0; with the writer blocked
+  on one frame, exactly 32 frames queue and the 33rd overflows (sticky, recording incomplete).
+  Linux: P2 212, sensor 63, evaluators 63, runtime 88, MC 23. Windows (P3 + MC suites): 218
+  passed, 19 POSIX-only skipped. The dry candidate dependency check resolves all six receipts.
+* **Still open (unchanged by v1.5):** a host slowdown like the one in section AC can still
+  produce `pending_newer_state` associations that fail `state_association_incomplete`.
+* Nothing was frozen or run. Next: Policy A re-approval for the v1.5 commit, then freeze and
+  verify; Gates A, B and C each need separate authorization.
+
+Final status: **P3 INCOMPLETE — contract v1.5 approved and applied offline; Policy A re-approval pending; no v1.5 candidate frozen; no gate run — Qualification 0/3**

@@ -1,7 +1,8 @@
 # P3 contract `p3-acceptance-v1.5` — proposal (raw depth recorder capacity 8 → 32)
 
-**Status: PROPOSAL ONLY — NOT APPROVED, NOT APPLIED.** Nothing was changed, built, frozen or
-run for this proposal. P3 remains INCOMPLETE, qualification 0/3.
+**Status: APPROVED by Neura-Shadow (2026-10-25) exactly as written in `3593ae5`; APPLIED offline
+(acceptance report section AD).** Nothing was frozen or run. Policy A (content unchanged) must be
+re-approved for the v1.5 candidate commit. P3 remains INCOMPLETE, qualification 0/3.
 
 Basis: HEAD after `aa64445` and the retained v1.4 Gate B run
 `20261025T133925Z-p3-flight-b4436533` (acceptance report section AC).

@@ -50,7 +50,7 @@ The adapter (`gwm_sensor_adapter`) is pure-module plus a thin ROS node:
 | `geometry.py` | Explicit optical (X right, Y down, Z forward) → body FLU → FRD → local NED, Hamilton wxyz FRD→NED; depth is optical Z, not range; SDF include-chain resolver. |
 | `association.py` | 300-sample position/attitude histories; nearest PX4 `timestamp_sample` within 0.05 s, no interpolation; reports missing, older, pending, ambiguous ties, reset-epoch brackets, duplicates and reuse. |
 | `pipeline.py` | Separate accounting for receipt, decode, processing skip and recorder. Simulation-time 10 Hz phase accumulator; never republishes a frame; observations only while fresh. Health: unavailable / calibration_unavailable / stale (1.0 wall s receipt stall or 0.25 sim s source age) / fresh. |
-| `recorder.py` | Single-owner bounded queue (8); first overflow is sticky; drain + fsync + close marker. |
+| `recorder.py` | Single-owner bounded queue (`recorder_capacity` 32 since [v1.5](v3_sim_p3_recorder_capacity_v1_5_proposal.md): the 1.0 s stall limit at 30.31 Hz plus the in-flight frame; previously 8); first overflow is sticky and fails the run (`recorder_overflow_allowed` 0); drain + fsync + close marker. |
 
 ## 3. Geometry
 
