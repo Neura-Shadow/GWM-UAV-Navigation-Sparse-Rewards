@@ -2,8 +2,8 @@
 
 **Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
-cannot run again (§14). The runner fix is applied offline (§15). A new candidate is frozen only
-after Policy A approval for a commit carrying the fix, and Gate A needs its own authorization. Gates A, B, S
+cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` is frozen
+(§16); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -497,5 +497,20 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 102.
   * Windows: 367 passed, 26 skipped.
   * P3 still verifies to `1e205fec…`.
-* **Next:** Policy A approval for this commit, re-freeze, then a new Gate A authorization. Nothing
-  has been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §16
+  up to the authorization).
+
+## 16. Frozen P4 candidate `1628fc44` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `601eceae76e371a921c6f652413e8a292b0d80d3`. That commit has the same P4 sources as fix commit
+  `4804a47`; only docs changed. Receipt: `state/p4-policy-A-approval-601ecea.json` (`11c4cfa7…b82c`).
+* Manifest `state/p4-candidate-601ecea.json`: canonical
+  **`1628fc44afcffab730c7ad7d69c5047f010f52e64767b07e715f1b90dc122f07`** (file `4bbe9a1f…6d94`).
+  `verify` reproduces it.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3b6aef59…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC build `7542919c…`, and its selection matches; QGC ELF `82994283…`;
+    `hardware:d3d12` with profile `2e9e9ba1…`.
+  * Gates A/B/S/C; no execution without authorization.
+* No gate record exists for `1628fc44`. The failed Gate A of `3785a54c` and its consumed authorization
+  stay in `state/` as history. Gate A has not been run.

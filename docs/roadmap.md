@@ -284,7 +284,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   offline implementation M1–M7 complete ([contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md)).
   **INCOMPLETE.** Candidate `3785a54c` failed Gate A at p4-readiness on a runner defect
   (ground-diagnostic SITL gate env; P3 readiness passed); its authorization is consumed. Runner fix
-  `4804a47` applied offline. Next: Policy A for a commit carrying the fix, a new frozen candidate, then Gate A authorization.
+  `4804a47` applied offline. Candidate `1628fc44` frozen (commit `601ecea`); Gate A awaits authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
