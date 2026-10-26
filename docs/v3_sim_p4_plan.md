@@ -409,3 +409,26 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * geofence, offboard-loss and graph checks abort.
 * **Evaluator.** Synthetic run directories exercise every §6, §6.1, §7 and §9.1 rule, in both pass
   and fail cases.
+
+## 12. Frozen P4 candidate (2026-10-26)
+
+* **Policy A** (`bf1ef9b1…`, content unchanged from P3 v1.6) was approved by Neura-Shadow for the P4
+  candidate at `6c418336cf425317f5b9972e9f59776a443dde39`. The receipt is
+  `state/p4-policy-A-approval-6c41833.json` (`1d63a8de…e67e`).
+* **Preflight.**
+  * P3 sensor receipt `c5d37413…` and P4 package receipt `3b6aef59…` both match their sources.
+  * The DDS agent and QGC ELF are intact, with the owner bound.
+  * The five WSL D3D12 libraries match their pins.
+  * 871.1 GiB was free and no simulation processes were running.
+* **Manifest.** `state/p4-candidate-6c41833.json`, canonical SHA-256
+  **`2ddabd14a48a900d66ed2890cc48ecb367d6d3d860a4cb3b85cf0efe77f50a66`** (file `8d97eec5…29c1`).
+  * It binds the P3 baseline `1e205fec…` (still verifying), 29 P4 and 103 P3 source files, the MC
+    build `7542919c…` (the runtime selection matches), QGC ELF `82994283…`, `hardware:d3d12` with
+    D3D12 profile `2e9e9ba1…`, and gates A/B/S/C with 3 qualification flights.
+  * `verify` reproduces it. Execution without authorization is false, and no P4 authorization or
+    gate artifact exists.
+* **Known label defect.** `configs/p4_validation.yaml` `contract_revision` still reads "revision 2".
+  The manifest copies that text, although the frozen sources implement revision 3 (`map_scan_deg`
+  360 pinned and the traversed L2 rule, both hashed). Correcting the label changes a P4 source, so
+  it needs a new commit, a Policy A approval for it, and a re-freeze.
+* Gate A has not been run.
