@@ -100,3 +100,29 @@ def test_p4_controller_receives_best_effort_map_and_health(tmp_path, monkeypatch
     _, result = run_controller(tmp_path, monkeypatch, publish_px4=False,
                                stop_when=lambda node: node.map_received > 5 and node.health_received > 5)
     assert result["local_map_messages"] > 5 and result["adapter_health_messages"] > 5
+
+
+def test_p4_controller_traces_the_graph_check_like_the_accepted_p2_node(tmp_path, monkeypatch):
+    """P4 Gate B e187b475: a 0.48 s stall inside the untraced graph check exceeded the dispatch budget."""
+    import collect_p2_evidence
+    from gwm_px4_control.contracts import load_config
+    from timing_evidence import verify_timing
+    run, result = run_controller(tmp_path, monkeypatch, publish_px4=False, stop_when=lambda node: False,
+                                 wall_limit_s=2.6)
+    traces = [json.loads(line) for line in (run / "timing-trace.jsonl").read_text().splitlines()]
+    checks = [r for r in traces if r["operation"] == "graph_check"]
+    writes = [r for r in traces if r["operation"] == "graph_json_persistence"]
+    callbacks = [r for r in traces if r["operation"] == "control_callback"]
+    ticks = [r for r in traces if r["operation"] == "mission_tick"]
+    assert len(checks) >= 2 and len(writes) == len(checks)
+    for check in checks:
+        assert sum(check["start_wall_s"] <= w["start_wall_s"] <= w["end_wall_s"] <= check["end_wall_s"] for w in writes) == 1
+        owner = [c for c in callbacks if c["start_wall_s"] <= check["start_wall_s"] <= check["end_wall_s"] <= c["end_wall_s"]]
+        assert len(owner) == 1  # inside one control callback, before its mission tick, as in P2
+        assert any(owner[0]["start_wall_s"] <= t["start_wall_s"] <= owner[0]["end_wall_s"]
+                   and t["start_wall_s"] >= check["end_wall_s"] for t in ticks)
+    starts = [c["start_wall_s"] for c in checks]
+    assert all(b - a >= 1.0 for a, b in zip(starts, starts[1:]))  # cadence unchanged
+    streams, _, events = collect_p2_evidence.read_bag(run)
+    report = verify_timing(run, result, streams, events, load_config(ROOT / "simulation/px4_gazebo/configs/p2_control.yaml"))
+    assert report["graph_check_duration_wall_s"] == max(c["duration_wall_s"] for c in checks)

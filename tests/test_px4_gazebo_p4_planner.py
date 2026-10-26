@@ -220,15 +220,32 @@ def test_s5_blocked_path_refuses_safely(runs):
 
 
 def test_s6_sensor_loss_hovers_frozen_then_aborts():
-    stop = 36.1 + 2.0 / 0.3  # perception stops once the vehicle is about 2 m from origin
+    # Perception stops about 2 m from the origin, between two 10 Hz frames (frames at 36.1 + 0.1 n).
+    stop = 36.1 + 2.0 / syn.p4_config()["mission"]["transit_speed_m_s"] + 0.05
     run = syn.closed_loop(SCENARIOS["S6"]["boxes"], stop_perception_at=stop)
     sup = run["supervisor"]
     hover = next(t for t in sup.transitions if t["to"] == supervisor.HOVER)
-    last_usable = max(d for d in [stop - 0.1 * k for k in range(3)] if d < stop)
-    assert hover["sim_s"] <= last_usable + 0.35 and hover["reason"].startswith("stale_inputs:")
+    last_frame = 36.1 + 0.1 * math.floor((stop - 36.1) / 0.1)
+    max_age = CONFIG["perception"]["snapshot_max_age_sim_s"]
+    # Stale once older than the snapshot age; detected at the next 20 Hz control tick.
+    assert hover["sim_s"] <= last_frame + max_age + 0.05 + 1e-6 and hover["reason"].startswith("stale_inputs:")
     frozen = [p for p in run["trajectory"] if p[0] >= hover["sim_s"]]
     assert max(math.dist(frozen[0][1], p[1]) for p in frozen) <= 0.01
     assert max(abs(planner.wrap(p[2] - frozen[0][2])) for p in frozen) <= math.radians(0.5)
     assert sup.state == supervisor.ABORT and sup.abort_reason.startswith("stale_inputs:")
     abort = next(t for t in sup.transitions if t["to"] == supervisor.ABORT)
     assert abort["sim_s"] - hover["sim_s"] == pytest.approx(10.0, abs=0.1)
+
+
+# Revision 4: TRANSIT speed versus the 0.30 m tracking bound (P4 Gate B c932b212) ------------------
+def test_pinned_transit_speed_keeps_px4_like_tracking_inside_the_bound():
+    """PX4's horizontal loop is proportional (MPC_XY_P 0.95); with position-only setpoints a target at
+    speed v leaves a steady lag of v / 0.95. Gate B measured 0.316 m at 0.3 m/s (bound 0.30 m)."""
+    bound = CONFIG["planner"]["tracking_m"]
+    pinned = syn.closed_loop(SCENARIOS["S2"]["boxes"], px4_xy_p=0.95)
+    assert CONFIG["mission"]["transit_speed_m_s"] == 0.2
+    assert math.dist(pinned["final"], GOAL) < 1e-6 and pinned["min_clearance"] >= 0.20
+    assert pinned["track_max"] <= 0.2 / 0.95 + 0.01 < bound
+    assert states(pinned)[:2] == [supervisor.OBSTACLE_DETECTED, supervisor.AVOIDING]
+    old = syn.closed_loop(SCENARIOS["S2"]["boxes"], px4_xy_p=0.95, speed=0.3)
+    assert old["track_max"] > bound  # the Gate B failure: P2's 0.3 m/s ramp cannot meet the bound

@@ -1,4 +1,4 @@
-"""Strict P4 configuration contract (p4-acceptance-v1 revisions 2 and 3, §4–§6).
+"""Strict P4 configuration contract (p4-acceptance-v1 revisions 2, 3 and 4, §4–§6).
 
 Every value the contract fixes is pinned here, so an edited configuration cannot
 silently drift from the approved numbers. P2 timing/freshness limits are read
@@ -47,6 +47,9 @@ PINNED = {
     ("mission", "goal_hover_sim_s"): 5.0,
     ("mission", "goal_tolerance_m"): 0.30,
     ("mission", "settled_speed_m_s"): 0.1,
+    # revision 4: TRANSIT target speed. PX4 steady lag with position-only setpoints is v / MPC_XY_P
+    # (0.95): 0.316 m at P2's 0.3 m/s ramp, 0.21 m here, inside the 0.30 m tracking bound.
+    ("mission", "transit_speed_m_s"): 0.2,
     ("geofence", "x_min_m"): -1.0,
     ("geofence", "x_max_m"): 9.5,
     ("geofence", "y_abs_max_m"): 3.0,

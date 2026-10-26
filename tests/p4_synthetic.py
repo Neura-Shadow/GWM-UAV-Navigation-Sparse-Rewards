@@ -105,11 +105,14 @@ def truth_clearance(vehicle_xy, boxes, r_body=0.39):
     return best
 
 
-def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None):
-    """Offline closed loop with ideal tracking (vehicle = commanded target, height 2 m).
+def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None, speed=None, px4_xy_p=None):
+    """Offline closed loop at height 2 m, translating at `speed` (default: the pinned TRANSIT speed).
 
     Independent renderer -> production perception (scan + grid) at 10 Hz -> production supervisor
-    and apply_action at 20 Hz. Returns the trajectory, supervisor and minimum truth clearance."""
+    and apply_action at 20 Hz. Tracking is ideal (vehicle = commanded target) unless `px4_xy_p` is
+    given: then the vehicle follows the target through a first-order horizontal position loop
+    v = px4_xy_p * error, like PX4's proportional MPC_XY_P with position-only setpoints.
+    Returns the trajectory, supervisor, minimum truth clearance and maximum tracking error."""
     from gwm_obstacle_avoidance import local_map, perception, planner, supervisor
     from gwm_sensor_adapter.geometry import Extrinsic
     S, C = sensors(), p4_config()
@@ -126,7 +129,9 @@ def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None):
         cam, rays = perception.extract_scan(image, CAL, extrinsic, position, q, P, S["near_m"], S["far_m"], 0.0)
         perception.integrate(grid, cam, rays, P["max_hit_range_m"], S["near_m"])
 
+    speed = C["mission"]["transit_speed_m_s"] if speed is None else speed
     sim, yaw, target = 0.0, 0.0, (0.0, 0.0)
+    vehicle, track_max = target, 0.0
     positions = [target]
     for d in range(0, scan_deg + 1):  # MAP_SCAN: 1 deg per 10 Hz frame
         perceive(target, math.radians(d))
@@ -138,28 +143,35 @@ def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None):
     dt, tick = 0.05, 0
     while sim < sim_limit:
         if tick % 2 == 0 and (stop_perception_at is None or sim < stop_perception_at):
-            perceive(target, yaw)
+            perceive(vehicle, yaw)
             last_acq = sim
         snapshot = {"acquisition_sim_s": last_acq, "calibration_identity": "synthetic"}
         traversed = planner.traversed_mask(grid, positions[-80:], C["envelope"]["r_body_m"])
         decision = sup.step({"sim": sim, "snapshot": snapshot, "grid": grid, "traversed": traversed,
                              "adapter_health": health if (stop_perception_at is None or sim < stop_perception_at + 1.0)
                              else {"status": "stale", "calibration_identity": "synthetic", "sim_s": 1e9},
-                             "consecutive_unusable": 0, "reset_sim": None, "vehicle": target, "vehicle_yaw": yaw,
+                             "consecutive_unusable": 0, "reset_sim": None, "vehicle": vehicle, "vehicle_yaw": yaw,
                              "target": target, "goal": tuple(C["mission"]["goal_enu_m"]), "origin": (0.0, 0.0),
                              "geofence": C["geofence"]})
         decisions.append(decision)
         if decision["state"] == supervisor.ABORT:
             break
-        target, yaw = supervisor.apply_action(target, yaw, decision, 0.3, math.radians(10), dt,
+        target, yaw = supervisor.apply_action(target, yaw, decision, speed, math.radians(10), dt,
                                               tuple(C["mission"]["goal_enu_m"]))
-        if math.dist(positions[-1], target) > 0.02:
-            positions.append(target)
-        trajectory.append((sim, target, yaw, decision["state"]))
-        min_clearance = min(min_clearance, truth_clearance(target, boxes))
-        if math.dist(target, C["mission"]["goal_enu_m"]) < 1e-6:
+        if px4_xy_p is None:
+            vehicle = target
+        else:
+            for _ in range(10):  # 5 ms integration of the position loop
+                vehicle = (vehicle[0] + px4_xy_p * (target[0] - vehicle[0]) * dt / 10,
+                           vehicle[1] + px4_xy_p * (target[1] - vehicle[1]) * dt / 10)
+        track_max = max(track_max, math.dist(target, vehicle))
+        if math.dist(positions[-1], vehicle) > 0.02:
+            positions.append(vehicle)
+        trajectory.append((sim, vehicle, yaw, decision["state"]))
+        min_clearance = min(min_clearance, truth_clearance(vehicle, boxes))
+        if math.dist(target, C["mission"]["goal_enu_m"]) < 1e-6 and math.dist(vehicle, target) < 0.05:
             break
         sim += dt
         tick += 1
     return {"trajectory": trajectory, "supervisor": sup, "decisions": decisions, "min_clearance": min_clearance,
-            "final": target, "sim": sim}
+            "final": target, "sim": sim, "track_max": track_max}

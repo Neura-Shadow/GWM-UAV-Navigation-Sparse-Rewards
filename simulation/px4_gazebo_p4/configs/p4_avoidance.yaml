@@ -43,7 +43,8 @@
     "map_scan_deg": 360.0,
     "goal_hover_sim_s": 5.0,
     "goal_tolerance_m": 0.30,
-    "settled_speed_m_s": 0.1
+    "settled_speed_m_s": 0.1,
+    "transit_speed_m_s": 0.2
   },
   "geofence": {"x_min_m": -1.0, "x_max_m": 9.5, "y_abs_max_m": 3.0, "height_min_m": 1.0, "height_max_m": 3.0},
   "topics": {"local_map": "/gwm/p4/local_map", "adapter_health": "/gwm/sensors/front_depth/health"}

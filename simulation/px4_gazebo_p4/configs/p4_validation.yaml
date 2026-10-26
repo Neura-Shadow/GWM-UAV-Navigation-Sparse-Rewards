@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "p4-acceptance-v1",
-  "contract_revision": "revisions 2 and 3 (operator-approved 2026-10-26; revision 2 commit d3c06b4, revision 3 commit ea2c9e3)",
+  "contract_revision": "revisions 2, 3 and 4 (operator-approved 2026-10-26; revision 2 commit d3c06b4, revision 3 commit ea2c9e3, revision 4 commit 65b99e4)",
   "p3_baseline_manifest_sha256": "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c",
   "p3_baseline_manifest": "state/p3-candidate-087722b.json",
   "safety": {

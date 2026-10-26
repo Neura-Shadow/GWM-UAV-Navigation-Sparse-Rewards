@@ -145,7 +145,7 @@ def test_map_scan_holds_on_stale_depth_and_aborts_after_ten_seconds():
 def test_s1_transit_goal_hover_and_single_land_request():
     rig = Rig()
     rig.run_until(lambda a: rig.m.state == "TRANSIT", 45.0)
-    rig.run_until(lambda a: rig.m.state == "GOAL_HOVER", 40.0)
+    rig.run_until(lambda a: rig.m.state == "GOAL_HOVER", 50.0)  # 8 m at the pinned 0.20 m/s
     assert mission.enu_from_ned(rig.m.target) == pytest.approx((8.0, 0.0))
     assert rig.m.supervisor.transitions == []  # S1: no avoidance, no hover
     actions = rig.run_until(lambda a: a["command"] is not None, 7.0)
@@ -153,6 +153,21 @@ def test_s1_transit_goal_hover_and_single_land_request():
     assert rig.m.state == "REQUEST_LAND" and rig.m.windows["GOAL_HOVER"]["end_sim_s"] - rig.m.windows["GOAL_HOVER"]["start_sim_s"] >= 5.0
     decisions = [e for e in rig.m.events if e["event"] == "p4_decision"]
     assert decisions and all(d["state"] == "NORMAL" for d in decisions)
+
+
+def test_transit_translates_at_the_pinned_p4_speed_and_p2_keeps_its_ramp():
+    """Revision 4: TRANSIT advances the target at transit_speed_m_s (0.20 m/s), not P2's ramp_m_s."""
+    assert P4C["mission"]["transit_speed_m_s"] == 0.2 and P2["ramp_m_s"] == 0.3
+    rig = Rig()
+    rig.run_until(lambda a: rig.m.state == "TRANSIT", 45.0)
+    steps, previous = [], mission.enu_from_ned(rig.m.target)
+    for _ in range(100):
+        rig.step()
+        current = mission.enu_from_ned(rig.m.target)
+        steps.append(math.dist(previous, current))
+        previous = current
+    assert max(steps) == pytest.approx(0.2 * 0.05, abs=1e-9)  # 20 Hz ticks at 0.20 m/s
+    assert sum(steps) / len(steps) == pytest.approx(0.2 * 0.05, abs=1e-6)
 
 
 def test_supervisor_abort_routes_through_p2_recovery_with_one_land():

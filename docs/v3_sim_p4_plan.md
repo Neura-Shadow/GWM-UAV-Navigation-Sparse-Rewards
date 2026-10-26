@@ -12,7 +12,13 @@ offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
-**passed Gate A** (§31); Gates B, S and C await separate authorizations. Gates A, B, S
+**passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
+position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
+applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
+`MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
+like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
+at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
+treat as a failed flight (§42); this needs a contract decision. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -894,3 +900,312 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   it has the least margin of any run. Gate B, S and C flights run under heavier load.
 * **Status:** Gate A is accepted for `c932b212`. Gate B (S2), then Gate S (S1, S5, S6), then Gate C
   (S2, S3, S4) each need their own operator authorization bound to this manifest. P4 is not complete.
+
+## 32. P4 Gate B of candidate `c932b212` — FAILED on tracking (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-c932b2125ebb.json` (`93bf622c…1ace`), consumed.
+  Result `state/p4-gate-B-c932b212….result.json` (`eb4fc96b…f3d`): `accepted: false`,
+  `first_failure: smoke:safety:tracking`, no automatic retry. Run 03:30:56–03:33:57 UTC; no leftover
+  processes.
+* **S2 flight** `20261026T033114Z-p4-flight-S2-8215374e`: functionally correct.
+  * The mission completed: NORMAL → AVOIDING → RESUME → NORMAL, then the goal, with a final goal
+    distance of 0.069 m.
+  * 0 collisions; minimum truth clearance 0.457 m (limit 0.20 m).
+  * Perception compute p99 0.019 s.
+  * The only failure is horizontal tracking: maximum 0.342 m against the 0.30 m bound, and 382 of
+    620 TRANSIT decisions were above 0.30 m.
+* **Cause, physical and not a code fault:** P4 translates the target at P2's `ramp_m_s` of 0.3 m/s
+  and sends position-only `trajectory_setpoint`s (the P2 helper sets velocity and acceleration to
+  NaN). PX4's horizontal position loop is proportional, with stock `MPC_XY_P` 0.95 (x500 airframe,
+  not overridden). A position-only target moving at constant speed `v` therefore leaves a steady lag
+  of `v / MPC_XY_P` = 0.3 / 0.95 ≈ **0.316 m**.
+  * The flight shows exactly that: the error plateaus at 0.31–0.33 m in every straight segment, peaks
+    at 0.342 m in turns, and falls to about 0.03 m when the target holds.
+  * The contract's 0.30 m bound is therefore unreachable at 0.3 m/s under the pinned P2 setpoint form
+    and PX4 gains.
+  * The offline closed loop assumed perfect tracking, so it could not show this.
+* **Options (operator decision; nothing applied):**
+  * **(a) Recommended. Contract revision 4:** a P4-only transit target speed of 0.20 m/s, as a new
+    pinned `p4_avoidance.yaml` value. L7 already allows any speed ≤ 0.3 m/s, P2's `ramp_m_s` stays
+    0.3 for takeoff and landing, and every safety threshold is unchanged.
+    * Expected steady lag 0.21 m, plus the observed turn overshoot of about 0.03 m, giving about
+      0.24 m.
+    * Transit stays far inside the 150 s deadline.
+  * **(b)** Velocity feedforward in `trajectory_setpoint`. This changes the setpoint wire form that
+    P2's accepted evaluators check, so it is riskier.
+  * Relaxing the 0.30 m bound or changing PX4 gains is not proposed.
+
+## 33. Contract revision 4 proposed (transit speed 0.20 m/s; awaiting approval)
+
+* [Revision 4 proposal](v3_sim_p4_contract_revision4_proposal.md), drafted at the operator's request
+  after §32. A new pinned `mission.transit_speed_m_s` = 0.20 makes the P4 `TRANSIT` target speed
+  slower than P2's 0.3 m/s ramp, which stays for every P2 phase. No threshold, scenario, gate or
+  P2/P3 file changes.
+* **Rationale:** with position-only setpoints, PX4's steady horizontal lag is `v / MPC_XY_P`. At
+  0.3 m/s that is 0.316 m, measured in Gate B. At 0.20 m/s it is 0.211 m, about 0.23 m with the
+  measured turn overshoot, inside the unchanged 0.30 m bound.
+* **Offline study:** production perception and supervisor with a first-order 0.95 position-loop
+  model. It reproduces the SITL plateau at 0.3 m/s (0.308 m). At 0.20 m/s, S1–S5 give the same
+  outcomes and supervisor transitions, max tracking 0.205 m, equal or larger clearances, and
+  `TRANSIT` of at most 55 s against the 150 s deadline.
+* **Approved (2026-10-26) and applied in §34.** On approval: the config and pin, `TRANSIT` using the pinned speed in
+  `mission.py`, tests, a package rebuild, then a new commit, Policy A approval, a freeze and the gates
+  from Gate A onward.
+
+## 34. Contract revision 4 applied (offline)
+
+* **Approval:** operator Neura-Shadow, exactly as written in `65b99e4`. The contract now names
+  revisions 2, 3 and 4 in its header, §3, §5 L7 and the §6 table, and the proposal is marked
+  approved and applied. `p4_validation.yaml` `contract_revision` names revisions 2, 3 and 4
+  (`d3c06b4`, `ea2c9e3`, `65b99e4`).
+* **Code:**
+  * `p4_avoidance.yaml` has `mission.transit_speed_m_s` 0.2, pinned in `contracts.PINNED`.
+  * `mission.py` `TRANSIT` passes the pinned speed to `supervisor.apply_action`. P2 phases keep
+    `ramp_m_s` 0.3 from the unchanged `p2_control.yaml`.
+* **Tests:**
+  * The pin is checked: the repository value is 0.2, and 0.3 is refused.
+  * The mission advances the target exactly 0.2 × 0.05 m per 20 Hz `TRANSIT` tick, while P2's ramp
+    stays 0.3.
+  * The synthetic closed loop takes the pinned speed and an optional first-order PX4 position loop
+    (`MPC_XY_P` 0.95). The S2 regression gives max tracking ≤ 0.2 / 0.95 + 0.01 m at the pinned speed,
+    above 0.30 m at 0.3 m/s (the Gate B failure), with an unchanged detour and clearance ≥ 0.20 m.
+  * `test_s1` allows 50 s for the 8 m transit.
+  * The S6 sensor-loss test now uses the exact 10 Hz frame grid. Perception stops between frames,
+    and `HOVER` must follow within the snapshot age plus one control tick. The old approximate bound
+    failed only because 0.20 m/s put the cutoff exactly on a frame boundary; the behaviour (HOVER
+    0.30 s after the last frame, ABORT after 10 s) is unchanged.
+* **Rebuild:** new P4 package hash `3adf426bed0d1a57fdfc1fdf97751ce7efe5a21f55654c3f1f46613e4ad7a96f`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 108, equivalence 6, ROS
+    harness 2.
+  * Windows: full run 376 passed, 29 skipped, with the S6 test failing before its fix; the planner
+    file then passed 26 of 26.
+  * P3 still verifies to `1e205fec…`.
+  * Dry P4 candidate: build `3adf426b…`.
+* **Next (at the time):** Policy A approval, a freeze, then the gates from Gate A onward (done in
+  §35 up to the Gate A authorization).
+
+## 35. Frozen P4 candidate `e187b475` (2026-10-26, contract revisions 2, 3 and 4)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `add6c225174eb57326cb0dcdd0d3ac8ef688406f`. Receipt: `state/p4-policy-A-approval-add6c22.json`
+  (`500413bf…2fa3`), with candidate phase "p4-acceptance-v1 (revisions 2, 3 and 4)".
+* Manifest `state/p4-candidate-add6c22.json`: canonical
+  **`e187b475eb5f00b6759f13fb1c87a52b6df831b953d13123c0be897aadb7df86`** (file `cfbaaf1b…7c28`).
+  `verify` reproduces it.
+  * Revision label: "revisions 2, 3 and 4 (… revision 4 commit 65b99e4)".
+  * Against `c932b212`, exactly the four revision 4 files differ: `p4_avoidance.yaml` (binds
+    `transit_speed_m_s` 0.2), `p4_validation.yaml`, `contracts.py` and `mission.py`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3adf426b…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `e187b475`. Earlier candidates' records stay in `state/` as history,
+  including `c932b212`'s accepted Gate A and failed Gate B. A new manifest needs its own Gate A, then
+  B, S and C. Gate A has not been run.
+
+## 36. P4 Gate A of candidate `e187b475` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-e187b475eb5f.json` (`494259ea…6485`), consumed.
+  Result `state/p4-gate-A-e187b475….result.json` (`2ab4ffec…815e`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 04:44:00–04:52:59 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run.**
+
+  | Run | Result | Compute p99 / max (s) | RTF |
+  |---|---|---|---|
+  | p3-readiness `…044420Z…4bb7a5cc` | passed (unchanged P3 evaluation) | — | 0.71 |
+  | p4-readiness `…044522Z…bc63ce22` | passed | 0.0340 / 0.0353 | 0.66 |
+  | fixture-G2 `…044638Z…47d04268` | `obstacle_in_trigger_range` (expected); hit 1.8 m, truth 1.8 m | 0.0291 / 0.0349 | 0.68 |
+  | fixture-G4 `…044755Z…e117b7cb` | `obstacle_in_trigger_range` (expected); hit 3.8 m, truth 3.8 m | 0.0238 / 0.0272 | 0.68 |
+  | fixture-G6 `…044911Z…59e7346a` | `no_obstacle_in_trigger_range` (expected); hit 5.85 m, truth 5.85 m | 0.0341 / 0.0354 | 0.68 |
+  | fault-adapter_stop `…045027Z…f7d906b2` | adapter SIGINT at t = 30.892 s; HOVER (`adapter_health_missing`) at 32.342 s | 0.0271 / 0.0283 | 0.72 |
+  | fault-bridge_stop `…045148Z…c18bd0c5` | bridge SIGINT at t = 31.004 s; HOVER (`snapshot_stale`) at 31.254 s | 0.0302 / 0.0324 | 0.71 |
+
+* **Margins:** the highest compute p99 is 0.0341 s against the 0.050 s limit. The fault-run p99 is
+  lower than on `c932b212` (0.0271 against 0.0456 s).
+* **Status:** Gate A is accepted for `e187b475`. Gate B (S2, the first flight at the revision 4
+  transit speed), then Gate S (S1, S5, S6), then Gate C (S2, S3, S4) each need their own operator
+  authorization bound to this manifest. P4 is not complete.
+
+## 37. P4 Gate B of candidate `e187b475` — FAILED on a dispatch-budget stall in `MAP_SCAN` (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-e187b475eb5f.json` (`a449404a…5280`), consumed.
+  Result `state/p4-gate-B-e187b475….result.json` (`9b8081b7…104d`): `accepted: false`,
+  `first_failure: smoke:runtime_status:Abort:controller_failed`, no automatic retry. Run
+  04:54:41–04:56:31 UTC; no leftover processes.
+* **S2 flight** `20261026T045500Z-p4-flight-S2-def51241`:
+  * P2 initialization, takeoff, reference lock, yaw handover and `INITIAL_HOVER` passed.
+  * In `MAP_SCAN`, about 209° into the revolution at t = 59.496 s, `p4_control` raised the accepted
+    P2 `DispatchGuard` error `stale_action`: the control callback exceeded the 0.05 s wall-time
+    dispatch budget.
+  * P2 recovery sent LAND at once (command 21). The vehicle reported landed and at rest from 64.7 s.
+  * The truth observer closed cleanly (3171 poses, largest gap 0.04 s); only `ros-controller` exited
+    non-zero.
+  * `TRANSIT` was never reached, so the revision 4 speed was not exercised.
+  * The evaluator's `KeyError:'sensor_window_sim_s'` is a consequence of the abort.
+* **Where the time went:** the failing callback lasted 0.4839 s, but its `mission_tick` took
+  0.0006 s and started 0.4823 s after the callback entry.
+  * Before the mission tick, `tick()` does only trivial checks and the once-per-second
+    `inspect_graph()`: ROS graph queries for the PX4 topics, then writing `ros-graph.json`.
+  * The callbacks that carry that check recur every 1.05 s with a 1–3 ms pre-tick delay. The failing
+    callback falls exactly on that cadence, with a 0.4823 s pre-tick delay.
+  * Every `MAP_SCAN` callback before it took at most 0.0058 s.
+  * The separate perception process kept publishing every 0.1 s with normal compute through the
+    stall, so this was not a host-wide freeze.
+* **Assessment:**
+  * The structure is inherited unchanged from the accepted P2 node, which runs the same graph check
+    inside the same budget window (`node.py` lines 248–251). The stall is not related to revision 4,
+    because `MAP_SCAN` is speed-independent, and it is not a P4 logic defect.
+  * It is the first such stall seen in any P4 run; `c932b212`'s whole S2 flight had a maximum
+    callback of 0.0233 s.
+  * Unlike P2, `p4_control` does not trace `graph_check` and `graph_json_persistence`, so whether
+    the graph query or the JSON write blocked cannot be told from this evidence.
+* **Options (operator chose (b), applied in §38):**
+  * **(a)** Treat it as an intermittent environment event and re-freeze the unchanged sources.
+  * **(b) Recommended:** add P2's `graph_check` and `graph_json_persistence` spans to `p4_control`.
+    This is parity with the accepted P2 instrumentation, with no behaviour change, so a recurrence
+    can be attributed. Then rebuild and re-freeze.
+  * Either way, candidate `e187b475` cannot run Gate B again, and a new manifest needs Gate A first.
+
+## 38. Graph-check tracing after the failed Gate B of `e187b475` (offline)
+
+* **Change in `p4_control`, the same as the accepted P2 node (`node.py` lines 186 and 249):**
+  * The once-per-second `inspect_graph()` call in the control callback is wrapped in a
+    `graph_check` span.
+  * Its `ros-graph.json` write is wrapped in a `graph_json_persistence` span.
+  * There is no behaviour change: the cadence, graph rules and file are the same, and the call is
+    still inside the same dispatch-budget window.
+  * P2's `verify_timing` now reports `graph_check_duration_wall_s` for P4 runs as it does for P2. A
+    recurrence can be attributed to the graph query or to the JSON write.
+* **Test:** new `test_p4_controller_traces_the_graph_check_like_the_accepted_p2_node` in
+  `tests/test_px4_gazebo_p4_ros_harness.py` runs the real node under real rclpy for about 2.6 s. It
+  checks that:
+  * there are at least 2 `graph_check` spans, each containing exactly one `graph_json_persistence`;
+  * each lies inside one control callback, before that callback's `mission_tick`;
+  * the spans are at least 1.0 s apart;
+  * P2's `verify_timing` reports their maximum duration.
+
+  Against the `e187b475` controller the test fails (0 spans); with the change it passes.
+* **Rebuild:** new P4 package hash `07a6c74d6cb03393b4930d802b4f2d5ab626bad624dd57b47b664a02dac18ed6`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 108, equivalence 6, ROS
+    harness 3.
+  * Windows: 377 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Limit:** tracing makes a stall attributable. It does not prevent one, because the check sits in
+  the inherited P2 structure.
+* **Next (at the time):** Policy A approval, a freeze, then the gates from Gate A onward (done in
+  §39 up to the Gate A authorization).
+
+## 39. Frozen P4 candidate `1be1896a` (2026-10-26, contract revisions 2, 3 and 4)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `e967e4ce414bc77a11de86bf20944683a369bf7c`. Receipt: `state/p4-policy-A-approval-e967e4c.json`
+  (`d0a181d3…99c9`), with candidate phase "p4-acceptance-v1 (revisions 2, 3 and 4)".
+* Manifest `state/p4-candidate-e967e4c.json`: canonical
+  **`1be1896a794200acfd77733b7b788001e4296a66ef00e63a84cf5c158de5137b`** (file `22bb6d4f…277d`).
+  `verify` reproduces it.
+  * Only `control_node.py` differs from `e187b475`, and the manifest binds the traced version.
+  * Baselines and build: P3 `1e205fec…`; P4 build `07a6c74d…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `1be1896a`. Earlier candidates' records stay in `state/` as history,
+  including `e187b475`'s accepted Gate A and failed Gate B. Gate A has not been run.
+
+## 40. P4 Gate A of candidate `1be1896a` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-1be1896a7942.json` (`cc46bfc0…99ea`), consumed.
+  Result `state/p4-gate-A-1be1896a….result.json` (`c73fcce0…046b`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 05:12:55–05:21:53 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run.**
+
+  | Run | Result | Compute p99 / max (s) | RTF | `graph_check` max (s) |
+  |---|---|---|---|---|
+  | p3-readiness `…051315Z…92e596e9` | passed (unchanged P3/P2 run) | — | 0.70 | 0.0028 |
+  | p4-readiness `…051420Z…2764e0ad` | passed | 0.0328 / 0.0334 | 0.66 | 0.0049 |
+  | fixture-G2 `…051535Z…b79a206c` | `obstacle_in_trigger_range` (expected); hit 1.8 m, truth 1.8 m | 0.0277 / 0.0348 | 0.67 | 0.0052 |
+  | fixture-G4 `…051653Z…3614b966` | `obstacle_in_trigger_range` (expected); hit 3.7999 m, truth 3.8 m | 0.0370 / **0.0765** | 0.69 | 0.0045 |
+  | fixture-G6 `…051808Z…10292134` | `no_obstacle_in_trigger_range` (expected); hit 5.85 m, truth 5.85 m | 0.0301 / 0.0341 | 0.72 | 0.0036 |
+  | fault-adapter_stop `…051921Z…84ceb27c` | adapter SIGINT at t = 31.024 s; HOVER (`adapter_health_missing`) at 32.424 s | 0.0288 / 0.0391 | 0.70 | 0.0023 |
+  | fault-bridge_stop `…052043Z…0f49f6d2` | bridge SIGINT at t = 31.024 s; HOVER (`snapshot_stale`) at 31.274 s | 0.0307 / 0.0330 | 0.70 | 0.0045 |
+
+* **New tracing at work:** about 16 graph checks per run, with a p50 of about 1.4 ms, a maximum of
+  5.2 ms and JSON writes of at most 2.0 ms. All are far inside the 0.05 s dispatch budget, and the
+  stall of §37 did not recur.
+* **Margin note:** G4's compute max of 0.0765 s is within the 0.090 s limit, but it is the closest
+  value to any limit in this gate; its p99 is 0.037 s.
+* **Status:** Gate A is accepted for `1be1896a`. Gate B (S2 at the revision 4 transit speed), then
+  Gate S (S1, S5, S6), then Gate C (S2, S3, S4) each need their own operator authorization bound to
+  this manifest. P4 is not complete.
+
+## 41. P4 Gate B of candidate `1be1896a` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-1be1896a7942.json` (`28619638…be88`), consumed.
+  Result `state/p4-gate-B-1be1896a….result.json` (`d46fd9ca…5dcb`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 05:23:32–05:26:57 UTC; no leftover processes.
+* **S2 flight** `20261026T052351Z-p4-flight-S2-80f2bc40`: passed with acceptance credit; every owned
+  process stopped gracefully.
+  * **Outcome:** `goal_reached_with_detour` as expected. Supervisor NORMAL → OBSTACLE_DETECTED →
+    AVOIDING → RESUME → NORMAL; the controller completed through landing (`COMPLETE`); final goal
+    distance 0.041 m.
+  * **Safety:** 0 collisions; minimum truth clearance 0.403 m (≥ 0.20 m). **Tracking maximum
+    0.246 m (≤ 0.30 m)**, against 0.342 m at 0.3 m/s on `c932b212`. The revision 4 prediction was
+    about 0.23 m. Truth interval at most 0.04 s.
+  * **Performance:** perception compute p99 0.0211 s and max 0.0274 s; latency p95 0.052 s sim;
+    10.0 Hz; usable fraction 1.0; RTF 0.99.
+  * **Transit:** 44.9 s sim, against the 150 s deadline; the revision 4 study predicted 45.4 s.
+  * **Timing:** 120 graph checks, each at most 3.7 ms; slowest control callback 17.4 ms (budget
+    0.05 s).
+* **Status:** Gates A and B are accepted for `1be1896a`. Gate S (S1, S5, S6), then Gate C (S2, S3,
+  S4) each need their own operator authorization bound to this manifest. P4 is not complete.
+
+## 42. P4 Gate S of candidate `1be1896a` — FAILED at S5 (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-S-1be1896a7942.json` (`b744ebd0…5cd7`), consumed.
+  Result `state/p4-gate-S-1be1896a….result.json` (`3c19e0e1…4005`): `accepted: false`,
+  `first_failure: safety-S5:performance:compute_max`, no automatic retry. Run 05:28:56–05:35:01 UTC;
+  no leftover processes. S6 did not run.
+* **safety-S1** `20261026T052917Z-p4-flight-S1-4735309e`: **passed**. `goal_reached`, final goal
+  distance 0.031 m, maximum lateral 0.064 m, tracking 0.256 m, 0 collisions, compute p99 0.030 s,
+  RTF 1.00.
+* **safety-S5** `20261026T053224Z-p4-flight-S5-e89ee6ef`: **the behaviour was correct.**
+  * Supervisor: OBSTACLE_DETECTED and AVOIDING at 81.53 s, HOVER at 90.07 s (`no_progress_candidate`),
+    ABORT at 110.12 s (`hover_timeout`). The target moved 0.0 m after HOVER.
+  * Minimum truth clearance 0.891 m, 0 collisions, tracking 0.234 m. Commands `[176, 400, 21]`,
+    with the single LAND issued through P2 recovery; the vehicle landed.
+  * The evaluator failed it on five items.
+* **Root cause of four of the five failures:** contract §5 routes `ABORT` into P2 `RECOVERY` ("one
+  LAND (21) through P2 recovery rules"). The accepted P2/P3 evidence tools treat `RECOVERY` as a
+  failed flight, and the P4 evaluator reuses them unchanged:
+  1. **`p2:timing`.** P2 `trace_metrics` sets its status to `failed` whenever the controller result
+     has any `failure`, and a supervisor abort records one (`p4_supervisor_abort:hover_timeout`).
+     Its full flight timing requirements (prestream, gaps, late dispatch, stale source) are skipped
+     in that case, so they were never applied to S5.
+  2. **`p2_integrity_error: estimator_reference_reset:final_alignment_lost`.** The P2 reference
+     monitor, replayed by `reference_evidence.classify`, rejects any loss of in-air alignment
+     outside `REQUEST_LAND`, `VERIFY_LANDING`, `VERIFY_LANDED_AND_DISARMED` and `COMPLETE`. A
+     touchdown in `RECOVERY` always trips it.
+  3. **`rgb_absence:snapshot_missing:window_end`.** The P3 runner's RGB-absence snapshotter takes
+     its `window_end` snapshot only on the `COMPLETE` transition (`p3_runner.py`, `TRIGGERS`), and a
+     run ending in `RECOVERY` never reaches it.
+  4. **`mc_causal_yaw:p2_integrity_missing`.** This follows from item 2.
+
+  S6 ends the same way (`ABORT` → `RECOVERY`), so as specified **neither S5 nor S6 can pass**
+  §8(a)/(b) and §9.1 F4, whatever the behaviour. The offline evaluator tests did not replay P2
+  integrity on a real `RECOVERY` landing.
+* **Independent fifth failure, `performance:compute_max`:** one perception frame took 0.0948 s
+  against the 0.090 s maximum. It was at takeoff (acquisition 19.31 s); the frame before took
+  0.0405 s, and only 1 of 974 frames exceeded 0.05 s. The p99 was 0.0266 s. This is a transient
+  stall, not sustained cost; the cause (host contention or a Python pause) cannot be told from this
+  evidence. The earlier maximum was G4's 0.0765 s (§40).
+* **Options (operator decision; nothing applied):**
+  * **Contract revision 5 (recommended):** a P4 supervisor `ABORT` lands through P2's nominal
+    sequence (`REQUEST_LAND` → `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`), with
+    the same single LAND (21) and P2 landing checks. The abort is recorded as the P4 outcome, not
+    as a P2 failure. P2 safety errors still go to `RECOVERY` and fail. The unchanged P2/P3 checks
+    (timing, reference, yaw, RGB absence, MC) then apply in full to S5 and S6.
+  * **The compute-max spike:** investigate offline (for example Python GC pauses in the perception
+    process), or accept it as host variance.
+  * Candidate `1be1896a` cannot run Gate S again. Its accepted Gates A and B stay as history; a new
+    manifest needs Gates A, B, S and C.
