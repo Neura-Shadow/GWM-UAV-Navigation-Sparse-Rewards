@@ -3,7 +3,8 @@
 **Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
 cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
-failed Gate A on two `p4_control` defects and cannot run again either (§17). Gates A, B, S
+failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
+offline (§18); a new candidate needs Policy A approval and a freeze. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -534,7 +535,7 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   The perception node and the accepted P3 adapter publish BEST_EFFORT. Both publishers logged
   "incompatible QoS … RELIABILITY", and the controller received `local_map_messages: 0` and
   `adapter_health_messages: 0`. Perception itself worked: `p4/local_map.jsonl` is 1.35 MB.
-* **Correction needed (not applied):** both are in the `gwm_obstacle_avoidance` package, so the fix
+* **Correction (applied offline, §18):** both are in the `gwm_obstacle_avoidance` package, so the fix
   needs a rebuild and gives a new P4 package hash.
   * Defect 1: add P2's `bag_write:` spans in `control_node.bag()`.
   * Defect 2: subscribe to the map and health topics with the BEST_EFFORT profile the publishers use.
@@ -542,3 +543,30 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Offline tests: run `verify_timing` on a P4 controller trace, and check QoS compatibility.
   * Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
     `1628fc44` cannot run Gate A again.
+
+## 18. `p4_control` corrections after the failed Gate A of `1628fc44` (offline)
+
+* **Trace spans:** `control_node.bag()` now records the accepted P2 node's `cdr_serialize:<topic>` and
+  `bag_write:<topic>` spans for every persisted message, including `/gwm/p2/events`.
+  * Trace budget: the P2 flights used the same span set. At the 240 s simulation deadline the
+    estimate is about 290k records against the 500k capacity.
+* **QoS:** `p4_control` subscribes to `/gwm/p4/local_map` and the adapter health topic as
+  BEST_EFFORT, KEEP_LAST 10, VOLATILE, matching both publishers. The accepted P3 adapter is unchanged.
+* **Tests:** new `tests/test_px4_gazebo_p4_ros_harness.py` runs the real `p4_control` under real
+  rclpy and rosbag2, offline, with no PX4 or Gazebo. It is skipped without a ROS-sourced Linux shell.
+  * An in-process BEST_EFFORT publisher feeds `/clock`, the PX4 output topics, the map and health.
+  * One test checks that the `bag_write` count equals the persisted bag count, then runs the accepted
+    P2 `verify_timing` on the trace and bag.
+  * The other test checks that the map and health messages arrive.
+  * Before the fix both tests failed, reproducing the Gate A evidence: 0 `bag_write` records against
+    71 bag messages, and "incompatible QoS … RELIABILITY". After the fix both pass.
+* **Rebuild:** new P4 package hash `3dd6106358aac0a920ba31a4a9de84f9950708233694db95ae175d3fe90e140c`;
+  `state/p4-built.json` matches the source. The consumed candidate `1628fc44` binds the old build
+  (`3b6aef59…`) and stays as history.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 102, ROS harness 2.
+  * Windows: 367 passed, 27 skipped.
+  * P3 still verifies to `1e205fec…`.
+  * Dry P4 candidate: build `3dd61063…`, 29 P4 files.
+* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
+  been frozen and no gate has run.

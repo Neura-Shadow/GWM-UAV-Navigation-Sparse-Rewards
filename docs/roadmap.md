@@ -286,7 +286,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   (ground-diagnostic SITL gate env; P3 readiness passed); its authorization is consumed. Runner fix
   `4804a47` applied offline. Candidate `1628fc44` failed Gate A at p4-readiness (P3 readiness passed)
   on two `p4_control` defects: missing P2 `bag_write` trace spans, and RELIABLE subscriptions to the BEST_EFFORT map/health
-  topics (plan §17). Fix not yet applied.
+  topics (plan §17). Both fixed offline and the package rebuilt as `3dd61063` (plan §18); awaiting Policy A for the fix commit.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
