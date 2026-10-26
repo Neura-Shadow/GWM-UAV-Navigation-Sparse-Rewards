@@ -4,7 +4,7 @@
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
 cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
 failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
-offline (§18); a new candidate needs Policy A approval and a freeze. Gates A, B, S
+offline (§18). Candidate `b4db489e` is frozen (§19); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -568,5 +568,20 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Windows: 367 passed, 27 skipped.
   * P3 still verifies to `1e205fec…`.
   * Dry P4 candidate: build `3dd61063…`, 29 P4 files.
-* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
-  been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §19
+  up to the authorization).
+
+## 19. Frozen P4 candidate `b4db489e` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `05f4052c0eec28b8c8a3c85818af5b69df78760d`. Receipt: `state/p4-policy-A-approval-05f4052.json`
+  (`8b772de3…486e`).
+* Manifest `state/p4-candidate-05f4052.json`: canonical
+  **`b4db489e820db723305e7e38e360a3f86f948f938c954b5e0416d6a4d016d8b2`** (file `eeb6a739…4b4c`).
+  `verify` reproduces it.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3dd61063…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC build `7542919c…`, and its selection matches; QGC ELF `82994283…`;
+    `hardware:d3d12` with profile `2e9e9ba1…`.
+  * Gates A/B/S/C; no execution without authorization.
+* No gate record exists for `b4db489e`. The failed Gate A runs of `3785a54c` and `1628fc44` and their
+  consumed authorizations stay in `state/` as history. Gate A has not been run.
