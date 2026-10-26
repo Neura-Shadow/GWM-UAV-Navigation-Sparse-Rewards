@@ -431,4 +431,7 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   The manifest copies that text, although the frozen sources implement revision 3 (`map_scan_deg`
   360 pinned and the traversed L2 rule, both hashed). Correcting the label changes a P4 source, so
   it needs a new commit, a Policy A approval for it, and a re-freeze.
+* **Label corrected** in the next commit: `contract_revision` now names revisions 2 and 3, with their
+  commits, and a test pins it. Candidate `2ddabd14` stays frozen until it is replaced by a re-freeze
+  at that commit, which waits on the operator's Policy A approval.
 * Gate A has not been run.
