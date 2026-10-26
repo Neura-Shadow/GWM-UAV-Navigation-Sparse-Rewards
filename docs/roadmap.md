@@ -280,7 +280,9 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
 - [x] P3 Depth sensing — **COMPLETE — Contract v1.6 — Qualification 3/3 PASSED** (PX4 SITL,
   depth-only flights; no hardware). [Final acceptance](v3_sim_p3_final_acceptance_v1_6.md),
   [contract and operation](v3_sim_p3_contract.md). P4 is the next phase.
-- [ ] P4 Non-learning obstacle avoidance
+- [ ] P4 Non-learning obstacle avoidance — contract `p4-acceptance-v1` (revisions 2 and 3) approved;
+  offline implementation M1–M7 complete ([contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md)).
+  Not frozen; Gates A/B/S/C not run.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

@@ -1,8 +1,8 @@
-"""P4 initial-planning feasibility (evidence for proposed contract revision 3).
+"""P4 initial-planning feasibility (contract revision 3, approved and applied).
 
 Frames from the independent renderer are integrated exactly as the perception
-node does. The proposed L2 'traversed' rule is simulated on a grid copy only;
-the production planner is unchanged until the revision is approved.
+node does; the production planner applies revision 3 L2 (traversed cells count
+as FREE, never over OCCUPIED). `NONE` reproduces the revision 2 rule.
 """
 import math
 from pathlib import Path
@@ -52,11 +52,12 @@ def footprint_unknown_radii(grid, center=(0.0, 0.0), radius=1.0):
 
 
 def with_traversed(grid, positions):
-    """Proposed L2: cells within R_body of an earlier position count as FREE (never over OCCUPIED)."""
-    mask = planner.traversed_mask(grid, positions, R_BODY)
-    copy = local_map.Grid(grid.x_min, grid.y_min, grid.nx, grid.ny, grid.resolution, grid.cells.copy())
-    copy.cells[mask & (copy.cells == local_map.UNKNOWN)] = local_map.FREE
-    return copy, mask
+    return grid, planner.traversed_mask(grid, positions, R_BODY)
+
+
+def none(grid):
+    """Revision 2 L2: no traversed allowance."""
+    return np.zeros(grid.cells.shape, dtype=bool)
 
 
 def context(x=0.0, yaw=0.0):
@@ -72,9 +73,9 @@ def test_approved_pm30_scan_leaves_the_start_footprint_unobserved(maps):
     radii, bearings = footprint_unknown_radii(maps["pm30"])
     outside_body = radii > R_BODY
     assert outside_body.sum() > 100 and np.abs(bearings[outside_body]).max() > 170  # beside and behind
-    assert not planner.path_status(maps["pm30"], context(), CONFIG["planner"], 0.25)["valid"]
+    assert not planner.path_status(maps["pm30"], none(maps["pm30"]), context(), CONFIG["planner"], 0.25)["valid"]
     traversed, mask = with_traversed(maps["pm30"], [(0.0, 0.0)])
-    assert not planner.path_status(traversed, context(), CONFIG["planner"], 0.25)["valid"]
+    assert not planner.path_status(traversed, mask, context(), CONFIG["planner"], 0.25)["valid"]
     decision = planner.plan(traversed, mask, context(), CONFIG["planner"], CONFIG["envelope"], 0.25)
     assert decision["action"] == planner.SCAN and decision["candidates_valid"] == 0  # S1 would HOVER
 
@@ -84,12 +85,12 @@ def test_full_scan_leaves_only_the_near_clip_blind_zone_inside_the_body_disc(map
     assert len(radii) > 0, "near-clip blind zone must remain unknown (not marked free)"
     blind = 0.13233 + SENSORS["near_m"]  # optical offset + near clip
     assert radii.max() <= blind and radii.max() < R_BODY
-    assert not planner.path_status(maps["full360"], context(), CONFIG["planner"], 0.25)["valid"]  # literal L2
+    assert not planner.path_status(maps["full360"], none(maps["full360"]), context(), CONFIG["planner"], 0.25)["valid"]
 
 
 def test_full_scan_with_traversed_disc_starts_s1_without_hovering(maps):
     traversed, mask = with_traversed(maps["full360"], [(0.0, 0.0)])
-    assert planner.path_status(traversed, context(), CONFIG["planner"], 0.25)["valid"]
+    assert planner.path_status(traversed, mask, context(), CONFIG["planner"], 0.25)["valid"]
     decision = planner.plan(traversed, mask, context(), CONFIG["planner"], CONFIG["envelope"], 0.25)
     assert decision["action"] == planner.TRANSLATE and decision["best"]["k"] == 0
     assert decision["best"]["length"] == max(CONFIG["planner"]["lengths_m"])
@@ -97,8 +98,8 @@ def test_full_scan_with_traversed_disc_starts_s1_without_hovering(maps):
 
 def test_traversed_never_overrides_an_observed_obstacle():
     grid = start_map("full360", boxes=[{"center": [0.0, 0.75], "size": [0.2, 0.2]}])  # beside the vehicle
-    traversed, _ = with_traversed(grid, [(0.0, 0.0)])
-    status = planner.path_status(traversed, context(), CONFIG["planner"], 0.25)
+    traversed, mask = with_traversed(grid, [(0.0, 0.0)])
+    status = planner.path_status(traversed, mask, context(), CONFIG["planner"], 0.25)
     assert not status["valid"] and status["reason"] == "occupied"
 
 
@@ -110,6 +111,6 @@ def test_s1_straight_transit_stays_valid_beyond_the_initial_scan_radius(maps):
     while x <= 6.5:  # 0.03 m per 10 Hz frame = 0.3 m/s
         integrate_frame(grid, (x, 0.0, 2.0), 0.0)
         positions.append((x, 0.0))
-        traversed, _ = with_traversed(grid, positions[-60:])
-        assert planner.path_status(traversed, context(x), CONFIG["planner"], 0.25)["valid"], x
+        traversed, mask = with_traversed(grid, positions[-60:])
+        assert planner.path_status(traversed, mask, context(x), CONFIG["planner"], 0.25)["valid"], x
         x += 0.03

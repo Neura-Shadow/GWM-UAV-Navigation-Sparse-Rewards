@@ -1,4 +1,4 @@
-"""Collision-checked candidate planner with deterministic scoring (contract §5 L1–L7).
+"""Collision-checked candidate planner with deterministic scoring (contract §5 L1–L7, revision 3).
 
 Collision validity (L2) is independent of the vehicle heading; translation
 authority (L4) is a separate check. In-place yaw (L5) is the only way to acquire
@@ -48,16 +48,18 @@ def endpoint(start, heading, length):
     return start[0] + length * math.cos(heading), start[1] + length * math.sin(heading)
 
 
-def collision_check(grid, start, end, ctx, settings, max_age):
-    """L2: (collision_valid, reason, unknown_only, unknown_cells)."""
+def collision_check(grid, traversed, start, end, ctx, settings, max_age):
+    """L2 (revision 3): every cell within r_infl of the swept segment is FREE or traversed;
+    traversed never overrides OCCUPIED. Returns (collision_valid, reason, unknown_only, unknown_cells)."""
     if ctx.snapshot_age is None or ctx.snapshot_age > max_age:
         return False, "stale_snapshot", False, 0
     r = settings["r_infl_m"]
     if not (inside_fence(start, ctx, r) and inside_fence(end, ctx, r)):
         return False, "geofence", False, 0
-    states = grid.segment_states(start, end, r)
+    ii, jj, states, inside = grid.segment_cells(start, end, r)
     occupied = int(np.count_nonzero(states == OCCUPIED))
-    unknown = int(np.count_nonzero((states != FREE) & (states != OCCUPIED)))
+    known_free = (states == FREE) | (traversed[ii, jj] & (states != OCCUPIED))
+    unknown = int(np.count_nonzero(~known_free & (states != OCCUPIED))) + (0 if inside else 1)
     if occupied:
         return False, "occupied", False, unknown
     if unknown:
@@ -73,7 +75,7 @@ def deviation(point, ctx):
     return abs(ux * (point[1] - ctx.origin[1]) - uy * (point[0] - ctx.origin[0])) / norm
 
 
-def evaluate_candidates(grid, ctx, settings, max_age):
+def evaluate_candidates(grid, traversed, ctx, settings, max_age):
     rows = []
     step = math.radians(settings["heading_step_deg"])
     weights = settings["weights"]
@@ -81,15 +83,21 @@ def evaluate_candidates(grid, ctx, settings, max_age):
     start_distance = math.dist(ctx.target, ctx.goal)
     for k in range(-settings["heading_steps"], settings["heading_steps"] + 1):
         heading = wrap(ctx.path_heading + k * step)
-        for length in settings["lengths_m"]:
+        for nominal in settings["lengths_m"]:
+            # Segments are clipped at the goal distance: a candidate never extends beyond the goal.
+            length = min(nominal, max(start_distance, 1e-6))
             end = endpoint(ctx.target, heading, length)
-            valid, reason, unknown_only, unknown = collision_check(grid, ctx.target, end, ctx, settings, max_age)
-            row = {"k": k, "heading": heading, "length": length, "end": end, "valid": valid, "reason": reason,
+            valid, reason, unknown_only, unknown = collision_check(grid, traversed, ctx.target, end, ctx, settings, max_age)
+            row = {"k": k, "heading": heading, "length": length, "nominal_length": nominal, "end": end,
+                   "valid": valid, "reason": reason,
                    "unknown_only": unknown_only, "unknown_cells": unknown,
                    "progress": start_distance - math.dist(end, ctx.goal)}
             if valid:
                 distance = grid.occupied_distance(ctx.target, end, search)
-                clearance = search if distance is None else distance
+                # Clearance is only resolved to one grid cell; quantizing keeps mirror-symmetric
+                # scenes exactly tied so the L3 tie-break (+y first) decides, not rasterization noise.
+                raw = search if distance is None else distance
+                clearance = math.floor(raw / grid.resolution + 1e-9) * grid.resolution
                 row["clearance"] = clearance
                 row["deviation"] = deviation(end, ctx)
                 row["turn"] = abs(wrap(heading - ctx.vehicle_yaw))
@@ -101,8 +109,22 @@ def evaluate_candidates(grid, ctx, settings, max_age):
 
 
 def tie_key(row):
-    """L3: higher score; then smaller |k|; then +y (k > 0) before -y; then the shorter L."""
-    return (-round(row["score"], 9), abs(row["k"]), 0 if row["k"] >= 0 else 1, row["length"])
+    """L3 tie-break: smaller |k|; then +y (k > 0) before -y; then the shorter L."""
+    return (abs(row["k"]), 0 if row["k"] >= 0 else 1, row["nominal_length"])
+
+
+def score_resolution(settings, resolution):
+    """Scores closer than the 0.10 m grid can resolve are ties (clearance quantum plus half a cell
+    of deviation): 0.3 * 0.1 + 0.6 * 0.05 = 0.06."""
+    weights = settings["weights"]
+    return weights["clearance"] * resolution + weights["deviation"] * resolution / 2
+
+
+def select(rows, settings, resolution):
+    """L3: the best score, with scores within the grid's score resolution treated as tied."""
+    best = max(r["score"] for r in rows)
+    tied = [r for r in rows if r["score"] >= best - score_resolution(settings, resolution) - 1e-12]
+    return min(tied, key=tie_key)
 
 
 def yaw_permitted(grid, traversed, ctx, settings, envelope, max_age):
@@ -129,14 +151,15 @@ def yaw_permitted(grid, traversed, ctx, settings, envelope, max_age):
 
 def plan(grid, traversed, ctx, settings, envelope, max_age):
     """One deterministic decision: TRANSLATE, YAW_TO, SCAN or HOLD with its evidence."""
-    rows = evaluate_candidates(grid, ctx, settings, max_age)
-    progress = [r for r in rows if r["valid"] and r["progress"] > settings["min_progress_m"]]
+    rows = evaluate_candidates(grid, traversed, ctx, settings, max_age)
+    reaches_goal = lambda r: math.dist(r["end"], ctx.goal) < 1e-9 and r["progress"] > 0
+    progress = [r for r in rows if r["valid"] and (r["progress"] > settings["min_progress_m"] or reaches_goal(r))]
     decision = {"path_heading": ctx.path_heading, "candidates_valid": sum(r["valid"] for r in rows),
                 "candidates_progress": len(progress), "best": None, "action": HOLD, "heading": None,
                 "length": None, "end": None, "reason": None}
     half = math.radians(settings["observable_half_angle_deg"])
     if progress:
-        best = min(progress, key=tie_key)
+        best = select(progress, settings, grid.resolution)
         decision["best"] = {k: best[k] for k in ("k", "heading", "length", "end", "score", "progress", "clearance",
                                                  "deviation")}
         if abs(wrap(best["heading"] - ctx.vehicle_yaw)) <= half:
@@ -150,7 +173,7 @@ def plan(grid, traversed, ctx, settings, envelope, max_age):
         return decision
     blocked = [r for r in rows if r["unknown_only"] and round(r["heading"], 6) not in ctx.scanned]
     if blocked:
-        target = min(blocked, key=lambda r: (-r["unknown_cells"], abs(r["k"]), 0 if r["k"] >= 0 else 1, r["length"]))
+        target = min(blocked, key=lambda r: (-r["unknown_cells"], abs(r["k"]), 0 if r["k"] >= 0 else 1, r["nominal_length"]))
         permitted, reason = yaw_permitted(grid, traversed, ctx, settings, envelope, max_age)
         if permitted:
             decision.update(action=SCAN, heading=target["heading"], reason="unknown_blocked")
@@ -161,12 +184,12 @@ def plan(grid, traversed, ctx, settings, envelope, max_age):
     return decision
 
 
-def path_status(grid, ctx, settings, max_age):
+def path_status(grid, traversed, ctx, settings, max_age):
     """Straight path segment (k = 0, L = 1.5 m) validity and occupied cells in the 3 m corridor."""
     heading = ctx.path_heading
     length = min(max(settings["lengths_m"]), max(math.dist(ctx.target, ctx.goal), 1e-6))
     end = endpoint(ctx.target, heading, length)
-    valid, reason, _, _ = collision_check(grid, ctx.target, end, ctx, settings, max_age)
+    valid, reason, _, _ = collision_check(grid, traversed, ctx.target, end, ctx, settings, max_age)
     corridor_end = endpoint(ctx.target, heading, settings["trigger_range_m"])
     states = grid.segment_states(ctx.target, corridor_end, settings["r_infl_m"])
     return {"valid": valid, "reason": reason, "end": end, "length": length,

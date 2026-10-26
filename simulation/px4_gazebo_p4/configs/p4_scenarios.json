@@ -19,7 +19,7 @@
   "ground_fixtures": {
     "G2": {"boxes": [{"name": "pillar_a", "center": [2.0, 0.0], "size": [0.4, 0.4]}], "expected_trigger": "obstacle_in_trigger_range"},
     "G4": {"boxes": [{"name": "pillar_a", "center": [4.0, 0.0], "size": [0.4, 0.4]},
-                     {"name": "pillar_b", "center": [6.5, -1.4], "size": [0.4, 0.4]}], "expected_trigger": "no_obstacle_in_trigger_range"},
+                     {"name": "pillar_b", "center": [6.5, -1.4], "size": [0.4, 0.4]}], "expected_trigger": "obstacle_in_trigger_range"},
     "G6": {"boxes": [{"name": "wall", "center": [6.0, 0.0], "size": [0.3, 8.0]}], "expected_trigger": "no_obstacle_in_trigger_range"}
   },
   "box_height_m": 4.0,
