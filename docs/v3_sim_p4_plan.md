@@ -10,7 +10,8 @@ environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Ga
 and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
-`22557ad6` is frozen (§27); its Gate A awaits operator authorization. Gates A, B, S
+`22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
+on a truth-observer shutdown race (§28). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -791,3 +792,36 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * No gate record exists for `22557ad6`. The five failed Gate A runs (`3785a54c`, `1628fc44`,
   `b4db489e`, `4722a88e`, `45031345`) and their consumed authorizations stay in `state/` as history.
   Gate A has not been run.
+
+## 28. P4 Gate A of candidate `22557ad6` — FAILED at fixture G4 cleanup (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-22557ad6f223.json` (`efb2887c…b36b`), consumed.
+  Result `state/p4-gate-A-22557ad6….result.json` (`3dcc2c0e…d457`): `accepted: false`,
+  `first_failure: fixture-G4:cleanup:p4-truth-observer:nonzero_exit_3`, no automatic retry. Run
+  02:50:00–02:54:29 UTC; no leftover processes. G6 and the faults did not run.
+* **Passed:**
+  * **p3-readiness** `…025019Z…f4e263a5`.
+  * **p4-readiness** `…025114Z…48f2aea8`: compute p99 0.0201 s and max 0.0222 s, against 0.0737 s
+    in §25. The §26 optimization holds at runtime.
+  * **fixture-G2** `…025221Z…a6a4f595`: trigger decision `obstacle_in_trigger_range` as expected;
+    nearest hit 1.8 m against truth 1.8 m; compute p99 0.0299 s.
+* **fixture-G4** `…025332Z…2e1e92c9`: the functional result was correct. The trigger decision was
+  `obstacle_in_trigger_range` as expected, the nearest hit was 3.8 m against truth 3.8 m, and compute
+  p99 was 0.0332 s. Cleanup then failed: the truth observer exited 3 within 0.02 s of SIGINT, while
+  its `truth-closed.json` records `"error": null`.
+* **Defect (P4 truth observer shutdown race):** on SIGINT, `p4_truth_observer.main` closes the
+  ledgers and builds the close record while its gz-transport subscriptions are still active.
+  * Gazebo stops after the observer and keeps publishing poses at 50 Hz.
+  * A pose callback that arrives after `Ledger.close()` writes to a closed file. `fail()` then sets
+    the error after the close record has been written, so the return code is 3.
+  * G2 passed only because no callback landed in that window. Nothing was lost before the stop: G4
+    has 1063 pose rows with a largest gap of 0.04 s.
+* **Correction needed (not applied):** in `p4_truth_observer.py`:
+  * On stop, mark the ledgers closed under their lock and unsubscribe, so that later callbacks are
+    dropped and are not errors.
+  * Derive the exit code from the error recorded in the close record.
+  * Add an offline test that writes after close.
+
+  `p4_truth_observer.py` is in `validation/`, outside the package, so build `ada6d608` is unchanged.
+  Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
+  `22557ad6` cannot run Gate A again.
