@@ -16,8 +16,9 @@ on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
 applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
-like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41); Gates S and C
-await separate authorizations. Gates A, B, S
+like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
+at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
+treat as a failed flight (§42); this needs a contract decision. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1158,3 +1159,53 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     0.05 s).
 * **Status:** Gates A and B are accepted for `1be1896a`. Gate S (S1, S5, S6), then Gate C (S2, S3,
   S4) each need their own operator authorization bound to this manifest. P4 is not complete.
+
+## 42. P4 Gate S of candidate `1be1896a` — FAILED at S5 (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-S-1be1896a7942.json` (`b744ebd0…5cd7`), consumed.
+  Result `state/p4-gate-S-1be1896a….result.json` (`3c19e0e1…4005`): `accepted: false`,
+  `first_failure: safety-S5:performance:compute_max`, no automatic retry. Run 05:28:56–05:35:01 UTC;
+  no leftover processes. S6 did not run.
+* **safety-S1** `20261026T052917Z-p4-flight-S1-4735309e`: **passed**. `goal_reached`, final goal
+  distance 0.031 m, maximum lateral 0.064 m, tracking 0.256 m, 0 collisions, compute p99 0.030 s,
+  RTF 1.00.
+* **safety-S5** `20261026T053224Z-p4-flight-S5-e89ee6ef`: **the behaviour was correct.**
+  * Supervisor: OBSTACLE_DETECTED and AVOIDING at 81.53 s, HOVER at 90.07 s (`no_progress_candidate`),
+    ABORT at 110.12 s (`hover_timeout`). The target moved 0.0 m after HOVER.
+  * Minimum truth clearance 0.891 m, 0 collisions, tracking 0.234 m. Commands `[176, 400, 21]`,
+    with the single LAND issued through P2 recovery; the vehicle landed.
+  * The evaluator failed it on five items.
+* **Root cause of four of the five failures:** contract §5 routes `ABORT` into P2 `RECOVERY` ("one
+  LAND (21) through P2 recovery rules"). The accepted P2/P3 evidence tools treat `RECOVERY` as a
+  failed flight, and the P4 evaluator reuses them unchanged:
+  1. **`p2:timing`.** P2 `trace_metrics` sets its status to `failed` whenever the controller result
+     has any `failure`, and a supervisor abort records one (`p4_supervisor_abort:hover_timeout`).
+     Its full flight timing requirements (prestream, gaps, late dispatch, stale source) are skipped
+     in that case, so they were never applied to S5.
+  2. **`p2_integrity_error: estimator_reference_reset:final_alignment_lost`.** The P2 reference
+     monitor, replayed by `reference_evidence.classify`, rejects any loss of in-air alignment
+     outside `REQUEST_LAND`, `VERIFY_LANDING`, `VERIFY_LANDED_AND_DISARMED` and `COMPLETE`. A
+     touchdown in `RECOVERY` always trips it.
+  3. **`rgb_absence:snapshot_missing:window_end`.** The P3 runner's RGB-absence snapshotter takes
+     its `window_end` snapshot only on the `COMPLETE` transition (`p3_runner.py`, `TRIGGERS`), and a
+     run ending in `RECOVERY` never reaches it.
+  4. **`mc_causal_yaw:p2_integrity_missing`.** This follows from item 2.
+
+  S6 ends the same way (`ABORT` → `RECOVERY`), so as specified **neither S5 nor S6 can pass**
+  §8(a)/(b) and §9.1 F4, whatever the behaviour. The offline evaluator tests did not replay P2
+  integrity on a real `RECOVERY` landing.
+* **Independent fifth failure, `performance:compute_max`:** one perception frame took 0.0948 s
+  against the 0.090 s maximum. It was at takeoff (acquisition 19.31 s); the frame before took
+  0.0405 s, and only 1 of 974 frames exceeded 0.05 s. The p99 was 0.0266 s. This is a transient
+  stall, not sustained cost; the cause (host contention or a Python pause) cannot be told from this
+  evidence. The earlier maximum was G4's 0.0765 s (§40).
+* **Options (operator decision; nothing applied):**
+  * **Contract revision 5 (recommended):** a P4 supervisor `ABORT` lands through P2's nominal
+    sequence (`REQUEST_LAND` → `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`), with
+    the same single LAND (21) and P2 landing checks. The abort is recorded as the P4 outcome, not
+    as a P2 failure. P2 safety errors still go to `RECOVERY` and fail. The unchanged P2/P3 checks
+    (timing, reference, yaw, RGB absence, MC) then apply in full to S5 and S6.
+  * **The compute-max spike:** investigate offline (for example Python GC pauses in the perception
+    process), or accept it as host variance.
+  * Candidate `1be1896a` cannot run Gate S again. Its accepted Gates A and B stay as history; a new
+    manifest needs Gates A, B, S and C.
