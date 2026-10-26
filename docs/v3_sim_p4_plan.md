@@ -9,7 +9,8 @@ not exit on SIGINT within the 15 s grace (§20). The operator treated that as an
 environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
 and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
-compute p99 limit (§25). Gates A, B, S
+compute p99 limit (§25). Perception is now vectorized with identical outputs (§26); a new
+candidate needs Policy A approval and a freeze. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -731,3 +732,46 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Re-freeze the same sources, accepting a low chance of passing given the measured margin.
   * The limit itself is a contract timing requirement and is not to be relaxed.
   * Candidate `45031345` cannot run Gate A again.
+
+## 26. Perception compute optimization after the failed Gate A of `45031345` (offline)
+
+* **Changes, outputs unchanged:**
+  * `local_map.Grid.mark_rays` marks a batch of rays with NumPy. It uses the same per-ray step
+    count (`math.hypot`), the same `t = n/steps` samples, the same float operations and the same end
+    cell, and `mark_ray` delegates to it.
+  * Grid states only rise (UNKNOWN < FREE < OCCUPIED, free never clears occupied), so batch marking
+    equals sequential marking.
+  * `perception.integrate` collects the rays and marks them in one batch.
+  * `perception.extract_scan` computes the per-column reductions for all columns at once: hit,
+    first-minimum index, band membership, too-close, NaN and the valid minimum. Azimuths still use
+    `math.atan2/cos/sin` per column.
+  * No configuration, threshold, contract value or P3 code changed.
+* **Equivalence proof:** new `tests/test_px4_gazebo_p4_equivalence.py` keeps verbatim copies of the
+  implementations frozen in `45031345` (commit `9604a04`). It checks that:
+  * scans are equal float for float, and grids byte for byte, over every scenario and fixture layout
+    plus a near-obstacle layout, on ground and at altitude, with NaN and too-close patches and all
+    four ray kinds present;
+  * a 500-ray batch equals sequential marking, including off-grid, zero-length and pre-occupied
+    cases;
+  * single-ray cases match.
+  * A separate 140-frame scratch digest was identical before and after.
+* **Rebuild:** new P4 package hash `ada6d608e40855886ea29636ab7df67eb21e3e152319b825c879208ab8d7502b`;
+  the receipt matches the source.
+* **Offline compute per processed frame** (`P4Processor.poll`, same Python, frozen reference against
+  vectorized):
+
+  | Scene | p50 before | p50 after | p99 before | p99 after | max before | max after |
+  |---|---|---|---|---|---|---|
+  | Ground, empty world | 0.0208 s | 0.0088 s | 0.0310 s | 0.0137 s | 0.0351 s | 0.0153 s |
+  | 2 m, S4 obstacles | 0.0218 s | 0.0065 s | 0.0430 s | 0.0095 s | 0.0436 s | 0.0106 s |
+  | 2 m, S5 wall | 0.0184 s | 0.0079 s | 0.0229 s | 0.0119 s | 0.0256 s | 0.0132 s |
+
+  * The remaining time is mostly the accepted P3 `DepthProcessor.observe` (about 6 ms).
+  * These offline numbers are not runtime evidence. Only a gate run measures the contract limit.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 104, equivalence 6, ROS
+    harness 2.
+  * Windows: 374 passed, 28 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
+  been frozen and no gate has run.

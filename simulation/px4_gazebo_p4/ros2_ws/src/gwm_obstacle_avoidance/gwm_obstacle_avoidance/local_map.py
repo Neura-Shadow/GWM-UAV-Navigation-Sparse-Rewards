@@ -44,18 +44,37 @@ class Grid:
     # Updates ----------------------------------------------------------------------------------
     def mark_ray(self, start, end, hit):
         """FREE along start->end (excluding an occupied cell), OCCUPIED at end when `hit`."""
-        length = math.hypot(end[0] - start[0], end[1] - start[1])
-        steps = max(1, int(math.ceil(length / (self.resolution / 2))))
-        end_index = self.index(*end)
-        for n in range(steps + 1):
-            t = n / steps
-            index = self.index(start[0] + t * (end[0] - start[0]), start[1] + t * (end[1] - start[1]))
-            if index is None or (hit and index == end_index):
-                continue
-            if self.cells[index] != OCCUPIED:
-                self.cells[index] = FREE
-        if hit and end_index is not None:
-            self.cells[end_index] = OCCUPIED
+        self.mark_rays([start], [end], [hit])
+
+    def mark_rays(self, starts, ends, hits):
+        """`mark_ray` for a batch, with identical cells. Each ray samples t = n/steps, n = 0..steps,
+        steps = ceil(length / (resolution/2)), using the same float operations as a scalar loop.
+        States only rise (UNKNOWN < FREE < OCCUPIED; free never clears occupied), so the result
+        does not depend on the order of the rays."""
+        if not starts:
+            return
+        half = self.resolution / 2
+        steps = np.array([max(1, int(math.ceil(math.hypot(e[0] - s[0], e[1] - s[1]) / half)))
+                          for s, e in zip(starts, ends)], dtype=np.int64)
+        sx, sy = np.array([s[0] for s in starts], dtype=float), np.array([s[1] for s in starts], dtype=float)
+        dx = np.array([e[0] - s[0] for s, e in zip(starts, ends)], dtype=float)
+        dy = np.array([e[1] - s[1] for s, e in zip(starts, ends)], dtype=float)
+        end_indices = [self.index(*e) for e in ends]
+        end_ok = np.array([index is not None for index in end_indices])
+        end_i = np.array([index[0] if index else -1 for index in end_indices], dtype=np.int64)
+        end_j = np.array([index[1] if index else -1 for index in end_indices], dtype=np.int64)
+        hit = np.asarray(hits, dtype=bool)
+        ray = np.repeat(np.arange(len(starts)), steps + 1)
+        n = np.arange(ray.size) - np.repeat(np.cumsum(steps + 1) - (steps + 1), steps + 1)
+        t = n / steps[ray]
+        i = np.floor((sx[ray] + t * dx[ray] - self.x_min) / self.resolution).astype(np.int64)
+        j = np.floor((sy[ray] + t * dy[ray] - self.y_min) / self.resolution).astype(np.int64)
+        keep = (i >= 0) & (i < self.nx) & (j >= 0) & (j < self.ny)
+        keep &= ~(hit[ray] & end_ok[ray] & (i == end_i[ray]) & (j == end_j[ray]))
+        i, j = i[keep], j[keep]
+        self.cells[i, j] = np.maximum(self.cells[i, j], FREE)
+        occupied = hit & end_ok
+        self.cells[end_i[occupied], end_j[occupied]] = OCCUPIED
 
     # Queries ----------------------------------------------------------------------------------
     def _window(self, xs, ys, radius):
