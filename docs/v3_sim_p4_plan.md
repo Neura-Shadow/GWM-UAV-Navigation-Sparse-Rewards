@@ -13,7 +13,8 @@ compute p99 limit (§25). Perception is now vectorized with identical outputs (�
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
 **passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
-position-only setpoints at 0.3 m/s; that needs an operator decision. Gates A, B, S
+position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) is proposed and
+awaits approval (§33). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -929,3 +930,20 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * **(b)** Velocity feedforward in `trajectory_setpoint`. This changes the setpoint wire form that
     P2's accepted evaluators check, so it is riskier.
   * Relaxing the 0.30 m bound or changing PX4 gains is not proposed.
+
+## 33. Contract revision 4 proposed (transit speed 0.20 m/s; awaiting approval)
+
+* [Revision 4 proposal](v3_sim_p4_contract_revision4_proposal.md), drafted at the operator's request
+  after §32. A new pinned `mission.transit_speed_m_s` = 0.20 makes the P4 `TRANSIT` target speed
+  slower than P2's 0.3 m/s ramp, which stays for every P2 phase. No threshold, scenario, gate or
+  P2/P3 file changes.
+* **Rationale:** with position-only setpoints, PX4's steady horizontal lag is `v / MPC_XY_P`. At
+  0.3 m/s that is 0.316 m, measured in Gate B. At 0.20 m/s it is 0.211 m, about 0.23 m with the
+  measured turn overshoot, inside the unchanged 0.30 m bound.
+* **Offline study:** production perception and supervisor with a first-order 0.95 position-loop
+  model. It reproduces the SITL plateau at 0.3 m/s (0.308 m). At 0.20 m/s, S1–S5 give the same
+  outcomes and supervisor transitions, max tracking 0.205 m, equal or larger clearances, and
+  `TRANSIT` of at most 55 s against the 150 s deadline.
+* **Not applied.** On approval: the config and pin, `TRANSIT` using the pinned speed in
+  `mission.py`, tests, a package rebuild, then a new commit, Policy A approval, a freeze and the gates
+  from Gate A onward.
