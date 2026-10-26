@@ -11,8 +11,8 @@ and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), 
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
-on a truth-observer shutdown race (§28), now fixed offline (§29). A new candidate needs Policy A
-approval and a freeze. Gates A, B, S
+on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` is frozen
+(§30); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -853,5 +853,22 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     harness 2.
   * Windows: 375 passed, 29 skipped.
   * P3 still verifies to `1e205fec…`.
-* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
-  been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §30
+  up to the authorization).
+
+## 30. Frozen P4 candidate `c932b212` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `a3401018254dc6bbb6faf23b61b4489fbb4c6eec`. Receipt: `state/p4-policy-A-approval-a340101.json`
+  (`eb687405…0b82`).
+* Manifest `state/p4-candidate-a340101.json`: canonical
+  **`c932b2125ebb2f11754688b5a44a337be70f4f2b0993e77dbb963ab6e7ee2f9c`** (file `0fb1e426…5047`).
+  `verify` reproduces it.
+  * Only `validation/p4_truth_observer.py` differs from `22557ad6`, and the manifest binds the
+    corrected file.
+  * Baselines and build: P3 `1e205fec…`; P4 build `ada6d608…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `c932b212`. The six failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`, `45031345`, `22557ad6`) and their consumed authorizations stay in `state/`
+  as history. Gate A has not been run.
