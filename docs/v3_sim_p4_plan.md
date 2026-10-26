@@ -18,7 +18,8 @@ applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§3
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
 like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
-treat as a failed flight (§42); this needs a contract decision. Gates A, B, S
+treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
+`COMPLETE`) is proposed and awaits approval (§43). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1209,3 +1210,29 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     process), or accept it as host variance.
   * Candidate `1be1896a` cannot run Gate S again. Its accepted Gates A and B stay as history; a new
     manifest needs Gates A, B, S and C.
+
+## 43. Contract revision 5 proposed (abort landing; compute spike investigated; awaiting approval)
+
+* [Revision 5 proposal](v3_sim_p4_contract_revision5_proposal.md), drafted at the operator's request
+  after §42.
+  * A designed supervisor `ABORT` lands through P2's nominal sequence `REQUEST_LAND` →
+    `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`, with exactly one LAND (21).
+  * The abort is recorded as the P4 outcome `supervisor_abort`, not as a P2 failure.
+  * The 45 s wall LAND-to-landed bound stays as an explicit evaluator check.
+  * P2 safety errors and geofence breaches still enter `RECOVERY` and fail.
+  * Routing never makes a run pass, because each §7 outcome check still requires its own expected
+    outcome and abort reason.
+  * The unchanged P2/P3 evidence checks (timing with full flight requirements, reference, yaw, RGB
+    absence at `COMPLETE`, MC causality, MAVLink landing window) then apply in full to S5 and S6.
+* **Compute-max spike (0.0948 s at S5 takeoff), investigated offline; no contract change:**
+  * Not P4 compute: the offline maximum is 0.019 s, and thread CPU equals wall time.
+  * Not Python GC: a full collection takes 0.008 s at about 62,000 objects; a 120 s simulated flight
+    had no generation-2 collection and only 0.1 ms young-generation pauses; `gc.freeze()` makes no
+    difference.
+  * Not page faults (0–4 per poll), and not GIL contention (single-threaded executor).
+  * `p4_control` was unaffected at that instant (5.4 ms maximum), and the VM was not saturated
+    (24 CPUs, 4–5 used).
+  * Assessment: host-level preemption of the perception thread. The §6.1 limit stays.
+  * Optional diagnostic: record per-frame thread-CPU time and involuntary context switches.
+* **Not applied.** On approval: the mission, controller-outcome and evaluator changes and tests, a
+  rebuild, then a new commit, Policy A approval, a freeze and Gates A–C.
