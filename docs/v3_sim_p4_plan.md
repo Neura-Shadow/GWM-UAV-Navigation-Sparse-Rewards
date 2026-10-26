@@ -4,7 +4,8 @@
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
 cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
 failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
-offline (§18). Candidate `b4db489e` is frozen (§19); its Gate A awaits operator authorization. Gates A, B, S
+offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanup: Gazebo did
+not exit on SIGINT within the 15 s grace (§20). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -585,3 +586,27 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Gates A/B/S/C; no execution without authorization.
 * No gate record exists for `b4db489e`. The failed Gate A runs of `3785a54c` and `1628fc44` and their
   consumed authorizations stay in `state/` as history. Gate A has not been run.
+
+## 20. P4 Gate A of candidate `b4db489e` — FAILED at p3-readiness cleanup (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-b4db489e820d.json` (`c7b3b908…e827`), consumed.
+  Result `state/p4-gate-A-b4db489e….result.json` (`273d356c…9b93`): `accepted: false`,
+  `first_failure: p3-readiness:cleanup:gazebo:forced_kill_after_grace`, no automatic retry. Run
+  01:49:22–01:50:41 UTC; no leftover processes. P4 readiness, the fixtures and the faults did not run.
+* **p3-readiness** `20261026T014941Z-p4-p3_readiness-ea9a39a9`: runtime exit 0, P2 controller
+  completed. The shutdown followed the P3 contract §7 order, with the same timings as the passing run
+  `…012605Z…21036f92`, up to the DDS Agent (exit 0 at +4.4 s). The Gazebo world pause returned `true`.
+  Gazebo then did not exit within 15 s of SIGINT; it was killed with -9 at +20.0 s. In the passing
+  runs it exited 0 about 0.5 s after SIGINT.
+* **Classification:** the evaluator applied the unchanged P3 rule (exit 0 within grace, no
+  escalation) correctly.
+  * The step runs only accepted P2/P3 processes (`p2_control`, the P3 bridge, adapter and probe); no
+    P4 node runs in it.
+  * The `p4_control` corrections of §18 are not involved, and no P4 code defect is identified.
+  * Gazebo is adopted from PX4's launch, so its own output is not retained; the cause of the hang is
+    unknown.
+  * This is the first forced Gazebo stop seen in 15 runs: 12 accepted P3 runs and the three P4 P3
+    readiness runs.
+* **Status:** candidate `b4db489e` cannot run Gate A again. Whether to treat this as an intermittent
+  environment event (new freeze and Gate A authorization on the same sources) or to investigate first
+  is an operator decision.
