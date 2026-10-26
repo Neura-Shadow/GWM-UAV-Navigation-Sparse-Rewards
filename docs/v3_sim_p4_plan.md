@@ -14,8 +14,8 @@ compute p99 limit (§25). Perception is now vectorized with identical outputs (�
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
 **passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
-applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36); Gates B, S and C
-await separate authorizations. Gates A, B, S
+applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
+`MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37); operator decision pending. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1023,3 +1023,43 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * **Status:** Gate A is accepted for `e187b475`. Gate B (S2, the first flight at the revision 4
   transit speed), then Gate S (S1, S5, S6), then Gate C (S2, S3, S4) each need their own operator
   authorization bound to this manifest. P4 is not complete.
+
+## 37. P4 Gate B of candidate `e187b475` — FAILED on a dispatch-budget stall in `MAP_SCAN` (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-e187b475eb5f.json` (`a449404a…5280`), consumed.
+  Result `state/p4-gate-B-e187b475….result.json` (`9b8081b7…104d`): `accepted: false`,
+  `first_failure: smoke:runtime_status:Abort:controller_failed`, no automatic retry. Run
+  04:54:41–04:56:31 UTC; no leftover processes.
+* **S2 flight** `20261026T045500Z-p4-flight-S2-def51241`:
+  * P2 initialization, takeoff, reference lock, yaw handover and `INITIAL_HOVER` passed.
+  * In `MAP_SCAN`, about 209° into the revolution at t = 59.496 s, `p4_control` raised the accepted
+    P2 `DispatchGuard` error `stale_action`: the control callback exceeded the 0.05 s wall-time
+    dispatch budget.
+  * P2 recovery sent LAND at once (command 21). The vehicle reported landed and at rest from 64.7 s.
+  * The truth observer closed cleanly (3171 poses, largest gap 0.04 s); only `ros-controller` exited
+    non-zero.
+  * `TRANSIT` was never reached, so the revision 4 speed was not exercised.
+  * The evaluator's `KeyError:'sensor_window_sim_s'` is a consequence of the abort.
+* **Where the time went:** the failing callback lasted 0.4839 s, but its `mission_tick` took
+  0.0006 s and started 0.4823 s after the callback entry.
+  * Before the mission tick, `tick()` does only trivial checks and the once-per-second
+    `inspect_graph()`: ROS graph queries for the PX4 topics, then writing `ros-graph.json`.
+  * The callbacks that carry that check recur every 1.05 s with a 1–3 ms pre-tick delay. The failing
+    callback falls exactly on that cadence, with a 0.4823 s pre-tick delay.
+  * Every `MAP_SCAN` callback before it took at most 0.0058 s.
+  * The separate perception process kept publishing every 0.1 s with normal compute through the
+    stall, so this was not a host-wide freeze.
+* **Assessment:**
+  * The structure is inherited unchanged from the accepted P2 node, which runs the same graph check
+    inside the same budget window (`node.py` lines 248–251). The stall is not related to revision 4,
+    because `MAP_SCAN` is speed-independent, and it is not a P4 logic defect.
+  * It is the first such stall seen in any P4 run; `c932b212`'s whole S2 flight had a maximum
+    callback of 0.0233 s.
+  * Unlike P2, `p4_control` does not trace `graph_check` and `graph_json_persistence`, so whether
+    the graph query or the JSON write blocked cannot be told from this evidence.
+* **Options (operator decision; nothing applied):**
+  * **(a)** Treat it as an intermittent environment event and re-freeze the unchanged sources.
+  * **(b) Recommended:** add P2's `graph_check` and `graph_json_persistence` spans to `p4_control`.
+    This is parity with the accepted P2 instrumentation, with no behaviour change, so a recurrence
+    can be attributed. Then rebuild and re-freeze.
+  * Either way, candidate `e187b475` cannot run Gate B again, and a new manifest needs Gate A first.

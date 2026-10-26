@@ -298,8 +298,9 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   Candidate `c932b212` (commit `a340101`): **Gate A ACCEPTED** (P3/P4 readiness, G2/G4/G6, both faults; plan §31).
   Gate B failed on tracking (0.342 m against 0.30 m): PX4's steady lag at 0.3 m/s with position-only setpoints
   is 0.316 m (plan §32). Contract revision 4 (P4 transit speed 0.20 m/s) approved and applied offline, package
-  `3adf426b` (plan §33–§34). Candidate `e187b475` (commit `add6c22`): **Gate A ACCEPTED** (plan §36);
-  Gates B, S, C pending separate authorization.
+  `3adf426b` (plan §33–§34). Candidate `e187b475` (commit `add6c22`): **Gate A ACCEPTED** (plan §36); Gate B
+  failed in MAP_SCAN on a 0.48 s stall in the inherited graph check (dispatch budget 0.05 s); safe LAND (plan §37).
+  Operator decision pending.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
