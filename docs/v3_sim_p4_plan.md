@@ -6,8 +6,8 @@ cannot run again (§14). The runner fix is applied offline (§15). Candidate `16
 failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
 offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanup: Gazebo did
 not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
-environment event. Candidate `4722a88e` re-freezes the same sources (§21); its Gate A awaits
-operator authorization. Gates A, B, S
+environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
+and P4 readiness, then failed at fixture G2 on a world-generator defect (§22). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -628,3 +628,34 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     without authorization.
 * No gate record exists for `4722a88e`. The failed Gate A runs of `3785a54c`, `1628fc44` and
   `b4db489e` and their consumed authorizations stay in `state/` as history. Gate A has not been run.
+
+## 22. P4 Gate A of candidate `4722a88e` — FAILED at fixture G2 (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-4722a88ec202.json` (`fc1be449…ee85`), consumed.
+  Result `state/p4-gate-A-4722a88e….result.json` (`ac75c3bf…4001`): `accepted: false`,
+  `first_failure: fixture-G2:runtime_status:TimeoutError:PX4 prompt/wall deadline exceeded: boot`, no
+  automatic retry. Run 01:58:52–02:03:10 UTC; no leftover processes. G4, G6 and the faults did not run.
+* **p3-readiness** `20261026T015909Z-p4-p3_readiness-111a3347`: **passed**. Gazebo stopped gracefully.
+* **p4-readiness** `20261026T020010Z-p4-p4_readiness-2c12286c`: **passed**. This is the first pass
+  under the full P4 workload, and it confirms the §15 and §18 corrections.
+* **fixture-G2** `20261026T020125Z-p4-G2-94602e38`: PX4 started Gazebo with the run-local G2 world.
+  It then logged "Waiting for Gazebo world…" until "Timed out waiting for Gazebo world", and the
+  runner's boot deadline expired.
+  * The evaluator also reported `evaluator_incomplete_evidence:KeyError:'sensor_window_sim_s'`. That
+    is a consequence of the aborted runtime.
+* **Defect (P4 world generator):** `p4_worlds.generate` adds a world-level
+  `<plugin filename="gz-sim-contact-system">`. The pinned PX4 `default.sdf` declares no plugins, so
+  Gazebo loads its systems from PX4's `server.config`: Physics, UserCommands, SceneBroadcaster,
+  Contact, Sensors and the rest. Once a world declares any plugin, Gazebo skips the server-config
+  plugins. The G2 world therefore ran without SceneBroadcaster, so `/world/default/scene/info` never
+  answered, and without physics or sensors.
+  * Both worlds pass `gz sdf -k`.
+  * `server.config` already loads the Contact system, so the added plugin is unnecessary.
+  * The offline test pinned the wrong expectation: its minimal base world had no server config, and
+    it asserted that the plugin was present.
+  * Every generated scenario world (G2/G4/G6, S1–S6) has the same defect.
+* **Correction needed (not applied):** generate worlds without any world-level plugin. Change the
+  offline test to assert that the generated world declares no world plugin, and that PX4's
+  `server.config` lists `gz-sim-contact-system`. `p4_worlds.py` is in `scripts/`, outside the
+  package, so the package build `3dd61063` is unchanged. Then a new commit, Policy A approval, a freeze
+  and a new Gate A authorization. Candidate `4722a88e` cannot run Gate A again.
