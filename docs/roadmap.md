@@ -295,7 +295,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   perception compute p99 limit (0.0737 s against 0.050 s; plan §25). Perception vectorized with identical outputs,
   package `ada6d608` (plan §26). Candidate `22557ad6` (commit `0379b22`) passed P3/P4 readiness (compute p99 0.020 s)
   and G2, then failed at G4 cleanup on a truth-observer shutdown race (plan §28). Fixed offline (plan §29).
-  Candidate `c932b212` frozen (commit `a340101`); Gate A awaits authorization.
+  Candidate `c932b212` (commit `a340101`): **Gate A ACCEPTED** (P3/P4 readiness, G2/G4/G6, both faults; plan §31).
+  Gates B, S, C pending separate authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

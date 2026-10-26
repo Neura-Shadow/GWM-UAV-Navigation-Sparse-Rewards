@@ -11,8 +11,8 @@ and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), 
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
-on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` is frozen
-(§30); its Gate A awaits operator authorization. Gates A, B, S
+on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
+**passed Gate A** (§31); Gates B, S and C await separate authorizations. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -872,3 +872,25 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * No gate record exists for `c932b212`. The six failed Gate A runs (`3785a54c`, `1628fc44`,
   `b4db489e`, `4722a88e`, `45031345`, `22557ad6`) and their consumed authorizations stay in `state/`
   as history. Gate A has not been run.
+
+## 31. P4 Gate A of candidate `c932b212` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-c932b2125ebb.json` (`dd112d64…4de7`), consumed.
+  Result `state/p4-gate-A-c932b212….result.json` (`fdb66af7…0671`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 03:19:52–03:28:34 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run.**
+
+  | Run | Result | Compute p99 / max (s) | RTF |
+  |---|---|---|---|
+  | p3-readiness `…032009Z…1bd9aaac` | passed (unchanged P3 evaluation) | — | 0.78 |
+  | p4-readiness `…032108Z…cd131e23` | passed | 0.0283 / 0.0328 | 0.75 |
+  | fixture-G2 `…032217Z…fe53a6ec` | `obstacle_in_trigger_range` (expected); hit 1.8 m, truth 1.8 m | 0.0285 / 0.0292 | — |
+  | fixture-G4 `…032330Z…805ed9c9` | `obstacle_in_trigger_range` (expected); hit 3.7999 m, truth 3.8 m | 0.0341 / 0.0421 | — |
+  | fixture-G6 `…032451Z…c20129ec` | `no_obstacle_in_trigger_range` (expected); hit 5.8501 m, truth 5.85 m | 0.0299 / 0.0318 | — |
+  | fault-adapter_stop `…032605Z…6b76b2ac` | adapter SIGINT at t = 30.96 s; supervisor HOVER (`adapter_health_missing`) at 32.56 s | 0.0456 / 0.0465 | — |
+  | fault-bridge_stop `…032725Z…abea7443` | bridge SIGINT at t = 30.992 s; HOVER (`snapshot_stale`) at 31.242 s | 0.0227 / 0.0236 | — |
+
+* **Margin note:** the adapter_stop run's compute p99 of 0.0456 s is within the 0.050 s limit, but
+  it has the least margin of any run. Gate B, S and C flights run under heavier load.
+* **Status:** Gate A is accepted for `c932b212`. Gate B (S2), then Gate S (S1, S5, S6), then Gate C
+  (S2, S3, S4) each need their own operator authorization bound to this manifest. P4 is not complete.
