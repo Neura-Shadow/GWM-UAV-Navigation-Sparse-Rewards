@@ -16,7 +16,8 @@ on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
 applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
-like P2's (§38). Candidate `1be1896a` is frozen (§39); its Gate A awaits operator authorization. Gates A, B, S
+like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40); Gates B, S and C await separate
+authorizations. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1110,3 +1111,29 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     authorization.
 * No gate record exists for `1be1896a`. Earlier candidates' records stay in `state/` as history,
   including `e187b475`'s accepted Gate A and failed Gate B. Gate A has not been run.
+
+## 40. P4 Gate A of candidate `1be1896a` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-1be1896a7942.json` (`cc46bfc0…99ea`), consumed.
+  Result `state/p4-gate-A-1be1896a….result.json` (`c73fcce0…046b`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 05:12:55–05:21:53 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run.**
+
+  | Run | Result | Compute p99 / max (s) | RTF | `graph_check` max (s) |
+  |---|---|---|---|---|
+  | p3-readiness `…051315Z…92e596e9` | passed (unchanged P3/P2 run) | — | 0.70 | 0.0028 |
+  | p4-readiness `…051420Z…2764e0ad` | passed | 0.0328 / 0.0334 | 0.66 | 0.0049 |
+  | fixture-G2 `…051535Z…b79a206c` | `obstacle_in_trigger_range` (expected); hit 1.8 m, truth 1.8 m | 0.0277 / 0.0348 | 0.67 | 0.0052 |
+  | fixture-G4 `…051653Z…3614b966` | `obstacle_in_trigger_range` (expected); hit 3.7999 m, truth 3.8 m | 0.0370 / **0.0765** | 0.69 | 0.0045 |
+  | fixture-G6 `…051808Z…10292134` | `no_obstacle_in_trigger_range` (expected); hit 5.85 m, truth 5.85 m | 0.0301 / 0.0341 | 0.72 | 0.0036 |
+  | fault-adapter_stop `…051921Z…84ceb27c` | adapter SIGINT at t = 31.024 s; HOVER (`adapter_health_missing`) at 32.424 s | 0.0288 / 0.0391 | 0.70 | 0.0023 |
+  | fault-bridge_stop `…052043Z…0f49f6d2` | bridge SIGINT at t = 31.024 s; HOVER (`snapshot_stale`) at 31.274 s | 0.0307 / 0.0330 | 0.70 | 0.0045 |
+
+* **New tracing at work:** about 16 graph checks per run, with a p50 of about 1.4 ms, a maximum of
+  5.2 ms and JSON writes of at most 2.0 ms. All are far inside the 0.05 s dispatch budget, and the
+  stall of §37 did not recur.
+* **Margin note:** G4's compute max of 0.0765 s is within the 0.090 s limit, but it is the closest
+  value to any limit in this gate; its p99 is 0.037 s.
+* **Status:** Gate A is accepted for `1be1896a`. Gate B (S2 at the revision 4 transit speed), then
+  Gate S (S1, S5, S6), then Gate C (S2, S3, S4) each need their own operator authorization bound to
+  this manifest. P4 is not complete.
