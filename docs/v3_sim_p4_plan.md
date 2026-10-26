@@ -13,8 +13,8 @@ compute p99 limit (§25). Perception is now vectorized with identical outputs (�
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
 **passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
-position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) is proposed and
-awaits approval (§33). Gates A, B, S
+position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
+applied offline (§33, §34); a new candidate needs Policy A approval and a freeze, then Gate A onward. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -944,6 +944,40 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   model. It reproduces the SITL plateau at 0.3 m/s (0.308 m). At 0.20 m/s, S1–S5 give the same
   outcomes and supervisor transitions, max tracking 0.205 m, equal or larger clearances, and
   `TRANSIT` of at most 55 s against the 150 s deadline.
-* **Not applied.** On approval: the config and pin, `TRANSIT` using the pinned speed in
+* **Approved (2026-10-26) and applied in §34.** On approval: the config and pin, `TRANSIT` using the pinned speed in
   `mission.py`, tests, a package rebuild, then a new commit, Policy A approval, a freeze and the gates
   from Gate A onward.
+
+## 34. Contract revision 4 applied (offline)
+
+* **Approval:** operator Neura-Shadow, exactly as written in `65b99e4`. The contract now names
+  revisions 2, 3 and 4 in its header, §3, §5 L7 and the §6 table, and the proposal is marked
+  approved and applied. `p4_validation.yaml` `contract_revision` names revisions 2, 3 and 4
+  (`d3c06b4`, `ea2c9e3`, `65b99e4`).
+* **Code:**
+  * `p4_avoidance.yaml` has `mission.transit_speed_m_s` 0.2, pinned in `contracts.PINNED`.
+  * `mission.py` `TRANSIT` passes the pinned speed to `supervisor.apply_action`. P2 phases keep
+    `ramp_m_s` 0.3 from the unchanged `p2_control.yaml`.
+* **Tests:**
+  * The pin is checked: the repository value is 0.2, and 0.3 is refused.
+  * The mission advances the target exactly 0.2 × 0.05 m per 20 Hz `TRANSIT` tick, while P2's ramp
+    stays 0.3.
+  * The synthetic closed loop takes the pinned speed and an optional first-order PX4 position loop
+    (`MPC_XY_P` 0.95). The S2 regression gives max tracking ≤ 0.2 / 0.95 + 0.01 m at the pinned speed,
+    above 0.30 m at 0.3 m/s (the Gate B failure), with an unchanged detour and clearance ≥ 0.20 m.
+  * `test_s1` allows 50 s for the 8 m transit.
+  * The S6 sensor-loss test now uses the exact 10 Hz frame grid. Perception stops between frames,
+    and `HOVER` must follow within the snapshot age plus one control tick. The old approximate bound
+    failed only because 0.20 m/s put the cutoff exactly on a frame boundary; the behaviour (HOVER
+    0.30 s after the last frame, ABORT after 10 s) is unchanged.
+* **Rebuild:** new P4 package hash `3adf426bed0d1a57fdfc1fdf97751ce7efe5a21f55654c3f1f46613e4ad7a96f`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 108, equivalence 6, ROS
+    harness 2.
+  * Windows: full run 376 passed, 29 skipped, with the S6 test failing before its fix; the planner
+    file then passed 26 of 26.
+  * P3 still verifies to `1e205fec…`.
+  * Dry P4 candidate: build `3adf426b…`.
+* **Next:** Policy A approval for this commit, a freeze, then the gates from Gate A onward. Nothing
+  has been frozen and no gate has run.

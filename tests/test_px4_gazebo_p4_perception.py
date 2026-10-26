@@ -23,6 +23,7 @@ TOL = 0.10 + 0.07  # contract e_depth + e_grid
 def test_repository_config_is_disabled_and_pins_contract_values(tmp_path):
     config = contracts.load_config(syn.P4 / "configs/p4_avoidance.yaml")
     assert config["enabled"] is False
+    assert config["mission"]["transit_speed_m_s"] == 0.2  # revision 4
     with pytest.raises(PermissionError):
         contracts.require_enabled(config, authorization_present=True)
     enabled = dict(config, enabled=True)
@@ -30,7 +31,8 @@ def test_repository_config_is_disabled_and_pins_contract_values(tmp_path):
         contracts.require_enabled(enabled, authorization_present=False)
     contracts.require_enabled(enabled, authorization_present=True)
     for section, key, value in (("planner", "r_infl_m", 0.9), ("envelope", "r_body_m", 0.3),
-                                ("supervisor", "stale_abort_sim_s", 12.0), ("geofence", "y_abs_max_m", 4.0)):
+                                ("supervisor", "stale_abort_sim_s", 12.0), ("geofence", "y_abs_max_m", 4.0),
+                                ("mission", "transit_speed_m_s", 0.3)):
         changed = json.loads(json.dumps(config))
         changed[section][key] = value
         path = tmp_path / f"{section}_{key}.json"
@@ -42,8 +44,8 @@ def test_repository_config_is_disabled_and_pins_contract_values(tmp_path):
 def test_p4_validation_config_names_the_p3_baseline_and_gates():
     validation = json.loads((syn.P4 / "configs/p4_validation.yaml").read_text())
     assert validation["contract"] == "p4-acceptance-v1"
-    assert validation["contract_revision"].startswith("revisions 2 and 3")
-    assert "d3c06b4" in validation["contract_revision"] and "ea2c9e3" in validation["contract_revision"]
+    assert validation["contract_revision"].startswith("revisions 2, 3 and 4")
+    assert all(c in validation["contract_revision"] for c in ("d3c06b4", "ea2c9e3", "65b99e4"))
     assert validation["p3_baseline_manifest_sha256"] == "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c"
     assert [role for _, _, role in validation["gates"]["C"]] == ["qualification-1", "qualification-2", "qualification-3"]
     assert [s for _, s, _ in validation["gates"]["S"]] == ["S1", "S5", "S6"]

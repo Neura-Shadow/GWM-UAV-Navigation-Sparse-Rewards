@@ -1,10 +1,12 @@
 # v3-SIM P4 contract `p4-acceptance-v1` — deterministic non-learning obstacle avoidance
 
 **Status: APPROVED — revision 2 (commit `d3c06b4`) plus revision 3 (commit `ea2c9e3`,
-[proposal](v3_sim_p4_contract_revision3_proposal.md)).** Revision 2 added the S6 fault-injection window
+[proposal](v3_sim_p4_contract_revision3_proposal.md)) plus revision 4 (commit `65b99e4`,
+[proposal](v3_sim_p4_contract_revision4_proposal.md)).** Revision 2 added the S6 fault-injection window
 in §9.1, the separation of collision validity from translation authority in §5 L2–L6, and the
 runtime-performance limits in §6.1 and Gate A. Revision 3 makes the initial plan feasible: a 360°
-`MAP_SCAN`, traversed cells counting as free in L2, and free space observed only beyond the near clip. The design rationale
+`MAP_SCAN`, traversed cells counting as free in L2, and free space observed only beyond the near clip. Revision 4 pins a P4 `TRANSIT` target speed of
+0.20 m/s so PX4's steady tracking lag stays inside the unchanged 0.30 m bound. The design rationale
 and the verified integration facts are in the [P4 plan](v3_sim_p4_plan.md). Baseline: P3 COMPLETE
 under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiable unchanged.
 
@@ -45,7 +47,8 @@ under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiab
 ## 3. Limits carried over from P2/P3 unchanged
 
 * **P2 timing and safety** (`p2_control.yaml` values, read by P4 from that file):
-  * rate 20 Hz, prestream 2.0 s, setpoint ramp 0.3 m/s, yaw ramp 10°/s;
+  * rate 20 Hz, prestream 2.0 s, setpoint ramp 0.3 m/s (P2 phases; P4 `TRANSIT` uses the slower
+    0.20 m/s of L7), yaw ramp 10°/s;
   * `max_sample_gap_sim_s` 0.2; position and attitude freshness 0.25 s sim; flags 1.5 s;
     state 2.0 s wall; clock stall 1.0 s;
   * ACK deadlines 3.0 s sim / 5.0 s wall, one attempt;
@@ -126,8 +129,9 @@ enters space that is not observed `FREE`.
   `UNKNOWN` cells (no `OCCUPIED` cell in their swept inflation), the action is `SCAN`: an L5 yaw
   toward the heading of the blocked candidate with the most `UNKNOWN` cells. Ties go to the smaller
   |k|, then +y. A heading is scanned at most once per `HOVER` episode.
-* **L7.** A translating target advances along the selected segment at ≤ 0.3 m/s. Any action is
-  re-validated each tick, and a failed re-validation yields `HOLD`.
+* **L7.** A translating target advances along the selected segment at the pinned `TRANSIT` speed of
+  0.20 m/s (`mission.transit_speed_m_s`; never above P2's 0.3 m/s ramp). Any action is re-validated
+  each tick, and a failed re-validation yields `HOLD`.
 
 **Supervisor transitions:**
 
@@ -156,6 +160,7 @@ enters space that is not observed `FREE`.
 | Minimum ground-truth clearance (envelope surface to obstacle surface) | **≥ 0.20 m** at every truth sample |
 | Collisions (truth envelope overlap or any obstacle contact message) | **0** |
 | Horizontal tracking, vehicle versus commanded target, during `TRANSIT` | ≤ 0.30 m |
+| `TRANSIT` target speed | 0.20 m/s (steady PX4 lag 0.20 / `MPC_XY_P` 0.95 ≈ 0.21 m, inside the 0.30 m tracking bound) |
 | Response latency (snapshot acquisition that first invalidates the path → supervisor leaves `NORMAL`) | ≤ 0.25 s sim |
 | Setpoint validity | no commanded target inside any ground-truth obstacle inflated by `R_body` + 0.10 m |
 

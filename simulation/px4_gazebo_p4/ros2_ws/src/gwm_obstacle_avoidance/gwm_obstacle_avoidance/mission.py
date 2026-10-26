@@ -268,9 +268,10 @@ class P4Mission(Mission):
                             "plan": decision["plan"]})
         if decision["state"] == supervisor.ABORT:
             raise P4Abort(ABORT_PREFIX + str(decision["reason"]))
+        # Revision 4: TRANSIT translates at the pinned P4 speed, below P2's ramp (kept for every P2 phase).
         target, yaw = supervisor.apply_action(enu_from_ned(self.target), yaw_enu_from_ned(self.yaw_target), decision,
-                                              self.config["ramp_m_s"], math.radians(self.config["yaw_ramp_deg_s"]),
-                                              dt, self.goal_enu)
+                                              self.p4["mission"]["transit_speed_m_s"],
+                                              math.radians(self.config["yaw_ramp_deg_s"]), dt, self.goal_enu)
         self._set_target_enu(target)
         self.yaw_target = wrap(math.pi / 2 - yaw)
         m = self.p4["mission"]

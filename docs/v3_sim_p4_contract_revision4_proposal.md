@@ -1,6 +1,7 @@
 # P4 contract `p4-acceptance-v1` — revision 4 proposal (transit speed versus the tracking bound)
 
-**Status: PROPOSED — awaiting operator approval. Not applied.** It amends revisions 2 and 3 (commits
+**Status: APPROVED by the operator (2026-10-26) exactly as written in `65b99e4`; APPLIED** to the
+[contract](v3_sim_p4_contract.md). It amends revisions 2 and 3 (commits
 `d3c06b4`, `ea2c9e3`). It changes one speed: P4's own `TRANSIT` target speed becomes 0.20 m/s.
 P2's 0.3 m/s ramp, every threshold, limit, scenario and gate are unchanged. Nothing was launched to
 prepare this proposal.
