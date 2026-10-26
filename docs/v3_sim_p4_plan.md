@@ -8,7 +8,8 @@ offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanu
 not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
 environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
 and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
-offline (§23). Candidate `45031345` is frozen (§24); its Gate A awaits operator authorization. Gates A, B, S
+offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
+compute p99 limit (§25). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -695,3 +696,38 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * No gate record exists for `45031345`. The four failed Gate A runs (`3785a54c`, `1628fc44`,
   `b4db489e`, `4722a88e`) and their consumed authorizations stay in `state/` as history. Gate A has
   not been run.
+
+## 25. P4 Gate A of candidate `45031345` — FAILED at p4-readiness performance (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-4503134502a5.json` (`b84fba28…1aee`), consumed.
+  Result `state/p4-gate-A-45031345….result.json` (`ad807744…d509`): `accepted: false`,
+  `first_failure: p4-readiness:performance:compute_p99`, no automatic retry. Run 02:18:54–02:21:29
+  UTC; no leftover processes. The fixtures and faults did not run.
+* **p3-readiness** `20261026T021916Z-p4-p3_readiness-8ceafda7`: **passed**.
+* **p4-readiness** `20261026T022023Z-p4-p4_readiness-50f2bba5`: runtime passed and perception
+  `passed`, with 244 of 249 snapshots usable. Contract §6.1 limits per frame of thread wall time:
+  p99 ≤ 0.050 s and max ≤ 0.090 s.
+
+  | p4-readiness run | p99 | max | Frames over 0.050 s |
+  |---|---|---|---|
+  | This run (`…50f2bba5`) | **0.0737 s** (fail) | 0.0764 s | 11 of 249 |
+  | Passing run of `4722a88e` (`…020010Z…2c12286c`), same package `3dd61063` | 0.0428 s | 0.0500 s | 1 of 266 |
+
+  * The median barely moved (0.034 s against 0.032 s); the tail is heavier.
+  * Host contention was higher in this run: every process used 10–15% more CPU, and the RTF was
+    0.64 against 0.69.
+* **Assessment:** the package code is unchanged, so this is not a regression. The perception step
+  has too little margin against the approved budget on this host: even the passing run was within
+  6% of the p99 limit.
+  * Offline profile (synthetic ground frames, same Python): `poll` p50 is about 0.03 s.
+  * About 75% of the time is P4 code. The largest part is plain-Python ray marching
+    (`local_map.mark_ray`/`index`, about 300k cell visits per 33 frames, roughly half the time).
+    `extract_scan` is about a quarter.
+  * The accepted P3 `observe`, about 22%, cannot be changed.
+* **Options (operator decision):**
+  * Optimize P4 perception without changing outputs: vectorize the ray marching and the scan
+    extraction, with offline tests proving identical grids and scans. This needs a package rebuild,
+    a new commit, Policy A approval, a freeze and Gate A authorization.
+  * Re-freeze the same sources, accepting a low chance of passing given the measured margin.
+  * The limit itself is a contract timing requirement and is not to be relaxed.
+  * Candidate `45031345` cannot run Gate A again.
