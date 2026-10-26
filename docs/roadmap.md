@@ -282,7 +282,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   [contract and operation](v3_sim_p3_contract.md). P4 is the next phase.
 - [ ] P4 Non-learning obstacle avoidance — contract `p4-acceptance-v1` (revisions 2 and 3) approved;
   offline implementation M1–M7 complete ([contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md)).
-  Candidate `2ddabd14` frozen and verified (Policy A approved for `6c41833`); Gates A/B/S/C not run.
+  Candidate `3785a54c` frozen and verified (Policy A approved for `8c1bd76`); Gates A/B/S/C not run.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

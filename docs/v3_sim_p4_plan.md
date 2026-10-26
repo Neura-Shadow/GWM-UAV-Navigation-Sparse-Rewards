@@ -435,3 +435,23 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   commits, and a test pins it. Candidate `2ddabd14` stays frozen until it is replaced by a re-freeze
   at that commit, which waits on the operator's Policy A approval.
 * Gate A has not been run.
+
+## 13. Re-frozen P4 candidate (supersedes `2ddabd14`)
+
+* **Policy A** (`bf1ef9b1…`) was approved by Neura-Shadow for `8c1bd76a890325003bf7116d925a5498a721f747`
+  (the revision-label correction). The receipt is `state/p4-policy-A-approval-8c1bd76.json`
+  (`18fd93b7…e9bb`).
+* **Preflight** was unchanged from §12: P3 sensor receipt `c5d37413…` and P4 package receipt
+  `3b6aef59…` match their sources; DDS agent, QGC ELF (owner bound) and the five D3D12 libraries
+  are intact; 871.1 GiB free; no simulation processes.
+* **Manifest.** `state/p4-candidate-8c1bd76.json`, canonical SHA-256
+  **`3785a54c7f10ae1ce3c6dfcaae95d3126cf9609718e23899b4f9df2b07e37ecf`** (file `32b8c254…f2ed`).
+  * Contract `p4-acceptance-v1`, revisions 2 and 3, with the P3 baseline `1e205fec…` still
+    verifying.
+  * It binds 29 P4 and 103 P3 source files, P4 build `3b6aef59…`, MC build `7542919c…` (the runtime
+    selection matches), QGC ELF `82994283…`, `hardware:d3d12` with profile `2e9e9ba1…`, and gates
+    A/B/S/C with 3 qualification flights.
+  * `verify` reproduces it, execution without authorization is false, and no P4 authorization or
+    gate artifact exists.
+* **Superseded.** `2ddabd14` no longer verifies, because its sources changed. Its receipt and
+  manifest remain in `state/` as history. Gate A has not been run.
