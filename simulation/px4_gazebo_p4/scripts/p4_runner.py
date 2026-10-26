@@ -141,9 +141,10 @@ class P4Runner(base.Runner):
                    "--timing-config", str(self.run / "p2_timing.yaml"), "--p4-config", str(self.run / "p4_avoidance.yaml"),
                    "--run-dir", str(self.run), "--authorization-marker", str(self.marker)]
         command.append("--flight" if self.p4_scope == "flight" else "--ground-diagnostic")
-        env = dict(env, GWM_P4_OWNED_NAMESPACE="1")
-        if self.p4_scope != "flight":
-            env.pop("GWM_ALLOW_SITL_COMMANDS", None)
+        # The accepted P2 rule gates(env, flight or ground_diagnostic) requires the SITL gate for both
+        # modes, because both publish setpoints. Ground diagnostic still cannot send a vehicle_command
+        # (P2 transport_allowed) and the graph check expects zero vehicle_command publishers.
+        env = dict(env, GWM_P4_OWNED_NAMESPACE="1", GWM_ALLOW_SITL_COMMANDS="1")
         return command, env
 
     # ---- controller phase -------------------------------------------------------------------

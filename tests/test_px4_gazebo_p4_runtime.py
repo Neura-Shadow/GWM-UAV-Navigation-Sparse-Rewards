@@ -144,6 +144,23 @@ def test_runner_scopes_map_to_the_unchanged_p3_stack(runner_module):
     assert runner_module.SCOPES["p3_readiness"] == "readiness"
 
 
+@pytest.mark.parametrize("scope,mode", [("p4_readiness", "--ground-diagnostic"), ("fixture", "--ground-diagnostic"),
+                                        ("fault", "--ground-diagnostic"), ("flight", "--flight")])
+def test_controller_environment_satisfies_the_p2_gate_rule(runner_module, tmp_path, scope, mode):
+    """P4 Gate A 3785a54c regression: P2 gates(env, flight or ground_diagnostic) needs the SITL gate."""
+    from gwm_px4_control.contracts import gates
+    (tmp_path / "state").mkdir()
+    (tmp_path / "state/p4-built.json").write_text(json.dumps({"install": str(tmp_path / "install")}))
+    runner = object.__new__(runner_module.P4Runner)
+    runner.root, runner.run, runner.p4_scope, runner.marker = tmp_path, tmp_path / "run", scope, tmp_path / "marker"
+    base_env = {"GWM_ALLOW_OPTIONAL_RUNTIME": "1", "GWM_RUN_GAZEBO_PX4_TESTS": "1", "GWM_ALLOW_PX4_LAUNCH": "1"}
+    command, env = runner.p4_controller_command(dict(base_env))
+    gates(env, flight=True)  # the exact check p4_control performs for --flight and --ground-diagnostic
+    assert env["GWM_P4_OWNED_NAMESPACE"] == "1" and env["GWM_ALLOW_SITL_COMMANDS"] == "1"
+    assert command[-1] == mode and command.count("--flight") == (scope == "flight")
+    assert command[0].endswith("gwm_obstacle_avoidance/lib/gwm_obstacle_avoidance/p4_control")
+
+
 def test_runner_redirects_only_the_px4_world_line(runner_module, tmp_path):
     runner = object.__new__(runner_module.P4Runner)
     runner.run, runner.world_dir, runner.summary = tmp_path, tmp_path / "world", {}

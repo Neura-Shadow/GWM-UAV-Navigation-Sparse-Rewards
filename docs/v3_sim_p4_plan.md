@@ -474,8 +474,24 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * The other processes were graceful (QGC teardown accepted again).
   * The truth observer recorded 69 poses with a largest gap of 0.036 s.
   * Perception produced no snapshot before the abort, so it was not exercised.
-* **Correction needed (not applied):** for ground-diagnostic scopes the runner should set
+* **Correction (applied offline, §15):** for ground-diagnostic scopes the runner should set
   `GWM_ALLOW_SITL_COMMANDS=1` in the controller environment only, as P2's ground diagnostics require.
   `vehicle_command` stays forbidden by P2's `transport_allowed` and by the graph check (0 expected
   publishers). The fix needs a new commit, a Policy A approval for it, a re-freeze and a new Gate A
   authorization. Candidate `3785a54c` cannot run Gate A again.
+
+## 15. Runner correction after the failed Gate A (offline)
+
+* `p4_runner.p4_controller_command` now sets `GWM_ALLOW_SITL_COMMANDS=1` in the `p4_control`
+  environment for every scope (ground diagnostic and flight), and nowhere else. It no longer removes
+  the variable. No package, config, threshold, contract or P2/P3 file changed. The P4 package hash is
+  unchanged (`3b6aef59…`), so no rebuild is needed.
+* Regression test `test_controller_environment_satisfies_the_p2_gate_rule`
+  (`tests/test_px4_gazebo_p4_runtime.py`, Linux) passes the controller environment for the
+  p4_readiness, fixture, fault and flight scopes through the accepted P2 `gates()` check.
+* Regression after the fix:
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 102.
+  * Windows: 367 passed, 26 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next:** Policy A approval for this commit, re-freeze, then a new Gate A authorization. Nothing
+  has been frozen and no gate has run.
