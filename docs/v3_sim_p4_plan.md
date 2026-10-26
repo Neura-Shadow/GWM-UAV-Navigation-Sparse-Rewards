@@ -14,7 +14,8 @@ compute p99 limit (§25). Perception is now vectorized with identical outputs (�
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
 **passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
-applied offline (§33, §34); a new candidate needs Policy A approval and a freeze, then Gate A onward. Gates A, B, S
+applied offline (§33, §34). Candidate `e187b475` is frozen (§35); its Gate A awaits operator
+authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -979,5 +980,23 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     file then passed 26 of 26.
   * P3 still verifies to `1e205fec…`.
   * Dry P4 candidate: build `3adf426b…`.
-* **Next:** Policy A approval for this commit, a freeze, then the gates from Gate A onward. Nothing
-  has been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then the gates from Gate A onward (done in
+  §35 up to the Gate A authorization).
+
+## 35. Frozen P4 candidate `e187b475` (2026-10-26, contract revisions 2, 3 and 4)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `add6c225174eb57326cb0dcdd0d3ac8ef688406f`. Receipt: `state/p4-policy-A-approval-add6c22.json`
+  (`500413bf…2fa3`), with candidate phase "p4-acceptance-v1 (revisions 2, 3 and 4)".
+* Manifest `state/p4-candidate-add6c22.json`: canonical
+  **`e187b475eb5f00b6759f13fb1c87a52b6df831b953d13123c0be897aadb7df86`** (file `cfbaaf1b…7c28`).
+  `verify` reproduces it.
+  * Revision label: "revisions 2, 3 and 4 (… revision 4 commit 65b99e4)".
+  * Against `c932b212`, exactly the four revision 4 files differ: `p4_avoidance.yaml` (binds
+    `transit_speed_m_s` 0.2), `p4_validation.yaml`, `contracts.py` and `mission.py`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3adf426b…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `e187b475`. Earlier candidates' records stay in `state/` as history,
+  including `c932b212`'s accepted Gate A and failed Gate B. A new manifest needs its own Gate A, then
+  B, S and C. Gate A has not been run.
