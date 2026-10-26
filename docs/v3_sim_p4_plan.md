@@ -1,7 +1,11 @@
 # v3-SIM P4 — deterministic non-learning obstacle avoidance: implementation plan
 
-**Status: contract approved (revisions 2 and 3); this plan records the design.** Nothing was built, launched, frozen or
-pushed for this plan. The normative rules (thresholds, scenarios, gates) are in the proposed
+**Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
+implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
+cannot run again (§14). The runner fix is applied offline (§15). A new candidate is frozen only
+after Policy A approval for a commit carrying the fix, and Gate A needs its own authorization. Gates A, B, S
+and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
+keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
 an implementer follows.
 
