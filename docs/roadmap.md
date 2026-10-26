@@ -282,7 +282,21 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   [contract and operation](v3_sim_p3_contract.md). P4 is the next phase.
 - [ ] P4 Non-learning obstacle avoidance — contract `p4-acceptance-v1` (revisions 2 and 3) approved;
   offline implementation M1–M7 complete ([contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md)).
-  Not frozen; Gates A/B/S/C not run.
+  **INCOMPLETE.** Candidate `3785a54c` failed Gate A at p4-readiness on a runner defect
+  (ground-diagnostic SITL gate env; P3 readiness passed); its authorization is consumed. Runner fix
+  `4804a47` applied offline. Candidate `1628fc44` failed Gate A at p4-readiness (P3 readiness passed)
+  on two `p4_control` defects: missing P2 `bag_write` trace spans, and RELIABLE subscriptions to the BEST_EFFORT map/health
+  topics (plan §17). Both fixed offline and the package rebuilt as `3dd61063` (plan §18). Candidate `b4db489e`
+  (commit `05f4052`) failed Gate A at P3 readiness cleanup: Gazebo was force-killed after the 15 s SIGINT grace;
+  no P4 code was involved (plan §20). Treated as an intermittent environment event; the same sources are
+  re-frozen as candidate `4722a88e` (commit `40ad650`). Its Gate A passed P3 and P4 readiness, then failed at
+  fixture G2: the generated world's added plugin disabled PX4's server-config systems (plan §22). Fixed
+  offline (plan §23). Candidate `45031345` (commit `9604a04`) failed Gate A at p4-readiness on the
+  perception compute p99 limit (0.0737 s against 0.050 s; plan §25). Perception vectorized with identical outputs,
+  package `ada6d608` (plan §26). Candidate `22557ad6` (commit `0379b22`) passed P3/P4 readiness (compute p99 0.020 s)
+  and G2, then failed at G4 cleanup on a truth-observer shutdown race (plan §28). Fixed offline (plan §29).
+  Candidate `c932b212` (commit `a340101`): **Gate A ACCEPTED** (P3/P4 readiness, G2/G4/G6, both faults; plan §31).
+  Gates B, S, C pending separate authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

@@ -115,10 +115,13 @@ def main(argv=None):
             self.register("/clock", "rosgraph_msgs/msg/Clock")
             self.register(EVENT_TOPIC, "std_msgs/msg/String")
             self.event_pub = self.create_publisher(String, EVENT_TOPIC, 10)
+            # P4 perception and the accepted P3 adapter publish BEST_EFFORT; a RELIABLE subscriber receives nothing.
+            sensor_qos = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=10, reliability=ReliabilityPolicy.BEST_EFFORT,
+                                    durability=DurabilityPolicy.VOLATILE)
             self.ros_subscriptions += [
                 self.create_subscription(ClockMessage, "/clock", self.clock_received, self.qos),
-                self.create_subscription(String, p4["topics"]["local_map"], self.map_message, 10),
-                self.create_subscription(String, p4["topics"]["adapter_health"], self.health_message, 10)]
+                self.create_subscription(String, p4["topics"]["local_map"], self.map_message, sensor_qos),
+                self.create_subscription(String, p4["topics"]["adapter_health"], self.health_message, sensor_qos)]
             (self.run / "topic-contract.json").write_text(json.dumps(self.topic_map, indent=2, allow_nan=False) + "\n")
             self.steady = Clock(clock_type=ClockType.STEADY_TIME)
             self.timer = self.create_timer(1 / c["rate_hz"], self.tick, clock=self.steady)
@@ -137,8 +140,12 @@ def main(argv=None):
                 self.registered.add(topic)
 
         def bag(self, topic, message, sim):
+            # Same spans as the accepted P2 node: P2 verify_timing counts one bag_write per persisted message.
             try:
-                self.writer.write(topic, serialize_message(message), max(0, int(sim * 1e9)))
+                with self.trace.span("cdr_serialize:" + topic, sim):
+                    serialized = serialize_message(message)
+                with self.trace.span("bag_write:" + topic, sim):
+                    self.writer.write(topic, serialized, max(0, int(sim * 1e9)))
             except Exception:
                 self.evidence_error = "bag_write_failed"
                 raise

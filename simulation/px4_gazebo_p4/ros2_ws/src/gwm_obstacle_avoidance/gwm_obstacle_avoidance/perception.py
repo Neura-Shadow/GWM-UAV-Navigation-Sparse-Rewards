@@ -62,33 +62,38 @@ def extract_scan(image, calibration, extrinsic, position_ned, q_wxyz, settings, 
     distance = np.hypot(points[..., 0] - vehicle_enu[0], points[..., 1] - vehicle_enu[1])
     camera_xy = (float(translation[0]), float(translation[1]))
     center_row = int(round(cy))
+    # Per-column reductions over the rows, computed for all columns at once.
+    has_hit = in_band.any(axis=0)
+    nearest = np.argmin(np.where(in_band, distance, np.inf), axis=0)  # first minimum, as per column
+    band_any = band_rows.any(axis=0)
+    band_too_close = (band_rows & (codes == depth_module.TOO_CLOSE)).any(axis=0)
+    band_nan = (band_rows & (codes == depth_module.INVALID_NAN)).any(axis=0)
+    band_valid = band_rows & (codes == depth_module.VALID)
+    band_valid_any = band_valid.any(axis=0)
+    band_valid_min = np.where(band_valid, distance, np.inf).min(axis=0)
     rays = []
     for k, u in enumerate(columns):
         direction = world_dirs[center_row, k]
         azimuth = math.atan2(direction[1], direction[0])
         unit = (math.cos(azimuth), math.sin(azimuth))
-        band = band_rows[:, k]
-        hits = in_band[:, k]
-        if hits.any():
-            index = int(np.argmin(np.where(hits, distance[:, k], np.inf)))
+        if has_hit[k]:
+            index = int(nearest[k])
             point = (float(points[index, k, 0]), float(points[index, k, 1]))
             rays.append({"u": int(u), "azimuth": azimuth, "kind": HIT, "range_m": float(distance[index, k]), "end": point})
             continue
-        band_codes = codes[band, k]
-        if band_codes.size == 0:
+        if not band_any[k]:
             rays.append({"u": int(u), "azimuth": azimuth, "kind": UNKNOWN_RAY, "range_m": None, "end": None})
             continue
-        if np.any(band_codes == depth_module.TOO_CLOSE):
+        if band_too_close[k]:
             end = (camera_xy[0] + near_m * unit[0], camera_xy[1] + near_m * unit[1])
             rays.append({"u": int(u), "azimuth": azimuth, "kind": TOO_CLOSE_RAY, "range_m": near_m, "end": end})
             continue
-        if np.any(band_codes == depth_module.INVALID_NAN):
+        if band_nan[k]:
             rays.append({"u": int(u), "azimuth": azimuth, "kind": UNKNOWN_RAY, "range_m": None, "end": None})
             continue
         limit = cap
-        valid = band_codes == depth_module.VALID
-        if valid.any():  # returns outside the band (e.g. ground on the ground) bound the free distance
-            limit = min(limit, float(distance[band, k][valid].min()))
+        if band_valid_any[k]:  # returns outside the band (e.g. ground on the ground) bound the free distance
+            limit = min(limit, float(band_valid_min[k]))
         if limit < near_m:
             rays.append({"u": int(u), "azimuth": azimuth, "kind": UNKNOWN_RAY, "range_m": None, "end": None})
             continue
@@ -99,20 +104,20 @@ def extract_scan(image, calibration, extrinsic, position_ned, q_wxyz, settings, 
 
 def integrate(grid, camera_xy, rays, max_hit_range, near_m):
     """Free space starts at the camera's near clip: nothing closer than `near_m` is observed
-    (a near-clipped object may be invisible rather than reported too close)."""
+    (a near-clipped object may be invisible rather than reported too close). Rays are marked as one
+    batch; grid states only rise, so this equals marking them one after another."""
+    starts, ends, hits = [], [], []
     for ray in rays:
-        if ray["kind"] not in (HIT, FREE_RAY):
-            if ray["kind"] == TOO_CLOSE_RAY:
-                index = grid.index(*ray["end"])
-                if index is not None:
-                    grid.cells[index] = 2
-            continue
-        start = (camera_xy[0] + near_m * math.cos(ray["azimuth"]), camera_xy[1] + near_m * math.sin(ray["azimuth"]))
-        if ray["kind"] == HIT:
-            if ray["range_m"] <= max_hit_range:
-                grid.mark_ray(start, ray["end"], hit=True)
-        else:
-            grid.mark_ray(start, ray["end"], hit=False)
+        if ray["kind"] == TOO_CLOSE_RAY:
+            index = grid.index(*ray["end"])
+            if index is not None:
+                grid.cells[index] = 2
+        elif ray["kind"] == FREE_RAY or (ray["kind"] == HIT and ray["range_m"] <= max_hit_range):
+            starts.append((camera_xy[0] + near_m * math.cos(ray["azimuth"]),
+                           camera_xy[1] + near_m * math.sin(ray["azimuth"])))
+            ends.append(ray["end"])
+            hits.append(ray["kind"] == HIT)
+    grid.mark_rays(starts, ends, hits)
 
 
 class P4Processor(DepthProcessor):

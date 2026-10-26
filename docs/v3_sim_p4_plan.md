@@ -1,7 +1,20 @@
 # v3-SIM P4 — deterministic non-learning obstacle avoidance: implementation plan
 
-**Status: contract approved (revisions 2 and 3); this plan records the design.** Nothing was built, launched, frozen or
-pushed for this plan. The normative rules (thresholds, scenarios, gates) are in the proposed
+**Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
+implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
+cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
+failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
+offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanup: Gazebo did
+not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
+environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
+and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
+offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
+compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
+`22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
+on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
+**passed Gate A** (§31); Gates B, S and C await separate authorizations. Gates A, B, S
+and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
+keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
 an implementer follows.
 
@@ -409,3 +422,475 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * geofence, offboard-loss and graph checks abort.
 * **Evaluator.** Synthetic run directories exercise every §6, §6.1, §7 and §9.1 rule, in both pass
   and fail cases.
+
+## 12. Frozen P4 candidate (2026-10-26)
+
+* **Policy A** (`bf1ef9b1…`, content unchanged from P3 v1.6) was approved by Neura-Shadow for the P4
+  candidate at `6c418336cf425317f5b9972e9f59776a443dde39`. The receipt is
+  `state/p4-policy-A-approval-6c41833.json` (`1d63a8de…e67e`).
+* **Preflight.**
+  * P3 sensor receipt `c5d37413…` and P4 package receipt `3b6aef59…` both match their sources.
+  * The DDS agent and QGC ELF are intact, with the owner bound.
+  * The five WSL D3D12 libraries match their pins.
+  * 871.1 GiB was free and no simulation processes were running.
+* **Manifest.** `state/p4-candidate-6c41833.json`, canonical SHA-256
+  **`2ddabd14a48a900d66ed2890cc48ecb367d6d3d860a4cb3b85cf0efe77f50a66`** (file `8d97eec5…29c1`).
+  * It binds the P3 baseline `1e205fec…` (still verifying), 29 P4 and 103 P3 source files, the MC
+    build `7542919c…` (the runtime selection matches), QGC ELF `82994283…`, `hardware:d3d12` with
+    D3D12 profile `2e9e9ba1…`, and gates A/B/S/C with 3 qualification flights.
+  * `verify` reproduces it. Execution without authorization is false, and no P4 authorization or
+    gate artifact exists.
+* **Known label defect.** `configs/p4_validation.yaml` `contract_revision` still reads "revision 2".
+  The manifest copies that text, although the frozen sources implement revision 3 (`map_scan_deg`
+  360 pinned and the traversed L2 rule, both hashed). Correcting the label changes a P4 source, so
+  it needs a new commit, a Policy A approval for it, and a re-freeze.
+* **Label corrected** in the next commit: `contract_revision` now names revisions 2 and 3, with their
+  commits, and a test pins it. Candidate `2ddabd14` stays frozen until it is replaced by a re-freeze
+  at that commit, which waits on the operator's Policy A approval.
+* Gate A has not been run.
+
+## 13. Re-frozen P4 candidate (supersedes `2ddabd14`)
+
+* **Policy A** (`bf1ef9b1…`) was approved by Neura-Shadow for `8c1bd76a890325003bf7116d925a5498a721f747`
+  (the revision-label correction). The receipt is `state/p4-policy-A-approval-8c1bd76.json`
+  (`18fd93b7…e9bb`).
+* **Preflight** was unchanged from §12: P3 sensor receipt `c5d37413…` and P4 package receipt
+  `3b6aef59…` match their sources; DDS agent, QGC ELF (owner bound) and the five D3D12 libraries
+  are intact; 871.1 GiB free; no simulation processes.
+* **Manifest.** `state/p4-candidate-8c1bd76.json`, canonical SHA-256
+  **`3785a54c7f10ae1ce3c6dfcaae95d3126cf9609718e23899b4f9df2b07e37ecf`** (file `32b8c254…f2ed`).
+  * Contract `p4-acceptance-v1`, revisions 2 and 3, with the P3 baseline `1e205fec…` still
+    verifying.
+  * It binds 29 P4 and 103 P3 source files, P4 build `3b6aef59…`, MC build `7542919c…` (the runtime
+    selection matches), QGC ELF `82994283…`, `hardware:d3d12` with profile `2e9e9ba1…`, and gates
+    A/B/S/C with 3 qualification flights.
+  * `verify` reproduces it, execution without authorization is false, and no P4 authorization or
+    gate artifact exists.
+* **Superseded.** `2ddabd14` no longer verifies, because its sources changed. Its receipt and
+  manifest remain in `state/` as history. Gate A has not been run.
+
+## 14. P4 Gate A of candidate `3785a54c` — FAILED at p4-readiness (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-3785a54c7f10.json` (`62021de1…e86f`), consumed.
+  Result `state/p4-gate-A-3785a54c….result.json` (`4be2b2a5…21df`): `accepted: false`,
+  `first_failure: p4-readiness:runtime_status:Abort:controller_failed`, no automatic retry. Run
+  00:35:43–00:37:32 UTC; no leftover processes.
+* **p3-readiness** `20261026T003602Z-p4-p3_readiness-c3c4362b`: **passed**. This was the unchanged P3
+  readiness evaluation under the P4 runner. Every process was graceful and the QGC unattended
+  teardown accepted the P4 namespace-owner copy.
+* **p4-readiness** `20261026T003709Z-p4-p4_readiness-fa5e8ad3`: `p4_control` refused to start with
+  `Missing explicit gates: GWM_ALLOW_SITL_COMMANDS`. The accepted P2 rule
+  (`gwm_px4_control.contracts.gates(env, flight or ground_diagnostic)`) requires that gate for the
+  ground-diagnostic mode, because it publishes setpoints. The P4 runner removed the variable from the
+  controller environment for every non-flight scope. **This is a P4 runner defect**, not a
+  perception, planner or acceptance-rule failure.
+  * The other processes were graceful (QGC teardown accepted again).
+  * The truth observer recorded 69 poses with a largest gap of 0.036 s.
+  * Perception produced no snapshot before the abort, so it was not exercised.
+* **Correction (applied offline, §15):** for ground-diagnostic scopes the runner should set
+  `GWM_ALLOW_SITL_COMMANDS=1` in the controller environment only, as P2's ground diagnostics require.
+  `vehicle_command` stays forbidden by P2's `transport_allowed` and by the graph check (0 expected
+  publishers). The fix needs a new commit, a Policy A approval for it, a re-freeze and a new Gate A
+  authorization. Candidate `3785a54c` cannot run Gate A again.
+
+## 15. Runner correction after the failed Gate A (offline)
+
+* `p4_runner.p4_controller_command` now sets `GWM_ALLOW_SITL_COMMANDS=1` in the `p4_control`
+  environment for every scope (ground diagnostic and flight), and nowhere else. It no longer removes
+  the variable. No package, config, threshold, contract or P2/P3 file changed. The P4 package hash is
+  unchanged (`3b6aef59…`), so no rebuild is needed.
+* Regression test `test_controller_environment_satisfies_the_p2_gate_rule`
+  (`tests/test_px4_gazebo_p4_runtime.py`, Linux) passes the controller environment for the
+  p4_readiness, fixture, fault and flight scopes through the accepted P2 `gates()` check.
+* Regression after the fix:
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 102.
+  * Windows: 367 passed, 26 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §16
+  up to the authorization).
+
+## 16. Frozen P4 candidate `1628fc44` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `601eceae76e371a921c6f652413e8a292b0d80d3`. That commit has the same P4 sources as fix commit
+  `4804a47`; only docs changed. Receipt: `state/p4-policy-A-approval-601ecea.json` (`11c4cfa7…b82c`).
+* Manifest `state/p4-candidate-601ecea.json`: canonical
+  **`1628fc44afcffab730c7ad7d69c5047f010f52e64767b07e715f1b90dc122f07`** (file `4bbe9a1f…6d94`).
+  `verify` reproduces it.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3b6aef59…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC build `7542919c…`, and its selection matches; QGC ELF `82994283…`;
+    `hardware:d3d12` with profile `2e9e9ba1…`.
+  * Gates A/B/S/C; no execution without authorization.
+* No gate record exists for `1628fc44`. The failed Gate A of `3785a54c` and its consumed authorization
+  stay in `state/` as history. Gate A has not been run.
+
+## 17. P4 Gate A of candidate `1628fc44` — FAILED at p4-readiness (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-1628fc44afcf.json` (`bc6ce22e…1d88`), consumed.
+  Result `state/p4-gate-A-1628fc44….result.json` (`234701ff…5862`): `accepted: false`,
+  `first_failure: p4-readiness:p2_integrity_error:ValueError:Trace/persisted bag count mismatch:
+  offboard_control_mode`, no automatic retry. Run 01:25:35–01:28:06 UTC; no leftover processes.
+* **p3-readiness** `20261026T012605Z-p4-p3_readiness-21036f92`: **passed** again.
+* **p4-readiness** `20261026T012706Z-p4-p4_readiness-43b0ab68`: the runtime passed. The runner fix
+  worked: `p4_control` exited 0 with a valid graph and no flight commands possible. The independent
+  evaluator then failed it.
+* **Defect 1 (the failing check):** P2's accepted `timing_evidence.verify_timing` requires one
+  `bag_write:<topic>` trace span for every persisted message of each topic and of `/gwm/p2/events`.
+  P2's `node.bag()` records those spans. P4's `control_node.bag()` writes the bag without them, so the
+  trace holds 0 `bag_write` records. No offline test ran `verify_timing` on a P4 controller trace.
+* **Defect 2 (found in the same evidence; it would have failed later checks):** `p4_control`
+  subscribes to `/gwm/p4/local_map` and to the adapter health topic with the default RELIABLE QoS.
+  The perception node and the accepted P3 adapter publish BEST_EFFORT. Both publishers logged
+  "incompatible QoS … RELIABILITY", and the controller received `local_map_messages: 0` and
+  `adapter_health_messages: 0`. Perception itself worked: `p4/local_map.jsonl` is 1.35 MB.
+* **Correction (applied offline, §18):** both are in the `gwm_obstacle_avoidance` package, so the fix
+  needs a rebuild and gives a new P4 package hash.
+  * Defect 1: add P2's `bag_write:` spans in `control_node.bag()`.
+  * Defect 2: subscribe to the map and health topics with the BEST_EFFORT profile the publishers use.
+    The accepted P3 adapter is not changed.
+  * Offline tests: run `verify_timing` on a P4 controller trace, and check QoS compatibility.
+  * Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
+    `1628fc44` cannot run Gate A again.
+
+## 18. `p4_control` corrections after the failed Gate A of `1628fc44` (offline)
+
+* **Trace spans:** `control_node.bag()` now records the accepted P2 node's `cdr_serialize:<topic>` and
+  `bag_write:<topic>` spans for every persisted message, including `/gwm/p2/events`.
+  * Trace budget: the P2 flights used the same span set. At the 240 s simulation deadline the
+    estimate is about 290k records against the 500k capacity.
+* **QoS:** `p4_control` subscribes to `/gwm/p4/local_map` and the adapter health topic as
+  BEST_EFFORT, KEEP_LAST 10, VOLATILE, matching both publishers. The accepted P3 adapter is unchanged.
+* **Tests:** new `tests/test_px4_gazebo_p4_ros_harness.py` runs the real `p4_control` under real
+  rclpy and rosbag2, offline, with no PX4 or Gazebo. It is skipped without a ROS-sourced Linux shell.
+  * An in-process BEST_EFFORT publisher feeds `/clock`, the PX4 output topics, the map and health.
+  * One test checks that the `bag_write` count equals the persisted bag count, then runs the accepted
+    P2 `verify_timing` on the trace and bag.
+  * The other test checks that the map and health messages arrive.
+  * Before the fix both tests failed, reproducing the Gate A evidence: 0 `bag_write` records against
+    71 bag messages, and "incompatible QoS … RELIABILITY". After the fix both pass.
+* **Rebuild:** new P4 package hash `3dd6106358aac0a920ba31a4a9de84f9950708233694db95ae175d3fe90e140c`;
+  `state/p4-built.json` matches the source. The consumed candidate `1628fc44` binds the old build
+  (`3b6aef59…`) and stays as history.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 102, ROS harness 2.
+  * Windows: 367 passed, 27 skipped.
+  * P3 still verifies to `1e205fec…`.
+  * Dry P4 candidate: build `3dd61063…`, 29 P4 files.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §19
+  up to the authorization).
+
+## 19. Frozen P4 candidate `b4db489e` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `05f4052c0eec28b8c8a3c85818af5b69df78760d`. Receipt: `state/p4-policy-A-approval-05f4052.json`
+  (`8b772de3…486e`).
+* Manifest `state/p4-candidate-05f4052.json`: canonical
+  **`b4db489e820db723305e7e38e360a3f86f948f938c954b5e0416d6a4d016d8b2`** (file `eeb6a739…4b4c`).
+  `verify` reproduces it.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3dd61063…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC build `7542919c…`, and its selection matches; QGC ELF `82994283…`;
+    `hardware:d3d12` with profile `2e9e9ba1…`.
+  * Gates A/B/S/C; no execution without authorization.
+* No gate record exists for `b4db489e`. The failed Gate A runs of `3785a54c` and `1628fc44` and their
+  consumed authorizations stay in `state/` as history. Gate A has not been run.
+
+## 20. P4 Gate A of candidate `b4db489e` — FAILED at p3-readiness cleanup (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-b4db489e820d.json` (`c7b3b908…e827`), consumed.
+  Result `state/p4-gate-A-b4db489e….result.json` (`273d356c…9b93`): `accepted: false`,
+  `first_failure: p3-readiness:cleanup:gazebo:forced_kill_after_grace`, no automatic retry. Run
+  01:49:22–01:50:41 UTC; no leftover processes. P4 readiness, the fixtures and the faults did not run.
+* **p3-readiness** `20261026T014941Z-p4-p3_readiness-ea9a39a9`: runtime exit 0, P2 controller
+  completed. The shutdown followed the P3 contract §7 order, with the same timings as the passing run
+  `…012605Z…21036f92`, up to the DDS Agent (exit 0 at +4.4 s). The Gazebo world pause returned `true`.
+  Gazebo then did not exit within 15 s of SIGINT; it was killed with -9 at +20.0 s. In the passing
+  runs it exited 0 about 0.5 s after SIGINT.
+* **Classification:** the evaluator applied the unchanged P3 rule (exit 0 within grace, no
+  escalation) correctly.
+  * The step runs only accepted P2/P3 processes (`p2_control`, the P3 bridge, adapter and probe); no
+    P4 node runs in it.
+  * The `p4_control` corrections of §18 are not involved, and no P4 code defect is identified.
+  * Gazebo is adopted from PX4's launch, so its own output is not retained; the cause of the hang is
+    unknown.
+  * This is the first forced Gazebo stop seen in 15 runs: 12 accepted P3 runs and the three P4 P3
+    readiness runs.
+* **Status:** candidate `b4db489e` cannot run Gate A again. Whether to treat this as an intermittent
+  environment event (new freeze and Gate A authorization on the same sources) or to investigate first
+  is an operator decision.
+
+## 21. Re-frozen P4 candidate `4722a88e` (2026-10-26)
+
+* **Operator decision (Neura-Shadow):** the Gazebo forced stop of §20 is treated as an intermittent
+  environment event, and the unchanged P4 sources are re-frozen. Policy A (`bf1ef9b1…b3b0`,
+  unchanged) was approved for commit `40ad650b349685326685d280ab208cf64ccaffe5`, whose P4 sources are
+  identical to `05f4052`. Receipt: `state/p4-policy-A-approval-40ad650.json` (`56ab4e4c…6961`).
+* Manifest `state/p4-candidate-40ad650.json`: canonical
+  **`4722a88ec20273e72894c2dbac4000122771d74db162491950f027bc6d9b3f50`** (file `78156605…7147`).
+  `verify` reproduces it.
+  * Same as `b4db489e`: P4 and P3 source files, P4 build `3dd61063…`, and runtime bindings. Only the
+    approval receipt and the freeze time differ.
+  * P3 baseline `1e205fec…`; MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution
+    without authorization.
+* No gate record exists for `4722a88e`. The failed Gate A runs of `3785a54c`, `1628fc44` and
+  `b4db489e` and their consumed authorizations stay in `state/` as history. Gate A has not been run.
+
+## 22. P4 Gate A of candidate `4722a88e` — FAILED at fixture G2 (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-4722a88ec202.json` (`fc1be449…ee85`), consumed.
+  Result `state/p4-gate-A-4722a88e….result.json` (`ac75c3bf…4001`): `accepted: false`,
+  `first_failure: fixture-G2:runtime_status:TimeoutError:PX4 prompt/wall deadline exceeded: boot`, no
+  automatic retry. Run 01:58:52–02:03:10 UTC; no leftover processes. G4, G6 and the faults did not run.
+* **p3-readiness** `20261026T015909Z-p4-p3_readiness-111a3347`: **passed**. Gazebo stopped gracefully.
+* **p4-readiness** `20261026T020010Z-p4-p4_readiness-2c12286c`: **passed**. This is the first pass
+  under the full P4 workload, and it confirms the §15 and §18 corrections.
+* **fixture-G2** `20261026T020125Z-p4-G2-94602e38`: PX4 started Gazebo with the run-local G2 world.
+  It then logged "Waiting for Gazebo world…" until "Timed out waiting for Gazebo world", and the
+  runner's boot deadline expired.
+  * The evaluator also reported `evaluator_incomplete_evidence:KeyError:'sensor_window_sim_s'`. That
+    is a consequence of the aborted runtime.
+* **Defect (P4 world generator):** `p4_worlds.generate` adds a world-level
+  `<plugin filename="gz-sim-contact-system">`. The pinned PX4 `default.sdf` declares no plugins, so
+  Gazebo loads its systems from PX4's `server.config`: Physics, UserCommands, SceneBroadcaster,
+  Contact, Sensors and the rest. Once a world declares any plugin, Gazebo skips the server-config
+  plugins. The G2 world therefore ran without SceneBroadcaster, so `/world/default/scene/info` never
+  answered, and without physics or sensors.
+  * Both worlds pass `gz sdf -k`.
+  * `server.config` already loads the Contact system, so the added plugin is unnecessary.
+  * The offline test pinned the wrong expectation: its minimal base world had no server config, and
+    it asserted that the plugin was present.
+  * Every generated scenario world (G2/G4/G6, S1–S6) has the same defect.
+* **Correction (applied offline, §23):** generate worlds without any world-level plugin. Change the
+  offline test to assert that the generated world declares no world plugin, and that PX4's
+  `server.config` lists `gz-sim-contact-system`. `p4_worlds.py` is in `scripts/`, outside the
+  package, so the package build `3dd61063` is unchanged. Then a new commit, Policy A approval, a freeze
+  and a new Gate A authorization. Candidate `4722a88e` cannot run Gate A again.
+
+## 23. World-generator correction after the failed Gate A of `4722a88e` (offline)
+
+* `p4_worlds.generate` no longer adds a world-level plugin. It now refuses a base world that declares
+  any plugin, because PX4's `server.config` must supply every system, the Contact system included.
+* Tests in `tests/test_px4_gazebo_p4_scenarios.py`:
+  * Every generated world declares no world plugin.
+  * The generator refuses a base world that declares a plugin.
+  * Against the real pinned PX4 tree (Linux workspace): `server.config` lists the contact, physics,
+    scene-broadcaster, user-commands and sensors systems; the pinned `default.sdf` declares no
+    plugin; and all nine generated worlds (G2/G4/G6, S1–S6) stay plugin-free.
+* `p4_worlds.py` is outside the package: the build `3dd61063…` is unchanged, and its receipt still
+  matches.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 104, ROS harness 2.
+  * Windows: 368 passed, 28 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §24
+  up to the authorization).
+
+## 24. Frozen P4 candidate `45031345` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `9604a04d7299cb0cf2cde20ca0e47f12e96a9e5b`. Receipt: `state/p4-policy-A-approval-9604a04.json`
+  (`d555ed52…02e5`).
+* Manifest `state/p4-candidate-9604a04.json`: canonical
+  **`4503134502a51272d9841615f6412b135a44ad37cc1480644e2d4ba89b65ecc1`** (file `f1e5cdc4…7e39`).
+  `verify` reproduces it.
+  * Only `scripts/p4_worlds.py` differs from `4722a88e`, and the manifest binds the corrected file.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3dd61063…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `45031345`. The four failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`) and their consumed authorizations stay in `state/` as history. Gate A has
+  not been run.
+
+## 25. P4 Gate A of candidate `45031345` — FAILED at p4-readiness performance (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-4503134502a5.json` (`b84fba28…1aee`), consumed.
+  Result `state/p4-gate-A-45031345….result.json` (`ad807744…d509`): `accepted: false`,
+  `first_failure: p4-readiness:performance:compute_p99`, no automatic retry. Run 02:18:54–02:21:29
+  UTC; no leftover processes. The fixtures and faults did not run.
+* **p3-readiness** `20261026T021916Z-p4-p3_readiness-8ceafda7`: **passed**.
+* **p4-readiness** `20261026T022023Z-p4-p4_readiness-50f2bba5`: runtime passed and perception
+  `passed`, with 244 of 249 snapshots usable. Contract §6.1 limits per frame of thread wall time:
+  p99 ≤ 0.050 s and max ≤ 0.090 s.
+
+  | p4-readiness run | p99 | max | Frames over 0.050 s |
+  |---|---|---|---|
+  | This run (`…50f2bba5`) | **0.0737 s** (fail) | 0.0764 s | 11 of 249 |
+  | Passing run of `4722a88e` (`…020010Z…2c12286c`), same package `3dd61063` | 0.0428 s | 0.0500 s | 1 of 266 |
+
+  * The median barely moved (0.034 s against 0.032 s); the tail is heavier.
+  * Host contention was higher in this run: every process used 10–15% more CPU, and the RTF was
+    0.64 against 0.69.
+* **Assessment:** the package code is unchanged, so this is not a regression. The perception step
+  has too little margin against the approved budget on this host: even the passing run was within
+  6% of the p99 limit.
+  * Offline profile (synthetic ground frames, same Python): `poll` p50 is about 0.03 s.
+  * About 75% of the time is P4 code. The largest part is plain-Python ray marching
+    (`local_map.mark_ray`/`index`, about 300k cell visits per 33 frames, roughly half the time).
+    `extract_scan` is about a quarter.
+  * The accepted P3 `observe`, about 22%, cannot be changed.
+* **Options (operator decision):**
+  * Optimize P4 perception without changing outputs: vectorize the ray marching and the scan
+    extraction, with offline tests proving identical grids and scans. This needs a package rebuild,
+    a new commit, Policy A approval, a freeze and Gate A authorization.
+  * Re-freeze the same sources, accepting a low chance of passing given the measured margin.
+  * The limit itself is a contract timing requirement and is not to be relaxed.
+  * Candidate `45031345` cannot run Gate A again.
+
+## 26. Perception compute optimization after the failed Gate A of `45031345` (offline)
+
+* **Changes, outputs unchanged:**
+  * `local_map.Grid.mark_rays` marks a batch of rays with NumPy. It uses the same per-ray step
+    count (`math.hypot`), the same `t = n/steps` samples, the same float operations and the same end
+    cell, and `mark_ray` delegates to it.
+  * Grid states only rise (UNKNOWN < FREE < OCCUPIED, free never clears occupied), so batch marking
+    equals sequential marking.
+  * `perception.integrate` collects the rays and marks them in one batch.
+  * `perception.extract_scan` computes the per-column reductions for all columns at once: hit,
+    first-minimum index, band membership, too-close, NaN and the valid minimum. Azimuths still use
+    `math.atan2/cos/sin` per column.
+  * No configuration, threshold, contract value or P3 code changed.
+* **Equivalence proof:** new `tests/test_px4_gazebo_p4_equivalence.py` keeps verbatim copies of the
+  implementations frozen in `45031345` (commit `9604a04`). It checks that:
+  * scans are equal float for float, and grids byte for byte, over every scenario and fixture layout
+    plus a near-obstacle layout, on ground and at altitude, with NaN and too-close patches and all
+    four ray kinds present;
+  * a 500-ray batch equals sequential marking, including off-grid, zero-length and pre-occupied
+    cases;
+  * single-ray cases match.
+  * A separate 140-frame scratch digest was identical before and after.
+* **Rebuild:** new P4 package hash `ada6d608e40855886ea29636ab7df67eb21e3e152319b825c879208ab8d7502b`;
+  the receipt matches the source.
+* **Offline compute per processed frame** (`P4Processor.poll`, same Python, frozen reference against
+  vectorized):
+
+  | Scene | p50 before | p50 after | p99 before | p99 after | max before | max after |
+  |---|---|---|---|---|---|---|
+  | Ground, empty world | 0.0208 s | 0.0088 s | 0.0310 s | 0.0137 s | 0.0351 s | 0.0153 s |
+  | 2 m, S4 obstacles | 0.0218 s | 0.0065 s | 0.0430 s | 0.0095 s | 0.0436 s | 0.0106 s |
+  | 2 m, S5 wall | 0.0184 s | 0.0079 s | 0.0229 s | 0.0119 s | 0.0256 s | 0.0132 s |
+
+  * The remaining time is mostly the accepted P3 `DepthProcessor.observe` (about 6 ms).
+  * These offline numbers are not runtime evidence. Only a gate run measures the contract limit.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 104, equivalence 6, ROS
+    harness 2.
+  * Windows: 374 passed, 28 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §27
+  up to the authorization).
+
+## 27. Frozen P4 candidate `22557ad6` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `0379b2275605759a968ffb5f514f258045d1539c`. Receipt: `state/p4-policy-A-approval-0379b22.json`
+  (`c80ea928…0ac7`).
+* Manifest `state/p4-candidate-0379b22.json`: canonical
+  **`22557ad6f223081fba3fc7db08d522188f40dc9f48a61e09bab0cf753574cd6c`** (file `9cc9398a…d5ff`).
+  `verify` reproduces it.
+  * Only `local_map.py` and `perception.py` differ from `45031345`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `ada6d608…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `22557ad6`. The five failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`, `45031345`) and their consumed authorizations stay in `state/` as history.
+  Gate A has not been run.
+
+## 28. P4 Gate A of candidate `22557ad6` — FAILED at fixture G4 cleanup (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-22557ad6f223.json` (`efb2887c…b36b`), consumed.
+  Result `state/p4-gate-A-22557ad6….result.json` (`3dcc2c0e…d457`): `accepted: false`,
+  `first_failure: fixture-G4:cleanup:p4-truth-observer:nonzero_exit_3`, no automatic retry. Run
+  02:50:00–02:54:29 UTC; no leftover processes. G6 and the faults did not run.
+* **Passed:**
+  * **p3-readiness** `…025019Z…f4e263a5`.
+  * **p4-readiness** `…025114Z…48f2aea8`: compute p99 0.0201 s and max 0.0222 s, against 0.0737 s
+    in §25. The §26 optimization holds at runtime.
+  * **fixture-G2** `…025221Z…a6a4f595`: trigger decision `obstacle_in_trigger_range` as expected;
+    nearest hit 1.8 m against truth 1.8 m; compute p99 0.0299 s.
+* **fixture-G4** `…025332Z…2e1e92c9`: the functional result was correct. The trigger decision was
+  `obstacle_in_trigger_range` as expected, the nearest hit was 3.8 m against truth 3.8 m, and compute
+  p99 was 0.0332 s. Cleanup then failed: the truth observer exited 3 within 0.02 s of SIGINT, while
+  its `truth-closed.json` records `"error": null`.
+* **Defect (P4 truth observer shutdown race):** on SIGINT, `p4_truth_observer.main` closes the
+  ledgers and builds the close record while its gz-transport subscriptions are still active.
+  * Gazebo stops after the observer and keeps publishing poses at 50 Hz.
+  * A pose callback that arrives after `Ledger.close()` writes to a closed file. `fail()` then sets
+    the error after the close record has been written, so the return code is 3.
+  * G2 passed only because no callback landed in that window. Nothing was lost before the stop: G4
+    has 1063 pose rows with a largest gap of 0.04 s.
+* **Correction (applied offline, §29):** in `p4_truth_observer.py`:
+  * On stop, mark the ledgers closed under their lock and unsubscribe, so that later callbacks are
+    dropped and are not errors.
+  * Derive the exit code from the error recorded in the close record.
+  * Add an offline test that writes after close.
+
+  `p4_truth_observer.py` is in `validation/`, outside the package, so build `ada6d608` is unchanged.
+  Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
+  `22557ad6` cannot run Gate A again.
+
+## 29. Truth-observer shutdown correction after the failed Gate A of `22557ad6` (offline)
+
+* **`p4_truth_observer.py` changes:**
+  * `Ledger.write` returns False and drops the row once the ledger is closed. `close` sets that flag
+    under the same lock as the writes.
+  * Callbacks return early once a stop is requested.
+  * On stop, the observer unsubscribes every topic before closing; the result is recorded as
+    `unsubscribed` in `truth-closed.json`.
+  * The exit code is derived from the error written in the close record, so the two always agree.
+  * The installed gz-transport13 Python `Node` provides `unsubscribe`.
+  * The evaluator still requires `truth-closed.json` to have `error: null`, and every pose before the
+    stop is still recorded.
+* **Tests** in `tests/test_px4_gazebo_p4_scenarios.py`:
+  * A ledger write after close is dropped, without an exception.
+  * With fake gz modules, a pump thread keeps delivering pose and contact callbacks through SIGINT and
+    after the close. The observer then exits 0 with `error: null`, the ledger row count equals the
+    recorded count, and both topics are unsubscribed. This test is Linux-only.
+  * Against the observer frozen in `22557ad6`, the second test reproduces the Gate A symptom (exit 3)
+    and the first fails. Both pass with the fix.
+* `p4_truth_observer.py` is outside the package, so build `ada6d608…` is unchanged and its receipt
+  still matches.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 106, equivalence 6, ROS
+    harness 2.
+  * Windows: 375 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §30
+  up to the authorization).
+
+## 30. Frozen P4 candidate `c932b212` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `a3401018254dc6bbb6faf23b61b4489fbb4c6eec`. Receipt: `state/p4-policy-A-approval-a340101.json`
+  (`eb687405…0b82`).
+* Manifest `state/p4-candidate-a340101.json`: canonical
+  **`c932b2125ebb2f11754688b5a44a337be70f4f2b0993e77dbb963ab6e7ee2f9c`** (file `0fb1e426…5047`).
+  `verify` reproduces it.
+  * Only `validation/p4_truth_observer.py` differs from `22557ad6`, and the manifest binds the
+    corrected file.
+  * Baselines and build: P3 `1e205fec…`; P4 build `ada6d608…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `c932b212`. The six failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`, `45031345`, `22557ad6`) and their consumed authorizations stay in `state/`
+  as history. Gate A has not been run.
+
+## 31. P4 Gate A of candidate `c932b212` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-c932b2125ebb.json` (`dd112d64…4de7`), consumed.
+  Result `state/p4-gate-A-c932b212….result.json` (`fdb66af7…0671`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 03:19:52–03:28:34 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run.**
+
+  | Run | Result | Compute p99 / max (s) | RTF |
+  |---|---|---|---|
+  | p3-readiness `…032009Z…1bd9aaac` | passed (unchanged P3 evaluation) | — | 0.78 |
+  | p4-readiness `…032108Z…cd131e23` | passed | 0.0283 / 0.0328 | 0.75 |
+  | fixture-G2 `…032217Z…fe53a6ec` | `obstacle_in_trigger_range` (expected); hit 1.8 m, truth 1.8 m | 0.0285 / 0.0292 | — |
+  | fixture-G4 `…032330Z…805ed9c9` | `obstacle_in_trigger_range` (expected); hit 3.7999 m, truth 3.8 m | 0.0341 / 0.0421 | — |
+  | fixture-G6 `…032451Z…c20129ec` | `no_obstacle_in_trigger_range` (expected); hit 5.8501 m, truth 5.85 m | 0.0299 / 0.0318 | — |
+  | fault-adapter_stop `…032605Z…6b76b2ac` | adapter SIGINT at t = 30.96 s; supervisor HOVER (`adapter_health_missing`) at 32.56 s | 0.0456 / 0.0465 | — |
+  | fault-bridge_stop `…032725Z…abea7443` | bridge SIGINT at t = 30.992 s; HOVER (`snapshot_stale`) at 31.242 s | 0.0227 / 0.0236 | — |
+
+* **Margin note:** the adapter_stop run's compute p99 of 0.0456 s is within the 0.050 s limit, but
+  it has the least margin of any run. Gate B, S and C flights run under heavier load.
+* **Status:** Gate A is accepted for `c932b212`. Gate B (S2), then Gate S (S1, S5, S6), then Gate C
+  (S2, S3, S4) each need their own operator authorization bound to this manifest. P4 is not complete.
