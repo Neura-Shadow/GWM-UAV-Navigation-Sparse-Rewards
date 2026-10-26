@@ -16,7 +16,7 @@ on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
 applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
-like P2's (§38); a new candidate needs Policy A approval and a freeze, then Gate A onward. Gates A, B, S
+like P2's (§38). Candidate `1be1896a` is frozen (§39); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1093,5 +1093,20 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * P3 still verifies to `1e205fec…`.
 * **Limit:** tracing makes a stall attributable. It does not prevent one, because the check sits in
   the inherited P2 structure.
-* **Next:** Policy A approval for this commit, a freeze, then the gates from Gate A onward. Nothing
-  has been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then the gates from Gate A onward (done in
+  §39 up to the Gate A authorization).
+
+## 39. Frozen P4 candidate `1be1896a` (2026-10-26, contract revisions 2, 3 and 4)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `e967e4ce414bc77a11de86bf20944683a369bf7c`. Receipt: `state/p4-policy-A-approval-e967e4c.json`
+  (`d0a181d3…99c9`), with candidate phase "p4-acceptance-v1 (revisions 2, 3 and 4)".
+* Manifest `state/p4-candidate-e967e4c.json`: canonical
+  **`1be1896a794200acfd77733b7b788001e4296a66ef00e63a84cf5c158de5137b`** (file `22bb6d4f…277d`).
+  `verify` reproduces it.
+  * Only `control_node.py` differs from `e187b475`, and the manifest binds the traced version.
+  * Baselines and build: P3 `1e205fec…`; P4 build `07a6c74d…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `1be1896a`. Earlier candidates' records stay in `state/` as history,
+  including `e187b475`'s accepted Gate A and failed Gate B. Gate A has not been run.
