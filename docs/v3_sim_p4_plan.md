@@ -12,7 +12,8 @@ offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
 on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c932b212` (§30)
-**passed Gate A** (§31); Gates B, S and C await separate authorizations. Gates A, B, S
+**passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
+position-only setpoints at 0.3 m/s; that needs an operator decision. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -894,3 +895,37 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   it has the least margin of any run. Gate B, S and C flights run under heavier load.
 * **Status:** Gate A is accepted for `c932b212`. Gate B (S2), then Gate S (S1, S5, S6), then Gate C
   (S2, S3, S4) each need their own operator authorization bound to this manifest. P4 is not complete.
+
+## 32. P4 Gate B of candidate `c932b212` — FAILED on tracking (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-c932b2125ebb.json` (`93bf622c…1ace`), consumed.
+  Result `state/p4-gate-B-c932b212….result.json` (`eb4fc96b…f3d`): `accepted: false`,
+  `first_failure: smoke:safety:tracking`, no automatic retry. Run 03:30:56–03:33:57 UTC; no leftover
+  processes.
+* **S2 flight** `20261026T033114Z-p4-flight-S2-8215374e`: functionally correct.
+  * The mission completed: NORMAL → AVOIDING → RESUME → NORMAL, then the goal, with a final goal
+    distance of 0.069 m.
+  * 0 collisions; minimum truth clearance 0.457 m (limit 0.20 m).
+  * Perception compute p99 0.019 s.
+  * The only failure is horizontal tracking: maximum 0.342 m against the 0.30 m bound, and 382 of
+    620 TRANSIT decisions were above 0.30 m.
+* **Cause, physical and not a code fault:** P4 translates the target at P2's `ramp_m_s` of 0.3 m/s
+  and sends position-only `trajectory_setpoint`s (the P2 helper sets velocity and acceleration to
+  NaN). PX4's horizontal position loop is proportional, with stock `MPC_XY_P` 0.95 (x500 airframe,
+  not overridden). A position-only target moving at constant speed `v` therefore leaves a steady lag
+  of `v / MPC_XY_P` = 0.3 / 0.95 ≈ **0.316 m**.
+  * The flight shows exactly that: the error plateaus at 0.31–0.33 m in every straight segment, peaks
+    at 0.342 m in turns, and falls to about 0.03 m when the target holds.
+  * The contract's 0.30 m bound is therefore unreachable at 0.3 m/s under the pinned P2 setpoint form
+    and PX4 gains.
+  * The offline closed loop assumed perfect tracking, so it could not show this.
+* **Options (operator decision; nothing applied):**
+  * **(a) Recommended. Contract revision 4:** a P4-only transit target speed of 0.20 m/s, as a new
+    pinned `p4_avoidance.yaml` value. L7 already allows any speed ≤ 0.3 m/s, P2's `ramp_m_s` stays
+    0.3 for takeoff and landing, and every safety threshold is unchanged.
+    * Expected steady lag 0.21 m, plus the observed turn overshoot of about 0.03 m, giving about
+      0.24 m.
+    * Transit stays far inside the 150 s deadline.
+  * **(b)** Velocity feedforward in `trajectory_setpoint`. This changes the setpoint wire form that
+    P2's accepted evaluators check, so it is riskier.
+  * Relaxing the 0.30 m bound or changing PX4 gains is not proposed.

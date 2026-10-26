@@ -296,7 +296,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   package `ada6d608` (plan §26). Candidate `22557ad6` (commit `0379b22`) passed P3/P4 readiness (compute p99 0.020 s)
   and G2, then failed at G4 cleanup on a truth-observer shutdown race (plan §28). Fixed offline (plan §29).
   Candidate `c932b212` (commit `a340101`): **Gate A ACCEPTED** (P3/P4 readiness, G2/G4/G6, both faults; plan §31).
-  Gates B, S, C pending separate authorization.
+  Gate B failed on tracking (0.342 m against 0.30 m): PX4's steady lag at 0.3 m/s with position-only setpoints
+  is 0.316 m (plan §32). Operator decision pending.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
