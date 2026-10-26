@@ -300,7 +300,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   is 0.316 m (plan §32). Contract revision 4 (P4 transit speed 0.20 m/s) approved and applied offline, package
   `3adf426b` (plan §33–§34). Candidate `e187b475` (commit `add6c22`): **Gate A ACCEPTED** (plan §36); Gate B
   failed in MAP_SCAN on a 0.48 s stall in the inherited graph check (dispatch budget 0.05 s); safe LAND (plan §37).
-  Operator decision pending.
+  Graph check now traced like P2, package `07a6c74d` (plan §38); awaiting Policy A for the fix commit.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

@@ -15,7 +15,8 @@ on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c
 **passed Gate A** (§31). It failed Gate B on the 0.30 m tracking bound (§32), which is infeasible with
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
 applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
-`MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37); operator decision pending. Gates A, B, S
+`MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
+like P2's (§38); a new candidate needs Policy A approval and a freeze, then Gate A onward. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1057,9 +1058,40 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     callback of 0.0233 s.
   * Unlike P2, `p4_control` does not trace `graph_check` and `graph_json_persistence`, so whether
     the graph query or the JSON write blocked cannot be told from this evidence.
-* **Options (operator decision; nothing applied):**
+* **Options (operator chose (b), applied in §38):**
   * **(a)** Treat it as an intermittent environment event and re-freeze the unchanged sources.
   * **(b) Recommended:** add P2's `graph_check` and `graph_json_persistence` spans to `p4_control`.
     This is parity with the accepted P2 instrumentation, with no behaviour change, so a recurrence
     can be attributed. Then rebuild and re-freeze.
   * Either way, candidate `e187b475` cannot run Gate B again, and a new manifest needs Gate A first.
+
+## 38. Graph-check tracing after the failed Gate B of `e187b475` (offline)
+
+* **Change in `p4_control`, the same as the accepted P2 node (`node.py` lines 186 and 249):**
+  * The once-per-second `inspect_graph()` call in the control callback is wrapped in a
+    `graph_check` span.
+  * Its `ros-graph.json` write is wrapped in a `graph_json_persistence` span.
+  * There is no behaviour change: the cadence, graph rules and file are the same, and the call is
+    still inside the same dispatch-budget window.
+  * P2's `verify_timing` now reports `graph_check_duration_wall_s` for P4 runs as it does for P2. A
+    recurrence can be attributed to the graph query or to the JSON write.
+* **Test:** new `test_p4_controller_traces_the_graph_check_like_the_accepted_p2_node` in
+  `tests/test_px4_gazebo_p4_ros_harness.py` runs the real node under real rclpy for about 2.6 s. It
+  checks that:
+  * there are at least 2 `graph_check` spans, each containing exactly one `graph_json_persistence`;
+  * each lies inside one control callback, before that callback's `mission_tick`;
+  * the spans are at least 1.0 s apart;
+  * P2's `verify_timing` reports their maximum duration.
+
+  Against the `e187b475` controller the test fails (0 spans); with the change it passes.
+* **Rebuild:** new P4 package hash `07a6c74d6cb03393b4930d802b4f2d5ab626bad624dd57b47b664a02dac18ed6`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 108, equivalence 6, ROS
+    harness 3.
+  * Windows: 377 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Limit:** tracing makes a stall attributable. It does not prevent one, because the check sits in
+  the inherited P2 structure.
+* **Next:** Policy A approval for this commit, a freeze, then the gates from Gate A onward. Nothing
+  has been frozen and no gate has run.

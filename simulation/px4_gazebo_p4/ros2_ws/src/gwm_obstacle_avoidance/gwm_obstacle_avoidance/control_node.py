@@ -229,7 +229,8 @@ def main(argv=None):
                 elif len(pubs) != 1:
                     valid = False
             self.graph_record, self.graph_ok = details, valid
-            (self.run / "ros-graph.json").write_text(json.dumps(details, indent=2, allow_nan=False) + "\n")
+            with self.trace.span("graph_json_persistence", self.sim()):  # same span as the accepted P2 node
+                (self.run / "ros-graph.json").write_text(json.dumps(details, indent=2, allow_nan=False) + "\n")
 
         def check_dispatch(self, recovery=False):
             self.guard.check(time.monotonic(), self.graph_checked, self.graph_ok)
@@ -288,7 +289,10 @@ def main(argv=None):
                 if args.ground_diagnostic and entry - self.start_wall > tc["ground_wall_s"]:
                     raise TimeoutError("ground_diagnostic_deadline")
                 if time.monotonic() - self.graph_checked >= 1.0:
-                    self.inspect_graph()
+                    # Traced like the accepted P2 node, so a graph-query or JSON-write stall is attributable
+                    # (P4 Gate B e187b475: a 0.48 s stall here exceeded the 0.05 s dispatch budget).
+                    with self.trace.span("graph_check", self.sim()):
+                        self.inspect_graph()
                     self.graph_checked = time.monotonic()
                 with self.trace.span("mission_tick", self.sim(), phase=self.mission.state) as selection:
                     try:
