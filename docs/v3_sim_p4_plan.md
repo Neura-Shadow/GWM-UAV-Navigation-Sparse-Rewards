@@ -455,3 +455,27 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     gate artifact exists.
 * **Superseded.** `2ddabd14` no longer verifies, because its sources changed. Its receipt and
   manifest remain in `state/` as history. Gate A has not been run.
+
+## 14. P4 Gate A of candidate `3785a54c` — FAILED at p4-readiness (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-3785a54c7f10.json` (`62021de1…e86f`), consumed.
+  Result `state/p4-gate-A-3785a54c….result.json` (`4be2b2a5…21df`): `accepted: false`,
+  `first_failure: p4-readiness:runtime_status:Abort:controller_failed`, no automatic retry. Run
+  00:35:43–00:37:32 UTC; no leftover processes.
+* **p3-readiness** `20261026T003602Z-p4-p3_readiness-c3c4362b`: **passed**. This was the unchanged P3
+  readiness evaluation under the P4 runner. Every process was graceful and the QGC unattended
+  teardown accepted the P4 namespace-owner copy.
+* **p4-readiness** `20261026T003709Z-p4-p4_readiness-fa5e8ad3`: `p4_control` refused to start with
+  `Missing explicit gates: GWM_ALLOW_SITL_COMMANDS`. The accepted P2 rule
+  (`gwm_px4_control.contracts.gates(env, flight or ground_diagnostic)`) requires that gate for the
+  ground-diagnostic mode, because it publishes setpoints. The P4 runner removed the variable from the
+  controller environment for every non-flight scope. **This is a P4 runner defect**, not a
+  perception, planner or acceptance-rule failure.
+  * The other processes were graceful (QGC teardown accepted again).
+  * The truth observer recorded 69 poses with a largest gap of 0.036 s.
+  * Perception produced no snapshot before the abort, so it was not exercised.
+* **Correction needed (not applied):** for ground-diagnostic scopes the runner should set
+  `GWM_ALLOW_SITL_COMMANDS=1` in the controller environment only, as P2's ground diagnostics require.
+  `vehicle_command` stays forbidden by P2's `transport_allowed` and by the graph check (0 expected
+  publishers). The fix needs a new commit, a Policy A approval for it, a re-freeze and a new Gate A
+  authorization. Candidate `3785a54c` cannot run Gate A again.
