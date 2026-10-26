@@ -2,8 +2,8 @@
 
 **Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
-cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` is frozen
-(§16); its Gate A awaits operator authorization. Gates A, B, S
+cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
+failed Gate A on two `p4_control` defects and cannot run again either (§17). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -514,3 +514,31 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Gates A/B/S/C; no execution without authorization.
 * No gate record exists for `1628fc44`. The failed Gate A of `3785a54c` and its consumed authorization
   stay in `state/` as history. Gate A has not been run.
+
+## 17. P4 Gate A of candidate `1628fc44` — FAILED at p4-readiness (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-A-1628fc44afcf.json` (`bc6ce22e…1d88`), consumed.
+  Result `state/p4-gate-A-1628fc44….result.json` (`234701ff…5862`): `accepted: false`,
+  `first_failure: p4-readiness:p2_integrity_error:ValueError:Trace/persisted bag count mismatch:
+  offboard_control_mode`, no automatic retry. Run 01:25:35–01:28:06 UTC; no leftover processes.
+* **p3-readiness** `20261026T012605Z-p4-p3_readiness-21036f92`: **passed** again.
+* **p4-readiness** `20261026T012706Z-p4-p4_readiness-43b0ab68`: the runtime passed. The runner fix
+  worked: `p4_control` exited 0 with a valid graph and no flight commands possible. The independent
+  evaluator then failed it.
+* **Defect 1 (the failing check):** P2's accepted `timing_evidence.verify_timing` requires one
+  `bag_write:<topic>` trace span for every persisted message of each topic and of `/gwm/p2/events`.
+  P2's `node.bag()` records those spans. P4's `control_node.bag()` writes the bag without them, so the
+  trace holds 0 `bag_write` records. No offline test ran `verify_timing` on a P4 controller trace.
+* **Defect 2 (found in the same evidence; it would have failed later checks):** `p4_control`
+  subscribes to `/gwm/p4/local_map` and to the adapter health topic with the default RELIABLE QoS.
+  The perception node and the accepted P3 adapter publish BEST_EFFORT. Both publishers logged
+  "incompatible QoS … RELIABILITY", and the controller received `local_map_messages: 0` and
+  `adapter_health_messages: 0`. Perception itself worked: `p4/local_map.jsonl` is 1.35 MB.
+* **Correction needed (not applied):** both are in the `gwm_obstacle_avoidance` package, so the fix
+  needs a rebuild and gives a new P4 package hash.
+  * Defect 1: add P2's `bag_write:` spans in `control_node.bag()`.
+  * Defect 2: subscribe to the map and health topics with the BEST_EFFORT profile the publishers use.
+    The accepted P3 adapter is not changed.
+  * Offline tests: run `verify_timing` on a P4 controller trace, and check QoS compatibility.
+  * Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
+    `1628fc44` cannot run Gate A again.
