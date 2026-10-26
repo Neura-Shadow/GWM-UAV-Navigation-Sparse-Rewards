@@ -8,7 +8,7 @@ offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanu
 not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
 environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
 and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
-offline (§23). A new candidate needs Policy A approval and a freeze. Gates A, B, S
+offline (§23). Candidate `45031345` is frozen (§24); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -677,5 +677,21 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 104, ROS harness 2.
   * Windows: 368 passed, 28 skipped.
   * P3 still verifies to `1e205fec…`.
-* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
-  been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §24
+  up to the authorization).
+
+## 24. Frozen P4 candidate `45031345` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `9604a04d7299cb0cf2cde20ca0e47f12e96a9e5b`. Receipt: `state/p4-policy-A-approval-9604a04.json`
+  (`d555ed52…02e5`).
+* Manifest `state/p4-candidate-9604a04.json`: canonical
+  **`4503134502a51272d9841615f6412b135a44ad37cc1480644e2d4ba89b65ecc1`** (file `f1e5cdc4…7e39`).
+  `verify` reproduces it.
+  * Only `scripts/p4_worlds.py` differs from `4722a88e`, and the manifest binds the corrected file.
+  * Baselines and build: P3 `1e205fec…`; P4 build `3dd61063…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `45031345`. The four failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`) and their consumed authorizations stay in `state/` as history. Gate A has
+  not been run.
