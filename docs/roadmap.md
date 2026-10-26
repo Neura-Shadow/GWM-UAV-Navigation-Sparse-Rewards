@@ -293,7 +293,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   fixture G2: the generated world's added plugin disabled PX4's server-config systems (plan §22). Fixed
   offline (plan §23). Candidate `45031345` (commit `9604a04`) failed Gate A at p4-readiness on the
   perception compute p99 limit (0.0737 s against 0.050 s; plan §25). Perception vectorized with identical outputs,
-  package `ada6d608` (plan §26); awaiting Policy A for the fix commit.
+  package `ada6d608` (plan §26). Candidate `22557ad6` frozen (commit `0379b22`); Gate A awaits authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

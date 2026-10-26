@@ -9,8 +9,8 @@ not exit on SIGINT within the 15 s grace (§20). The operator treated that as an
 environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
 and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
-compute p99 limit (§25). Perception is now vectorized with identical outputs (§26); a new
-candidate needs Policy A approval and a freeze. Gates A, B, S
+compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
+`22557ad6` is frozen (§27); its Gate A awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -773,5 +773,21 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     harness 2.
   * Windows: 374 passed, 28 skipped.
   * P3 still verifies to `1e205fec…`.
-* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
-  been frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then a new Gate A authorization (done in §27
+  up to the authorization).
+
+## 27. Frozen P4 candidate `22557ad6` (2026-10-26)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `0379b2275605759a968ffb5f514f258045d1539c`. Receipt: `state/p4-policy-A-approval-0379b22.json`
+  (`c80ea928…0ac7`).
+* Manifest `state/p4-candidate-0379b22.json`: canonical
+  **`22557ad6f223081fba3fc7db08d522188f40dc9f48a61e09bab0cf753574cd6c`** (file `9cc9398a…d5ff`).
+  `verify` reproduces it.
+  * Only `local_map.py` and `perception.py` differ from `45031345`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `ada6d608…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `22557ad6`. The five failed Gate A runs (`3785a54c`, `1628fc44`,
+  `b4db489e`, `4722a88e`, `45031345`) and their consumed authorizations stay in `state/` as history.
+  Gate A has not been run.
