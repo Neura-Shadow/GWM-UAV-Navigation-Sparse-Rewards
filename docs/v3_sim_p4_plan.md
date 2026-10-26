@@ -5,7 +5,9 @@ implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a
 cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
 failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
 offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanup: Gazebo did
-not exit on SIGINT within the 15 s grace (§20). Gates A, B, S
+not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
+environment event. Candidate `4722a88e` re-freezes the same sources (§21); its Gate A awaits
+operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -610,3 +612,19 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * **Status:** candidate `b4db489e` cannot run Gate A again. Whether to treat this as an intermittent
   environment event (new freeze and Gate A authorization on the same sources) or to investigate first
   is an operator decision.
+
+## 21. Re-frozen P4 candidate `4722a88e` (2026-10-26)
+
+* **Operator decision (Neura-Shadow):** the Gazebo forced stop of §20 is treated as an intermittent
+  environment event, and the unchanged P4 sources are re-frozen. Policy A (`bf1ef9b1…b3b0`,
+  unchanged) was approved for commit `40ad650b349685326685d280ab208cf64ccaffe5`, whose P4 sources are
+  identical to `05f4052`. Receipt: `state/p4-policy-A-approval-40ad650.json` (`56ab4e4c…6961`).
+* Manifest `state/p4-candidate-40ad650.json`: canonical
+  **`4722a88ec20273e72894c2dbac4000122771d74db162491950f027bc6d9b3f50`** (file `78156605…7147`).
+  `verify` reproduces it.
+  * Same as `b4db489e`: P4 and P3 source files, P4 build `3dd61063…`, and runtime bindings. Only the
+    approval receipt and the freeze time differ.
+  * P3 baseline `1e205fec…`; MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution
+    without authorization.
+* No gate record exists for `4722a88e`. The failed Gate A runs of `3785a54c`, `1628fc44` and
+  `b4db489e` and their consumed authorizations stay in `state/` as history. Gate A has not been run.

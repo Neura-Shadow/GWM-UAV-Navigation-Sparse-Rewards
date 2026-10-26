@@ -288,7 +288,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   on two `p4_control` defects: missing P2 `bag_write` trace spans, and RELIABLE subscriptions to the BEST_EFFORT map/health
   topics (plan §17). Both fixed offline and the package rebuilt as `3dd61063` (plan §18). Candidate `b4db489e`
   (commit `05f4052`) failed Gate A at P3 readiness cleanup: Gazebo was force-killed after the 15 s SIGINT grace;
-  no P4 code was involved (plan §20). Operator decision pending.
+  no P4 code was involved (plan §20). Treated as an intermittent environment event; the same sources are
+  re-frozen as candidate `4722a88e` (commit `40ad650`). Gate A awaits authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
