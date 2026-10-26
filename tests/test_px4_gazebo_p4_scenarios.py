@@ -56,14 +56,16 @@ def test_s6_declares_the_sensor_fault_and_s3_the_expected_side():
 
 
 @pytest.mark.parametrize("name,trigger,nearest", [("G2", "obstacle_in_trigger_range", 1.8),
-                                                  ("G4", "no_obstacle_in_trigger_range", 3.8),
+                                                  ("G4", "obstacle_in_trigger_range", 3.8),
                                                   ("G6", "no_obstacle_in_trigger_range", 5.85)])
 def test_ground_fixtures_place_obstacles_at_2_4_and_6_m(name, trigger, nearest):
     _, declaration = p4_worlds.generate(BASE, name, SCENARIOS)
     assert declaration["group"] == "ground_fixtures" and declaration["expected_trigger"] == trigger
     surfaces = [b["center_m"][0] - b["size_m"][0] / 2 for b in declaration["boxes"]]
     assert min(surfaces) == pytest.approx(nearest)
-    assert (min(surfaces) <= syn.p4_config()["planner"]["trigger_range_m"]) == (trigger == "obstacle_in_trigger_range")
+    planner_settings = syn.p4_config()["planner"]  # corridor: trigger range plus the inflation radius
+    reach = planner_settings["trigger_range_m"] + planner_settings["r_infl_m"]
+    assert (min(surfaces) <= reach) == (trigger == "obstacle_in_trigger_range")
 
 
 def test_generator_rejects_unknown_scenarios_and_already_modified_worlds():

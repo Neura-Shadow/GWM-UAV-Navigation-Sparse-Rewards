@@ -132,7 +132,7 @@ def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None):
         perceive(target, math.radians(d))
         sim += 0.1
     sup = supervisor.Supervisor(C, sim)
-    health = {"status": "fresh", "calibration_identity": "synthetic"}
+    health = {"status": "fresh", "calibration_identity": "synthetic", "sim_s": 1e9}
     last_acq = sim
     trajectory, decisions, min_clearance = [], [], math.inf
     dt, tick = 0.05, 0
@@ -144,7 +144,7 @@ def closed_loop(boxes, sim_limit=200.0, scan_deg=360, stop_perception_at=None):
         traversed = planner.traversed_mask(grid, positions[-80:], C["envelope"]["r_body_m"])
         decision = sup.step({"sim": sim, "snapshot": snapshot, "grid": grid, "traversed": traversed,
                              "adapter_health": health if (stop_perception_at is None or sim < stop_perception_at + 1.0)
-                             else {"status": "stale", "calibration_identity": "synthetic"},
+                             else {"status": "stale", "calibration_identity": "synthetic", "sim_s": 1e9},
                              "consecutive_unusable": 0, "reset_sim": None, "vehicle": target, "vehicle_yaw": yaw,
                              "target": target, "goal": tuple(C["mission"]["goal_enu_m"]), "origin": (0.0, 0.0),
                              "geofence": C["geofence"]})

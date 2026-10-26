@@ -353,3 +353,59 @@ Listed with recommendations in contract §10:
 7. the second depth-image subscriber;
 8. S7 as replay-only;
 9. the `px4_gazebo_p4/` location.
+
+## 11. Implementation status (offline, M1–M7 complete)
+
+All milestones are implemented in `simulation/px4_gazebo_p4/` and verified offline. No P4 runtime
+has been launched, no candidate frozen and no gate run. The P3 candidate still verifies to
+`1e205fec…`, and no file in its manifest scope changed.
+
+**Implementation choices within the approved contract** (each covered by tests):
+
+* **Near-clip blind zone (revision 3, P3 rule).** Free space is marked only from the camera's near
+  clip outward. The cells left unknown around the takeoff point lie inside the traversed body disc
+  (L2, revision 3).
+* **Goal clipping (L1).** A candidate segment is clipped at the goal distance and never extends past
+  the goal. The step that ends exactly at the goal counts as progress.
+* **Ties (L3).** Clearance is quantized to the 0.10 m grid. Scores closer than the grid can resolve
+  (0.3·0.1 + 0.6·0.05 = 0.06) are ties and go to the L3 tie-break (smaller |k|, then +y, then shorter
+  L). Without this, rasterization noise flipped the detour side every tick.
+* **Silent adapter (supervisor).** "Adapter health not fresh" includes a missing health stream: a
+  record older than 2.0 s sim. That is the adapter's 1.0 s health period plus its 1.0 s P3 stall
+  limit.
+* **Ground scopes.** The ground-diagnostic controller finishes after its P2 prestream. The runner
+  then holds the declared 15 s ground window while perception runs; the fault scope injects its
+  stop after that window. Gate A fixture trigger decisions and the fault `HOVER` decision are
+  checked by replaying the production planner and supervisor on the recorded ledgers. Stale-clock
+  and calibration-mismatch faults are covered by offline tests, since they cannot be induced at
+  runtime without changing accepted components.
+* **World.** PX4 boots the generated scenario world because the run-local `rootfs/gz_env.sh`
+  redirects `PX4_GZ_WORLDS` to the run's world directory. The base world must match the
+  P3-pinned `default.sdf` digest.
+* **Namespace owner.** `scripts/p4_namespace_owner.py` is a byte-identical copy of the P3 owner, so
+  the unattended QGC ownership guard (which pins that file's hash) is unchanged. Its
+  `from p3_runner import main` resolves to the P4 entry shim `scripts/p3_runner.py`. The accepted
+  P3 runner is loaded from its own path.
+* **Evidence channel.** P4 controller events use the existing `/gwm/p2/events` channel, so the
+  unchanged P2 timing and yaw-ownership evaluators read them.
+* **Landing window.** The native-command landing window runs from the first controller LAND
+  (normal or ABORT) through `COMPLETE`, or through the final landed/disarmed observation after an
+  ABORT.
+
+**Offline evidence:**
+
+* **Closed loop.** The independent renderer, production perception, supervisor and an
+  ideal-tracking vehicle run S1–S5 as the contract requires:
+  * S1 reaches the goal with no avoidance or hover;
+  * S2 detours on +y and S3 on −y;
+  * S4 reaches the goal;
+  * S5 hovers and then aborts.
+
+  Minimum truth clearance is at least 0.63 m. S6 hovers with yaw frozen and aborts after 10 s.
+* **Mission and controller.** The P4 mission was run on P2 `StateCache` inputs:
+  * `MAP_SCAN` is 360° counter-clockwise at ≤ 10°/s;
+  * `TRANSIT` reaches `GOAL_HOVER`, which issues exactly one LAND;
+  * a supervisor ABORT goes through P2 recovery;
+  * geofence, offboard-loss and graph checks abort.
+* **Evaluator.** Synthetic run directories exercise every §6, §6.1, §7 and §9.1 rule, in both pass
+  and fail cases.

@@ -107,7 +107,7 @@ def test_candidates_are_clipped_at_the_goal_and_the_last_step_reaches_it():
 # Supervisor ---------------------------------------------------------------------------------------
 def inputs(sim, grid, **override):
     value = {"sim": sim, "snapshot": {"acquisition_sim_s": sim - 0.05, "calibration_identity": "cal"}, "grid": grid,
-             "traversed": none(grid), "adapter_health": {"status": "fresh", "calibration_identity": "cal"},
+             "traversed": none(grid), "adapter_health": {"status": "fresh", "calibration_identity": "cal", "sim_s": 1e9},
              "consecutive_unusable": 0, "reset_sim": None, "vehicle": (0.0, 0.0), "vehicle_yaw": 0.0,
              "target": (0.0, 0.0), "goal": GOAL, "origin": (0.0, 0.0), "geofence": CONFIG["geofence"]}
     value.update(override)
@@ -117,10 +117,12 @@ def inputs(sim, grid, **override):
 STALE = {
     "no_usable_snapshot": lambda sim: {"snapshot": None},
     "snapshot_stale": lambda sim: {"snapshot": {"acquisition_sim_s": 9.70, "calibration_identity": "cal"}},
-    "adapter_health_not_fresh": lambda sim: {"adapter_health": {"status": "stale", "calibration_identity": "cal"}},
-    "calibration_mismatch": lambda sim: {"adapter_health": {"status": "fresh", "calibration_identity": "other"}},
+    "adapter_health_not_fresh": lambda sim: {"adapter_health": {"status": "stale", "calibration_identity": "cal", "sim_s": 1e9}},
+    "calibration_mismatch": lambda sim: {"adapter_health": {"status": "fresh", "calibration_identity": "other", "sim_s": 1e9}},
     "unusable_frames": lambda sim: {"consecutive_unusable": 3},
     "estimator_reset_since_last_usable_frame": lambda sim: {"reset_sim": sim - 0.01},
+    "adapter_health_missing": lambda sim: {"adapter_health": {"status": "fresh", "calibration_identity": "cal",
+                                                               "sim_s": sim - 2.01}},
 }
 
 

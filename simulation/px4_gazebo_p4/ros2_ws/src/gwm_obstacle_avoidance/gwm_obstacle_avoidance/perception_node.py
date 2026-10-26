@@ -77,6 +77,7 @@ def main(argv=None):
             self.sim_time = None
             self.compute, self.latency, self.receipt_gaps = [], [], []
             self.last_receipt_wall = None
+            self.gap_since_snapshot = 0.0
             self.snapshots = 0
             self.map_pub = self.create_publisher(String, config["topics"]["local_map"], qos(10))
             self.subs = [self.create_subscription(Image, sensors["image_topic"], self.image, qos(sensors["sensor_queue_depth"])),
@@ -108,8 +109,10 @@ def main(argv=None):
 
         def image(self, msg):
             entry = time.monotonic()
-            if self.last_receipt_wall is not None and len(self.receipt_gaps) < COST_CAPACITY:
-                self.receipt_gaps.append(entry - self.last_receipt_wall)
+            if self.last_receipt_wall is not None:
+                self.gap_since_snapshot = max(self.gap_since_snapshot, entry - self.last_receipt_wall)
+                if len(self.receipt_gaps) < COST_CAPACITY:
+                    self.receipt_gaps.append(entry - self.last_receipt_wall)
             self.last_receipt_wall = entry
             fields = {"width": msg.width, "height": msg.height, "encoding": msg.encoding,
                       "is_bigendian": msg.is_bigendian, "step": msg.step, "data": memoryview(msg.data).cast("B")}
@@ -135,6 +138,10 @@ def main(argv=None):
             snapshot["publication_sim_s"] = self.sim_time
             snapshot["latency_sim_s"] = None if self.sim_time is None else self.sim_time - snapshot["acquisition_sim_s"]
             snapshot["publication_wall_s"] = time.monotonic()
+            # Largest image receipt gap since the previous snapshot, including the wait for the next frame.
+            pending = 0.0 if self.last_receipt_wall is None else entry - self.last_receipt_wall
+            snapshot["receipt_gap_max_wall_s"] = max(self.gap_since_snapshot, pending)
+            self.gap_since_snapshot = 0.0
             if len(self.compute) < COST_CAPACITY:
                 self.compute.append(compute)
                 if snapshot["latency_sim_s"] is not None:

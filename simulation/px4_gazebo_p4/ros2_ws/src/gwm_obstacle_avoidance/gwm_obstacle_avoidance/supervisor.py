@@ -46,6 +46,9 @@ class Supervisor:
         health = inputs.get("adapter_health") or {}
         if health.get("status") != "fresh":
             return "adapter_health_not_fresh"
+        # A stopped adapter stops publishing health: an old 'fresh' record is not fresh.
+        if health.get("sim_s") is None or inputs["sim"] - health["sim_s"] > self.config["supervisor"]["adapter_health_max_age_sim_s"]:
+            return "adapter_health_missing"
         if health.get("calibration_identity") != snapshot.get("calibration_identity"):
             return "calibration_mismatch"
         if inputs.get("consecutive_unusable", 0) >= self.config["perception"]["unusable_frames_to_hover"]:

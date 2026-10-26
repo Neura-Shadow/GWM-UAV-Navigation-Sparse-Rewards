@@ -38,6 +38,9 @@ PINNED = {
     ("supervisor", "stale_abort_sim_s"): 10.0,
     ("supervisor", "transit_deadline_sim_s"): 150.0,
     ("supervisor", "min_clearance_margin_m"): 0.10,
+    # "Adapter health not fresh" includes a silent adapter: it publishes at least every 1.0 s and its own
+    # stall limit is 1.0 s (P3 stall_wall_s), so a record older than 2.0 s sim means no fresh health.
+    ("supervisor", "adapter_health_max_age_sim_s"): 2.0,
     ("mission", "goal_enu_m"): [8.0, 0.0],
     ("mission", "map_scan_deg"): 360.0,  # revision 3: one full in-place revolution
     ("mission", "height_m"): 2.0,

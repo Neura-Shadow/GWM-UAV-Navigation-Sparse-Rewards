@@ -34,7 +34,8 @@
     "hover_timeout_sim_s": 20.0,
     "stale_abort_sim_s": 10.0,
     "transit_deadline_sim_s": 150.0,
-    "min_clearance_margin_m": 0.10
+    "min_clearance_margin_m": 0.10,
+    "adapter_health_max_age_sim_s": 2.0
   },
   "mission": {
     "goal_enu_m": [8.0, 0.0],

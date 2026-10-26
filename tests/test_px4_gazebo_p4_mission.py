@@ -43,7 +43,7 @@ class Rig:
         m.handover = {"completed_sim_s": 30.0}
         m.start_sim, m.state, m.enter_sim, m.enter_wall = 1.0, state, self.sim, self.wall
         m.positions = [(0.0, 0.0)]
-        m.on_adapter_health({"status": "fresh", "calibration_identity": "cal"})
+        m.on_adapter_health({"status": "fresh", "calibration_identity": "cal", "sim_s": 1e9})
         self.publish_state()
         self.perceive()
 
