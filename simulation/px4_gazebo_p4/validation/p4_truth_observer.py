@@ -18,20 +18,29 @@ MIN_POSE_INTERVAL_NS = 20_000_000  # keep the vehicle pose at <= 50 Hz, well ins
 
 
 class Ledger:
+    """Append-only JSONL ledger. Gazebo keeps publishing after the observer stops, so a write that
+    arrives after close is dropped (returns False), never an error (P4 Gate A 22557ad6)."""
+
     def __init__(self, path):
         self.stream = path.open("x", buffering=1)
         self.count = 0
+        self.closed = False
         self.lock = threading.Lock()
 
     def write(self, row):
         with self.lock:
+            if self.closed:
+                return False
             self.stream.write(json.dumps(row, allow_nan=False, separators=(",", ":")) + "\n")
             self.count += 1
+            return True
 
     def close(self):
-        self.stream.flush()
-        os.fsync(self.stream.fileno())
-        self.stream.close()
+        with self.lock:
+            self.closed = True
+            self.stream.flush()
+            os.fsync(self.stream.fileno())
+            self.stream.close()
 
 
 def pose_row(stamp_ns, poses, model):
@@ -76,6 +85,8 @@ def main(argv=None):
         stopping.set()
 
     def on_poses(msg):
+        if stopping.is_set():
+            return  # stop requested: late callbacks are not recorded
         try:
             stamp = msg.header.stamp.sec * 10**9 + msg.header.stamp.nsec
             last = state["last_pose_ns"]
@@ -92,6 +103,8 @@ def main(argv=None):
 
     def contact_receiver(name):
         def receive(msg):
+            if stopping.is_set():
+                return
             try:
                 stamp = msg.header.stamp.sec * 10**9 + msg.header.stamp.nsec
                 contacts.write(contact_row(stamp, name, msg.contact))
@@ -100,9 +113,11 @@ def main(argv=None):
         return receive
 
     node = Node()
-    subscribed = {"poses": bool(node.subscribe(Pose_V, f"/world/{args.world}/dynamic_pose/info", on_poses))}
+    topics = {"poses": f"/world/{args.world}/dynamic_pose/info",
+              **{"contact:" + name: "/gwm/p4/contacts/" + name for name in args.obstacle}}
+    subscribed = {"poses": bool(node.subscribe(Pose_V, topics["poses"], on_poses))}
     for name in args.obstacle:
-        subscribed["contact:" + name] = bool(node.subscribe(Contacts, "/gwm/p4/contacts/" + name, contact_receiver(name)))
+        subscribed["contact:" + name] = bool(node.subscribe(Contacts, topics["contact:" + name], contact_receiver(name)))
     if not all(subscribed.values()):
         fail(ValueError("subscription_failed:" + ",".join(k for k, v in subscribed.items() if not v)))
     signal.signal(signal.SIGINT, lambda *_: stopping.set())
@@ -110,14 +125,20 @@ def main(argv=None):
     started = time.monotonic()
     while not stopping.wait(0.1):
         pass
+    unsubscribed = {}
+    for key, topic in topics.items():
+        try:
+            unsubscribed[key] = bool(node.unsubscribe(topic))
+        except Exception:  # in-flight callbacks are still dropped by the closed ledgers
+            unsubscribed[key] = False
     for ledger in (poses, contacts):
         ledger.close()
-    closed = {"contract": "p4-truth-observer-v1", "subscribed": subscribed, "error": state["error"],
-              "pose_rows": poses.count, "contact_rows": contacts.count,
+    closed = {"contract": "p4-truth-observer-v1", "subscribed": subscribed, "unsubscribed": unsubscribed,
+              "error": state["error"], "pose_rows": poses.count, "contact_rows": contacts.count,
               "max_pose_gap_s": state["max_pose_gap_ns"] / 1e9, "wall_duration_s": time.monotonic() - started,
               "model": args.model, "obstacles": args.obstacle}
     (folder / "truth-closed.json").write_text(json.dumps(closed, indent=2, allow_nan=False) + "\n")
-    return 0 if state["error"] is None else 3
+    return 0 if closed["error"] is None else 3  # the exit code always agrees with the close record
 
 
 if __name__ == "__main__":

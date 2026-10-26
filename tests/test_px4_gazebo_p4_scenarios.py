@@ -1,6 +1,7 @@
 """P4 M5: scenario worlds (contract §7), ground fixtures and the truth observer, offline."""
 from pathlib import Path
 import sys
+import time
 from types import SimpleNamespace
 import xml.etree.ElementTree as ET
 
@@ -114,6 +115,79 @@ def test_truth_rows_keep_only_the_vehicle_and_record_contact_pairs():
     row = p4_truth_observer.contact_row(7, "pillar_a", [contact])
     assert row["contacts"] == [["pillar_a::obstacle_link::collision", "x500_depth_71::base_link::collision", 2]]
     assert p4_truth_observer.MIN_POSE_INTERVAL_NS / 1e9 <= 0.05
+
+
+def test_truth_ledger_drops_writes_after_close(tmp_path):
+    """P4 Gate A 22557ad6 regression: a late Gazebo callback wrote to a closed ledger and exited 3."""
+    ledger = p4_truth_observer.Ledger(tmp_path / "rows.jsonl")
+    assert ledger.write({"n": 1}) is True
+    ledger.close()
+    assert ledger.write({"n": 2}) is False and ledger.count == 1
+    assert (tmp_path / "rows.jsonl").read_text() == '{"n":1}\n'
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="delivers SIGINT to the test process")
+def test_truth_observer_exits_cleanly_while_callbacks_continue_after_stop(tmp_path, monkeypatch):
+    import json
+    import os
+    import signal
+    import threading
+    import types
+    callbacks, unsubscribed, done = {}, [], threading.Event()
+
+    class Node:
+        def subscribe(self, _type, topic, callback):
+            callbacks[topic] = callback
+            return True
+
+        def unsubscribe(self, topic):
+            unsubscribed.append(topic)
+            return True
+
+    modules = {"gz": types.ModuleType("gz"), "gz.msgs10": types.ModuleType("gz.msgs10"),
+               "gz.msgs10.contacts_pb2": types.ModuleType("c"), "gz.msgs10.pose_v_pb2": types.ModuleType("p"),
+               "gz.transport13": types.ModuleType("t")}
+    modules["gz.msgs10.contacts_pb2"].Contacts = object
+    modules["gz.msgs10.pose_v_pb2"].Pose_V = object
+    modules["gz.transport13"].Node = Node
+    for name, module in modules.items():
+        monkeypatch.setitem(sys.modules, name, module)
+    run = tmp_path / "run"
+    run.mkdir()
+    for key in (*p4_truth_observer.GATES, "GWM_P4_OWNED_NAMESPACE"):
+        monkeypatch.setenv(key, "1")
+    monkeypatch.setenv("GZ_PARTITION", run.name)
+
+    def pump():  # Gazebo keeps publishing through and after the observer's stop, like in G4
+        n = 0
+        while not done.is_set():
+            n += 1
+            stamp = SimpleNamespace(sec=n // 40, nsec=(n % 40) * 25_000_000)
+            pose = SimpleNamespace(name="x500_depth_71", position=SimpleNamespace(x=0.0, y=0.0, z=0.2),
+                                   orientation=SimpleNamespace(w=1.0, x=0.0, y=0.0, z=0.0))
+            for topic, callback in list(callbacks.items()):
+                payload = [pose] if "dynamic_pose" in topic else []
+                callback(SimpleNamespace(header=SimpleNamespace(stamp=stamp), pose=payload, contact=payload))
+    previous = signal.getsignal(signal.SIGINT), signal.getsignal(signal.SIGTERM)
+    pumper = threading.Thread(target=pump, daemon=True)
+    timer = threading.Timer(0.5, os.kill, (os.getpid(), signal.SIGINT))
+    try:
+        pumper.start()
+        timer.start()
+        code = p4_truth_observer.main([str(run), "default", "x500_depth_71", "--obstacle", "pillar_a"])
+        time.sleep(0.05)  # callbacks keep arriving after the close
+    finally:
+        done.set()
+        timer.cancel()
+        pumper.join(5)
+        signal.signal(signal.SIGINT, previous[0])
+        signal.signal(signal.SIGTERM, previous[1])
+    closed = json.loads((run / "p4/truth-closed.json").read_text())
+    assert code == 0 and closed["error"] is None and closed["pose_rows"] > 0
+    assert sorted(unsubscribed) == ["/gwm/p4/contacts/pillar_a", "/world/default/dynamic_pose/info"]
+    assert closed["unsubscribed"] == {"poses": True, "contact:pillar_a": True}
+    rows = (run / "p4/truth_poses.jsonl").read_text().splitlines()
+    assert len(rows) == closed["pose_rows"]
 
 
 def test_truth_observer_refuses_outside_the_owned_namespace(tmp_path, monkeypatch):

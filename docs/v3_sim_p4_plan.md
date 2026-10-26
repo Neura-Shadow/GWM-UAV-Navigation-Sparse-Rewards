@@ -11,7 +11,8 @@ and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), 
 offline (§23). Candidate `45031345` (§24) failed Gate A at p4-readiness on the perception
 compute p99 limit (§25). Perception is now vectorized with identical outputs (§26). Candidate
 `22557ad6` (§27) passed P3 readiness, P4 readiness and G2 at Gate A, then failed at G4 cleanup
-on a truth-observer shutdown race (§28). Gates A, B, S
+on a truth-observer shutdown race (§28), now fixed offline (§29). A new candidate needs Policy A
+approval and a freeze. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -816,7 +817,7 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     the error after the close record has been written, so the return code is 3.
   * G2 passed only because no callback landed in that window. Nothing was lost before the stop: G4
     has 1063 pose rows with a largest gap of 0.04 s.
-* **Correction needed (not applied):** in `p4_truth_observer.py`:
+* **Correction (applied offline, §29):** in `p4_truth_observer.py`:
   * On stop, mark the ledgers closed under their lock and unsubscribe, so that later callbacks are
     dropped and are not errors.
   * Derive the exit code from the error recorded in the close record.
@@ -825,3 +826,32 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   `p4_truth_observer.py` is in `validation/`, outside the package, so build `ada6d608` is unchanged.
   Then a new commit, Policy A approval, a freeze and a new Gate A authorization. Candidate
   `22557ad6` cannot run Gate A again.
+
+## 29. Truth-observer shutdown correction after the failed Gate A of `22557ad6` (offline)
+
+* **`p4_truth_observer.py` changes:**
+  * `Ledger.write` returns False and drops the row once the ledger is closed. `close` sets that flag
+    under the same lock as the writes.
+  * Callbacks return early once a stop is requested.
+  * On stop, the observer unsubscribes every topic before closing; the result is recorded as
+    `unsubscribed` in `truth-closed.json`.
+  * The exit code is derived from the error written in the close record, so the two always agree.
+  * The installed gz-transport13 Python `Node` provides `unsubscribe`.
+  * The evaluator still requires `truth-closed.json` to have `error: null`, and every pose before the
+    stop is still recorded.
+* **Tests** in `tests/test_px4_gazebo_p4_scenarios.py`:
+  * A ledger write after close is dropped, without an exception.
+  * With fake gz modules, a pump thread keeps delivering pose and contact callbacks through SIGINT and
+    after the close. The observer then exits 0 with `error: null`, the ledger row count equals the
+    recorded count, and both topics are unsubscribed. This test is Linux-only.
+  * Against the observer frozen in `22557ad6`, the second test reproduces the Gate A symptom (exit 3)
+    and the first fails. Both pass with the fix.
+* `p4_truth_observer.py` is outside the package, so build `ada6d608…` is unchanged and its receipt
+  still matches.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 106, equivalence 6, ROS
+    harness 2.
+  * Windows: 375 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
+  been frozen and no gate has run.
