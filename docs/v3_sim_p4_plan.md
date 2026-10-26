@@ -16,8 +16,8 @@ on a truth-observer shutdown race (§28), now fixed offline (§29). Candidate `c
 position-only setpoints at 0.3 m/s. Contract revision 4 (P4 transit speed 0.20 m/s) was approved and
 applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§36), then failed Gate B in
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
-like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40); Gates B, S and C await separate
-authorizations. Gates A, B, S
+like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41); Gates S and C
+await separate authorizations. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1137,3 +1137,24 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * **Status:** Gate A is accepted for `1be1896a`. Gate B (S2 at the revision 4 transit speed), then
   Gate S (S1, S5, S6), then Gate C (S2, S3, S4) each need their own operator authorization bound to
   this manifest. P4 is not complete.
+
+## 41. P4 Gate B of candidate `1be1896a` — ACCEPTED (2026-10-26)
+
+* **Authorization:** Neura-Shadow, `state/p4-auth-B-1be1896a7942.json` (`28619638…be88`), consumed.
+  Result `state/p4-gate-B-1be1896a….result.json` (`d46fd9ca…5dcb`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 05:23:32–05:26:57 UTC; no leftover processes.
+* **S2 flight** `20261026T052351Z-p4-flight-S2-80f2bc40`: passed with acceptance credit; every owned
+  process stopped gracefully.
+  * **Outcome:** `goal_reached_with_detour` as expected. Supervisor NORMAL → OBSTACLE_DETECTED →
+    AVOIDING → RESUME → NORMAL; the controller completed through landing (`COMPLETE`); final goal
+    distance 0.041 m.
+  * **Safety:** 0 collisions; minimum truth clearance 0.403 m (≥ 0.20 m). **Tracking maximum
+    0.246 m (≤ 0.30 m)**, against 0.342 m at 0.3 m/s on `c932b212`. The revision 4 prediction was
+    about 0.23 m. Truth interval at most 0.04 s.
+  * **Performance:** perception compute p99 0.0211 s and max 0.0274 s; latency p95 0.052 s sim;
+    10.0 Hz; usable fraction 1.0; RTF 0.99.
+  * **Transit:** 44.9 s sim, against the 150 s deadline; the revision 4 study predicted 45.4 s.
+  * **Timing:** 120 graph checks, each at most 3.7 ms; slowest control callback 17.4 ms (budget
+    0.05 s).
+* **Status:** Gates A and B are accepted for `1be1896a`. Gate S (S1, S5, S6), then Gate C (S2, S3,
+  S4) each need their own operator authorization bound to this manifest. P4 is not complete.
