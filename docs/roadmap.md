@@ -290,7 +290,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   (commit `05f4052`) failed Gate A at P3 readiness cleanup: Gazebo was force-killed after the 15 s SIGINT grace;
   no P4 code was involved (plan §20). Treated as an intermittent environment event; the same sources are
   re-frozen as candidate `4722a88e` (commit `40ad650`). Its Gate A passed P3 and P4 readiness, then failed at
-  fixture G2: the generated world's added plugin disabled PX4's server-config systems (plan §22). Fix not applied.
+  fixture G2: the generated world's added plugin disabled PX4's server-config systems (plan §22). Fixed
+  offline (plan §23); awaiting Policy A for the fix commit.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

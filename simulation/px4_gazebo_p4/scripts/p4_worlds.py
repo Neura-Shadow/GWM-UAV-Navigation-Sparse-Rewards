@@ -1,14 +1,17 @@
 """P4 scenario worlds generated from the pinned PX4 default world (contract §7).
 
-Only static obstacle boxes, a contact sensor on each obstacle and the gz Contact
-system are appended; the vehicle (spawned by PX4), sensors, physics and
-rendering settings stay exactly as pinned. The world keeps the name `default`
-so PX4's bridge and topics are unchanged. The evaluator re-reads the declaration
-written next to the world; nothing on the vehicle reads it.
+Only static obstacle boxes and a contact sensor on each obstacle are appended;
+the vehicle (spawned by PX4), sensors, physics and rendering settings stay
+exactly as pinned. No world plugin is added: the pinned world declares none, so
+Gazebo loads every system (Physics, SceneBroadcaster, Contact, Sensors, ...)
+from PX4's server.config, and a single world-level plugin would replace that
+whole set (P4 Gate A 4722a88e). The world keeps the name `default` so PX4's
+bridge and topics are unchanged. The evaluator re-reads the declaration written
+next to the world; nothing on the vehicle reads it.
 """
 import xml.etree.ElementTree as ET
 
-CONTACT_PLUGIN = ("gz-sim-contact-system", "gz::sim::systems::Contact")
+CONTACT_SYSTEM = "gz-sim-contact-system"  # supplied by PX4's server.config, never by the world
 CONTACT_PREFIX = "/gwm/p4/contacts/"
 WORLD = "default"
 
@@ -47,8 +50,8 @@ def generate(base_world_text, name, scenarios):
         raise ValueError("Unexpected pinned base world structure")
     if any(m.get("name", "").startswith(("pillar", "wall")) for m in world.findall("model")):
         raise ValueError("Base world already contains P4 obstacles")
-    if not any(p.get("filename") == CONTACT_PLUGIN[0] for p in world.findall("plugin")):
-        ET.SubElement(world, "plugin", filename=CONTACT_PLUGIN[0], name=CONTACT_PLUGIN[1])
+    if world.find("plugin") is not None:
+        raise ValueError("Pinned base world must not declare plugins; PX4 server.config supplies the systems")
     boxes = [_box(world, b["name"], b["center"], b["size"], scenarios["box_height_m"], scenarios["box_center_height_m"])
              for b in spec["boxes"]]
     declaration = {"contract": "p4-scenario-declaration-v1", "scenario": name, "group": group, "world": WORLD,

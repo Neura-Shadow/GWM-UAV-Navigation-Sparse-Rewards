@@ -7,7 +7,8 @@ failed Gate A on two `p4_control` defects and cannot run again either (§17). Bo
 offline (§18). Candidate `b4db489e` (§19) failed Gate A at P3 readiness cleanup: Gazebo did
 not exit on SIGINT within the 15 s grace (§20). The operator treated that as an intermittent
 environment event. Candidate `4722a88e` re-froze the same sources (§21). Its Gate A passed P3
-and P4 readiness, then failed at fixture G2 on a world-generator defect (§22). Gates A, B, S
+and P4 readiness, then failed at fixture G2 on a world-generator defect (§22), now fixed
+offline (§23). A new candidate needs Policy A approval and a freeze. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -654,8 +655,27 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * The offline test pinned the wrong expectation: its minimal base world had no server config, and
     it asserted that the plugin was present.
   * Every generated scenario world (G2/G4/G6, S1–S6) has the same defect.
-* **Correction needed (not applied):** generate worlds without any world-level plugin. Change the
+* **Correction (applied offline, §23):** generate worlds without any world-level plugin. Change the
   offline test to assert that the generated world declares no world plugin, and that PX4's
   `server.config` lists `gz-sim-contact-system`. `p4_worlds.py` is in `scripts/`, outside the
   package, so the package build `3dd61063` is unchanged. Then a new commit, Policy A approval, a freeze
   and a new Gate A authorization. Candidate `4722a88e` cannot run Gate A again.
+
+## 23. World-generator correction after the failed Gate A of `4722a88e` (offline)
+
+* `p4_worlds.generate` no longer adds a world-level plugin. It now refuses a base world that declares
+  any plugin, because PX4's `server.config` must supply every system, the Contact system included.
+* Tests in `tests/test_px4_gazebo_p4_scenarios.py`:
+  * Every generated world declares no world plugin.
+  * The generator refuses a base world that declares a plugin.
+  * Against the real pinned PX4 tree (Linux workspace): `server.config` lists the contact, physics,
+    scene-broadcaster, user-commands and sensors systems; the pinned `default.sdf` declares no
+    plugin; and all nine generated worlds (G2/G4/G6, S1–S6) stay plugin-free.
+* `p4_worlds.py` is outside the package: the build `3dd61063…` is unchanged, and its receipt still
+  matches.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 104, ROS harness 2.
+  * Windows: 368 passed, 28 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next:** Policy A approval for this commit, a freeze, then a new Gate A authorization. Nothing has
+  been frozen and no gate has run.

@@ -44,9 +44,34 @@ def test_scenario_world_matches_the_contract_table(name):
         size = [float(v) for v in model.find("link/collision/geometry/box/size").text.split()]
         assert size == box["size_m"]
         assert model.find("link/sensor[@type='contact']/topic").text == "/gwm/p4/contacts/" + box["name"]
-    plugins = [p.get("filename") for p in world.findall("plugin")]
-    assert ("gz-sim-contact-system" in plugins) == True  # noqa: E712
+    assert world.find("plugin") is None  # any world plugin would replace PX4's server.config systems
     assert declaration["outcome"] == SCENARIOS["scenarios"][name]["outcome"]
+
+
+PX4_TREES = sorted(Path.home().glob("uav_autonomy/mc_trace_builds/*/PX4-Autopilot"))
+
+
+@pytest.mark.skipif(not PX4_TREES, reason="pinned PX4 tree is only present in the Linux workspace")
+@pytest.mark.parametrize("tree", PX4_TREES, ids=lambda p: p.parent.name[:12])
+def test_px4_server_config_supplies_the_systems_for_the_plugin_free_world(tree):
+    """P4 Gate A 4722a88e regression: a world-level plugin disabled PX4's server.config systems."""
+    config = ET.parse(tree / "src/modules/simulation/gz_bridge/server.config").getroot()
+    systems = {p.get("filename") for p in config.iter("plugin")}
+    assert {p4_worlds.CONTACT_SYSTEM, "gz-sim-physics-system", "gz-sim-scene-broadcaster-system",
+            "gz-sim-user-commands-system", "gz-sim-sensors-system"} <= systems
+    base = (tree / "Tools/simulation/gz/worlds/default.sdf").read_text()
+    assert ET.fromstring(base).find("world/plugin") is None
+    for name in ("G2", "G4", "G6", "S1", "S2", "S3", "S4", "S5", "S6"):
+        text, _ = p4_worlds.generate(base, name, SCENARIOS)
+        assert ET.fromstring(text).find("world/plugin") is None
+
+
+def test_generator_refuses_a_base_world_that_declares_plugins():
+    with_plugin = BASE.replace('<model name="ground_plane">',
+                               '<plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>'
+                               '<model name="ground_plane">')
+    with pytest.raises(ValueError, match="must not declare plugins"):
+        p4_worlds.generate(with_plugin, "G2", SCENARIOS)
 
 
 def test_s6_declares_the_sensor_fault_and_s3_the_expected_side():
