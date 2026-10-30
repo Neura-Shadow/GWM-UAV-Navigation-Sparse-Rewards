@@ -304,8 +304,9 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   **Gate A ACCEPTED** (plan §40); **Gate B ACCEPTED** (S2: tracking 0.246 m, clearance 0.40 m, 0 collisions;
   plan §41). Gate S failed at S5 (S1 passed): the abort lands via P2 RECOVERY, which reused P2/P3 evidence
   checks treat as failure, plus one 0.0948 s perception frame (plan §42). Contract revision 5 (abort lands to
-  COMPLETE) approved and applied offline, package `c4bd5a55` (plan §43–§44). Candidate `6cc87fb2` frozen
-  (commit `b7e4de4`); Gate A awaits authorization.
+  COMPLETE) approved and applied offline, package `c4bd5a55` (plan §43–§44). Candidate `6cc87fb2` (commit
+  `b7e4de4`) failed Gate A at P3 readiness: QGC sent 35 REQUEST_MESSAGE frames against Policy A's cap of 34
+  (first time in 43 runs; plan §46). Operator decision pending.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

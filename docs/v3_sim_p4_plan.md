@@ -19,8 +19,8 @@ applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§3
 like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
-`COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` is frozen (§45); its Gate A
-awaits operator authorization. Gates A, B, S
+`COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
+readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1297,3 +1297,28 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     authorization.
 * No gate record exists for `6cc87fb2`. Earlier candidates' records stay in `state/` as history,
   including `1be1896a`'s accepted Gates A and B and its failed Gate S. Gate A has not been run.
+
+## 46. P4 Gate A of candidate `6cc87fb2` — FAILED at p3-readiness native commands (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate A", answering the request for this manifest),
+  `state/p4-auth-A-6cc87fb2047d.json` (`a8ff9c1b…1c5a`), consumed. Result
+  `state/p4-gate-A-6cc87fb2….result.json` (`b61ebb6b…f2af`): `accepted: false`,
+  `first_failure: p3-readiness:native_commands:payload_pattern_cap_exceeded`, no automatic retry.
+  Run 12:58:48–13:00:26 UTC; no leftover processes. The other six runs did not run.
+* **p3-readiness** `20261030T125919Z-p4-p3_readiness-958e86ef`:
+  * The step runs the unchanged P3 stack with the P2 controller; no P4 node runs in it.
+  * The unchanged Policy A evaluation found one violation. QGC (stock unattended build `82994283…`)
+    sent a 35th `COMMAND_LONG` 512 (`MAV_CMD_REQUEST_MESSAGE`, param1 435, param2 2) from 255/190
+    to 72/1. Policy A allows at most 34 byte-exact 512 frames, and 34 were allowed. There was 1 × 401
+    and 37 GCS heartbeats.
+  * Everything else passed.
+* **History:** in all 43 retained runs with QGC 512 traffic (P3 and P4, ground and flight), QGC sent
+  exactly 34. This is the first time it sent 35, most likely one QGC retry. P4 code cannot influence
+  QGC's request count.
+* **Assessment:** an intermittent behaviour of the unchanged QGC binary against the accepted Policy A
+  cap. It is not a P4 defect. Policy A content stays unchanged, as required.
+* **Options (operator decision):**
+  * **(a)** Treat it as an intermittent event and re-freeze the unchanged sources (a docs-only
+    commit), with a new Policy A approval and a new Gate A authorization.
+  * **(b)** Investigate the QGC retry first, from the retained MAVLink capture, before re-freezing.
+  * Candidate `6cc87fb2` cannot run Gate A again.
