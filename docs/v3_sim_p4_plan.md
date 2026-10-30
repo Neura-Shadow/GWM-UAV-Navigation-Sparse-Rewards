@@ -20,7 +20,9 @@ like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gat
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
 `COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
-readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). Gates A, B, S
+readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). The operator treated
+that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and its Gate A awaits
+authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1322,3 +1324,18 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     commit), with a new Policy A approval and a new Gate A authorization.
   * **(b)** Investigate the QGC retry first, from the retained MAVLink capture, before re-freezing.
   * Candidate `6cc87fb2` cannot run Gate A again.
+
+## 47. Re-frozen P4 candidate `c110bd30` (2026-10-30, same sources as `6cc87fb2`)
+
+* **Operator decision (Neura-Shadow):** the extra QGC request of §46 is treated as intermittent, and
+  the unchanged sources are re-frozen. Policy A (`bf1ef9b1…b3b0`, unchanged) was approved
+  ("Approve Policy A", answering the request) for commit `50d5002e9670d70f07c43792415494ae70f4efe0`,
+  whose P4 sources are identical to `b7e4de4`. Receipt: `state/p4-policy-A-approval-50d5002.json`
+  (`9b2d40c8…3528`).
+* Manifest `state/p4-candidate-50d5002.json`: canonical
+  **`c110bd30be22fb43e596cf1f4b01397cb97145138f8912d6535a7dc4c15da42b`** (file `ab1d2af5…cae7`).
+  `verify` reproduces it.
+  * No P4 file differs from `6cc87fb2`. Build `c4bd5a55…`; revisions 2–5; P3 `1e205fec…`; MC
+    selection matches; `hardware:d3d12`.
+* No gate record exists for `c110bd30`. Earlier records stay in `state/` as history. Gate A has not
+  been run.
