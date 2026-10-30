@@ -19,8 +19,8 @@ applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§3
 like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
-`COMPLETE`) was approved and applied offline (§43, §44); a new candidate needs Policy A approval and a
-freeze, then Gates A–C. Gates A, B, S
+`COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` is frozen (§45); its Gate A
+awaits operator authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1278,5 +1278,22 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     harness 3.
   * Windows: 380 passed, 29 skipped.
   * P3 still verifies to `1e205fec…`.
-* **Next:** Policy A approval for this commit, a freeze, then Gates A, B, S and C. Nothing has been
-  frozen and no gate has run.
+* **Next (at the time):** Policy A approval, a freeze, then Gates A–C (done in §45 up to the Gate A
+  authorization).
+
+## 45. Frozen P4 candidate `6cc87fb2` (2026-10-30, contract revisions 2–5)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `b7e4de4df96a55de410495f397c89e2aa33da200` ("Approve Policy A", answering the request for that
+  commit). Receipt: `state/p4-policy-A-approval-b7e4de4.json` (`903c9294…cdf4`), with candidate phase
+  "p4-acceptance-v1 (revisions 2, 3, 4 and 5)".
+* Manifest `state/p4-candidate-b7e4de4.json`: canonical
+  **`6cc87fb2047d799d3d097104d985c11f18547445a1c7242ece362cec06429a9f`** (file `8815a846…ff2f`).
+  `verify` reproduces it. The revision label names revisions 2–5.
+  * Against `1be1896a`, exactly the six revision 5 files differ: `p4_validation.yaml`, `contracts.py`,
+    `control_node.py`, `mission.py`, `perception_node.py` and `p4_evaluate.py`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `c4bd5a55…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `6cc87fb2`. Earlier candidates' records stay in `state/` as history,
+  including `1be1896a`'s accepted Gates A and B and its failed Gate S. Gate A has not been run.
