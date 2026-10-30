@@ -21,8 +21,8 @@ at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reuse
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
 `COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
 readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). The operator treated
-that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gate A** (§48);
-Gates B, S and C await separate authorizations. Gates A, B, S
+that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gates A and B**
+(§48, §49); Gates S and C await separate authorizations. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1354,3 +1354,19 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
 * **Status:** Gate A is accepted for `c110bd30`, with contract revisions 2–5. Gate B (S2), then Gate S
   (S1, S5, S6 — the first run of the revision 5 abort landing), then Gate C (S2, S3, S4) each need
   their own operator authorization bound to this manifest. P4 is not complete.
+
+## 49. P4 Gate B of candidate `c110bd30` — ACCEPTED (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate B", answering the request for this manifest),
+  `state/p4-auth-B-c110bd30be22.json`, consumed. Result `state/p4-gate-B-c110bd30….result.json`
+  (`b2fe75c5…dc26`): `accepted: true`, `first_failure: null`, no automatic retry. Run
+  14:14:39–14:18:02 UTC; no leftover processes.
+* **S2 flight** `20261030T141506Z-p4-flight-S2-9b8ef2b0`: passed with acceptance credit; every owned
+  process stopped gracefully.
+  * **Outcome:** `goal_reached_with_detour`. NORMAL → OBSTACLE_DETECTED → AVOIDING → RESUME →
+    NORMAL, `COMPLETE`, final goal distance 0.067 m.
+  * **Safety:** 0 collisions, minimum truth clearance 0.410 m, tracking maximum 0.252 m (≤ 0.30 m).
+  * **Performance:** compute p99 0.0253 s, max 0.0365 s; latency p95 0.052 s; 10.0 Hz; RTF 1.00.
+  * **Transit:** 47.5 s sim. Graph checks at most 2.7 ms; slowest control callback 15.2 ms.
+* **Status:** Gates A and B are accepted for `c110bd30`. Gate S (S1, S5, S6), then Gate C (S2, S3,
+  S4) need their own authorizations. P4 is not complete.
