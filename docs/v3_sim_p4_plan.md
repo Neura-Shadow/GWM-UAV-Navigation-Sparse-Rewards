@@ -21,8 +21,8 @@ at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reuse
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
 `COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
 readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). The operator treated
-that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and its Gate A awaits
-authorization. Gates A, B, S
+that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gate A** (§48);
+Gates B, S and C await separate authorizations. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1339,3 +1339,18 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     selection matches; `hardware:d3d12`.
 * No gate record exists for `c110bd30`. Earlier records stay in `state/` as history. Gate A has not
   been run.
+
+## 48. P4 Gate A of candidate `c110bd30` — ACCEPTED (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate A", answering the request for this manifest),
+  `state/p4-auth-A-c110bd30be22.json` (`dd5d7612…b4b0`), consumed. Result
+  `state/p4-gate-A-c110bd30….result.json` (`ffbd4ee9…f4fe9`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 13:39:16–13:48:42 UTC; no leftover processes.
+* **Every run passed with acceptance credit, and every owned process stopped gracefully in every run:**
+  p3-readiness (QGC 512 count 34, within the cap), p4-readiness, fixtures G2, G4 and G6, and faults
+  adapter_stop and bridge_stop.
+  * Perception compute p99 was 0.032–0.038 s and the max was 0.035–0.041 s (limits 0.050 / 0.090).
+  * Graph checks took at most 10.5 ms. RTF was 0.59–0.70.
+* **Status:** Gate A is accepted for `c110bd30`, with contract revisions 2–5. Gate B (S2), then Gate S
+  (S1, S5, S6 — the first run of the revision 5 abort landing), then Gate C (S2, S3, S4) each need
+  their own operator authorization bound to this manifest. P4 is not complete.

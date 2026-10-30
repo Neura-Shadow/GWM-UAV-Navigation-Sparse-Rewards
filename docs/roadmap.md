@@ -307,7 +307,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   COMPLETE) approved and applied offline, package `c4bd5a55` (plan §43–§44). Candidate `6cc87fb2` (commit
   `b7e4de4`) failed Gate A at P3 readiness: QGC sent 35 REQUEST_MESSAGE frames against Policy A's cap of 34
   (first time in 43 runs; plan §46). Treated as intermittent; the same sources are re-frozen as candidate
-  `c110bd30` (commit `50d5002`; plan §47). Gate A awaits authorization.
+  `c110bd30` (commit `50d5002`; plan §47): **Gate A ACCEPTED** (plan §48); Gates B, S, C pending separate
+  authorization.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation
