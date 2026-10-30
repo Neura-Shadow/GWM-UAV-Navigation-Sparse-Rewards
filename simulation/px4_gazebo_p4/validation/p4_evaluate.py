@@ -65,6 +65,10 @@ def performance(run, window, limits, f):
            "compute_max_s": max(compute, default=None), "compute_p99_s": pick(compute, 0.99),
            "receipt_gap_max_wall_s": max(gaps, default=None),
            "usable_fraction": (sum(1 for r in inside if r.get("usable")) / len(inside)) if inside else None}
+    # Diagnostic only (revision 5): thread CPU time and involuntary switches of the slowest frame.
+    slowest = max((r for r in inside if r.get("compute_wall_s") is not None), key=lambda r: r["compute_wall_s"], default=None)
+    out["slowest_frame"] = None if slowest is None else {
+        k: slowest.get(k) for k in ("acquisition_sim_s", "compute_wall_s", "compute_thread_cpu_s", "involuntary_context_switches")}
     f.check(rate >= limits["snapshot_rate_min_hz"], "performance:snapshot_rate")
     f.check(latency and out["latency_max_sim_s"] <= limits["snapshot_latency_max_sim_s"], "performance:snapshot_latency_max")
     f.check(latency and out["latency_p95_sim_s"] <= limits["snapshot_latency_p95_sim_s"], "performance:snapshot_latency_p95")
@@ -215,6 +219,18 @@ def response_latency(events, limit, f):
     return latency
 
 
+def abort_landing(result, limit_wall_s, prefix, f):
+    """Revision 5: a supervisor ABORT lands through P2's nominal sequence. Exactly one accepted LAND,
+    `COMPLETE` (landed and disarmed) within `limit_wall_s` of it, and no P2 failure recorded."""
+    lands = [t for t in result.get("transactions", []) if t["command"] == 21]
+    complete = next((t["monotonic_s"] for t in result.get("transitions", []) if t["to"] == "COMPLETE"), None)
+    f.check(len(lands) == 1 and lands[0]["status"] == "accepted", prefix + "single_accepted_land")
+    f.check(result.get("final_state") == "COMPLETE" and not result.get("failure"), prefix + "abort_not_landed_through_complete")
+    seconds = None if not lands or complete is None else complete - lands[0]["sent_monotonic_s"]
+    f.check(seconds is not None and 0 <= seconds <= limit_wall_s, prefix + "abort_landing_wall_limit")
+    return seconds
+
+
 # ---- scenario outcome --------------------------------------------------------------------------------
 def outcome(run, summary, declaration, events, offset, track, v, f):
     result = summary["controller_result"]
@@ -253,6 +269,7 @@ def outcome(run, summary, declaration, events, offset, track, v, f):
         after = [d["target_enu"] for d in decisions if hover_at is not None and d["sim_s"] >= hover_at]
         out["target_motion_after_hover_m"] = max((math.dist(after[0], a) for a in after), default=None)
         f.check(after and out["target_motion_after_hover_m"] <= v["fault_target_motion_m"], "outcome:progress_after_hover")
+        out["abort_landing_wall_s"] = abort_landing(result, summary["config"]["recovery_wall_s"], "outcome:", f)
         out["label"] = "safe_refusal" if not f.items else "failed"  # never goal_reached
     return out
 
@@ -322,8 +339,7 @@ def fault_window(run, summary, validation_p3, sensors, v, f):
                 "s6:f3_abort_timing")
     else:
         f.check(False, "s6:f3_hover_or_abort_missing")
-    lands = [t for t in result.get("transactions", []) if t["command"] == 21]
-    f.check(len(lands) == 1 and lands[0]["status"] == "accepted", "s6:f3_single_accepted_land")
+    out["abort_landing_wall_s"] = abort_landing(result, summary["config"]["recovery_wall_s"], "s6:f3_", f)
     f.check(result.get("p4_outcome") == "supervisor_abort", "s6:f3_not_supervisor_abort")
     out["label"] = "safe_stop_on_sensor_loss"
     return out

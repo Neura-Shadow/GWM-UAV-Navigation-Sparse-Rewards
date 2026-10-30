@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import resource
 import time
 
 from .contracts import load_config, require_enabled, strict_json
@@ -130,11 +131,16 @@ def main(argv=None):
 
         def poll(self):
             entry = time.monotonic()
+            cpu_entry, usage_entry = time.thread_time(), resource.getrusage(resource.RUSAGE_THREAD)
             _, snapshot = self.processor.poll(self.sim_time, entry)
             if snapshot is None:
                 return
             compute = time.monotonic() - entry  # contract §6.1: per-frame wall time in this thread
             snapshot["compute_wall_s"] = compute
+            # Diagnostic only (revision 5): wall time far above thread CPU time means the thread waited.
+            snapshot["compute_thread_cpu_s"] = time.thread_time() - cpu_entry
+            snapshot["involuntary_context_switches"] = (resource.getrusage(resource.RUSAGE_THREAD).ru_nivcsw
+                                                        - usage_entry.ru_nivcsw)
             snapshot["publication_sim_s"] = self.sim_time
             snapshot["latency_sim_s"] = None if self.sim_time is None else self.sim_time - snapshot["acquisition_sim_s"]
             snapshot["publication_wall_s"] = time.monotonic()

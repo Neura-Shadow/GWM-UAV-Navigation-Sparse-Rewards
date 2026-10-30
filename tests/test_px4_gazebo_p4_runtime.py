@@ -241,7 +241,12 @@ def flight_run(tmp_path, path_xy, boxes, contacts=(), interval_ns=40_000_000, ta
                              "vehicle_enu": [0, 0], "path_valid": True, "occupied_in_corridor": False,
                              "snapshot_acquisition_sim_s": 39.95}]
     write_jsonl(tmp_path / "ros-events.jsonl", events)
-    summary = {"controller_result": {"p4_outcome": outcome, "final_state": "COMPLETE" if outcome == "completed" else "RECOVERY",
+    landed = outcome in ("completed", "supervisor_abort")  # revision 5: a supervisor abort lands to COMPLETE
+    summary = {"config": {"recovery_wall_s": 45.0},
+               "controller_result": {"p4_outcome": outcome, "final_state": "COMPLETE" if landed else "RECOVERY",
+                                     "failure": None if landed else "p2_safety_error",
+                                     "transactions": [{"command": 21, "status": "accepted", "sent_monotonic_s": 100.0}],
+                                     "transitions": [{"to": "COMPLETE", "monotonic_s": 120.0}] if landed else [],
                                      "p4": {"origin_enu": [0.0, 0.0], "abort_reason": abort,
                                             "supervisor_transitions": [{"to": t, "sim_s": 41.0 + i} for i, t in enumerate(transitions)]}}}
     return tmp_path, {"boxes": boxes, "scenario": "S2", "outcome": "goal_reached_with_detour", "detour_side": None}, summary
@@ -314,7 +319,16 @@ def test_clear_path_outcome_rejects_avoidance_and_safe_refusal_is_never_goal_rea
     f = Failures()
     _, offset, events = p4_evaluate.safety(run, declaration, V4["safety"], CONFIG["envelope"], f)
     result = p4_evaluate.outcome(run, summary, declaration, events, offset, p4_evaluate.truth_track(run), V4["outcomes"], f)
-    assert not f.items and result["label"] == "safe_refusal"
+    assert not f.items and result["label"] == "safe_refusal" and result["abort_landing_wall_s"] == 20.0
+    # Revision 5: an abort that ends in P2 RECOVERY, or lands too slowly, is not a safe refusal.
+    for change, failure in ((dict(final_state="RECOVERY", failure="p4_supervisor_abort:hover_timeout", transitions=[]),
+                             "outcome:abort_not_landed_through_complete"),
+                            (dict(transitions=[{"to": "COMPLETE", "monotonic_s": 145.5}]), "outcome:abort_landing_wall_limit")):
+        bad = json.loads(json.dumps(summary))
+        bad["controller_result"].update(change)
+        f = Failures()
+        result = p4_evaluate.outcome(run, bad, declaration, events, offset, p4_evaluate.truth_track(run), V4["outcomes"], f)
+        assert failure in f.items and result["label"] == "failed"
 
 
 # ---- evaluator: ground fixtures and fault replay ----------------------------------------------------------
@@ -366,7 +380,7 @@ def test_fault_replay_reaches_hover_after_an_adapter_stop(tmp_path):
 
 # ---- evaluator: §9.1 S6 fault window ------------------------------------------------------------------
 def s6_run(tmp_path, *, native_until=60.0, late_receipt=False, bridge_exit=0, detect_after=0.6,
-           hover_at=44.30, abort_after=10.05, moving=False, lands=1):
+           hover_at=44.30, abort_after=10.05, moving=False, lands=1, land_wall=20.0, recovery=False):
     t_inj, request_wall = 44.0, 1044.0
     (tmp_path / "p4").mkdir(parents=True, exist_ok=True)
     (tmp_path / "p4/fault_injection.json").write_text(json.dumps(
@@ -388,10 +402,12 @@ def s6_run(tmp_path, *, native_until=60.0, late_receipt=False, bridge_exit=0, de
                  for k in range(int((abort_at - hover_at) / 0.05))]
     setpoints = [{"event": "setpoint", "ros_sim_s": d["sim_s"], "fields": {"yaw": 1.5707963}} for d in decisions]
     write_jsonl(tmp_path / "ros-events.jsonl", decisions + setpoints)
-    summary = {"sensor_window_sim_s": [30.0, 120.0],
+    summary = {"sensor_window_sim_s": [30.0, 120.0], "config": {"recovery_wall_s": 45.0},
                "processes": [{"name": "sensor-bridge", "exit_code": bridge_exit, "stop_requested_monotonic_s": request_wall}],
-               "controller_result": {"p4_outcome": "supervisor_abort",
-                                     "transactions": [{"command": 21, "status": "accepted"}] * lands,
+               "controller_result": {"p4_outcome": "supervisor_abort", "final_state": "RECOVERY" if recovery else "COMPLETE",
+                                     "failure": "p4_supervisor_abort:stale_inputs:snapshot_stale" if recovery else None,
+                                     "transactions": [{"command": 21, "status": "accepted", "sent_monotonic_s": 200.0}] * lands,
+                                     "transitions": [] if recovery else [{"to": "COMPLETE", "monotonic_s": 200.0 + land_wall}],
                                      "p4": {"supervisor_transitions": [{"to": "HOVER", "sim_s": hover_at, "reason": "stale_inputs:snapshot_stale"},
                                                                        {"to": "ABORT", "sim_s": abort_at, "reason": "stale_inputs:snapshot_stale"}]}}}
     return tmp_path, summary
@@ -421,7 +437,9 @@ def test_s6_fault_window_passes_for_the_designed_response(tmp_path, stub_stream)
     ({"hover_at": 44.40}, "s6:f3_late_hover"),
     ({"moving": True}, "s6:f3_motion_while_stale"),
     ({"abort_after": 10.4}, "s6:f3_abort_timing"),
-    ({"lands": 2}, "s6:f3_single_accepted_land")])
+    ({"lands": 2}, "s6:f3_single_accepted_land"),
+    ({"land_wall": 45.5}, "s6:f3_abort_landing_wall_limit"),
+    ({"recovery": True}, "s6:f3_abort_not_landed_through_complete")])
 def test_s6_fault_window_rejections(tmp_path, stub_stream, kwargs, failure):
     run, summary = s6_run(tmp_path, **kwargs)
     f = Failures()

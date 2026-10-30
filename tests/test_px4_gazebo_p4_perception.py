@@ -44,8 +44,8 @@ def test_repository_config_is_disabled_and_pins_contract_values(tmp_path):
 def test_p4_validation_config_names_the_p3_baseline_and_gates():
     validation = json.loads((syn.P4 / "configs/p4_validation.yaml").read_text())
     assert validation["contract"] == "p4-acceptance-v1"
-    assert validation["contract_revision"].startswith("revisions 2, 3 and 4")
-    assert all(c in validation["contract_revision"] for c in ("d3c06b4", "ea2c9e3", "65b99e4"))
+    assert validation["contract_revision"].startswith("revisions 2, 3, 4 and 5")
+    assert all(c in validation["contract_revision"] for c in ("d3c06b4", "ea2c9e3", "65b99e4", "ae0e037"))
     assert validation["p3_baseline_manifest_sha256"] == "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c"
     assert [role for _, _, role in validation["gates"]["C"]] == ["qualification-1", "qualification-2", "qualification-3"]
     assert [s for _, s, _ in validation["gates"]["S"]] == ["S1", "S5", "S6"]

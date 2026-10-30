@@ -1,4 +1,4 @@
-"""Strict P4 configuration contract (p4-acceptance-v1 revisions 2, 3 and 4, §4–§6).
+"""Strict P4 configuration contract (p4-acceptance-v1 revisions 2–5, §4–§6).
 
 Every value the contract fixes is pinned here, so an edited configuration cannot
 silently drift from the approved numbers. P2 timing/freshness limits are read

@@ -22,7 +22,8 @@ ABORT_PREFIX = "p4_supervisor_abort:"
 
 
 class P4Abort(ValueError):
-    """A designed supervisor ABORT; the node routes it through P2 recovery (one LAND)."""
+    """A designed supervisor ABORT. Revision 5: the mission lands it through P2's nominal sequence
+    (REQUEST_LAND -> COMPLETE, one LAND) as a P4 outcome; it never reaches P2 recovery."""
 
 
 def enu_from_ned(position):
@@ -58,6 +59,7 @@ class P4Mission(Mission):
         self.adapter_health = None
         self.positions = []
         self.last_reference = None
+        self.p4_abort = None
         self.reset_sim = None
         self.supervisor = None
         self.scan = None
@@ -202,11 +204,15 @@ class P4Mission(Mission):
         self._record_position(sample, sim)
         if not reference_pending:
             step = min(dt, c["max_sample_gap_sim_s"])
-            if self.state == "MAP_SCAN":
-                self._map_scan(sim, sample, step)
-            elif self.state == "TRANSIT":
-                self._transit(sim, sample, step)
-            elif self.state == "GOAL_HOVER":
+            phase = self.state
+            try:
+                if phase == "MAP_SCAN":
+                    self._map_scan(sim, sample, step)
+                elif phase == "TRANSIT":
+                    self._transit(sim, sample, step)
+            except P4Abort as abort:
+                actions["command"] = self._land_after_abort(str(abort), sim, wall)
+            if phase == "GOAL_HOVER":
                 actions["command"] = self._goal_hover(sim, wall, sample, fresh)
         if self.state in P4_STATES and dt > 0:
             actions["setpoint"] = self.position_action()
@@ -283,6 +289,24 @@ class P4Mission(Mission):
             self.goal_reached_sim = sim
             self.transition("GOAL_HOVER", sim, self._wall, goal_enu=self.goal_enu)
 
+    # Supervisor ABORT (revision 5) ------------------------------------------------------------------
+    def _land_after_abort(self, reason, sim, wall):
+        """Hold, then exactly one LAND through P2's nominal landing sequence; the abort is the P4
+        outcome, not a P2 failure. P2 safety errors and geofence breaches still raise to RECOVERY."""
+        self.p4_abort = reason
+        self.events.append({"event": "p4_supervisor_abort", "reason": reason, "sim_s": sim, "monotonic_s": wall})
+        self.transition("REQUEST_LAND", sim, wall, p4_abort=reason)
+        return self.request(21, sim, wall)
+
+    def transition(self, next_state, sim, wall, **evidence):
+        if not (self.p4_abort and next_state == "REQUEST_LAND" and self.state in ("MAP_SCAN", "TRANSIT")):
+            return super().transition(next_state, sim, wall, **evidence)
+        # The P2 order allows REQUEST_LAND only after GOAL_HOVER; a supervisor abort skips the rest of the
+        # P4 phases, so the order check runs from GOAL_HOVER and the record keeps the real source state.
+        real, self.state = self.state, "GOAL_HOVER"
+        super().transition(next_state, sim, wall, **evidence)
+        self.transitions[-1]["from"] = self.events[-1]["from"] = real
+
     # GOAL_HOVER --------------------------------------------------------------------------------------
     def _goal_hover(self, sim, wall, sample, fresh):
         m = self.p4["mission"]
@@ -304,6 +328,7 @@ class P4Mission(Mission):
         return {"supervisor_transitions": self.supervisor.transitions if self.supervisor else [],
                 "supervisor_state": self.supervisor.state if self.supervisor else None,
                 "abort_reason": self.supervisor.abort_reason if self.supervisor else None,
+                "p4_abort": self.p4_abort,
                 "map_scan": self.scan, "goal_reached_sim_s": self.goal_reached_sim,
                 "goal_enu": self.goal_enu if self.origin is not None else None,
                 "origin_enu": self.origin_enu if self.origin is not None else None,

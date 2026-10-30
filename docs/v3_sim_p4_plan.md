@@ -18,7 +18,9 @@ applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§3
 `MAP_SCAN` on a one-off 0.48 s stall in the inherited P2 graph check (§37). The graph check is now traced
 like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
-treat as a failed flight (§42); this needs a contract decision. Gates A, B, S
+treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
+`COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
+readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1209,3 +1211,114 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     process), or accept it as host variance.
   * Candidate `1be1896a` cannot run Gate S again. Its accepted Gates A and B stay as history; a new
     manifest needs Gates A, B, S and C.
+
+## 43. Contract revision 5 proposed (abort landing; compute spike investigated; awaiting approval)
+
+* [Revision 5 proposal](v3_sim_p4_contract_revision5_proposal.md), drafted at the operator's request
+  after §42.
+  * A designed supervisor `ABORT` lands through P2's nominal sequence `REQUEST_LAND` →
+    `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`, with exactly one LAND (21).
+  * The abort is recorded as the P4 outcome `supervisor_abort`, not as a P2 failure.
+  * The 45 s wall LAND-to-landed bound stays as an explicit evaluator check.
+  * P2 safety errors and geofence breaches still enter `RECOVERY` and fail.
+  * Routing never makes a run pass, because each §7 outcome check still requires its own expected
+    outcome and abort reason.
+  * The unchanged P2/P3 evidence checks (timing with full flight requirements, reference, yaw, RGB
+    absence at `COMPLETE`, MC causality, MAVLink landing window) then apply in full to S5 and S6.
+* **Compute-max spike (0.0948 s at S5 takeoff), investigated offline; no contract change:**
+  * Not P4 compute: the offline maximum is 0.019 s, and thread CPU equals wall time.
+  * Not Python GC: a full collection takes 0.008 s at about 62,000 objects; a 120 s simulated flight
+    had no generation-2 collection and only 0.1 ms young-generation pauses; `gc.freeze()` makes no
+    difference.
+  * Not page faults (0–4 per poll), and not GIL contention (single-threaded executor).
+  * `p4_control` was unaffected at that instant (5.4 ms maximum), and the VM was not saturated
+    (24 CPUs, 4–5 used).
+  * Assessment: host-level preemption of the perception thread. The §6.1 limit stays.
+  * Optional diagnostic: record per-frame thread-CPU time and involuntary context switches.
+* **Approved (2026-10-30) and applied in §44.** On approval: the mission, controller-outcome and evaluator changes and tests, a
+  rebuild, then a new commit, Policy A approval, a freeze and Gates A–C.
+
+## 44. Contract revision 5 applied (offline)
+
+* **Approval:** operator Neura-Shadow, as written in `ae0e037`, including the optional perception
+  diagnostic.
+  * The contract applies it in its header, the §4 mission note, the split §5 rows plus the abort
+    rule, and §9.1 F3.
+  * The proposal is marked approved and applied.
+  * `p4_validation.yaml` `contract_revision` names revisions 2–5 (`d3c06b4`, `ea2c9e3`, `65b99e4`,
+    `ae0e037`).
+* **Code:**
+  * **`mission.py`:** a `P4Abort` from `MAP_SCAN` or `TRANSIT` is caught inside the mission. It
+    records `p4_abort` and a `p4_supervisor_abort` event, enters `REQUEST_LAND` and returns the
+    single LAND (21). P2 then runs `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`
+    under its own checks.
+    * The P2 order check runs from `GOAL_HOVER`, and the transition record keeps the real source
+      state.
+    * Phase dispatch is unchanged (one P4 phase handler per tick).
+    * Geofence and P2 errors still raise to the node and P2 `RECOVERY`.
+  * **`control_node.outcome()`:** `COMPLETE` with a recorded abort gives `supervisor_abort`, and
+    `RECOVERY` gives `failed`.
+  * **`perception_node.py` (diagnostic only):** each snapshot also records `compute_thread_cpu_s`
+    and `involuntary_context_switches`.
+  * **`p4_evaluate.py`:**
+    * A new `abort_landing` check for S5 (`outcome:`) and S6 (`s6:f3_`): exactly one accepted
+      LAND, `COMPLETE` with no P2 failure, and LAND-to-`COMPLETE` ≤ `recovery_wall_s` (45 s wall).
+    * `performance` reports the slowest frame's CPU time and context switches; it is not a check.
+* **Tests:**
+  * A supervisor abort lands through `REQUEST_LAND` → `COMPLETE` with one LAND, a held target and
+    outcome `supervisor_abort`.
+  * The `MAP_SCAN` stale abort lands the same way.
+  * A geofence breach still routes to `RECOVERY` with outcome `failed`.
+  * S5 rejects an abort that ends in `RECOVERY` or lands in more than 45 s.
+  * S6 rejects a 45.5 s landing and a `RECOVERY` ending.
+* **Rebuild:** new P4 package hash `c4bd5a55abd997207f74fc019759f820ef97b8d07dd2ab103c1e54b44faf2486`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 111, equivalence 6, ROS
+    harness 3.
+  * Windows: 380 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next (at the time):** Policy A approval, a freeze, then Gates A–C (done in §45 up to the Gate A
+  authorization).
+
+## 45. Frozen P4 candidate `6cc87fb2` (2026-10-30, contract revisions 2–5)
+
+* Policy A (`bf1ef9b1…b3b0`, unchanged) was approved by Neura-Shadow for commit
+  `b7e4de4df96a55de410495f397c89e2aa33da200` ("Approve Policy A", answering the request for that
+  commit). Receipt: `state/p4-policy-A-approval-b7e4de4.json` (`903c9294…cdf4`), with candidate phase
+  "p4-acceptance-v1 (revisions 2, 3, 4 and 5)".
+* Manifest `state/p4-candidate-b7e4de4.json`: canonical
+  **`6cc87fb2047d799d3d097104d985c11f18547445a1c7242ece362cec06429a9f`** (file `8815a846…ff2f`).
+  `verify` reproduces it. The revision label names revisions 2–5.
+  * Against `1be1896a`, exactly the six revision 5 files differ: `p4_validation.yaml`, `contracts.py`,
+    `control_node.py`, `mission.py`, `perception_node.py` and `p4_evaluate.py`.
+  * Baselines and build: P3 `1e205fec…`; P4 build `c4bd5a55…`; 29 P4 and 103 P3 source files.
+  * Runtime: MC selection matches; `hardware:d3d12`; gates A/B/S/C; no execution without
+    authorization.
+* No gate record exists for `6cc87fb2`. Earlier candidates' records stay in `state/` as history,
+  including `1be1896a`'s accepted Gates A and B and its failed Gate S. Gate A has not been run.
+
+## 46. P4 Gate A of candidate `6cc87fb2` — FAILED at p3-readiness native commands (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate A", answering the request for this manifest),
+  `state/p4-auth-A-6cc87fb2047d.json` (`a8ff9c1b…1c5a`), consumed. Result
+  `state/p4-gate-A-6cc87fb2….result.json` (`b61ebb6b…f2af`): `accepted: false`,
+  `first_failure: p3-readiness:native_commands:payload_pattern_cap_exceeded`, no automatic retry.
+  Run 12:58:48–13:00:26 UTC; no leftover processes. The other six runs did not run.
+* **p3-readiness** `20261030T125919Z-p4-p3_readiness-958e86ef`:
+  * The step runs the unchanged P3 stack with the P2 controller; no P4 node runs in it.
+  * The unchanged Policy A evaluation found one violation. QGC (stock unattended build `82994283…`)
+    sent a 35th `COMMAND_LONG` 512 (`MAV_CMD_REQUEST_MESSAGE`, param1 435, param2 2) from 255/190
+    to 72/1. Policy A allows at most 34 byte-exact 512 frames, and 34 were allowed. There was 1 × 401
+    and 37 GCS heartbeats.
+  * Everything else passed.
+* **History:** in all 43 retained runs with QGC 512 traffic (P3 and P4, ground and flight), QGC sent
+  exactly 34. This is the first time it sent 35, most likely one QGC retry. P4 code cannot influence
+  QGC's request count.
+* **Assessment:** an intermittent behaviour of the unchanged QGC binary against the accepted Policy A
+  cap. It is not a P4 defect. Policy A content stays unchanged, as required.
+* **Options (operator decision):**
+  * **(a)** Treat it as an intermittent event and re-freeze the unchanged sources (a docs-only
+    commit), with a new Policy A approval and a new Gate A authorization.
+  * **(b)** Investigate the QGC retry first, from the retained MAVLink capture, before re-freezing.
+  * Candidate `6cc87fb2` cannot run Gate A again.

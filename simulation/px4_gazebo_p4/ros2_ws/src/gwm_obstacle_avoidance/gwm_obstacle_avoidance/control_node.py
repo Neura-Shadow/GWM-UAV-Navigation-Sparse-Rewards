@@ -21,16 +21,16 @@ from gwm_px4_control.execution_timing import (DispatchGuard, PublicationCoverage
 from gwm_px4_control.timing import StateCache
 
 from .contracts import load_config as load_p4_config, require_enabled
-from .mission import ABORT_PREFIX, P4Mission
+from .mission import P4Mission
 
 EVENT_TOPIC = "/gwm/p2/events"
 
 
 def outcome(mission, flight):
+    """Revision 5: a supervisor abort that landed through P2's nominal sequence is `supervisor_abort`;
+    any run ending in P2 RECOVERY is `failed`."""
     if mission.state == "COMPLETE" and not mission.failure:
-        return "completed"
-    if mission.failure and mission.failure.startswith(ABORT_PREFIX):
-        return "supervisor_abort"
+        return "supervisor_abort" if mission.p4_abort else "completed"
     return "not_run" if not flight else "failed"
 
 
