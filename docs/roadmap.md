@@ -280,35 +280,10 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
 - [x] P3 Depth sensing — **COMPLETE — Contract v1.6 — Qualification 3/3 PASSED** (PX4 SITL,
   depth-only flights; no hardware). [Final acceptance](v3_sim_p3_final_acceptance_v1_6.md),
   [contract and operation](v3_sim_p3_contract.md). P4 is the next phase.
-- [ ] P4 Non-learning obstacle avoidance — contract `p4-acceptance-v1` (revisions 2 and 3) approved;
-  offline implementation M1–M7 complete ([contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md)).
-  **INCOMPLETE.** Candidate `3785a54c` failed Gate A at p4-readiness on a runner defect
-  (ground-diagnostic SITL gate env; P3 readiness passed); its authorization is consumed. Runner fix
-  `4804a47` applied offline. Candidate `1628fc44` failed Gate A at p4-readiness (P3 readiness passed)
-  on two `p4_control` defects: missing P2 `bag_write` trace spans, and RELIABLE subscriptions to the BEST_EFFORT map/health
-  topics (plan §17). Both fixed offline and the package rebuilt as `3dd61063` (plan §18). Candidate `b4db489e`
-  (commit `05f4052`) failed Gate A at P3 readiness cleanup: Gazebo was force-killed after the 15 s SIGINT grace;
-  no P4 code was involved (plan §20). Treated as an intermittent environment event; the same sources are
-  re-frozen as candidate `4722a88e` (commit `40ad650`). Its Gate A passed P3 and P4 readiness, then failed at
-  fixture G2: the generated world's added plugin disabled PX4's server-config systems (plan §22). Fixed
-  offline (plan §23). Candidate `45031345` (commit `9604a04`) failed Gate A at p4-readiness on the
-  perception compute p99 limit (0.0737 s against 0.050 s; plan §25). Perception vectorized with identical outputs,
-  package `ada6d608` (plan §26). Candidate `22557ad6` (commit `0379b22`) passed P3/P4 readiness (compute p99 0.020 s)
-  and G2, then failed at G4 cleanup on a truth-observer shutdown race (plan §28). Fixed offline (plan §29).
-  Candidate `c932b212` (commit `a340101`): **Gate A ACCEPTED** (P3/P4 readiness, G2/G4/G6, both faults; plan §31).
-  Gate B failed on tracking (0.342 m against 0.30 m): PX4's steady lag at 0.3 m/s with position-only setpoints
-  is 0.316 m (plan §32). Contract revision 4 (P4 transit speed 0.20 m/s) approved and applied offline, package
-  `3adf426b` (plan §33–§34). Candidate `e187b475` (commit `add6c22`): **Gate A ACCEPTED** (plan §36); Gate B
-  failed in MAP_SCAN on a 0.48 s stall in the inherited graph check (dispatch budget 0.05 s); safe LAND (plan §37).
-  Graph check now traced like P2, package `07a6c74d` (plan §38). Candidate `1be1896a` (commit `e967e4c`):
-  **Gate A ACCEPTED** (plan §40); **Gate B ACCEPTED** (S2: tracking 0.246 m, clearance 0.40 m, 0 collisions;
-  plan §41). Gate S failed at S5 (S1 passed): the abort lands via P2 RECOVERY, which reused P2/P3 evidence
-  checks treat as failure, plus one 0.0948 s perception frame (plan §42). Contract revision 5 (abort lands to
-  COMPLETE) approved and applied offline, package `c4bd5a55` (plan §43–§44). Candidate `6cc87fb2` (commit
-  `b7e4de4`) failed Gate A at P3 readiness: QGC sent 35 REQUEST_MESSAGE frames against Policy A's cap of 34
-  (first time in 43 runs; plan §46). Treated as intermittent; the same sources are re-frozen as candidate
-  `c110bd30` (commit `50d5002`; plan §47): **Gates A, B and S ACCEPTED** (plan §48–§50; S1 goal, S5 safe
-  refusal, S6 safe stop on sensor loss, both aborts landed to COMPLETE). Gate C pending separate authorization.
+- [x] P4 Non-learning obstacle avoidance — **COMPLETE — Contract `p4-acceptance-v1` (revisions 2–5) — Gates A, B, S, C
+  PASSED** (PX4 SITL, depth-only flights; no hardware). Candidate `c110bd30`; qualification S2/S3/S4 3/3,
+  safety S1/S5/S6 3/3, 0 collisions. [Final acceptance](v3_sim_p4_final_acceptance.md),
+  [contract](v3_sim_p4_contract.md), [plan](v3_sim_p4_plan.md). P5 is the next phase.
 - [ ] P5 Fixed-weight policy substitution
 - [ ] P6 Failure validation
 - [ ] P7 Batch evaluation

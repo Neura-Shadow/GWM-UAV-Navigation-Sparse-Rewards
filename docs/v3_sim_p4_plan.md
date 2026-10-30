@@ -1,6 +1,7 @@
 # v3-SIM P4 — deterministic non-learning obstacle avoidance: implementation plan
 
-**Status (2026-10-26): P4 INCOMPLETE.** Contract approved (revisions 2 and 3). M1–M7 are
+**Status (2026-10-30): P4 COMPLETE** — candidate `c110bd30` passed Gates A, B, S and C (§51,
+[final acceptance](v3_sim_p4_final_acceptance.md)). History below: Contract approved (revisions 2 and 3). M1–M7 are
 implemented and verified offline (§11). Candidate `3785a54c` failed Gate A on a runner defect and
 cannot run again (§14). The runner fix is applied offline (§15). Candidate `1628fc44` (§16)
 failed Gate A on two `p4_control` defects and cannot run again either (§17). Both are fixed
@@ -21,8 +22,8 @@ at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reuse
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
 `COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
 readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). The operator treated
-that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gates A, B and S**
-(§48–§50); Gate C awaits separate authorization. Gates A, B, S
+that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gates A, B, S and C**
+(§48–§51). Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1395,3 +1396,23 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   frames were compute, not preemption, and all were within the limits.
 * **Status:** Gates A, B and S are accepted for `c110bd30`. Gate C (S2, S3, S4, three
   qualification flights) needs its own authorization. P4 is not complete.
+
+## 51. P4 Gate C of candidate `c110bd30` — ACCEPTED; P4 COMPLETE (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate C", answering the request for this manifest),
+  `state/p4-auth-C-c110bd30be22.json` (`d0529bdd…6c88`), consumed. Result
+  `state/p4-gate-C-c110bd30….result.json` (`c7ce0752…de3a`): `accepted: true`,
+  `first_failure: null`, no automatic retry. Run 14:41:15–14:50:52 UTC; no leftover processes.
+* **Qualification 3/3**, all with acceptance credit; P2 timing, RGB absence and Policy A passed;
+  every owned process stopped gracefully.
+
+  | Flight | Outcome | Safety | Compute p99 / max (s) |
+  |---|---|---|---|
+  | qualification-1, S2 `…144136Z…abeea2d5` | goal with detour, 0.023 m (OBSTACLE_DETECTED 81.15 → RESUME 101.66 → NORMAL 116.03) | 0 collisions, clearance 0.446 m, tracking 0.256 m | 0.0250 / 0.0332 |
+  | qualification-2, S3 `…144442Z…7907931e` | goal with detour, 0.047 m | 0 collisions, clearance 0.881 m, tracking 0.235 m | 0.0255 / 0.0425 |
+  | qualification-3, S4 `…144757Z…2fc2af47` | goal with detour, 0.024 m | 0 collisions, clearance 0.474 m, tracking 0.239 m | 0.0231 / 0.0323 |
+
+* **P4 COMPLETE:** contract `p4-acceptance-v1`, revisions 2–5, candidate `c110bd30`. Gates A (7/7),
+  B (1/1), S (3/3) and C (3/3) are accepted. See the
+  [final acceptance](v3_sim_p4_final_acceptance.md). The P3 v1.6 baseline still verifies to
+  `1e205fec…`. Nothing has been pushed, and no evidence cleanup has been done.
