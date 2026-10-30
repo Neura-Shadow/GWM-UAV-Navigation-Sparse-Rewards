@@ -19,7 +19,8 @@ applied offline (§33, §34). Candidate `e187b475` (§35) **passed Gate A** (§3
 like P2's (§38). Candidate `1be1896a` (§39) **passed Gate A** (§40) and **Gate B** (§41). It failed Gate S
 at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reused P2/P3 evidence checks
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
-`COMPLETE`) is proposed and awaits approval (§43). Gates A, B, S
+`COMPLETE`) was approved and applied offline (§43, §44); a new candidate needs Policy A approval and a
+freeze, then Gates A–C. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1234,5 +1235,48 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
     (24 CPUs, 4–5 used).
   * Assessment: host-level preemption of the perception thread. The §6.1 limit stays.
   * Optional diagnostic: record per-frame thread-CPU time and involuntary context switches.
-* **Not applied.** On approval: the mission, controller-outcome and evaluator changes and tests, a
+* **Approved (2026-10-30) and applied in §44.** On approval: the mission, controller-outcome and evaluator changes and tests, a
   rebuild, then a new commit, Policy A approval, a freeze and Gates A–C.
+
+## 44. Contract revision 5 applied (offline)
+
+* **Approval:** operator Neura-Shadow, as written in `ae0e037`, including the optional perception
+  diagnostic.
+  * The contract applies it in its header, the §4 mission note, the split §5 rows plus the abort
+    rule, and §9.1 F3.
+  * The proposal is marked approved and applied.
+  * `p4_validation.yaml` `contract_revision` names revisions 2–5 (`d3c06b4`, `ea2c9e3`, `65b99e4`,
+    `ae0e037`).
+* **Code:**
+  * **`mission.py`:** a `P4Abort` from `MAP_SCAN` or `TRANSIT` is caught inside the mission. It
+    records `p4_abort` and a `p4_supervisor_abort` event, enters `REQUEST_LAND` and returns the
+    single LAND (21). P2 then runs `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`
+    under its own checks.
+    * The P2 order check runs from `GOAL_HOVER`, and the transition record keeps the real source
+      state.
+    * Phase dispatch is unchanged (one P4 phase handler per tick).
+    * Geofence and P2 errors still raise to the node and P2 `RECOVERY`.
+  * **`control_node.outcome()`:** `COMPLETE` with a recorded abort gives `supervisor_abort`, and
+    `RECOVERY` gives `failed`.
+  * **`perception_node.py` (diagnostic only):** each snapshot also records `compute_thread_cpu_s`
+    and `involuntary_context_switches`.
+  * **`p4_evaluate.py`:**
+    * A new `abort_landing` check for S5 (`outcome:`) and S6 (`s6:f3_`): exactly one accepted
+      LAND, `COMPLETE` with no P2 failure, and LAND-to-`COMPLETE` ≤ `recovery_wall_s` (45 s wall).
+    * `performance` reports the slowest frame's CPU time and context switches; it is not a check.
+* **Tests:**
+  * A supervisor abort lands through `REQUEST_LAND` → `COMPLETE` with one LAND, a held target and
+    outcome `supervisor_abort`.
+  * The `MAP_SCAN` stale abort lands the same way.
+  * A geofence breach still routes to `RECOVERY` with outcome `failed`.
+  * S5 rejects an abort that ends in `RECOVERY` or lands in more than 45 s.
+  * S6 rejects a 45.5 s landing and a `RECOVERY` ending.
+* **Rebuild:** new P4 package hash `c4bd5a55abd997207f74fc019759f820ef97b8d07dd2ab103c1e54b44faf2486`;
+  the receipt matches the source.
+* **Regression:**
+  * Linux: P2 219, P3 sensor 63, evaluators 63, runtime 89, MC 23, P4 111, equivalence 6, ROS
+    harness 3.
+  * Windows: 380 passed, 29 skipped.
+  * P3 still verifies to `1e205fec…`.
+* **Next:** Policy A approval for this commit, a freeze, then Gates A, B, S and C. Nothing has been
+  frozen and no gate has run.

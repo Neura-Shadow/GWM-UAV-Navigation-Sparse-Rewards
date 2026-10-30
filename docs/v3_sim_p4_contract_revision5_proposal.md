@@ -1,6 +1,7 @@
 # P4 contract `p4-acceptance-v1` — revision 5 proposal (how a supervisor `ABORT` lands)
 
-**Status: PROPOSED — awaiting operator approval. Not applied.** It amends revisions 2, 3 and 4
+**Status: APPROVED by the operator (2026-10-30), including the optional perception diagnostic; APPLIED**
+to the [contract](v3_sim_p4_contract.md). It amends revisions 2, 3 and 4
 (commits `d3c06b4`, `ea2c9e3`, `65b99e4`). A designed P4 supervisor `ABORT` lands through P2's
 nominal landing sequence to `COMPLETE`, with the same single LAND (21), instead of through P2
 `RECOVERY`. P2 safety errors still use `RECOVERY` and fail the run. No threshold, limit, speed,

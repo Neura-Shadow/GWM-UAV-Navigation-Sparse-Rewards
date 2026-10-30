@@ -2,11 +2,13 @@
 
 **Status: APPROVED — revision 2 (commit `d3c06b4`) plus revision 3 (commit `ea2c9e3`,
 [proposal](v3_sim_p4_contract_revision3_proposal.md)) plus revision 4 (commit `65b99e4`,
-[proposal](v3_sim_p4_contract_revision4_proposal.md)).** Revision 2 added the S6 fault-injection window
+[proposal](v3_sim_p4_contract_revision4_proposal.md)) plus revision 5 (commit `ae0e037`,
+[proposal](v3_sim_p4_contract_revision5_proposal.md)).** Revision 2 added the S6 fault-injection window
 in §9.1, the separation of collision validity from translation authority in §5 L2–L6, and the
 runtime-performance limits in §6.1 and Gate A. Revision 3 makes the initial plan feasible: a 360°
 `MAP_SCAN`, traversed cells counting as free in L2, and free space observed only beyond the near clip. Revision 4 pins a P4 `TRANSIT` target speed of
-0.20 m/s so PX4's steady tracking lag stays inside the unchanged 0.30 m bound. The design rationale
+0.20 m/s so PX4's steady tracking lag stays inside the unchanged 0.30 m bound. Revision 5 lands a
+supervisor `ABORT` through P2's nominal landing sequence to `COMPLETE`; P2 safety errors still use `RECOVERY`. The design rationale
 and the verified integration facts are in the [P4 plan](v3_sim_p4_plan.md). Baseline: P3 COMPLETE
 under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiable unchanged.
 
@@ -70,6 +72,8 @@ under `p3-acceptance-v1.6` (candidate `1e205fec…`), which must remain verifiab
      heading, at ≤ 10°/s (≈ 36 s), executed as an L5 yaw (revision 3).
   3. `TRANSIT` under the supervisor to the goal (8.0, 0.0) m ENU from the recorded origin and heading.
   4. `GOAL_HOVER` 5 s (horizontal ≤ 0.30 m from the goal, speed ≤ 0.1 m/s).
+     On a supervisor `ABORT` in `MAP_SCAN` or `TRANSIT`, the mission goes from the hold directly to
+     step 5 (`REQUEST_LAND`) (revision 5).
   5. `REQUEST_LAND`, then P2 landing verification through `COMPLETE`.
 * **Geofence:** x ∈ [−1.0, 9.5] m, |y| ≤ 3.0 m, height 1.0–3.0 m. A breach of the measured position
   aborts.
@@ -145,8 +149,16 @@ enters space that is not observed `FREE`.
 | `HOVER` | a collision-valid progress candidate on a fresh snapshot | `AVOIDING` |
 | any | snapshot > 0.25 s sim, adapter health not `fresh`, calibration mismatch, 3 consecutive unusable frames, estimator reset since the last usable frame, or planner output fails re-validation | `HOVER` with yaw frozen too (no translation, no `YAW_TO` or `SCAN`) |
 | `HOVER` | 20 s sim without progress, or 10 s sim stale | `ABORT` |
-| any | P2 safety error, geofence breach, clearance to an occupied cell < `R_body` + 0.10 m, or `TRANSIT` deadline | `ABORT` |
-| `ABORT` | hold, then one LAND (21) through P2 recovery rules | (terminal) |
+| any | clearance to an occupied cell < `R_body` + 0.10 m, or `TRANSIT` deadline | `ABORT` |
+| any | P2 safety error or geofence breach | P2 `RECOVERY` (the run fails; unchanged P2 rules) |
+| `ABORT` | hold, then exactly one LAND (21) through P2's nominal landing sequence `REQUEST_LAND` → `VERIFY_LANDING` → `VERIFY_LANDED_AND_DISARMED` → `COMPLETE`, under P2's unchanged landing checks and phase deadlines; landed and disarmed within 45 s wall of the LAND command | (terminal) |
+
+A supervisor `ABORT` (`hover_timeout`, `stale_inputs:*`, `map_scan_stale_inputs:*`, `transit_deadline`,
+`clearance_below_body_margin`) is a P4 outcome, not a P2 failure. The controller records `p4_outcome`
+= `supervisor_abort` and the abort reason, and leaves the P2 failure field empty. Any other failure
+(P2 safety error, geofence breach, timing guard, ACK failure, observation gap, and so on) enters P2
+`RECOVERY` exactly as before and fails the run. Routing never makes a run pass: every scenario's §7
+outcome check still requires its own expected outcome and abort reason (revision 5).
 
 ## 6. Safety envelope (proposed limits; derivation in plan §4)
 
@@ -269,8 +281,8 @@ loss, in any scenario, fails under the unchanged P3 checks.
       `HOVER` with yaw frozen by `t_last` + 0.25 + 0.10 s sim.
     * From `HOVER` to `ABORT`, the commanded target moves ≤ 0.01 m horizontally and ≤ 0.5° in yaw.
     * `ABORT` comes 10 s sim (±0.10 s) after staleness began.
-    * Exactly one LAND (21) is issued and accepted, and the vehicle is landed and disarmed within
-      the P2 recovery limit (45 s wall).
+    * Exactly one LAND (21) is issued through `REQUEST_LAND` and accepted, and the vehicle reaches
+      `COMPLETE` (landed and disarmed) within 45 s wall of the LAND command (revision 5).
   * **F4 — everything else unchanged over the whole run:** §6 clearance and collisions, MAVLink
     policy, MC causality, RGB absence, P2 integrity, renderer and cleanup.
 * **Unexpected loss still fails.** It is a failure if:

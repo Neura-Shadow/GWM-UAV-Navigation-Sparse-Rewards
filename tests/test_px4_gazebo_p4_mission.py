@@ -47,7 +47,7 @@ class Rig:
         self.publish_state()
         self.perceive()
 
-    def publish_state(self, **status):
+    def publish_state(self, landed=False, **status):
         n, e, d = self.m.target
         yaw = self.m.yaw_target
         stamp = int(self.sim * 1e6)
@@ -62,7 +62,7 @@ class Rig:
                                  "quat_reset_counter": 0},
             "vehicle_status": {"timestamp": stamp, "arming_state": 2, "nav_state": 14, "system_id": 72,
                                "component_id": 1, "failsafe": False, "pre_flight_checks_pass": True, **status},
-            "vehicle_land_detected": {"timestamp": stamp, "landed": False},
+            "vehicle_land_detected": {"timestamp": stamp, "landed": landed},
             "estimator_status_flags": {"timestamp": stamp, "cs_tilt_align": True, "cs_yaw_align": True},
             "failsafe_flags": {"timestamp": stamp, "local_position_invalid": False, "local_altitude_invalid": False,
                                "attitude_invalid": False, "angular_velocity_invalid": False}}
@@ -136,8 +136,10 @@ def test_map_scan_is_one_counter_clockwise_revolution_then_transit():
 def test_map_scan_holds_on_stale_depth_and_aborts_after_ten_seconds():
     rig = Rig(stop_perception_at=40.5)
     held = rig.m.yaw_target
-    with pytest.raises(mission.P4Abort, match="map_scan_stale_inputs"):
-        rig.run_until(lambda a: False, 12.0)
+    actions = rig.run_until(lambda a: a["command"] is not None, 12.0)
+    # Revision 5: the stale MAP_SCAN abort lands through P2's nominal sequence, not RECOVERY.
+    assert actions["command"]["command"] == 21 and rig.m.state == "REQUEST_LAND" and rig.m.failure is None
+    assert rig.m.p4_abort.startswith("p4_supervisor_abort:map_scan_stale_inputs")
     # Rotation continues only until the last snapshot ages past 0.25 s (about 0.7 s at 10 deg/s).
     assert abs(mission.wrap(rig.m.yaw_target - held)) < math.radians(8)
 
@@ -170,16 +172,47 @@ def test_transit_translates_at_the_pinned_p4_speed_and_p2_keeps_its_ramp():
     assert sum(steps) / len(steps) == pytest.approx(0.2 * 0.05, abs=1e-6)
 
 
-def test_supervisor_abort_routes_through_p2_recovery_with_one_land():
+def land_step(rig, landed=False, **status):
+    rig.sim += 0.05
+    rig.wall += 0.05
+    rig.publish_state(landed=landed, **status)
+    return rig.m.tick(rig.sim, rig.wall, True)
+
+
+def test_supervisor_abort_lands_through_p2_nominal_sequence_with_one_land():
+    """Revision 5: hold, one LAND, REQUEST_LAND -> VERIFY_LANDING -> VERIFY_LANDED_AND_DISARMED -> COMPLETE."""
     rig = Rig(boxes=[{"name": "wall", "center": [4.0, 0.0], "size": [0.3, 8.0]}])
     rig.run_until(lambda a: rig.m.state == "TRANSIT", 45.0)
-    with pytest.raises(mission.P4Abort) as raised:
-        rig.run_until(lambda a: False, 60.0)
-    assert str(raised.value) == "p4_supervisor_abort:hover_timeout"
-    command = rig.m.abort(str(raised.value), rig.sim, rig.wall)  # what the node's fail() does
-    assert command == {"command": 21, "params": [0.0] * 7}
-    assert rig.m.state == "RECOVERY" and rig.m.failure == "p4_supervisor_abort:hover_timeout"
+    actions = rig.run_until(lambda a: a["command"] is not None, 60.0)
+    assert actions["command"] == {"command": 21, "params": [0.0] * 7}
+    assert rig.m.state == "REQUEST_LAND" and rig.m.failure is None
+    assert rig.m.p4_abort == "p4_supervisor_abort:hover_timeout" and rig.m.supervisor.state == "ABORT"
+    assert rig.m.transitions[-1]["from"] == "TRANSIT" and rig.m.transitions[-1]["evidence"]["p4_abort"] == rig.m.p4_abort
+    assert [e for e in rig.m.events if e["event"] == "transition"][-1]["from"] == "TRANSIT"
+    assert any(e["event"] == "p4_supervisor_abort" for e in rig.m.events)
+    hold = rig.m.target
+    rig.m.ack({"command": 21, "timestamp": math.ceil(rig.sim * 1e6), "result": 0, "target_system": P2["source_system"],
+               "target_component": P2["source_component"], "from_external": False}, rig.sim, rig.wall)
+    assert land_step(rig)["command"] is None and rig.m.state == "VERIFY_LANDING" and rig.m.target == hold
+    land_step(rig, nav_state=18)
+    assert rig.m.state == "VERIFY_LANDED_AND_DISARMED"
+    land_step(rig, landed=True, nav_state=18, arming_state=1)
+    assert rig.m.state == "COMPLETE" and rig.m.done and rig.m.failure is None
+    assert [r["command"] for r in rig.m.transactions.records] == [21]  # exactly one LAND in this rig
     assert control_node.outcome(rig.m, True) == "supervisor_abort"
+
+
+def test_p2_safety_errors_still_route_to_recovery_and_fail():
+    from gwm_obstacle_avoidance.supervisor import Supervisor
+    rig = Rig(state="TRANSIT")
+    rig.m.supervisor = Supervisor(P4C, rig.sim)
+    rig.m.target = (3.5, 0.0, -2.0)  # outside the geofence: a P2-class safety error, not a supervisor abort
+    with pytest.raises(ValueError, match="p4_geofence_horizontal") as raised:
+        land_step(rig)
+    assert not isinstance(raised.value, mission.P4Abort)
+    rig.m.abort(str(raised.value), rig.sim, rig.wall)  # what the node's fail() does
+    assert rig.m.state == "RECOVERY" and rig.m.p4_abort is None
+    assert control_node.outcome(rig.m, True) == "failed"
 
 
 def test_p4_phase_safety_checks_raise():
