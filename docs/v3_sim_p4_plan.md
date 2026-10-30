@@ -21,8 +21,8 @@ at S5: an expected supervisor abort lands through P2 `RECOVERY`, which the reuse
 treat as a failed flight (§42). Contract revision 5 (abort lands through P2's nominal sequence to
 `COMPLETE`) was approved and applied offline (§43, §44). Candidate `6cc87fb2` (§45) failed Gate A at P3
 readiness on one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34; §46). The operator treated
-that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gates A and B**
-(§48, §49); Gates S and C await separate authorizations. Gates A, B, S
+that as intermittent; candidate `c110bd30` re-freezes the same sources (§47) and **passed Gates A, B and S**
+(§48–§50); Gate C awaits separate authorization. Gates A, B, S
 and C must all pass. Sections 1–10 record the design; §11–§15 record events in date order and
 keep the wording of their time. The normative rules (thresholds, scenarios, gates) are in the
 [P4 contract](v3_sim_p4_contract.md); this document records the integration facts and the design
@@ -1370,3 +1370,28 @@ has been launched, no candidate frozen and no gate run. The P3 candidate still v
   * **Transit:** 47.5 s sim. Graph checks at most 2.7 ms; slowest control callback 15.2 ms.
 * **Status:** Gates A and B are accepted for `c110bd30`. Gate S (S1, S5, S6), then Gate C (S2, S3,
   S4) need their own authorizations. P4 is not complete.
+
+## 50. P4 Gate S of candidate `c110bd30` — ACCEPTED (2026-10-30)
+
+* **Authorization:** Neura-Shadow ("Authorize Gate S", answering the request for this manifest),
+  `state/p4-auth-S-c110bd30be22.json`, consumed. Result `state/p4-gate-S-c110bd30….result.json`
+  (`8ef9cad4…0ebf`): `accepted: true`, `first_failure: null`, no automatic retry. Run
+  14:30:42–14:39:20 UTC; no leftover processes.
+* **Every flight passed with acceptance credit:** P2 timing `passed` (full flight requirements),
+  RGB absence passed, Policy A passed (401 × 1, 512 × 34), and every owned process stopped
+  gracefully.
+
+  | Flight | Outcome | Safety | Compute p99 / max (s) |
+  |---|---|---|---|
+  | S1 `…143104Z…24276ada` | `goal_reached`, final goal distance 0.081 m, no supervisor transitions | 0 collisions, tracking 0.233 m | 0.0268 / 0.0428 |
+  | S5 `…143402Z…e0f9816e` | `safe_refusal`: OBSTACLE_DETECTED/AVOIDING 81.59 s, HOVER 90.09 s, ABORT 110.10 s (`hover_timeout`); revision 5 landing to `COMPLETE` 6.70 s wall after the single LAND | 0 collisions, clearance 0.903 m, tracking 0.236 m | 0.0243 / 0.0393 |
+  | S6 `…143657Z…6f435d5e` | `safe_stop_on_sensor_loss`: bridge cut at t_inj 85.724 s, last usable snapshot 85.768 s, HOVER 86.044 s, ABORT 96.096 s; target motion 0.0 m and yaw change 0.0° while stale; landing to `COMPLETE` 6.70 s wall after the LAND | 0 collisions, clearance 1.187 m, tracking 0.237 m | 0.0286 / 0.0304 |
+
+* **Revision 5 at work:** both aborts landed through `REQUEST_LAND` → `COMPLETE` with no P2 failure
+  recorded. Every unchanged P2/P3 check (timing, reference, yaw, RGB absence, MC, MAVLink landing
+  window) applied and passed.
+* **Perception diagnostic:** each run's slowest frame had thread-CPU time about equal to its wall
+  time (for example S1: 0.044 s CPU for 0.043 s wall) and 0–1 involuntary context switches. These
+  frames were compute, not preemption, and all were within the limits.
+* **Status:** Gates A, B and S are accepted for `c110bd30`. Gate C (S2, S3, S4, three
+  qualification flights) needs its own authorization. P4 is not complete.
