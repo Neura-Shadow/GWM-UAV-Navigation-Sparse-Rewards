@@ -707,3 +707,33 @@ rclpy):
 
 * **Next:** Gate B, one S2 SITL smoke flight. It needs its own operator authorization bound to
   `db4c4779…`.
+
+### 13.11 P5 Gate B for manifest `db4c4779…`: ACCEPTED (2026-10-31, one S2 SITL flight)
+
+* **Authorization:** `state/p5-auth-B-db4c47790167.json`. Run:
+  `20261031T095045Z-p5-flight-S2-934cd1b0`. The independent evaluation passed with no failures.
+  No residual simulator processes.
+* **Outcome:** `goal_reached_with_detour`, landed. The supervisor sequence matches P4's
+  (OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL). Response latency was 0.144 s.
+* **Safety (truth):** 0 collisions. Minimum clearance 0.356 m (limit ≥ 0.20). Tracking max 0.267 m
+  (limit ≤ 0.30).
+* **Policy participation (§6 limits):**
+  * 856 ledger records for 856 decisions; the policy was invoked on 833 of them.
+  * 0 failures, 0 choices outside the mask, 0 fallbacks; participation 1.0.
+  * Every score was reproduced bit for bit under the controller interpreter. The argmax and the
+    executed segment matched every time.
+  * Inference p50 0.70 ms, p99 1.73 ms, max 6.0 ms (limits 5 and 10 ms).
+  * Disagreement with the shadow P4 choice 0.65. No shield interventions.
+* **Unchanged limits:** checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 40.0 ms and max 74.9 ms (limits 50 and 90 ms).
+* **Against the accepted P4 Gate B S2 flight** (`docs/evidence/v3_sim_p5_gate_b_s2_vs_p4.json`;
+  reported, not acceptance evidence):
+  * same outcome and lineage;
+  * minimum clearance 0.053 m lower;
+  * tracking 0.015 m higher;
+  * path 0.20 m shorter (detour ratio 1.239 vs 1.264);
+  * time to goal 4.8 s shorter;
+  * controller CPU 0.51 vs 0.44;
+  * RTF 0.998 in both flights.
+* **Next:** Gate S (S1, S5, S6 in order) needs its own operator authorization. S5 carries the known
+  yaw-oscillation risk (§13.2).
