@@ -847,3 +847,28 @@ interpreter, with `perf_counter_ns` and `thread_time_ns` around each call.
   nothing was changed.
 * **Not yet tested:** the same probes under a Windows performance power mode. Changing it is an
   operator action on the host.
+
+### 13.16 P5 stopped by the operator (2026-10-31): not qualified
+
+The operator decided to stop P5 after §13.15 ("Stop P5 here"). There will be no contract revision 3,
+no new candidate and no further gates.
+
+* **Final state of manifest `db4c4779…`** (candidate `ab7b0c6`, model `p5-ranker-ee006a80…`):
+  * Gates A, B and S were accepted (§13.10–13.12).
+  * Gate C failed on `policy:inference_max` in S2: one tick took 10.84 ms against the 10 ms limit
+    (§13.13). S3 and S4 were not flown.
+  * **P5 is not qualified.** It makes no claim beyond what the accepted gates show.
+* **What the accepted evidence does show:**
+  * The frozen policy ran, without online updates, as the only ranker in 5 SITL flights across
+    Gates B, S and C.
+  * It had 0 policy failures, 0 choices outside the mask and 0 fallbacks, with 100%
+    participation.
+  * P4's safety layer was unchanged: 0 collisions, and every outcome matched P4's.
+  * Offline, on 300 held-out layouts, goal success was 7.0 points higher than P4 (§13.2).
+* **Open findings for any future phase:**
+  * The yaw-oscillation livelock (§13.2, seen in Gate S S5).
+  * Policy-path latency spikes on this hybrid-core WSL2 host under the Balanced power plan
+    (§13.14, §13.15). The 10 ms wall-clock maximum is sensitive to host scheduling and power
+    management, not only to the policy's own cost (median 0.4–0.6 ms).
+* **Kept unchanged:** all evidence (runs, gate results, consumption markers, authorizations), the
+  model files, and the P3, P4 and P5 manifests. Nothing was pushed.
