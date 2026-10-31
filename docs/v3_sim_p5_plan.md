@@ -628,3 +628,26 @@ rclpy):
   5. Then Gates B, S and C, one at a time.
 
   No simulator has been run for P5.
+
+### 13.7 Operator steps: Policy A approval and freeze (2026-10-31)
+
+* **Policy A approval:** the operator approved Policy A (`bf1ef9b1…`, unchanged from P4) for P5
+  commit `44ff340`. The receipt is `state/p5-policy-A-approval-44ff340.json`, scoped to this
+  candidate's Gates A/B/S/C. The P3 policy loader accepts it, and the QGC unattended ELF
+  `829942834b71…` matches.
+* **Freeze:** `state/p5-candidate-44ff340.json`, manifest SHA-256
+  **`baef37a0bc98ab72de2bd6d2b078d4b22f67eb476662eeaa3bafa4a4dc16d27b`**. `p5_manifest.py verify`
+  reproduces it. It binds:
+  * P3 `1e205fec…` and P4 `c110bd30…`;
+  * model `ee006a80…`;
+  * build `35eaccd0…`;
+  * the controller runtime (`/usr/bin/python3`, NumPy 1.26.4);
+  * Policy A with this approval;
+  * MC benchmark run `20261025T051926Z-mc-trace-benchmark-e6000074`;
+  * 45 P5 source files;
+  * gates A/B/S/C.
+* **Working-copy bytes:** the manifest binds the files as they are in this checkout. A few P5
+  files have CRLF line endings there. If git rewrites them, verification fails closed and a
+  re-freeze is needed.
+* **Next:** Gate A needs an operator authorization bound to `baef37a0…` (`p5_manifest.py
+  authorize --gate A`). Nothing has run in the simulator.
