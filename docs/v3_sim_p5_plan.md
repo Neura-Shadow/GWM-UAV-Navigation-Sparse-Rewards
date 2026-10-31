@@ -651,3 +651,27 @@ rclpy):
   re-freeze is needed.
 * **Next:** Gate A needs an operator authorization bound to `baef37a0…` (`p5_manifest.py
   authorize --gate A`). Nothing has run in the simulator.
+
+### 13.8 P5 Gate A for manifest `baef37a0…`: FAILED (2026-10-31, one attempt, no retry)
+
+* **Authorization:** `state/p5-auth-A-baef37a0bc98.json`. Result:
+  `state/p5-gate-A-baef37a0….result.json`, `accepted: false`. No residual simulator processes.
+* **Passed, with independent evaluations:**
+  * `p3-readiness`;
+  * `p5-readiness`;
+  * `fixture-G2`, `fixture-G4` and `fixture-G6` (revision 2 item 4);
+  * the offline `policy-failure-replay` (revision 2 item 5).
+* **First failure, `policy-fault-checkpoint`:**
+  * The runtime behaved as designed: the bound checkpoint plus one byte was refused with
+    `checkpoint_sha256_mismatch`, no node or run file existed, the controller exited with 1, and
+    status was passed.
+  * The evaluator then raised `FileNotFoundError: ros-events.jsonl`. The P3 depth-stream
+    association check proves estimator-reset brackets against the controller's own ledger of
+    received PX4 messages, which a refused controller never creates.
+  * This is an evaluator design gap in the P5 `policy_fault` scope, not a runtime failure.
+* **Informational only (in memory; the recorded evaluation and the gate result stand):** with stream
+  association skipped in that scope, the same run passes every other check. That covers depth and
+  RGB streams, §6.1 performance (compute p99 31.8 ms), the refusal, Policy A and cleanup.
+* **Proposed fix (needs operator approval and a new candidate):** in the `policy_fault` scope,
+  evaluate the depth stream without controller-ledger association. Association stays required in
+  P3 readiness, P5 readiness and G2/G4/G6 of the same gate. No threshold changes.
