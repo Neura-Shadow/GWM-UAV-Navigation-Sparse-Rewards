@@ -5,7 +5,7 @@ D1–D9 as recommended in §11. Revision 2 (Gate A items 4 and 5,
 [text](v3_sim_p5_contract_revision2.md)) approved by the operator on 2026-10-31.** Training (plan M3) was authorized and run offline on 2026-10-31.
 It produced candidate `p5-ranker-ee006a80…`, which meets §4.2 on 300 held-out layouts (plan §13).
 The operator accepted this candidate on 2026-10-31. The offline milestones M4
-(`P5Mission`, the policy ledger and `p5_control`) M5 (runner, gates and evaluator), M6 (P4 vs P5 comparison) and M7 (build and freeze tooling) are implemented. Candidate `44ff340` (manifest `baef37a0…`) failed Gate A on an evaluator gap (plan §13.8); the fixed candidate `ab7b0c6` is frozen as manifest `db4c4779…` (plan §13.9). Nothing is frozen or launched. The design rationale and verified integration facts are in the
+(`P5Mission`, the policy ledger and `p5_control`) M5 (runner, gates and evaluator), M6 (P4 vs P5 comparison) and M7 (build and freeze tooling) are implemented. Candidate `44ff340` (manifest `baef37a0…`) failed Gate A on an evaluator gap (plan §13.8); the fixed candidate `ab7b0c6` is frozen as manifest `db4c4779…` (plan §13.9); **Gate A accepted** for `db4c4779…` (plan §13.10). Nothing is frozen or launched. The design rationale and verified integration facts are in the
 [P5 plan](v3_sim_p5_plan.md).
 
 The baselines must stay independently verifiable and unchanged:

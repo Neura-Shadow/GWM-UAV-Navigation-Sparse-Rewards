@@ -688,3 +688,22 @@ rclpy):
   the same model `ee006a80…`, build `35eaccd0…`, controller runtime, P3 and P4 baselines and MC
   benchmark as `baef37a0`. The only source change is the `policy_fault` evaluator fix.
 * **Next:** a new Gate A authorization bound to `db4c4779…`. All seven rows rerun.
+
+### 13.10 P5 Gate A for manifest `db4c4779…`: ACCEPTED (2026-10-31, one attempt)
+
+* **Authorization:** `state/p5-auth-A-db4c47790167.json`. Result:
+  `state/p5-gate-A-db4c4779….result.json`, `accepted: true`, no first failure. No residual
+  simulator processes.
+
+  | Row | Run | Evaluation |
+  |---|---|---|
+  | p3-readiness | `20261031T092733Z-p5-p3_readiness-8d1c524a` | passed |
+  | p5-readiness | `20261031T092843Z-p5-p5_readiness-7433047e` | passed: checkpoint `ee006a80…` verified at start, NumPy 1.26.4, P2 timing passed, perception compute p99 28.1 ms |
+  | fixture-G2 | `20261031T093004Z-p5-G2-0031b247` | passed: 150 snapshots, all SCAN, policy not invoked, mask equals P4's, p99 0.77 ms |
+  | fixture-G4 | `20261031T093125Z-p5-G4-bd1f2142` | passed: 150 snapshots, all SCAN, p99 1.15 ms, max 1.68 ms |
+  | fixture-G6 | `20261031T093241Z-p5-G6-798410be` | passed: 150 snapshots, all SCAN, p99 0.99 ms |
+  | policy-failure-replay | `20261031T093337Z-p5-flight-snapshot-replay-1839274c` | passed: P4 S2 tick at 81.152 s (AVOIDING, 25 candidates); all six faults give HOLD, HOLD, `policy_unavailable` |
+  | policy-fault-checkpoint | `20261031T093404Z-p5-policy-fault-checkpoint_mismatch-0da6e13b` | passed: refused with `checkpoint_sha256_mismatch` before any node; Policy A and depth stream passed |
+
+* **Next:** Gate B, one S2 SITL smoke flight. It needs its own operator authorization bound to
+  `db4c4779…`.
