@@ -3,6 +3,7 @@
 **Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
 Offline milestones M0–M3 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
 It produced candidate artifact `p5-ranker-ee006a80…`, which meets the contract §4.2 readiness bar.
+The operator accepted that candidate as is, with its known yaw-oscillation limitation (§13.2).
 Nothing is frozen, launched or pushed.
 
 Baseline, verified on 2026-10-31:
@@ -440,6 +441,10 @@ tuning):**
   before the hover.
 * Any change, such as anti-oscillation training or a yaw hysteresis, would be a new candidate.
   Evaluating it would need a fresh held-out seed range.
+* **Operator decision (2026-10-31): candidate accepted as is.**
+  * The limitation is carried as a known risk, mainly for S5 in Gate S.
+  * The S5 outcome rule is unchanged: a `transit_deadline` abort there fails the gate.
+  * No retraining or tuning was done.
 
 **Artifact (operator decision D4: committed, ≤ 1 MB):**
 
