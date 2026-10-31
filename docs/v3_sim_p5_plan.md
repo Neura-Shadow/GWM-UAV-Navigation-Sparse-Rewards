@@ -1,10 +1,11 @@
 # v3-SIM P5 — fixed-weight policy substitution: plan and integration facts
 
 **Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
-Offline milestones M0–M4 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
+Offline milestones M0–M5 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
 It produced candidate artifact `p5-ranker-ee006a80…`, which meets the contract §4.2 readiness bar.
 The operator accepted that candidate as is, with its known yaw-oscillation limitation (§13.2).
-M4 (`P5Mission`, the policy ledger and `p5_control`) was authorized the same day (§13.3).
+M4 (`P5Mission`, the policy ledger and `p5_control`) and M5 (runner, gates, evaluator; contract
+revision 2) followed the same day (§13.3, §13.4).
 Nothing is frozen, launched or pushed.
 
 Baseline, verified on 2026-10-31:
@@ -308,7 +309,7 @@ These are listed with recommendations in contract §11, D1–D9:
 
 M3 (training) additionally needs its own authorization after the contract is approved.
 
-## 13. Implementation status: M0–M4 (offline, 2026-10-31)
+## 13. Implementation status: M0–M5 (offline, 2026-10-31)
 
 * **M0:** the `simulation/px4_gazebo_p5/` skeleton.
   * Configs: `p5_policy.yaml` (disabled, no fallback, no bound model), `p5_validation.yaml` (the
@@ -351,7 +352,8 @@ M3 (training) additionally needs its own authorization after the contract is app
   the margin to watch under SITL load.
 * **M3** (authorized 2026-10-31; offline, CPU only, no simulator): see §13.1–13.2.
 * **M4** (authorized 2026-10-31; offline, no simulator): see §13.3.
-* **Next:** M5–M7 (runner, gates, evaluator, comparison, build) need operator authorization.
+* **M5** (authorized 2026-10-31; offline, no simulator): see §13.4.
+* **Next:** M6–M7 (comparison, build, freeze tooling) need operator authorization.
   Freezing, Policy A approval and the gates come after M7.
 
 ### 13.1 M3 tooling (`training/`, commit `13c7dde`)
@@ -526,3 +528,44 @@ rclpy):
   about 42 MB at the 150 s deadline.
 * **Informational inference cost in the rig** (801 calls, no load): p50 0.56 ms, p99 1.72 ms, max
   3.43 ms.
+
+### 13.4 M5: runner, gate sequencer, evaluator and contract revision 2 (offline, 2026-10-31)
+
+* **Built:**
+  * `p5_runner` (a subclass of the accepted P4 runner: P5 manifest preconditions, `p5_control`
+    command with single-threaded BLAS, the `policy_fault` scope, P5 run-local configs);
+  * `run_p5_gates`, `run_p5.sh` and `verify_p5_evidence.sh`;
+  * the `p5_manifest` candidate identity, authorization and consumption bookkeeping (freeze and
+    build receipt in M7);
+  * `p5_evaluate`, which composes the unchanged P4 evaluator functions with the P5 checks;
+  * `p5_policy_eval`, the policy replays, run under the controller interpreter so scores reproduce
+    bit for bit.
+* **Gate A feasibility finding:** all 600 accepted P4 ground snapshots have no progress candidate,
+  so revision 1's ground-fixture replay could never invoke the policy. **Contract revision 2**
+  ([text](v3_sim_p5_contract_revision2.md)) was approved by the operator on 2026-10-31.
+* **Item 4, ground policy evaluation, on the accepted P4 G2/G4/G6 snapshots (read-only check):**
+  * all 450 snapshots: SCAN, policy not invoked;
+  * the mask equals P4's progress set;
+  * scores finite and bit-exact on repeat;
+  * p99 1.1–1.7 ms, max at most 1.9 ms.
+* **Item 5, flight-snapshot fault replay (offline Gate A row `flight_snapshot_replay`):**
+  * Both accepted P4 S2 sources pass integrity (gate-result row passed, evaluation hash unchanged).
+  * The rebuilt inputs reproduce P4's recorded plan exactly on 793 of 927 (Gate B) and 779 of 859
+    (Gate C) ticks.
+  * The selected tick is Gate B S2 at 81.152 s, AVOIDING, with 25 progress candidates and 1 slot
+    masked.
+  * The mask equals P4's, and the true policy chooses slot 14 (P4: 15), finite and inside the mask.
+  * All six faults (missing checkpoint, hash mismatch, NaN, timeout, output size, selection
+    outside the mask) give HOLD, HOLD, ABORT `policy_unavailable`.
+  * The full evaluator chain passes end to end on this real evidence, through a scratch root with
+    read-only links.
+* **Live checkpoint-mismatch start:** the controller's exit 1 is accepted only in the
+  `policy_fault` scope. The same exit in any other scope, and any other cleanup failure, still
+  fails (tested).
+* **Tests:** `test_px4_gazebo_p5_runtime.py` covers:
+  * every ledger and limit rule on a ledger the trained policy produced on a held-out layout;
+  * the ground and flight-snapshot rules, the latter on a recorded P4 rig flight of a held-out
+    avoidance layout, plus selection, limitation and integrity failures;
+  * checkpoint identity, the policy-fault refusal and the composition with the reused P4 checks;
+  * runner, gate and manifest bookkeeping, with source drift guards against P4's runner and gate
+    sequencer.

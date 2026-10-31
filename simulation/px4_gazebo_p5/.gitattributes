@@ -1,3 +1,6 @@
 # Model artifacts and their reports are bound by SHA-256: keep their bytes exact on every checkout.
 models/*.npz binary
 models/*.json -text
+# Run inside WSL; the namespace owner's hash is pinned by the unattended QGC build.
+*.sh text eol=lf
+scripts/p5_namespace_owner.py text eol=lf

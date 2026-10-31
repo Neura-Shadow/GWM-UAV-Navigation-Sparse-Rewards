@@ -1,10 +1,11 @@
 # v3-SIM P5 contract `p5-acceptance-v1` — fixed-weight policy substitution
 
 **Status: APPROVED (revision 1, commit `673d65e`) by the operator on 2026-10-31, with decisions
-D1–D9 as recommended in §11.** Training (plan M3) was authorized and run offline on 2026-10-31.
+D1–D9 as recommended in §11. Revision 2 (Gate A items 4 and 5,
+[text](v3_sim_p5_contract_revision2.md)) approved by the operator on 2026-10-31.** Training (plan M3) was authorized and run offline on 2026-10-31.
 It produced candidate `p5-ranker-ee006a80…`, which meets §4.2 on 300 held-out layouts (plan §13).
-The operator accepted this candidate on 2026-10-31. The offline controller milestone M4
-(`P5Mission`, the policy ledger and `p5_control`) is implemented. Nothing is frozen or launched. The design rationale and verified integration facts are in the
+The operator accepted this candidate on 2026-10-31. The offline milestones M4
+(`P5Mission`, the policy ledger and `p5_control`) and M5 (runner, gates and evaluator) are implemented. Nothing is frozen or launched. The design rationale and verified integration facts are in the
 [P5 plan](v3_sim_p5_plan.md).
 
 The baselines must stay independently verifiable and unchanged:
@@ -268,8 +269,8 @@ for the same manifest. P3 and P4 gate results grant no P5 credit.
 
 | Gate | Content |
 |---|---|
-| **A** — ground | (1) P3 readiness unchanged. (2) P4 and P3 manifests verify. (3) P5 readiness under load: the full stack with `p5_control` in ground-diagnostic mode for the 30 s window, all §6 limits. (4) P5 ground fixtures G2, G4 and G6: the policy ranks real snapshots and the decisions respect the mask; inference timing within limits. (5) Policy-failure fixtures: the evaluator replays recorded ground snapshots through the frozen runtime with injected missing weights, hash mismatch, NaN output and timeout, and requires HOLD then `policy_unavailable` decisions. One live start with a mismatched checkpoint must refuse to start. (6) A single PX4 input owner; graceful cleanup |
-| **B** — smoke | S2 |
+| **A** — ground | (1) P3 readiness unchanged. (2) P4 and P3 manifests verify. (3) P5 readiness under load: the full stack with `p5_control` in ground-diagnostic mode for the 30 s window, all §6 limits. (4) **Revision 2:** ground policy evaluation, G2, G4 and G6. On every recorded snapshot: the frozen input and model under the controller interpreter; finite, bit-identical scores; p99 ≤ 5 ms and max ≤ 10 ms; the mask equals P4's progress set; the P5 decision equals P4's (SCAN/HOLD when nothing is allowed); no policy-induced move into unknown or occupied space. (5) **Revision 2:** offline flight-snapshot policy-failure replay on an exactly reproduced TRANSIT tick of the accepted P4 S2 flight evidence. Missing checkpoint, hash mismatch, non-finite scores, timeout, invalid output size and invalid selection each give HOLD, HOLD, then ABORT `policy_unavailable`. One live start with a mismatched checkpoint must refuse before any node exists; its exit 1 is accepted only in that declared scope. (6) A single PX4 input owner; graceful cleanup. Full text: [revision 2](v3_sim_p5_contract_revision2.md) |
+| **B** — smoke | S2: genuine frozen-policy participation (§6 limits), shield-safe execution, detour, goal and landing. Replays after Gate B are additional evidence only |
 | **S** — safety | S1, S5, S6 in order |
 | **C** — qualification | S2, S3, S4 in order, 3/3 |
 

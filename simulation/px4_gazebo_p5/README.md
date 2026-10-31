@@ -12,10 +12,12 @@ outside every P3 and P4 manifest glob, so the accepted baselines keep verifying 
 |---|---|
 | `configs/` | policy configuration (contract values pinned), acceptance limits and gates, frozen model schema |
 | `ros2_ws/src/gwm_policy_control/` | policy runtime, observation adapter, ranker, planner and supervisor replicas with the selection hook, `P5Mission`, the policy ledger and the `p5_control` node |
-| `scripts/` | source identity and baseline checks (freeze, runner and gates follow in later milestones) |
+| `scripts/` | source identity, baseline checks, runner, gate sequencer and wrappers (freeze and build follow in M7) |
+| `validation/` | independent evaluator and the policy replays (run under the controller interpreter) |
 | `models/`, `training/` | content-addressed model artifacts and offline training (plan M3, separately authorized) |
 
-Status: offline milestones M0–M4. The candidate model `models/p5-ranker-ee006a80….npz` was trained
+Status: offline milestones M0–M5 (contract revision 2). The candidate model `models/p5-ranker-ee006a80….npz` was trained
 offline, meets the contract §4.2 readiness bar and was accepted by the operator. The `p5_control`
-node, `P5Mission` and the policy ledger are implemented (plan §13.3). Nothing is frozen, and no
+node, `P5Mission`, the policy ledger, the runner, the gate sequencer and the evaluator are implemented
+(plan §13.3–13.4). Nothing is frozen, and no
 simulator has been run for P5.
