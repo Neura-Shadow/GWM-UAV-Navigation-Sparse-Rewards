@@ -1,0 +1,22 @@
+{
+  "run_id": "20260912T010708Z-p2-flight-775b24dc",
+  "policy": "p2-estimator-reference-v2",
+  "acceptance": "failed",
+  "px4_commit": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+  "anchor_before": 1.6736366313799778,
+  "delta_heading": 0.0034521836787462234,
+  "anchor_after": 1.677088815058724,
+  "reset_us": 23408000,
+  "last_pre_reset_target_us": 23360000,
+  "late_old_target_us": 23412000,
+  "late_old_target_receipt_wall_s": 48658.833571126,
+  "first_heading_notification_receipt_wall_s": 48658.834819999,
+  "first_heading_notification_us": 23408000,
+  "controller_pair_accepted_s": 23.612,
+  "internal_setpoints": [
+    {"timestamp": 23496000, "yaw": 1.6736366748809814},
+    {"timestamp": 23600000, "yaw": 1.6736366748809814},
+    {"timestamp": 23704000, "yaw": 1.6770888566970825}
+  ],
+  "scope": "Recorded compensation race; completion of motion does not override failed reference continuity"
+}

@@ -1,0 +1,12 @@
+*.sh text eol=lf
+*.py text eol=lf
+*.yaml text eol=lf
+ros2_ws/src/gwm_px4_control/** text eol=lf
+ros2_ws/src/gwm_sensor_adapter/** text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.h text eol=lf
+*.cpp text eol=lf
+*.qml text eol=lf
+*.sdf text eol=lf
+scripts/p3_gz_shim/* text eol=lf

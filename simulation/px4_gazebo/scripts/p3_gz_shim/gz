@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# P3 contract v1.2: Gazebo-only libd3d12core lifetime fix (configs/p3_d3d12_profile.json).
+# First on the PATH of P3-owned processes. Only `gz sim` gets the preload; every other
+# gz subcommand, and PX4/ROS/QGC themselves, run unchanged. The real gz is pinned by the runner.
+set -euo pipefail
+real=${GWM_P3_REAL_GZ:?GWM_P3_REAL_GZ must name the real gz executable}
+if [[ ${1:-} == sim && -n ${GWM_P3_GZ_SIM_PRELOAD:-} ]]; then
+  export LD_PRELOAD="${GWM_P3_GZ_SIM_PRELOAD}${LD_PRELOAD:+:$LD_PRELOAD}"
+fi
+exec "$real" "$@"
