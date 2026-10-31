@@ -1,0 +1,237 @@
+{
+ "contract": "p3-native-command-policy-v1",
+ "default_policy": "strict_zero",
+ "provenance": {
+  "policy_A_source": "configs/p3_qgc_command_decision_v1.json option_A at archived commit 39ba887 (decision package SHA-256 0954e7250ae76662f46da99f21be815fcecf11430564b0be13d239a2eafb0e4c)",
+  "historical_operator_approval": "approved for the archived candidate only (receipt SHA-256 4beeaf4e11eee161b8afef76dcaa1e0eed4bf5c8cf8321958387555097134711); it does not transfer to this implementation"
+ },
+ "policies": {
+  "strict_zero": {
+   "description": "No native command or active-control frame from any non-vehicle source on the GCS link. QGC heartbeat required.",
+   "requires_operator_approval": false,
+   "allowed_commands": []
+  },
+  "A": {
+   "description": "Stock QGC management traffic: only COMMAND_LONG from GCS 255/190 to vehicle 72/1, at most one 401 RUN_PREARM_CHECKS and 34 command-512 REQUEST_MESSAGE frames inside the original 75 s startup window, each payload matching a frozen seven-float pattern within its individual cap. Cancels, COMMAND_INT, other commands and active-control messages remain violations. PX4 preflight checks unchanged.",
+   "requires_operator_approval": true,
+   "startup_wall_s": 75,
+   "allowed_commands": [
+    {
+     "message_id": 76,
+     "command": 401,
+     "source": [
+      255,
+      190
+     ],
+     "target": [
+      72,
+      1
+     ],
+     "maximum_frames": 1,
+     "startup_window_only": true,
+     "payload_patterns": [
+      {
+       "command": 401,
+       "seven_float32_le_hex": "00000000000000000000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      }
+     ]
+    },
+    {
+     "message_id": 76,
+     "command": 512,
+     "source": [
+      255,
+      190
+     ],
+     "target": [
+      72,
+      1
+     ],
+     "maximum_frames": 34,
+     "startup_window_only": true,
+     "payload_patterns": [
+      {
+       "command": 512,
+       "seven_float32_le_hex": "00001443000000000000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "00008c43000000000000000000000000000000000000000000000000",
+       "maximum_frames": 6
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080c643000000000000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000000400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000000410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000010410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000020410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000030410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000040400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000040410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000050410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000060410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000070410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000803f0000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000080400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000080410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000088410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000090410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d943000098410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000a0400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000a0410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000a8410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000b0410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000b8410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000c0400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000c0410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000c8410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000d0410000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      },
+      {
+       "command": 512,
+       "seven_float32_le_hex": "0080d9430000e0400000000000000000000000000000000000000000",
+       "maximum_frames": 1
+      }
+     ]
+    }
+   ],
+   "vehicle_landing_self_commands": {
+    "message_id": 76,
+    "source": [
+     72,
+     1
+    ],
+    "target": [
+     72,
+     0
+    ],
+    "phase": [
+     "REQUEST_LAND",
+     "COMPLETE"
+    ],
+    "max_frames_per_payload": 4,
+    "payload_patterns": [
+     {
+      "row": "a",
+      "command": 1001,
+      "seven_float32_le_hex": "000090420000803f000080bf000080bf000000000000000000000000"
+     },
+     {
+      "row": "b",
+      "command": 1000,
+      "seven_float32_le_hex": "0000c07f0000c07f0000c07f0000c07f000000400000000000000000"
+     },
+     {
+      "row": "c",
+      "command": 1001,
+      "seven_float32_le_hex": "000040c0000040c0000080bf000080bf000000000000000000000000"
+     }
+    ]
+   }
+  }
+ }
+}

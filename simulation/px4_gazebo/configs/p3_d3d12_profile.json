@@ -1,0 +1,18 @@
+{
+  "contract": "p3-d3d12-runtime-profile-v1",
+  "approval": "operator Neura-Shadow 2026-10-25, proposal commit 743bbf7 (p3-acceptance-v1.2)",
+  "renderer_identity": "D3D12 (NVIDIA GeForce RTX 4060 Laptop GPU)",
+  "environment": {
+    "GALLIUM_DRIVER": "d3d12",
+    "MESA_D3D12_DEFAULT_ADAPTER_NAME": "NVIDIA"
+  },
+  "gz_sim_preload": "/usr/lib/wsl/lib/libd3d12core.so",
+  "preload_reason": "libd3d12.so's destructor unmaps libd3d12core.so on the Gazebo render thread before that thread's TSD cleanup calls into it (SIGSEGV); keeping it loaded gives a clean exit 0 (acceptance report section T)",
+  "pinned_libraries": {
+    "/usr/lib/wsl/lib/libd3d12core.so": "a4104a2022932d8e6c714f103ebd89db1c5bdbf36fe92151c88d3d93d4e3894d",
+    "/usr/lib/wsl/lib/libd3d12.so": "b3d78d409a4dbbe8612551fc0c0d746d3e58d7997ee7eba78ce1064d77cfa8c3",
+    "/usr/lib/wsl/lib/libdxcore.so": "83d1671a839bcf71709349e77cd68341515df2e63080765618876996a0f4190c",
+    "/usr/lib/wsl/drivers/nvacui.inf_amd64_8221be02e2df3771/libnvwgf2umx.so": "36c79d26c9a597c809b97b67d486d341fe4e0a1422b28ee9b93ee769e721400f",
+    "/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.2.so": "e37486422ecafdad74fb05bbcdcfc35300241a5f46e72b63ca442d4e0c0cca8b"
+  }
+}

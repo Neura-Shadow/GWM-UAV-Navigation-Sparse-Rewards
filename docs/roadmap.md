@@ -235,3 +235,63 @@ completion summary is tracked in
 - [x] v2-6 Optional simulator benchmark integration
 
 These are optional post-v1 extensions and are not blockers for `v1.0.0`.
+
+---
+
+## Post-v2 Optional Extension: GWM-UAV-C2 AgentOps
+
+The completed GWM-UAV-C2 v2 extension remains the stable deterministic C2
+foundation.
+
+AgentOps is a separate optional v3 extension for a human-supervised multi-agent
+ground operations center. Agents remain proposal-oriented and operate through
+typed messages, allowlisted tools, deterministic v2 authorities, explicit
+human approval, and guarded simulator/SITL boundaries.
+
+- [x] v3-0 Agentic C2 scope and permission freeze
+- [x] v3-1 Typed agent contracts and tool registry
+  - [x] v3-1 planning spec
+  - [x] v3-1A Typed agent message dataclasses
+  - [x] v3-1B Tool registry and permission manifests
+  - [x] v3-1C Mock tool-call validation and audit records
+- [ ] v3-2 Supervisor agent and shared situation memory
+- [ ] v3-3 Mission, fleet, risk, and planning agents
+- [ ] v3-4 Simulation validation agent
+- [ ] v3-5 Safety review and human approval workflow
+- [ ] v3-6 Ground operations dashboard
+- [ ] v3-7 End-to-end mock and gated simulator demonstration
+
+### Immediate implementation priority: v3-SIM
+
+The operator-directed [simulation amendment](v3_simulation_scope_amendment.md)
+places P0/P1 and then P2 before v3-2 without changing AgentOps permissions or phase numbers.
+See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2_validation.md).
+
+- [x] P0 Version pinning and environment build
+- [x] P1 PX4/Gazebo simulator boot
+- [x] P1 Initial measured non-AI flight smoke
+- [x] P1 Repeated-flight acceptance: 20 consecutive trials
+- [x] P2 ROS 2 control, ACK verification, and coordinate tests: R3 traced the
+  native Fast DDS SHM publication wait and applied controller-only UDPv4.
+  Three new ground diagnostics, a complete new nominal smoke and a fresh
+  **20/20** consecutive batch passed, including independent timing, reference,
+  motion and LAND checks. R2 yaw policy and all original limits are unchanged.
+  Strict-v1, R1 and R2 failures remain preserved. P3 is eligible as the next slice.
+- [x] P3 Depth sensing — **COMPLETE — Contract v1.6 — Qualification 3/3 PASSED** (PX4 SITL,
+  depth-only flights; no hardware). [Final acceptance](v3_sim_p3_final_acceptance_v1_6.md),
+  [contract and operation](v3_sim_p3_contract.md). P4 is the next phase.
+- [x] P4 Non-learning obstacle avoidance — **P4 COMPLETE — Qualification 3/3 PASSED** (contract
+  `p4-acceptance-v1`, revisions 2–5; Gates A, B, S and C passed; PX4 SITL, depth-only flights; no
+  hardware). Candidate `c110bd30`; safety S1/S5/S6 3/3; seven flights, 0 collisions.
+  [Final acceptance](v3_sim_p4_final_acceptance.md), [contract](v3_sim_p4_contract.md),
+  [design](v3_sim_p4_plan.md). P5 is the next phase.
+- [ ] P5 Fixed-weight policy substitution
+- [ ] P6 Failure validation
+- [ ] P7 Batch evaluation
+
+Runtime-free tests and actual simulated-flight evidence are separate categories.
+The existing Isaac and Cosys-AirSim integration paths retain their own status.
+
+These are optional post-v2 research extensions and are not blockers for the
+completed v1 or v2 artifacts. AgentOps does not add direct vehicle command,
+real hardware, autonomous real flight, or offensive/weaponized behavior.

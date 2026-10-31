@@ -1,0 +1,258 @@
+{
+  "qgc_monitor": {
+    "requested_ref": "v5.1.4",
+    "source_commit": "4568b585648e8c6065cca6c650b52731c1d3baa3",
+    "url": "https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.4/QGroundControl-x86_64.AppImage",
+    "sha256": "1c4ac089abfaac6c6fcd75c7b477ea18da1bc3592cddca5ab1a19c1a13410e65",
+    "role": "optional real local GCS monitoring; no flight control interaction"
+  },
+  "schema_version": 1,
+  "platform": {
+    "os": "ubuntu",
+    "version": "24.04",
+    "ros": "jazzy",
+    "gazebo": "harmonic",
+    "gazebo_provider": "ROS Jazzy vendor packages"
+  },
+  "sources": {
+    "px4": {
+      "url": "https://github.com/PX4/PX4-Autopilot.git",
+      "requested_ref": "v1.17.0",
+      "commit": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4"
+    },
+    "px4_msgs": {
+      "url": "https://github.com/PX4/px4_msgs.git",
+      "requested_ref": "release/1.17",
+      "commit": "86d8239e962f6939e05c3737784f60c02fa884db"
+    },
+    "dds_agent": {
+      "url": "https://github.com/eProsima/Micro-XRCE-DDS-Agent.git",
+      "requested_ref": "v2.4.3",
+      "commit": "73622810d984349b80bbac0ef55fc0b694d62222"
+    }
+  },
+  "ros_key_source_commit": "984f1f74889ad6145b7808e876e64037e7681c31",
+  "measured": {
+    "sources": {
+      "px4": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+          "stderr": ""
+        },
+        "submodules": {
+          "exit_code": 0,
+          "stdout": "f47ce7b5fbbb3aa43d33d2be1f6cd3746b13d5bf Tools/simulation/flightgear/flightgear_bridge (heads/master)\n cbdb2fc7dd44331da1dcd04a891ed7f8c27b1ef0 Tools/simulation/flightgear/flightgear_bridge/models/Rascal (remotes/origin/electric-14-gcbdb2fc)\n fdb6dd685f55097230c0eb29aa7e9f5b8d0abf1e Tools/simulation/flightgear/flightgear_bridge/models/TF-G1 (heads/master)\n 99529413531106836f4303c5389928a4fef04b05 Tools/simulation/flightgear/flightgear_bridge/models/TF-G2 (9952941)\n 158e429a0110589b1e2adfe868e166271470e144 Tools/simulation/flightgear/flightgear_bridge/models/TF-R1 (heads/master)\n 6697ab169ceab512dc706acea63df4c882662c60 Tools/simulation/gazebo-classic/sitl_gazebo-classic (6697ab1)\n 28ef45c1fcb532b2bfd54c16b059c6a545143b2f Tools/simulation/gazebo-classic/sitl_gazebo-classic/external/OpticalFlow (28ef45c)\n 9b5b567ae77f93d1ef4d36151529ba2506a46e7a Tools/simulation/gazebo-classic/sitl_gazebo-classic/external/OpticalFlow/external/klt_feature_tracker (heads/master)\n b6127f4ec20de867e215fb5f78ae88b80f371909 Tools/simulation/gz (b6127f4)\n 66b764ada522893c05224950aa6268c809f8e48a Tools/simulation/jmavsim/jMAVSim (66b764a)\n c08380767b21938391bec676a43b36b837af9ba4 Tools/simulation/jmavsim/jMAVSim/jMAVlib (heads/master)\n f37ec259bd7a43565fe0ff4722465b7a303200f6 Tools/simulation/jsbsim/jsbsim_bridge (heads/master)\n 40571cd808a204f4062128daeb6bb6db8c134c48 Tools/simulation/jsbsim/jsbsim_bridge/models/ATI-Resolution (2019.1)\n d0d1db1961549e557885002cf9c3cff40cc27be2 Tools/simulation/jsbsim/jsbsim_bridge/models/Rascal (remotes/origin/preserve-this-branch-for-px4-submodules)\n 85151aaf6ba8b24ce82b387e088452c63f7e2096 boards/modalai/voxl2/libfc-sensor-api (85151aa)\n e37940d8535f603a16b8f6f21c21edaf584218aa platforms/nuttx/NuttX/apps (nuttx-11.0.0-5-ge37940d85)\n fb2fadf6f599c1406f052db013efd00a2518e72c platforms/nuttx/NuttX/nuttx (nuttx-8.2-10680-gfb2fadf6f5)\n c488af4e8807de80739aa48efd2ea51614dd8195 src/drivers/actuators/vertiq_io/iq-module-communication-cpp (c488af4)\n 36a01e428b110ff84c8babe5b65667b5e3037d5e src/drivers/cyphal/legacy_data_types (remotes/origin/legacy)\n 5c69d451ab0787a81dcb615692d707f2a286f5e5 src/drivers/cyphal/libcanard (3.0.1-1-g5c69d45)\n d0bd6516dac8ff61287fe49a9f2c75e7d4dc1b8e src/drivers/cyphal/public_regulated_data_types (d0bd651)\n 0b9695881bd1e8f830ab4538ab3acc0050019eba src/drivers/gps/devices (remotes/origin/backport-release/1.13-74-g0b96958)\n 35596994b60ba89fe02f71ce5127baa5e7ff2bbf src/drivers/ins/microstrain/mip_sdk (remotes/origin/feature/px4_compilation)\n 80b121c7714083cc4868c0fdb8c41623c7ef9c93 src/drivers/ins/sbgecom/sbgECom (heads/main)\n 993be80a62ec957c01fb41115b83663959a49f46 src/drivers/uavcan/libdronecan/dsdl (heads/master)\n 19fdf2e5b383243ccdb1094edae0603cf11469e8 src/drivers/uavcan/libdronecan/libuavcan/dsdl_compiler/pydronecan (1.0.16-2-g19fdf2e)\n 314887ca403c2fb0a0316add22672102936ed36c src/lib/cdrstream/cyclonedds (314887ca)\n bf5682e4747843d1d5133b9a2b54ce6f12f166c7 src/lib/cdrstream/rosidl (remotes/origin/v4.9.3)\n 673f5ce29015a9bba3c96792920a10601b5b0718 src/lib/crypto/libtomcrypt (1.17-2055-g673f5ce2)\n fd73d7630b9d3ed5a79d613ff680a549e9780de7 src/lib/crypto/libtommath (v1.2.0-247-gfd73d76)\n baca5d31259c598540e4d1284bc8d8f793abf83a src/lib/crypto/monocypher (3.1.2)\n 9ef591c447fe0386d698bf6fb9a6d27e43988ee4 src/lib/events/libevents (9ef591c)\n 052e6de72f67f1777198bce98f3de62f7f3c16a0 src/lib/heatshrink/heatshrink (heads/main)\n 3c0b1e3091e4ea423e1bf9da89d41d09517eb0c9 src/lib/tensorflow_lite_micro/tflite_micro (heads/main)\n 33af200d25ec6f0925b49b1ba82bbf1294ea5f72 src/modules/mavlink/mavlink (1.0.12-821-g33af200d)\n fcaa2c7d25e3169dc66155929c338487941555e9 src/modules/mavlink/mavlink/pymavlink (v2.4.47-63-gfcaa2c7d)\n 711aef423edd1820347b866d1e4164832df35d04 src/modules/uxrce_dds_client/Micro-XRCE-DDS-Client (711aef4)\n 6ec4dc1995f185330e4f6faa8c719eb86f180deb src/modules/zenoh/zenoh-pico (0.5.0-beta.9-1620-g6ec4dc19)\n 1e47f9d7437de5c3ee4cb0ac860d5ec875478059 test/fuzztest (2024-10-25-254-g1e47f9d)",
+          "stderr": ""
+        },
+        "status": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      },
+      "px4_msgs": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "86d8239e962f6939e05c3737784f60c02fa884db",
+          "stderr": ""
+        },
+        "submodules": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "status": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      },
+      "dds_agent": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "73622810d984349b80bbac0ef55fc0b694d62222",
+          "stderr": ""
+        },
+        "submodules": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "status": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      }
+    },
+    "asset_hashes": {
+      "Tools/simulation/gz/models/x500/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/x500/model.config": "52fdda8e66faa5095434d54e4dcaad5a6a8833cd014e0a5b439349ed8b4a1b67",
+      "Tools/simulation/gz/models/x500/model.sdf": "cfe92f98360967faa895b77aa8a6fff3fc9b290286e94e45297c4bdd7b62fbf9",
+      "Tools/simulation/gz/models/x500/thumbnails/1.png": "54d00187e5a03766d5e7b73311bc6bfa22f51cd98b823a287b2da8c551c3175e",
+      "Tools/simulation/gz/models/x500/thumbnails/2.png": "cb6040c119b2a382030165a2a98ab9e9cf816557808a4549c323f2a3792cb8b4",
+      "Tools/simulation/gz/models/x500/thumbnails/3.png": "848f431c64b34df15c59ad874e6211695ac53ee932ad3509ebb7c6372fc67375",
+      "Tools/simulation/gz/models/x500/thumbnails/4.png": "86e1b7f31a49894caeef210f43248587d6454eba467a492f9bc147bf732ae666",
+      "Tools/simulation/gz/models/x500/thumbnails/5.png": "b76053e95f7aff65c6f83533fb5635554292acb26fe51376c2d62e437e350e75",
+      "Tools/simulation/gz/models/x500_base/LICENSE": "cee4ef94e73cd38fb2886f5d7e7a04d6488f54b1e70cd8b1b29d74f38bfdba5b",
+      "Tools/simulation/gz/models/x500_base/materials/textures/CF.png": "3a56ec48eeaaf7774e8d3e8e5e88f6973bfa5652c610974c3eb2dbec6ec85944",
+      "Tools/simulation/gz/models/x500_base/materials/textures/nxp.png": "6c2262c84e0f5f55dbe38e712e6508d654fb6e7c427d1a19cdd62231bc2d52b1",
+      "Tools/simulation/gz/models/x500_base/materials/textures/rd.png": "9d8851c37dc612c336b46e41744c17fb8333a0af33ac4be93f7147f7549a8e25",
+      "Tools/simulation/gz/models/x500_base/meshes/1345_prop_ccw.stl": "ba197e0961117a3462b555d65edf3433ba8ff5691624100a185242cb5f456244",
+      "Tools/simulation/gz/models/x500_base/meshes/1345_prop_cw.stl": "7aa4b61c1ddc5304c9c1f5602eacf5e2ec5eafb95dd1f2a3368342f256122fc0",
+      "Tools/simulation/gz/models/x500_base/meshes/5010Base.dae": "798396a1945c7ff55a0840b77869e27affdd35fed0d784fff96b68f50f160ea0",
+      "Tools/simulation/gz/models/x500_base/meshes/5010Bell.dae": "b90a1b2dd63a8ebbe1f3339ed18cef23673e0d8f03314fd9b9533a68b6b66668",
+      "Tools/simulation/gz/models/x500_base/meshes/CF.png": "3a56ec48eeaaf7774e8d3e8e5e88f6973bfa5652c610974c3eb2dbec6ec85944",
+      "Tools/simulation/gz/models/x500_base/meshes/NXP-HGD-CF.dae": "7321861b113866996dfa79b403def5666d4b796810840d2c057c7b51fc315b0a",
+      "Tools/simulation/gz/models/x500_base/model.config": "4856afbdeb52f19468f56ddaf4be57c04688f347b8cef2f609daacd2d014d437",
+      "Tools/simulation/gz/models/x500_base/model.sdf": "e807dca3406f7cd5cb3d545898601c3ec17e0e5242e25cf467a69df1812cf436",
+      "Tools/simulation/gz/models/x500_base/thumbnails/1.png": "54d00187e5a03766d5e7b73311bc6bfa22f51cd98b823a287b2da8c551c3175e",
+      "Tools/simulation/gz/models/x500_base/thumbnails/2.png": "cb6040c119b2a382030165a2a98ab9e9cf816557808a4549c323f2a3792cb8b4",
+      "Tools/simulation/gz/models/x500_base/thumbnails/3.png": "848f431c64b34df15c59ad874e6211695ac53ee932ad3509ebb7c6372fc67375",
+      "Tools/simulation/gz/models/x500_base/thumbnails/4.png": "86e1b7f31a49894caeef210f43248587d6454eba467a492f9bc147bf732ae666",
+      "Tools/simulation/gz/models/x500_base/thumbnails/5.png": "b76053e95f7aff65c6f83533fb5635554292acb26fe51376c2d62e437e350e75",
+      "Tools/simulation/gz/worlds/default.sdf": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2"
+    },
+    "workspace": "/home/joker0625/uav_autonomy",
+    "project_commit": {
+      "exit_code": 0,
+      "stdout": "efae1ee55ee8bc5f7ab0a6b836d728feb2dd6597",
+      "stderr": ""
+    },
+    "lock_sha256": "a6c8233669f5f45335684a98fc811ccbe65854eb6323b4e99a311044a03df010",
+    "px4_binary_sha256": "5383767fd3068a8a306660430f10c8852eb4d581a8a7af5f3fc14cea7b9d106d",
+    "dds_build_dependencies": {
+      "build-jazzy-upstream-logger/microxrcedds_client/src/microxrcedds_client": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "d44dc3fa0c488376e34d26ed92853f1c66dcb670",
+          "stderr": ""
+        },
+        "origin": {
+          "exit_code": 0,
+          "stdout": "https://github.com/eProsima/Micro-XRCE-DDS-Client.git",
+          "stderr": ""
+        }
+      },
+      "build-jazzy-upstream-logger/microxrcedds_client/src/microxrcedds_client-build/microcdr/src/microcdr": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "3d1b17703c7cf4f22def2910bc845bdb5152d7b5",
+          "stderr": ""
+        },
+        "origin": {
+          "exit_code": 0,
+          "stdout": "https://github.com/eProsima/Micro-CDR.git",
+          "stderr": ""
+        }
+      },
+      "build-jazzy-upstream-logger/spdlog/src/spdlog": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "eb3220622e73a4889eee355ffa37972b3cac3df5",
+          "stderr": ""
+        },
+        "origin": {
+          "exit_code": 0,
+          "stdout": "https://github.com/gabime/spdlog.git",
+          "stderr": ""
+        }
+      }
+    },
+    "px4_build_dependencies": {
+      "build/px4_sitl_default_linux/OpticalFlow/src/OpticalFlow": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "a4d4cfde0c023be6b1ff8c8e796862413bc99272",
+          "stderr": ""
+        },
+        "origin": {
+          "exit_code": 0,
+          "stdout": "https://github.com/PX4/PX4-OpticalFlow.git",
+          "stderr": ""
+        },
+        "status": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "submodules": {
+          "exit_code": 0,
+          "stdout": "a2733b54f17b571dd958be498b57479a4104d8cd external/klt_feature_tracker (remotes/origin/pr-cmake)",
+          "stderr": ""
+        }
+      },
+      "build/px4_sitl_default_linux/OpticalFlow/src/OpticalFlow/external/klt_feature_tracker": {
+        "head": {
+          "exit_code": 0,
+          "stdout": "a2733b54f17b571dd958be498b57479a4104d8cd",
+          "stderr": ""
+        },
+        "origin": {
+          "exit_code": 0,
+          "stdout": "https://github.com/PX4/klt_feature_tracker.git",
+          "stderr": ""
+        },
+        "status": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "submodules": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      }
+    },
+    "packages": {
+      "exit_code": 1,
+      "stdout": "cmake\t3.28.3-1build7\tinstalled\ng++\t4:13.2.0-7ubuntu1\tinstalled\ngcc\t4:13.2.0-7ubuntu1\tinstalled\nninja-build\t1.11.1-2\tinstalled\npython3\t3.12.3-0ubuntu2.1\tinstalled\nros-jazzy-action-msgs\t2.0.4-1noble.20260902.015426\tinstalled\nros-jazzy-actionlib-msgs\t5.3.8-1noble.20260902.034206\tinstalled\nros-jazzy-actuator-msgs\t0.0.1-4noble.20260902.024100\tinstalled\nros-jazzy-ament-cmake\t2.5.6-2noble.20260225.222913\tinstalled\nros-jazzy-ament-cmake-auto\t2.5.6-2noble.20260225.232257\tinstalled\nros-jazzy-ament-cmake-copyright\t0.17.5-1noble.20260410.113746\tinstalled\nros-jazzy-ament-cmake-core\t2.5.6-2noble.20260224.191131\tinstalled\nros-jazzy-ament-cmake-cppcheck\t0.17.5-1noble.20260410.113607\tinstalled\nros-jazzy-ament-cmake-cpplint\t0.17.5-1noble.20260410.105800\tinstalled\nros-jazzy-ament-cmake-export-definitions\t2.5.6-2noble.20260224.232207\tinstalled\nros-jazzy-ament-cmake-export-dependencies\t2.5.6-2noble.20260225.043730\tinstalled\nros-jazzy-ament-cmake-export-include-directories\t2.5.6-2noble.20260224.232223\tinstalled\nros-jazzy-ament-cmake-export-interfaces\t2.5.6-2noble.20260225.042039\tinstalled\nros-jazzy-ament-cmake-export-libraries\t2.5.6-2noble.20260224.232254\tinstalled\nros-jazzy-ament-cmake-export-link-flags\t2.5.6-2noble.20260225.042107\tinstalled\nros-jazzy-ament-cmake-export-targets\t2.5.6-2noble.20260225.042100\tinstalled\nros-jazzy-ament-cmake-flake8\t0.17.5-1noble.20260410.113910\tinstalled\nros-jazzy-ament-cmake-gen-version-h\t2.5.6-2noble.20260225.042237\tinstalled\nros-jazzy-ament-cmake-gmock\t2.5.6-2noble.20260225.215706\tinstalled\nros-jazzy-ament-cmake-gtest\t2.5.6-2noble.20260225.145055\tinstalled\nros-jazzy-ament-cmake-include-directories\t2.5.6-2noble.20260225.042241\tinstalled\nros-jazzy-ament-cmake-libraries\t2.5.6-2noble.20260225.042312\tinstalled\nros-jazzy-ament-cmake-lint-cmake\t0.17.5-1noble.20260410.113602\tinstalled\nros-jazzy-ament-cmake-pep257\t0.17.5-1noble.20260410.113929\tinstalled\nros-jazzy-ament-cmake-pytest\t2.5.6-2noble.20260225.145739\tinstalled\nros-jazzy-ament-cmake-python\t2.5.6-2noble.20260225.042312\tinstalled\nros-jazzy-ament-cmake-ros\t0.12.1-1noble.20260603.150631\tinstalled\nros-jazzy-ament-cmake-target-dependencies\t2.5.6-2noble.20260225.043936\tinstalled\nros-jazzy-ament-cmake-test\t2.5.6-2noble.20260225.143205\tinstalled\nros-jazzy-ament-cmake-uncrustify\t0.17.5-1noble.20260410.113615\tinstalled\nros-jazzy-ament-cmake-version\t2.5.6-2noble.20260225.042330\tinstalled\nros-jazzy-ament-cmake-xmllint\t0.17.5-1noble.20260410.113914\tinstalled\nros-jazzy-ament-copyright\t0.17.5-1noble.20260410.105859\tinstalled\nros-jazzy-ament-cppcheck\t0.17.5-1noble.20260410.080408\tinstalled\nros-jazzy-ament-cpplint\t0.17.5-1noble.20260410.080348\tinstalled\nros-jazzy-ament-flake8\t0.17.5-1noble.20260410.113507\tinstalled\nros-jazzy-ament-index-cpp\t1.8.4-1noble.20260519.011052\tinstalled\nros-jazzy-ament-index-python\t1.8.4-1noble.20260519.010916\tinstalled\nros-jazzy-ament-lint\t0.17.5-1noble.20260410.080358\tinstalled\nros-jazzy-ament-lint-auto\t0.17.5-1noble.20260410.080333\tinstalled\nros-jazzy-ament-lint-cmake\t0.17.5-1noble.20260410.080405\tinstalled\nros-jazzy-ament-lint-common\t0.17.5-1noble.20260410.114154\tinstalled\nros-jazzy-ament-package\t0.16.5-1noble.20260121.174946\tinstalled\nros-jazzy-ament-pep257\t0.17.5-1noble.20260410.113520\tinstalled\nros-jazzy-ament-uncrustify\t0.17.5-1noble.20260410.080359\tinstalled\nros-jazzy-ament-xmllint\t0.17.5-1noble.20260410.113521\tinstalled\nros-jazzy-builtin-interfaces\t2.0.4-1noble.20260902.013948\tinstalled\nros-jazzy-class-loader\t2.7.1-1noble.20260604.024917\tinstalled\nros-jazzy-common-interfaces\t5.3.8-1noble.20260902.043650\tinstalled\nros-jazzy-composition-interfaces\t2.0.4-1noble.20260902.024252\tinstalled\nros-jazzy-compressed-depth-image-transport\t4.0.7-1noble.20260903.071753\tinstalled\nros-jazzy-compressed-image-transport\t4.0.7-1noble.20260903.072043\tinstalled\nros-jazzy-console-bridge-vendor\t1.7.2-1noble.20260603.150411\tinstalled\nros-jazzy-cv-bridge\t4.1.0-1noble.20260902.080510\tinstalled\nros-jazzy-diagnostic-msgs\t5.3.8-1noble.20260902.041325\tinstalled\nros-jazzy-domain-coordinator\t0.12.1-1noble.20260603.150342\tinstalled\nros-jazzy-eigen3-cmake-module\t0.3.1-1noble.20260603.150413\tinstalled\nros-jazzy-fastcdr\t2.2.8-1noble.20260901.205404\tinstalled\nros-jazzy-fastrtps\t2.14.6-1noble.20260901.222814\tinstalled\nros-jazzy-fastrtps-cmake-module\t3.6.4-1noble.20260603.150331\tinstalled\nros-jazzy-foonathan-memory-vendor\t1.3.1-3noble.20260225.055155\tinstalled\nros-jazzy-geometry-msgs\t5.3.8-1noble.20260902.030745\tinstalled\nros-jazzy-geometry2\t0.36.22-1noble.20260903.023449\tinstalled\nros-jazzy-gmock-vendor\t1.14.9000-2noble.20260225.143751\tinstalled\nros-jazzy-gps-msgs\t3.1.1-1noble.20260902.030750\tinstalled\nros-jazzy-gtest-vendor\t1.14.9000-2noble.20260225.055309\tinstalled\nros-jazzy-gz-cmake-vendor\t0.0.12-1noble.20260618.173318\tinstalled\nros-jazzy-gz-common-vendor\t0.0.10-1noble.20260905.033536\tinstalled\nros-jazzy-gz-dartsim-vendor\t0.0.3-1noble.20260225.232143\tinstalled\nros-jazzy-gz-fuel-tools-vendor\t0.0.6-1noble.20260905.065120\tinstalled\nros-jazzy-gz-gui-vendor\t0.0.5-1noble.20260905.071619\tinstalled\nros-jazzy-gz-math-vendor\t0.0.11-1noble.20260905.031649\tinstalled\nros-jazzy-gz-msgs-vendor\t0.0.8-1noble.20260905.033532\tinstalled\nros-jazzy-gz-ogre-next-vendor\t0.0.5-1noble.20260225.232146\tinstalled\nros-jazzy-gz-physics-vendor\t0.0.9-1noble.20260905.065116\tinstalled\nros-jazzy-gz-plugin-vendor\t0.0.5-1noble.20260820.145930\tinstalled\nros-jazzy-gz-rendering-vendor\t0.0.7-1noble.20260905.065113\tinstalled\nros-jazzy-gz-sensors-vendor\t0.0.6-1noble.20260905.071631\tinstalled\nros-jazzy-gz-sim-vendor\t0.0.13-1noble.20260905.073557\tinstalled\nros-jazzy-gz-tools-vendor\t0.0.8-1noble.20260820.143431\tinstalled\nros-jazzy-gz-transport-vendor\t0.0.9-1noble.20260905.065154\tinstalled\nros-jazzy-gz-utils-vendor\t0.0.5-1noble.20260618.173807\tinstalled\nros-jazzy-image-transport\t5.1.8-1noble.20260903.065618\tinstalled\nros-jazzy-image-transport-plugins\t4.0.7-1noble.20260903.082819\tinstalled\nros-jazzy-interactive-markers\t2.5.5-1noble.20260903.023910\tinstalled\nros-jazzy-kdl-parser\t2.11.0-3noble.20260901.011356\tinstalled\nros-jazzy-keyboard-handler\t0.3.2-1noble.20260225.235108\tinstalled\nros-jazzy-laser-geometry\t2.7.2-1noble.20260902.075605\tinstalled\nros-jazzy-launch\t3.4.11-1noble.20260603.150356\tinstalled\nros-jazzy-launch-ros\t0.26.12-1noble.20260902.054847\tinstalled\nros-jazzy-launch-testing\t3.4.11-1noble.20260603.150907\tinstalled\nros-jazzy-launch-testing-ament-cmake\t3.4.11-1noble.20260603.151149\tinstalled\nros-jazzy-launch-testing-ros\t0.26.12-1noble.20260902.081433\tinstalled\nros-jazzy-launch-xml\t3.4.11-1noble.20260603.150705\tinstalled\nros-jazzy-launch-yaml\t3.4.11-1noble.20260603.150711\tinstalled\nros-jazzy-libcurl-vendor\t3.4.4-1noble.20260225.235243\tinstalled\nros-jazzy-liblz4-vendor\t0.26.11-1noble.20260603.150356\tinstalled\nros-jazzy-libstatistics-collector\t1.7.4-1noble.20260902.051231\tinstalled\nros-jazzy-libyaml-vendor\t1.6.4-2noble.20260603.150356\tinstalled\nros-jazzy-lifecycle-msgs\t2.0.4-1noble.20260902.030832\tinstalled\nros-jazzy-map-msgs\t2.4.1-2noble.20260902.043113\tinstalled\nros-jazzy-marine-acoustic-msgs\t2.1.0-2noble.20260902.033749\tinstalled\nros-jazzy-mcap-vendor\t0.26.11-1noble.20260603.151024\tinstalled\nros-jazzy-message-filters\t4.11.17-1noble.20260902.103742\tinstalled\nros-jazzy-nav-msgs\t5.3.8-1noble.20260902.041413\tinstalled\nros-jazzy-orocos-kdl-vendor\t0.5.2-1noble.20260603.150813\tinstalled\nros-jazzy-osrf-pycommon\t2.1.7-1noble.20260225.055811\tinstalled\nros-jazzy-pluginlib\t5.4.6-1noble.20260831.165748\tinstalled\nros-jazzy-point-cloud-transport\t4.0.9-1noble.20260903.070003\tinstalled\nros-jazzy-pybind11-vendor\t3.1.3-1noble.20260226.000033\tinstalled\nros-jazzy-python-cmake-module\t0.11.1-2noble.20260226.000327\tinstalled\nros-jazzy-python-orocos-kdl-vendor\t0.5.2-1noble.20260603.151028\tinstalled\nros-jazzy-python-qt-binding\t2.2.2-1noble.20260226.000339\tinstalled\nros-jazzy-qt-gui\t2.7.6-1noble.20260519.011141\tinstalled\nros-jazzy-qt-gui-cpp\t2.7.6-1noble.20260831.231955\tinstalled\nros-jazzy-qt-gui-py-common\t2.7.6-1noble.20260519.011126\tinstalled\nros-jazzy-rcl\t9.2.11-1noble.20260902.044558\tinstalled\nros-jazzy-rcl-action\t9.2.11-1noble.20260902.045222\tinstalled\nros-jazzy-rcl-interfaces\t2.0.4-1noble.20260902.021729\tinstalled\nros-jazzy-rcl-lifecycle\t9.2.11-1noble.20260902.051007\tinstalled\nros-jazzy-rcl-logging-interface\t3.1.1-1noble.20260603.152452\tinstalled\nros-jazzy-rcl-logging-spdlog\t3.1.1-1noble.20260604.025148\tinstalled\nros-jazzy-rcl-yaml-param-parser\t9.2.11-1noble.20260612.050432\tinstalled\nros-jazzy-rclcpp\t28.1.22-1noble.20260902.055335\tinstalled\nros-jazzy-rclcpp-action\t28.1.22-1noble.20260902.103722\tinstalled\nros-jazzy-rclcpp-components\t28.1.22-1noble.20260902.062054\tinstalled\nros-jazzy-rclcpp-lifecycle\t28.1.22-1noble.20260903.011547\tinstalled\nros-jazzy-rclpy\t7.1.12-1noble.20260902.053513\tinstalled\nros-jazzy-rcpputils\t2.11.4-1noble.20260603.152446\tinstalled\nros-jazzy-rcutils\t6.7.6-1noble.20260603.152220\tinstalled\nros-jazzy-resource-retriever\t3.4.4-1noble.20260603.152233\tinstalled\nros-jazzy-rmw\t7.3.3-1noble.20260612.050218\tinstalled\nros-jazzy-rmw-connextdds\t\tnot-installed\nros-jazzy-rmw-cyclonedds-cpp\t\tnot-installed\nros-jazzy-rmw-dds-common\t3.1.1-1noble.20260902.031038\tinstalled\nros-jazzy-rmw-fastrtps-cpp\t8.4.4-1noble.20260902.041916\tinstalled\nros-jazzy-rmw-fastrtps-shared-cpp\t8.4.4-1noble.20260902.041127\tinstalled\nros-jazzy-rmw-implementation\t2.15.6-1noble.20260902.043425\tinstalled\nros-jazzy-rmw-implementation-cmake\t7.3.3-1noble.20260225.225156\tinstalled\nros-jazzy-robot-state-publisher\t3.3.4-1noble.20260903.022201\tinstalled\nros-jazzy-ros-base\t0.11.0-1noble.20260903.093452\tinstalled\nros-jazzy-ros-core\t0.11.0-1noble.20260903.085113\tinstalled\nros-jazzy-ros-environment\t4.2.1-1noble.20260225.043405\tinstalled\nros-jazzy-ros-gz\t1.0.24-1noble.20260905.090616\tinstalled\nros-jazzy-ros-gz-bridge\t1.0.24-1noble.20260905.070149\tinstalled\nros-jazzy-ros-gz-image\t1.0.24-1noble.20260905.072745\tinstalled\nros-jazzy-ros-gz-interfaces\t1.0.24-1noble.20260902.041547\tinstalled\nros-jazzy-ros-gz-sim\t1.0.24-1noble.20260905.085151\tinstalled\nros-jazzy-ros-gz-sim-demos\t1.0.24-1noble.20260905.085920\tinstalled\nros-jazzy-ros-workspace\t1.0.3-7noble.20260224.191628\tinstalled\nros-jazzy-ros2action\t0.32.12-1noble.20260903.070315\tinstalled\nros-jazzy-ros2bag\t0.26.11-1noble.20260903.091706\tinstalled\nros-jazzy-ros2cli\t0.32.12-1noble.20260902.102710\tinstalled\nros-jazzy-ros2cli-common-extensions\t0.3.1-1noble.20260903.085021\tinstalled\nros-jazzy-ros2component\t0.32.12-1noble.20260903.084755\tinstalled\nros-jazzy-ros2doctor\t0.32.12-1noble.20260902.103121\tinstalled\nros-jazzy-ros2interface\t0.32.12-1noble.20260902.103123\tinstalled\nros-jazzy-ros2launch\t0.26.12-1noble.20260903.074444\tinstalled\nros-jazzy-ros2lifecycle\t0.32.12-1noble.20260903.084439\tinstalled\nros-jazzy-ros2multicast\t0.32.12-1noble.20260902.103136\tinstalled\nros-jazzy-ros2node\t0.32.12-1noble.20260902.103130\tinstalled\nros-jazzy-ros2param\t0.32.12-1noble.20260903.084453\tinstalled\nros-jazzy-ros2pkg\t0.32.12-1noble.20260903.070408\tinstalled\nros-jazzy-ros2plugin\t5.4.6-1noble.20260903.074527\tinstalled\nros-jazzy-ros2run\t0.32.12-1noble.20260903.074618\tinstalled\nros-jazzy-ros2service\t0.32.12-1noble.20260903.074340\tinstalled\nros-jazzy-ros2topic\t0.32.12-1noble.20260903.070408\tinstalled\nros-jazzy-rosbag2\t0.26.11-1noble.20260903.092044\tinstalled\nros-jazzy-rosbag2-compression\t0.26.11-1noble.20260903.070441\tinstalled\nros-jazzy-rosbag2-compression-zstd\t0.26.11-1noble.20260903.075117\tinstalled\nros-jazzy-rosbag2-cpp\t0.26.11-1noble.20260902.083107\tinstalled\nros-jazzy-rosbag2-interfaces\t0.26.11-1noble.20260902.022225\tinstalled\nros-jazzy-rosbag2-py\t0.26.11-1noble.20260903.090602\tinstalled\nros-jazzy-rosbag2-storage\t0.26.11-1noble.20260902.082620\tinstalled\nros-jazzy-rosbag2-storage-default-plugins\t0.26.11-1noble.20260903.075127\tinstalled\nros-jazzy-rosbag2-storage-mcap\t0.26.11-1noble.20260903.070458\tinstalled\nros-jazzy-rosbag2-storage-sqlite3\t0.26.11-1noble.20260903.070451\tinstalled\nros-jazzy-rosbag2-transport\t0.26.11-1noble.20260903.085220\tinstalled\nros-jazzy-rosgraph-msgs\t2.0.4-1noble.20260902.031408\tinstalled\nros-jazzy-rosidl-adapter\t4.6.9-1noble.20260612.045507\tinstalled\nros-jazzy-rosidl-cli\t4.6.9-1noble.20260612.045120\tinstalled\nros-jazzy-rosidl-cmake\t4.6.9-1noble.20260612.050210\tinstalled\nros-jazzy-rosidl-core-generators\t0.2.1-1noble.20260902.013715\tinstalled\nros-jazzy-rosidl-core-runtime\t0.2.1-1noble.20260902.013745\tinstalled\nros-jazzy-rosidl-default-generators\t1.6.1-1noble.20260902.021422\tinstalled\nros-jazzy-rosidl-default-runtime\t1.6.1-1noble.20260902.015921\tinstalled\nros-jazzy-rosidl-dynamic-typesupport\t0.1.2-3noble.20260612.045843\tinstalled\nros-jazzy-rosidl-dynamic-typesupport-fastrtps\t0.1.0-3noble.20260902.013600\tinstalled\nros-jazzy-rosidl-generator-c\t4.6.9-1noble.20260612.050418\tinstalled\nros-jazzy-rosidl-generator-cpp\t4.6.9-1noble.20260612.050852\tinstalled\nros-jazzy-rosidl-generator-py\t0.22.2-1noble.20260612.051058\tinstalled\nros-jazzy-rosidl-generator-rs\t0.5.0-1noble.20260813.022251\tinstalled\nros-jazzy-rosidl-generator-type-description\t4.6.9-1noble.20260612.050043\tinstalled\nros-jazzy-rosidl-parser\t4.6.9-1noble.20260612.045810\tinstalled\nros-jazzy-rosidl-pycommon\t4.6.9-1noble.20260612.045929\tinstalled\nros-jazzy-rosidl-runtime-c\t4.6.9-1noble.20260612.045513\tinstalled\nros-jazzy-rosidl-runtime-cpp\t4.6.9-1noble.20260612.045852\tinstalled\nros-jazzy-rosidl-runtime-py\t0.13.2-1noble.20260612.050026\tinstalled\nros-jazzy-rosidl-typesupport-c\t3.2.3-1noble.20260612.050857\tinstalled\nros-jazzy-rosidl-typesupport-cpp\t3.2.3-1noble.20260612.051324\tinstalled\nros-jazzy-rosidl-typesupport-fastrtps-c\t3.6.4-1noble.20260901.223423\tinstalled\nros-jazzy-rosidl-typesupport-fastrtps-cpp\t3.6.4-1noble.20260901.222810\tinstalled\nros-jazzy-rosidl-typesupport-interface\t4.6.9-1noble.20260612.045126\tinstalled\nros-jazzy-rosidl-typesupport-introspection-c\t4.6.9-1noble.20260612.050623\tinstalled\nros-jazzy-rosidl-typesupport-introspection-cpp\t4.6.9-1noble.20260612.051103\tinstalled\nros-jazzy-rpyutils\t0.4.2-1noble.20260225.142204\tinstalled\nros-jazzy-rqt-gui\t1.6.4-1noble.20260902.081721\tinstalled\nros-jazzy-rqt-gui-cpp\t1.6.4-1noble.20260902.082559\tinstalled\nros-jazzy-rqt-gui-py\t1.6.4-1noble.20260902.105041\tinstalled\nros-jazzy-rqt-image-view\t1.3.0-2noble.20260903.073052\tinstalled\nros-jazzy-rqt-plot\t1.4.5-1noble.20260902.105705\tinstalled\nros-jazzy-rqt-py-common\t1.6.4-1noble.20260902.081726\tinstalled\nros-jazzy-rqt-topic\t1.7.5-1noble.20260903.074359\tinstalled\nros-jazzy-rviz-assimp-vendor\t14.1.23-1noble.20260715.010624\tinstalled\nros-jazzy-rviz-common\t14.1.23-1noble.20260903.022201\tinstalled\nros-jazzy-rviz-default-plugins\t14.1.23-1noble.20260905.033533\tinstalled\nros-jazzy-rviz-ogre-vendor\t14.1.23-1noble.20260715.010827\tinstalled\nros-jazzy-rviz-rendering\t14.1.23-1noble.20260715.013933\tinstalled\nros-jazzy-rviz2\t14.1.23-1noble.20260905.070259\tinstalled\nros-jazzy-sdformat-urdf\t1.0.2-1noble.20260905.070219\tinstalled\nros-jazzy-sdformat-vendor\t0.0.14-1noble.20260905.033543\tinstalled\nros-jazzy-sensor-msgs\t5.3.8-1noble.20260902.041633\tinstalled\nros-jazzy-sensor-msgs-py\t5.3.8-1noble.20260902.043313\tinstalled\nros-jazzy-service-msgs\t2.0.4-1noble.20260902.015102\tinstalled\nros-jazzy-shape-msgs\t5.3.8-1noble.20260902.034008\tinstalled\nros-jazzy-simulation-interfaces\t1.5.1-1noble.20260902.041638\tinstalled\nros-jazzy-spdlog-vendor\t1.6.2-1noble.20260603.150612\tinstalled\nros-jazzy-sqlite3-vendor\t0.26.11-1noble.20260603.150654\tinstalled\nros-jazzy-sros2\t0.13.6-1noble.20260903.070845\tinstalled\nros-jazzy-sros2-cmake\t0.13.6-1noble.20260903.075137\tinstalled\nros-jazzy-statistics-msgs\t2.0.4-1noble.20260902.022352\tinstalled\nros-jazzy-std-msgs\t5.3.8-1noble.20260902.022418\tinstalled\nros-jazzy-std-srvs\t5.3.8-1noble.20260902.031157\tinstalled\nros-jazzy-stereo-msgs\t5.3.8-1noble.20260902.043227\tinstalled\nros-jazzy-tango-icons-vendor\t0.3.1-1noble.20260225.230515\tinstalled\nros-jazzy-tf2\t0.36.22-1noble.20260902.041654\tinstalled\nros-jazzy-tf2-bullet\t0.36.22-1noble.20260903.022532\tinstalled\nros-jazzy-tf2-eigen\t0.36.22-1noble.20260903.022246\tinstalled\nros-jazzy-tf2-eigen-kdl\t0.36.22-1noble.20260902.042605\tinstalled\nros-jazzy-tf2-geometry-msgs\t0.36.22-1noble.20260903.022912\tinstalled\nros-jazzy-tf2-kdl\t0.36.22-1noble.20260903.022912\tinstalled\nros-jazzy-tf2-msgs\t0.36.22-1noble.20260902.041736\tinstalled\nros-jazzy-tf2-py\t0.36.22-1noble.20260902.102727\tinstalled\nros-jazzy-tf2-ros\t0.36.22-1noble.20260903.021700\tinstalled\nros-jazzy-tf2-ros-py\t0.36.22-1noble.20260903.022808\tinstalled\nros-jazzy-tf2-sensor-msgs\t0.36.22-1noble.20260903.022912\tinstalled\nros-jazzy-tf2-tools\t0.36.22-1noble.20260903.022914\tinstalled\nros-jazzy-theora-image-transport\t4.0.7-1noble.20260903.073409\tinstalled\nros-jazzy-tinyxml2-vendor\t0.9.2-1noble.20260225.230621\tinstalled\nros-jazzy-tracetools\t8.2.6-1noble.20260603.152223\tinstalled\nros-jazzy-trajectory-msgs\t5.3.8-1noble.20260902.041818\tinstalled\nros-jazzy-type-description-interfaces\t2.0.4-1noble.20260902.015447\tinstalled\nros-jazzy-uncrustify-vendor\t3.0.1-1noble.20260225.230730\tinstalled\nros-jazzy-unique-identifier-msgs\t2.5.1-1noble.20260902.014005\tinstalled\nros-jazzy-urdf\t2.10.1-2noble.20260831.232032\tinstalled\nros-jazzy-urdf-parser-plugin\t2.10.1-2noble.20260603.151118\tinstalled\nros-jazzy-urdfdom\t4.0.2-1noble.20260603.151654\tinstalled\nros-jazzy-urdfdom-headers\t1.1.3-1noble.20260603.150728\tinstalled\nros-jazzy-vision-msgs\t4.1.1-3noble.20260902.034028\tinstalled\nros-jazzy-visualization-msgs\t5.3.8-1noble.20260902.042956\tinstalled\nros-jazzy-xacro\t2.1.1-1noble.20260519.011123\tinstalled\nros-jazzy-yaml-cpp-vendor\t9.0.1-1noble.20260225.230938\tinstalled\nros-jazzy-zstd-image-transport\t4.0.7-1noble.20260903.073902\tinstalled\nros-jazzy-zstd-vendor\t0.26.11-1noble.20260603.150731\tinstalled",
+      "stderr": "dpkg-query: no packages found matching gz-*"
+    },
+    "tools": {
+      "cmake": {
+        "exit_code": 0,
+        "stdout": "cmake version 3.28.3\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).",
+        "stderr": ""
+      },
+      "ninja": {
+        "exit_code": 0,
+        "stdout": "1.11.1",
+        "stderr": ""
+      },
+      "gcc": {
+        "exit_code": 0,
+        "stdout": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
+        "stderr": ""
+      },
+      "git": {
+        "exit_code": 0,
+        "stdout": "git version 2.43.0",
+        "stderr": ""
+      },
+      "linux_python": {
+        "exit_code": 0,
+        "stdout": "Python 3.12.3",
+        "stderr": ""
+      },
+      "gazebo": {
+        "exit_code": 0,
+        "stdout": "8.15.0",
+        "stderr": ""
+      },
+      "px4_python_freeze": {
+        "exit_code": 0,
+        "stdout": "action-msgs==2.0.4\nactionlib-msgs==5.3.8\nactuator-msgs==0.0.1\nament-cmake-test==2.5.6\nament-copyright==0.17.5\nament-cppcheck==0.17.5\nament-cpplint==0.17.5\nament-flake8==0.17.5\nament-index-python==1.8.4\nament-lint==0.17.5\nament-lint-cmake==0.17.5\nament-package==0.16.5\nament-pep257==0.17.5\nament-uncrustify==0.17.5\nament-xmllint==0.17.5\nargcomplete==3.7.2\nattrs==26.1.0\nbuiltin-interfaces==2.0.4\nCerberus==1.3.8\ncertifi==2026.7.22\ncharset-normalizer==3.5.1\ncomposition-interfaces==2.0.4\ncontourpy==1.3.3\ncoverage==7.16.0\ncv-bridge==4.1.0\ncycler==0.12.1\ndiagnostic-msgs==5.3.8\ndomain-coordinator==0.12.1\nempy==3.3.4\nfastcrc==0.3.6\nfonttools==4.65.0\nfuture==1.0.0\ngeometry-msgs==5.3.8\ngps-msgs==3.1.1\nidna==3.19\nimportlib_resources==7.1.0\ninteractive-markers==2.5.5\nJinja2==3.1.6\njsonschema==4.26.0\njsonschema-specifications==2025.9.1\nkconfiglib==14.1.0\nkiwisolver==1.5.1\nlark==1.3.1\nlaser-geometry==2.7.2\nlaunch==3.4.11\nlaunch-ros==0.26.12\nlaunch-testing==3.4.11\nlaunch-testing-ros==0.26.12\nlaunch-xml==3.4.11\nlaunch-yaml==3.4.11\nlifecycle-msgs==2.0.4\nlxml==6.1.3\nmap-msgs==2.4.1\nmarine-acoustic-msgs==2.1.0\nMarkupSafe==3.0.3\nmatplotlib==3.11.1\nmessage-filters==4.11.17\nmpmath==1.3.0\nnav-msgs==5.3.8\nnumpy==2.5.3\nnunavut==2.3.1\nosrf-pycommon==2.1.7\npackaging==26.3\npandas==3.0.5\npillow==12.3.0\npkgconfig==1.6.0\npsutil==7.2.2\npycryptodome==3.23.0\npydsdl==1.25.0\nPygments==2.21.0\npymavlink==2.4.49\npyparsing==3.3.2\npyros-genmsg==0.5.8\npyserial==3.5\npython-dateutil==2.9.0.post0\npython-qt-binding==2.2.2\npyulog==1.2.4\nPyYAML==6.0.3\nqt-gui==2.7.6\nqt-gui-cpp==2.7.6\nqt-gui-py-common==2.7.6\nrcl-interfaces==2.0.4\nrclpy==7.1.12\nrcutils==6.7.6\nreferencing==0.37.0\nrequests==2.34.2\nresource-retriever==3.4.4\nrmw-dds-common==3.1.1\nros-gz-bridge==1.0.24\nros-gz-interfaces==1.0.24\nros-gz-sim==1.0.24\nros2action==0.32.12\nros2bag==0.26.11\nros2bag-mcap-cli==0.26.11\nros2bag-sqlite3-cli==0.26.11\nros2cli==0.32.12\nros2component==0.32.12\nros2doctor==0.32.12\nros2interface==0.32.12\nros2launch==0.26.12\nros2lifecycle==0.32.12\nros2multicast==0.32.12\nros2node==0.32.12\nros2param==0.32.12\nros2pkg==0.32.12\nros2plugin==5.4.6\nros2run==0.32.12\nros2service==0.32.12\nros2topic==0.32.12\nrosbag2-interfaces==0.26.11\nrosbag2-py==0.26.11\nrosgraph-msgs==2.0.4\nrosidl-adapter==4.6.9\nrosidl-cli==4.6.9\nrosidl-cmake==4.6.9\nrosidl-generator-c==4.6.9\nrosidl-generator-cpp==4.6.9\nrosidl-generator-py==0.22.2\nrosidl-generator-rs==0.5.0\nrosidl-generator-type-description==4.6.9\nrosidl-parser==4.6.9\nrosidl-pycommon==4.6.9\nrosidl-runtime-py==0.13.2\nrosidl-typesupport-c==3.2.3\nrosidl-typesupport-cpp==3.2.3\nrosidl-typesupport-fastrtps-c==3.6.4\nrosidl-typesupport-fastrtps-cpp==3.6.4\nrosidl-typesupport-introspection-c==4.6.9\nrosidl-typesupport-introspection-cpp==4.6.9\nrpds-py==2026.6.3\nrpyutils==0.4.2\nrqt-gui==1.6.4\nrqt-gui-py==1.6.4\nrqt-plot==1.4.5\nrqt-py-common==1.6.4\nrqt-topic==1.7.5\nsensor-msgs==5.3.8\nsensor-msgs-py==5.3.8\nservice-msgs==2.0.4\nsetuptools==84.0.0\nshape-msgs==5.3.8\nsimulation-interfaces==1.5.1\nsix==1.17.0\nsros2==0.13.6\nstatistics-msgs==2.0.4\nstd-msgs==5.3.8\nstd-srvs==5.3.8\nstereo-msgs==5.3.8\nsympy==1.14.0\ntf2-geometry-msgs==0.36.22\ntf2-kdl==0.36.22\ntf2-msgs==0.36.22\ntf2-py==0.36.22\ntf2-ros-py==0.36.22\ntf2-sensor-msgs==0.36.22\ntf2-tools==0.36.22\ntheora-image-transport==4.0.7\ntoml==0.10.2\ntrajectory-msgs==5.3.8\ntype-description-interfaces==2.0.4\ntyping_extensions==4.16.0\nunique-identifier-msgs==2.5.1\nurllib3==2.7.0\nvision-msgs==4.1.1\nvisualization-msgs==5.3.8\nwheel==0.48.0\nxacro==2.1.1",
+        "stderr": ""
+      }
+    }
+  },
+  "unresolved_reason": null,
+  "clean_rebuild_proven": false,
+  "reproducibility_limitations": [
+    "PX4's pinned optical_flow.cmake requests external OpticalFlow master; actual fetched commits are recorded, not a clean-rebuild guarantee.",
+    "Apt and pip package versions are recorded; setup does not use a frozen package mirror."
+  ]
+}

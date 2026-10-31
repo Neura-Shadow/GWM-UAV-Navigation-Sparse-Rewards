@@ -1,0 +1,993 @@
+{
+  "schema_version": 1,
+  "scope": "operator-directed software-only P0/P1",
+  "evidence_root": "/home/joker0625/uav_autonomy",
+  "full_local_audit": "state/p1-evidence.json",
+  "full_local_audit_sha256": "fddf880bb4bc7c7bc8969ad95c71fc62de375fa8c0e834c1d0c5458529b77b42",
+  "p0_environment": "passed",
+  "p1_boot": "passed",
+  "p1_initial_flight_smoke": "passed",
+  "p1_repeated_acceptance": "passed",
+  "ros2_autonomous_control": "not_implemented",
+  "obstacle_avoidance": "not_implemented",
+  "initial_smoke_run_id": "20260911T160305Z-p1-f0818342",
+  "recorded_attempt_counts": {
+    "total": 34,
+    "passed": 28,
+    "failed": 2,
+    "blocked": 4
+  },
+  "final_batch_metrics": {
+    "consecutive_passes": 20,
+    "independent_ulog_passes": 20,
+    "hover_min_duration_sim_s": 10.016000000000002,
+    "hover_max_duration_sim_s": 10.083999999999998,
+    "max_height_error_m": 0.29105000000000003,
+    "max_horizontal_displacement_m": 0.0958729831600123,
+    "max_sample_gap_sim_s": 0.11200000000000188,
+    "all_landed_disarmed": true
+  },
+  "verifier_sha256": "e35a29acbf6ca3becd0ef8b497c1cb1b4280cde7945c13c1c2d19e08f7c1a8c4",
+  "batches": [
+    {
+      "batch_id": "20260911T160450Z-repeat-251648a4",
+      "status": "failed",
+      "consecutive_passes": 7,
+      "required": 20,
+      "independent_ulog_passes": 7,
+      "run_ids": [
+        "20260911T160452Z-p1-060dc1be",
+        "20260911T160537Z-p1-538e35e4",
+        "20260911T160411Z-p1-8564cb09",
+        "20260911T160712Z-p1-0b410ff9",
+        "20260911T160759Z-p1-f9b8b7ac",
+        "20260911T160844Z-p1-7e0087a4",
+        "20260911T160933Z-p1-0dc05f25",
+        "20260911T161022Z-p1-d3907d3a"
+      ],
+      "failure": "Trial did not meet every acceptance gate: 20260911T161022Z-p1-d3907d3a",
+      "input_identity": null
+    },
+    {
+      "batch_id": "20260911T161204Z-repeat-8970f177",
+      "status": "passed",
+      "consecutive_passes": 20,
+      "required": 20,
+      "independent_ulog_passes": 20,
+      "run_ids": [
+        "20260911T161205Z-p1-3c49882b",
+        "20260911T161253Z-p1-3225daf9",
+        "20260911T161342Z-p1-cfcf49e9",
+        "20260911T161430Z-p1-a7845ff7",
+        "20260911T161517Z-p1-4bc0d64a",
+        "20260911T161604Z-p1-f6f6c3ad",
+        "20260911T161651Z-p1-bd94c8f4",
+        "20260911T161738Z-p1-b2fe36b0",
+        "20260911T161829Z-p1-6e9b2c24",
+        "20260911T161916Z-p1-81713afb",
+        "20260911T162004Z-p1-d46cc285",
+        "20260911T162054Z-p1-4098072c",
+        "20260911T162142Z-p1-48d03743",
+        "20260911T162230Z-p1-f290ab6b",
+        "20260911T162317Z-p1-10d56a6b",
+        "20260911T162403Z-p1-5acc9d88",
+        "20260911T162448Z-p1-c6763608",
+        "20260911T162538Z-p1-c91d7252",
+        "20260911T162626Z-p1-40afcb68",
+        "20260911T162712Z-p1-11a6f78a"
+      ],
+      "failure": null,
+      "input_identity": {
+        "config_sha256": "44a01bb187e29b72925b02050c39f1eeb3c6a17020e5350cb917223c9b9017e3",
+        "lock_sha256": "9a37285d5aa8b9f498dd000c8405092d7bbd07f6a213a84a79ddb6cdca31bde9",
+        "binary_sha256": "5383767fd3068a8a306660430f10c8852eb4d581a8a7af5f3fc14cea7b9d106d",
+        "operator_script_sha256": {
+          "build_baseline.sh": "326a7036bc961227a9715137e3c6979f0111368c2f9676c8d0e7c1b4ea31f0a8",
+          "check_environment.sh": "99b3f7317cbc21ce4bf255267c8c7eae9b603bf2df4c7ef367e80f01955c4037",
+          "common.sh": "f84399b6b3938327b4ca817fd2d08dab340dd09a4ff57368a2041a63035622cb",
+          "p1_contract.py": "daf348b6af40bf430166aa8f24936bd56396e4fc1312cd36828e99ce811222c8",
+          "p1_runner.py": "7db73916c05f6848094c5f0ea98892d8e794cab0bad20be35398b7aa1f54c1c8",
+          "record_versions.py": "6e1451dd9e37fa4963a794e637d961fada006456cf6a3e2ffbec3163e3dadf2a",
+          "run_p1_baseline.sh": "e630e8f0b0ffb736bbcb1900501729e68268b29143635f7579a634670ce9589c",
+          "run_p1_repeated.py": "4765892d6eab71faad01d74743e564cbfd7c7a7f18a1ca8cfe99d4612ac9661a",
+          "setup_environment.sh": "e566eb7eabdffe9580bbcf8553a65897fee78baeab0300da6efafce6415ed147",
+          "setup_qgc_monitor.sh": "a0c1d99a4a2a334ffee40a5508dbc31461d4d778d2f1b80102bfdb2fd7775882"
+        },
+        "mode": "gui_requested"
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "run_id": "20260911T154745Z-p1-11f1c326",
+      "boot": "failed",
+      "flight_smoke": "blocked",
+      "failure": "Logger status lacks file evidence",
+      "landed_disarmed": null,
+      "hover": null,
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T154745Z-p1-11f1c326/rootfs/log/2026-09-11/15_50_13.ulg",
+          "sha256": "6d3e4a0863be28d8d7db7cfc9c5d8ecf348387006711a401061fa5d8cf22c33a",
+          "bytes": 682613
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T155120Z-p1-8661c19b",
+      "boot": "failed",
+      "flight_smoke": "blocked",
+      "failure": "Normal preflight/estimator health did not become valid",
+      "landed_disarmed": null,
+      "hover": null,
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T155120Z-p1-8661c19b/rootfs/log/2026-09-11/15_51_30.ulg",
+          "sha256": "37f859491e18810a6909c74ae7ac04022b83b2a9dcfc20ab6d9dbb450e4925b7",
+          "bytes": 9427505
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T155532Z-p1-dea27417",
+      "boot": "failed",
+      "flight_smoke": "blocked",
+      "failure": "QGroundControl monitor exited; inspect qgc-monitor.log",
+      "landed_disarmed": null,
+      "hover": null,
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T155532Z-p1-dea27417/rootfs/log/2026-09-11/15_55_43.ulg",
+          "sha256": "51f10ba164fd4083c79dc9bac98240373f57be08136f44fd59d0fbd33e496dd5",
+          "bytes": 718831
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T155655Z-p1-bca379c1",
+      "boot": "passed",
+      "flight_smoke": "failed",
+      "failure": "Simulation time did not advance",
+      "landed_disarmed": null,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.7,
+        "end_sim_s": 27.74,
+        "duration_sim_s": 10.04,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.82491,
+        "height_max_m": 2.00282,
+        "height_max_error_m": 0.17508999999999997,
+        "horizontal_max_displacement_m": 0.06489128215715882
+      },
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T155655Z-p1-bca379c1/rootfs/log/2026-09-11/15_57_06.ulg",
+          "sha256": "81d4810539ab15d0d5f27320008baf1830856af7e5453806a16a8553fa5195bb",
+          "bytes": 6781302
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160158Z-p1-ec92e9ab",
+      "boot": "failed",
+      "flight_smoke": "blocked",
+      "failure": "QGroundControl monitor exited; inspect qgc-monitor.log",
+      "landed_disarmed": null,
+      "hover": null,
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160158Z-p1-ec92e9ab/rootfs/log/2026-09-11/16_02_10.ulg",
+          "sha256": "02900ed976e5621ba1efc31eea701a483d6d16c546dd128db0217fabf446ed80",
+          "bytes": 755732
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160305Z-p1-f0818342",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.616,
+        "end_sim_s": 27.64,
+        "duration_sim_s": 10.024000000000001,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.8202699999999998,
+        "height_max_m": 2.00859,
+        "height_max_error_m": 0.17973000000000017,
+        "horizontal_max_displacement_m": 0.059375514313561945
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160305Z-p1-f0818342/rootfs/log/2026-09-11/16_03_17.ulg",
+          "sha256": "44e713781e67b682e673de98b39c4d99da004ea9debc9c61ed9703d7a85ff2aa",
+          "bytes": 8727638
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160411Z-p1-8564cb09",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 14.732,
+        "end_sim_s": 24.796,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.7083899999999999,
+        "height_max_m": 2.05855,
+        "height_max_error_m": 0.29161000000000015,
+        "horizontal_max_displacement_m": 0.04509985033234589
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160411Z-p1-8564cb09/rootfs/log/2026-09-11/16_06_40.ulg",
+          "sha256": "c2f5786ac93977907324e54dbea5c7787caaf89e1f3e87ce1dbbd2cbe79b041c",
+          "bytes": 7862165
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160452Z-p1-060dc1be",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 15.896,
+        "end_sim_s": 25.912,
+        "duration_sim_s": 10.015999999999998,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.7577099999999999,
+        "height_max_m": 2.02893,
+        "height_max_error_m": 0.24229000000000012,
+        "horizontal_max_displacement_m": 0.05123841137271919
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160452Z-p1-060dc1be/rootfs/log/2026-09-11/16_05_03.ulg",
+          "sha256": "d44b7c39a4977be4f6aaafaafbd0f5cc347cd0f0dca85ef9179ecd0cedda2040",
+          "bytes": 8098135
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160537Z-p1-538e35e4",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.464,
+        "end_sim_s": 26.496,
+        "duration_sim_s": 10.032,
+        "max_sample_gap_sim_s": 0.10400000000000276,
+        "height_min_m": 1.76805,
+        "height_max_m": 2.03717,
+        "height_max_error_m": 0.2319500000000001,
+        "horizontal_max_displacement_m": 0.06286358962070174
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160537Z-p1-538e35e4/rootfs/log/2026-09-11/16_05_51.ulg",
+          "sha256": "84e1cdae3b178db778a544a40306519f03a8c0b8fd9d04d2e676979959e6cc00",
+          "bytes": 8457318
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160712Z-p1-0b410ff9",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 15.8,
+        "end_sim_s": 25.832,
+        "duration_sim_s": 10.032,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.75777,
+        "height_max_m": 2.02955,
+        "height_max_error_m": 0.24222999999999995,
+        "horizontal_max_displacement_m": 0.051852580456521156
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160712Z-p1-0b410ff9/rootfs/log/2026-09-11/16_07_24.ulg",
+          "sha256": "226719abcda0d04eadc8c2c35161f8de62e5ae682259b2c45753dbd8e9726db9",
+          "bytes": 8173906
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160759Z-p1-f9b8b7ac",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 15.868,
+        "end_sim_s": 25.932,
+        "duration_sim_s": 10.063999999999998,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.75205,
+        "height_max_m": 2.02447,
+        "height_max_error_m": 0.2479499999999999,
+        "horizontal_max_displacement_m": 0.06029017913391865
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160759Z-p1-f9b8b7ac/rootfs/log/2026-09-11/16_08_10.ulg",
+          "sha256": "b95408ecdd007e2ef7c57b41ba4e450b6262c64ce61dc3b7a43db7710f0ecd15",
+          "bytes": 8077044
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160844Z-p1-7e0087a4",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.78,
+        "end_sim_s": 26.804,
+        "duration_sim_s": 10.023999999999997,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.7868,
+        "height_max_m": 2.0488,
+        "height_max_error_m": 0.21320000000000006,
+        "horizontal_max_displacement_m": 0.06370833854371027
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160844Z-p1-7e0087a4/rootfs/log/2026-09-11/16_08_56.ulg",
+          "sha256": "6be200875d9b3a144660c0d30a1d89407374060bfb1e3edafc3287d92c681b36",
+          "bytes": 8574853
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T160933Z-p1-0dc05f25",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.02,
+        "end_sim_s": 27.084,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.79402,
+        "height_max_m": 2.01344,
+        "height_max_error_m": 0.20598000000000005,
+        "horizontal_max_displacement_m": 0.05369576985200976
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T160933Z-p1-0dc05f25/rootfs/log/2026-09-11/16_09_44.ulg",
+          "sha256": "68212988fc6eb0479456255764b4beb53aa4489eeba339ca5f104eb7d1d1c8dd",
+          "bytes": 8520239
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161022Z-p1-d3907d3a",
+      "boot": "passed",
+      "flight_smoke": "failed",
+      "failure": "PX4 prompt/wall deadline exceeded",
+      "landed_disarmed": null,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.136,
+        "end_sim_s": 27.2,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.80295,
+        "height_max_m": 2.01249,
+        "height_max_error_m": 0.19704999999999995,
+        "horizontal_max_displacement_m": 0.05283082528221569
+      },
+      "ulog_cross_check": null,
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161022Z-p1-d3907d3a/rootfs/log/2026-09-11/16_10_34.ulg",
+          "sha256": "9390761cbb463d15014d2b4471300723bf7ae3a47afc2a8952015ec0b205282a",
+          "bytes": 8821190
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161205Z-p1-3c49882b",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.656,
+        "end_sim_s": 27.712,
+        "duration_sim_s": 10.056000000000001,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.81865,
+        "height_max_m": 2.01613,
+        "height_max_error_m": 0.1813499999999999,
+        "horizontal_max_displacement_m": 0.09155219549524742
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161205Z-p1-3c49882b/rootfs/log/2026-09-11/16_12_16.ulg",
+          "sha256": "fc0b89b1b667e9b05283da5a0b05ab2fa913dbe0e5e11694ad74e7c054d12f1f",
+          "bytes": 8743616
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161253Z-p1-3225daf9",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.328,
+        "end_sim_s": 27.344,
+        "duration_sim_s": 10.016000000000002,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.80545,
+        "height_max_m": 2.00285,
+        "height_max_error_m": 0.19455,
+        "horizontal_max_displacement_m": 0.0530521526424706
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161253Z-p1-3225daf9/rootfs/log/2026-09-11/16_13_04.ulg",
+          "sha256": "ffcfcf8b3f8e4ba8da4959e45143bc0042dd39cf880405c5b9f62c729a9cb5f1",
+          "bytes": 8584106
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161342Z-p1-cfcf49e9",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.68,
+        "end_sim_s": 27.736,
+        "duration_sim_s": 10.056000000000001,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.8194299999999999,
+        "height_max_m": 2.004,
+        "height_max_error_m": 0.18057000000000012,
+        "horizontal_max_displacement_m": 0.06760606037922931
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161342Z-p1-cfcf49e9/rootfs/log/2026-09-11/16_13_54.ulg",
+          "sha256": "c21f3c31d58af20d283f99eb256379f49a8a746f780842f447f544e48e3d58e4",
+          "bytes": 8713232
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161430Z-p1-a7845ff7",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.328,
+        "end_sim_s": 26.4,
+        "duration_sim_s": 10.072,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.7667499999999998,
+        "height_max_m": 2.02386,
+        "height_max_error_m": 0.23325000000000018,
+        "horizontal_max_displacement_m": 0.06413785465698085
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161430Z-p1-a7845ff7/rootfs/log/2026-09-11/16_14_42.ulg",
+          "sha256": "22478b1d34ad28923a7ebb85027612e4f463c0e65336783e7876cf0b82e0a8db",
+          "bytes": 8229775
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161517Z-p1-4bc0d64a",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.048,
+        "end_sim_s": 26.096,
+        "duration_sim_s": 10.048000000000002,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.7457500000000001,
+        "height_max_m": 2.0498600000000002,
+        "height_max_error_m": 0.25424999999999986,
+        "horizontal_max_displacement_m": 0.04213424379290555
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161517Z-p1-4bc0d64a/rootfs/log/2026-09-11/16_15_28.ulg",
+          "sha256": "1978cb22c82b78bb4bbe3c3cf60ea50309aec1da343700f2dc5b95a210d5dc84",
+          "bytes": 8360165
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161604Z-p1-f6f6c3ad",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.38,
+        "end_sim_s": 27.42,
+        "duration_sim_s": 10.040000000000003,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.80132,
+        "height_max_m": 2.0047699999999997,
+        "height_max_error_m": 0.19867999999999997,
+        "horizontal_max_displacement_m": 0.0339460999232607
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161604Z-p1-f6f6c3ad/rootfs/log/2026-09-11/16_16_16.ulg",
+          "sha256": "49a01be6b29cc7e7e830ca17ffa864e84ab55fcac9a99a1da8bc0c13a4bbd5a9",
+          "bytes": 8624358
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161651Z-p1-bd94c8f4",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 15.988,
+        "end_sim_s": 26.052,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.76883,
+        "height_max_m": 2.0184,
+        "height_max_error_m": 0.2311700000000001,
+        "horizontal_max_displacement_m": 0.07411527507875822
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161651Z-p1-bd94c8f4/rootfs/log/2026-09-11/16_17_02.ulg",
+          "sha256": "f1617ce7a736fc997c27751947067014dcba7121d54c2d7e538a90e0bf2e9234",
+          "bytes": 8141348
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161738Z-p1-b2fe36b0",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.916,
+        "end_sim_s": 27.964,
+        "duration_sim_s": 10.047999999999998,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.8071199999999998,
+        "height_max_m": 2.00613,
+        "height_max_error_m": 0.19288000000000016,
+        "horizontal_max_displacement_m": 0.029118094031031636
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161738Z-p1-b2fe36b0/rootfs/log/2026-09-11/16_17_53.ulg",
+          "sha256": "62e29b4c40d964e0359a63a074110fdab25767b76c97505959bc752aedaa341c",
+          "bytes": 8769876
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161829Z-p1-6e9b2c24",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.408,
+        "end_sim_s": 27.456,
+        "duration_sim_s": 10.047999999999998,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.8117800000000002,
+        "height_max_m": 2.00097,
+        "height_max_error_m": 0.18821999999999983,
+        "horizontal_max_displacement_m": 0.05827643863518086
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161829Z-p1-6e9b2c24/rootfs/log/2026-09-11/16_18_40.ulg",
+          "sha256": "59ccedc2a324f00339db4eb3247cc47cfe5583b0834da2bff7a6b2e6fd1c23da",
+          "bytes": 8643305
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T161916Z-p1-81713afb",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.832,
+        "end_sim_s": 26.872,
+        "duration_sim_s": 10.04,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.77881,
+        "height_max_m": 2.01451,
+        "height_max_error_m": 0.22119,
+        "horizontal_max_displacement_m": 0.05573636514879671
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T161916Z-p1-81713afb/rootfs/log/2026-09-11/16_19_28.ulg",
+          "sha256": "5202f2a552ae65aae8813677df0b9144cb9b035df9ffd8cda26f3fef522e63bd",
+          "bytes": 8468522
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162004Z-p1-d46cc285",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.488,
+        "end_sim_s": 27.52,
+        "duration_sim_s": 10.032,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.81046,
+        "height_max_m": 2.00354,
+        "height_max_error_m": 0.18954000000000004,
+        "horizontal_max_displacement_m": 0.0958729831600123
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162004Z-p1-d46cc285/rootfs/log/2026-09-11/16_20_15.ulg",
+          "sha256": "c89c07f666c328bc13fc1053db442ec8ca71b7a001d4fbe66ba494f9cf1f2b5d",
+          "bytes": 8715544
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162054Z-p1-4098072c",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.808,
+        "end_sim_s": 26.864,
+        "duration_sim_s": 10.056000000000001,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.79419,
+        "height_max_m": 2.02568,
+        "height_max_error_m": 0.20581000000000005,
+        "horizontal_max_displacement_m": 0.05657086175762218
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162054Z-p1-4098072c/rootfs/log/2026-09-11/16_21_05.ulg",
+          "sha256": "ab6b982d2c909ad0761cdc76d9c6b724f2e82f3ae4c9a9f472ac5c2fbd9de61a",
+          "bytes": 8355852
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162142Z-p1-48d03743",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.964,
+        "end_sim_s": 27.036,
+        "duration_sim_s": 10.072000000000003,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.7980500000000001,
+        "height_max_m": 2.0331,
+        "height_max_error_m": 0.20194999999999985,
+        "horizontal_max_displacement_m": 0.04942335075649971
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162142Z-p1-48d03743/rootfs/log/2026-09-11/16_21_54.ulg",
+          "sha256": "5d0c402fae157e2cdfbdcf49caa57e79599c2d3915e19968b3f760742c21bd96",
+          "bytes": 8538483
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162230Z-p1-f290ab6b",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.492,
+        "end_sim_s": 27.564,
+        "duration_sim_s": 10.072,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.81457,
+        "height_max_m": 2.00619,
+        "height_max_error_m": 0.18542999999999998,
+        "horizontal_max_displacement_m": 0.05347729424718495
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162230Z-p1-f290ab6b/rootfs/log/2026-09-11/16_22_41.ulg",
+          "sha256": "37f9a6db23d01d040c75ece7b6f3c65d4a2f12f3b8989381aa648ad34cae6ab8",
+          "bytes": 8715189
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162317Z-p1-10d56a6b",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 16.144,
+        "end_sim_s": 26.208,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.77699,
+        "height_max_m": 2.03274,
+        "height_max_error_m": 0.22300999999999993,
+        "horizontal_max_displacement_m": 0.043668470318984146
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162317Z-p1-10d56a6b/rootfs/log/2026-09-11/16_23_29.ulg",
+          "sha256": "656fd758431e8a6f89571bf981b9aa940a64e50d1dc8ccc5c4781f5693009ac1",
+          "bytes": 8160742
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162403Z-p1-5acc9d88",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 14.512,
+        "end_sim_s": 24.552,
+        "duration_sim_s": 10.04,
+        "max_sample_gap_sim_s": 0.11199999999999832,
+        "height_min_m": 1.70895,
+        "height_max_m": 2.05132,
+        "height_max_error_m": 0.29105000000000003,
+        "horizontal_max_displacement_m": 0.059853838640474846
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162403Z-p1-5acc9d88/rootfs/log/2026-09-11/16_24_14.ulg",
+          "sha256": "e03392da66510cafed21fa74f70398e528e06a28922aa63a197c8b8f4a72e52e",
+          "bytes": 7843582
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162448Z-p1-c6763608",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.496,
+        "end_sim_s": 27.576,
+        "duration_sim_s": 10.080000000000002,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.8165,
+        "height_max_m": 2.00109,
+        "height_max_error_m": 0.1835,
+        "horizontal_max_displacement_m": 0.07362623988769221
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162448Z-p1-c6763608/rootfs/log/2026-09-11/16_24_59.ulg",
+          "sha256": "b38b93d2bbfcbbf361d4334b47ec02ea7c81345029a98462d6e15fb434f5335e",
+          "bytes": 8715764
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162538Z-p1-c91d7252",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.844,
+        "end_sim_s": 27.908,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.8217400000000001,
+        "height_max_m": 2.01017,
+        "height_max_error_m": 0.17825999999999986,
+        "horizontal_max_displacement_m": 0.06660573248602555
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162538Z-p1-c91d7252/rootfs/log/2026-09-11/16_25_49.ulg",
+          "sha256": "3cec9bf459a5f5d2b2c757705a6c0130f5664a4e772366921336fdb58360ffcb",
+          "bytes": 8822332
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162626Z-p1-40afcb68",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 15.72,
+        "end_sim_s": 25.804,
+        "duration_sim_s": 10.083999999999998,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.73746,
+        "height_max_m": 2.02241,
+        "height_max_error_m": 0.26254,
+        "horizontal_max_displacement_m": 0.05830054030624416
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162626Z-p1-40afcb68/rootfs/log/2026-09-11/16_26_38.ulg",
+          "sha256": "3b87b79b06a26d1a0962f8c16cdad2f1ff0813fc603e25aef11429fec73292ae",
+          "bytes": 8015533
+        }
+      ]
+    },
+    {
+      "run_id": "20260911T162712Z-p1-11a6f78a",
+      "boot": "passed",
+      "flight_smoke": "passed",
+      "failure": null,
+      "landed_disarmed": true,
+      "hover": {
+        "status": "passed",
+        "samples": 98,
+        "start_sim_s": 17.564,
+        "end_sim_s": 27.628,
+        "duration_sim_s": 10.064,
+        "max_sample_gap_sim_s": 0.11200000000000188,
+        "height_min_m": 1.81582,
+        "height_max_m": 1.99563,
+        "height_max_error_m": 0.18418,
+        "horizontal_max_displacement_m": 0.0690796967277651
+      },
+      "ulog_cross_check": "passed",
+      "ulog_files": [
+        {
+          "relative_path": "runs/20260911T162712Z-p1-11a6f78a/rootfs/log/2026-09-11/16_27_24.ulg",
+          "sha256": "0d1cec94befdf2bf196f7129cfa2db098631e095c091458d0c2e8abc3fc02dba",
+          "bytes": 8716042
+        }
+      ]
+    }
+  ],
+  "regression": {
+    "command": "C:\\Users\\zongx\\anaconda3\\python.exe -m pytest -q -rs",
+    "passed": 835,
+    "skipped": 12,
+    "duration_s": 117.9,
+    "focused_tests": 35,
+    "shell_syntax": "passed",
+    "shellcheck": "passed",
+    "python_compile": "passed",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "Flights ran from the implementation working tree based on efae1ee; raw summaries and batch input_identity record exact script hashes.",
+    "GUI was requested; no screenshot-based rendering or depth validation is claimed.",
+    "The separately named design report was unavailable; implementation follows the pasted source-derived requirements.",
+    "Clean rebuild from frozen package sources has not been proven."
+  ]
+}

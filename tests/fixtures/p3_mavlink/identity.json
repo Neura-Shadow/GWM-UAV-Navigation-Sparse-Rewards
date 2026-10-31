@@ -1,0 +1,103 @@
+{
+  "scope": "offline_native_header_generated_fixtures_only",
+  "PX4_commit": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+  "generator_sha256": "6570b5924482cf23572e7712f6514f92b0f4943a9a5d52b34574370608bae05f",
+  "CRC_schema_sha256": "e199d62603267b46ea55f4a1c4af440fde8fbd4d1fa843a9acf661975fc1e39d",
+  "fixtures": {
+    "cancel401-v2.bin": {
+      "sha256": "bb1a1e8fecc7baadaf22a2ae391c625b45c4cc37059a8e1f7cde34511c1988b9",
+      "decoded": [
+        {
+          "message_id": 80,
+          "source_system": 255,
+          "source_component": 190,
+          "start": 0,
+          "end": 16,
+          "raw_hex": "fd04000004ffbe5000009101480111eb",
+          "signed": false,
+          "signature_verification": "not_performed",
+          "command": 401,
+          "target_system": 72,
+          "target_component": 1,
+          "transmitted_payload_bytes": 4,
+          "command_cancel": true
+        }
+      ]
+    },
+    "command401-v2.bin": {
+      "sha256": "0f9443c4d168e48bf79305df25dcdd0ebe4202950206bfdeb9e8c75dde24c47a",
+      "decoded": [
+        {
+          "message_id": 76,
+          "source_system": 255,
+          "source_component": 190,
+          "start": 0,
+          "end": 44,
+          "raw_hex": "fd20000001ffbe4c000000000000000000000000000000000000000000000000000000000000910148014bcd",
+          "signed": false,
+          "signature_verification": "not_performed",
+          "command": 401,
+          "target_system": 72,
+          "target_component": 1,
+          "transmitted_payload_bytes": 32,
+          "command_cancel": false
+        }
+      ]
+    },
+    "heartbeat-v2.bin": {
+      "sha256": "305ecf7673794563301254f2e41091f531a7c7d23bf410ff3e87857d549d252d",
+      "decoded": [
+        {
+          "message_id": 0,
+          "source_system": 255,
+          "source_component": 190,
+          "start": 0,
+          "end": 21,
+          "raw_hex": "fd09000000ffbe0000000000000006080004033d48",
+          "signed": false,
+          "signature_verification": "not_performed"
+        }
+      ]
+    },
+    "request512-v1.bin": {
+      "sha256": "88d2eebdfbb544918c7d84a62202d9031ce4c27e3e2875a36d358da8756eb56f",
+      "decoded": [
+        {
+          "message_id": 76,
+          "source_system": 255,
+          "source_component": 190,
+          "start": 0,
+          "end": 41,
+          "raw_hex": "fe2102ffbe4c0000144300000000000000000000000000000000000000000000000000024801006794",
+          "signed": false,
+          "signature_verification": "not_performed",
+          "command": 512,
+          "target_system": 72,
+          "target_component": 1,
+          "transmitted_payload_bytes": 33,
+          "command_cancel": false
+        }
+      ]
+    },
+    "waypoint16-v2.bin": {
+      "sha256": "90e9662c1b3ee1f5dc2235c78f9249fb6e48168dbeb2bb398acdc0ca7d3193e0",
+      "decoded": [
+        {
+          "message_id": 75,
+          "source_system": 255,
+          "source_component": 190,
+          "start": 0,
+          "end": 45,
+          "raw_hex": "fd21000003ffbe4b0000000000000000000000000000000000000a000000140000000000404010004801017288",
+          "signed": false,
+          "signature_verification": "not_performed",
+          "command": 16,
+          "target_system": 72,
+          "target_component": 1,
+          "transmitted_payload_bytes": 33,
+          "command_cancel": false
+        }
+      ]
+    }
+  }
+}

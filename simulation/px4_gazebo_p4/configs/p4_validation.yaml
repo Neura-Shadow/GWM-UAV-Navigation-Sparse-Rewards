@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "contract": "p4-acceptance-v1",
+  "contract_revision": "revisions 2, 3, 4 and 5 (operator-approved 2026-10-26 and 2026-10-30; revision 2 commit d3c06b4, revision 3 commit ea2c9e3, revision 4 commit 65b99e4, revision 5 commit ae0e037)",
+  "p3_baseline_manifest_sha256": "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c",
+  "p3_baseline_manifest": "state/p3-candidate-087722b.json",
+  "safety": {
+    "min_truth_clearance_m": 0.20,
+    "collisions_allowed": 0,
+    "tracking_horizontal_m": 0.30,
+    "response_latency_sim_s": 0.25,
+    "setpoint_obstacle_margin_m": 0.10,
+    "truth_pose_interval_max_s": 0.05,
+    "truth_motion_allowance_m": 0.015
+  },
+  "performance": {
+    "snapshot_rate_min_hz": 8.0,
+    "snapshot_latency_max_sim_s": 0.25,
+    "snapshot_latency_p95_sim_s": 0.15,
+    "perception_compute_p99_s": 0.050,
+    "perception_compute_max_s": 0.090,
+    "perception_receipt_gap_max_wall_s": 1.0
+  },
+  "outcomes": {
+    "goal_final_distance_m": 0.30,
+    "clear_path_max_lateral_m": 0.30,
+    "fault_hover_after_last_usable_sim_s": 0.35,
+    "fault_target_motion_m": 0.01,
+    "fault_target_yaw_deg": 0.5,
+    "fault_abort_after_stale_sim_s": 10.0,
+    "fault_abort_tolerance_sim_s": 0.10,
+    "fault_pre_window_min_sim_s": 5.0,
+    "fault_pre_window_trim_sim_s": 0.12,
+    "fault_inject_distance_m": 2.0
+  },
+  "ground_fixture": {"reconstruction_tolerance_m": 0.17, "window_sim_s": 15.0},
+  "gates": {
+    "A": [["p3_readiness", null, "p3-readiness"], ["p4_readiness", null, "p4-readiness"],
+          ["fixture", "G2", "fixture-G2"], ["fixture", "G4", "fixture-G4"], ["fixture", "G6", "fixture-G6"],
+          ["fault", "adapter_stop", "fault-adapter_stop"], ["fault", "bridge_stop", "fault-bridge_stop"]],
+    "B": [["flight", "S2", "smoke"]],
+    "S": [["flight", "S1", "safety-S1"], ["flight", "S5", "safety-S5"], ["flight", "S6", "safety-S6"]],
+    "C": [["flight", "S2", "qualification-1"], ["flight", "S3", "qualification-2"], ["flight", "S4", "qualification-3"]]
+  },
+  "predecessor": {"B": "A", "S": "B", "C": "S"},
+  "qualification_flights": 3
+}
