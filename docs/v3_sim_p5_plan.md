@@ -787,3 +787,36 @@ rclpy):
 * **The result is permanent.** Manifest `db4c4779…` cannot be re-run for Gate C. Any change needs
   an operator decision, a new candidate, Policy A approval, a re-freeze and a new gate sequence.
   The §5 thresholds are part of the preserved contract.
+
+### 13.14 Offline investigation of the Gate C inference spike (2026-10-31; no simulator, nothing re-run)
+
+Authorized by the operator after §13.13. The scripts read retained run evidence and run the production
+`PolicyRanker` under the controller interpreter (`/usr/bin/python3`, NumPy 1.26.4, OPENBLAS_NUM_THREADS=1).
+
+* **Spike pattern over the five P5 flights of `db4c4779…`:**
+  * Decisions over 3 ms are isolated, at 0 to 3 per flight. Per-quarter medians stay flat at 0.5–0.7 ms,
+    so there is no drift with flight length or memory growth.
+  * Maxima: 6.0 ms (Gate B S2), 2.5 (S1), 5.08 (S5), 1.91 (S6), 10.84 (Gate C S2).
+* **Ruled out:**
+  * *Garbage collection.* With the full `p5_control` import set, the heap holds about 23,000–27,000
+    tracked objects, and a full collection takes about 2 ms (6 ms when cold). Over 3,000 real decisions
+    (P4 `evaluate_candidates`, then `choose`, plus a ledger record each), no collection landed inside
+    the timed region. `gc.freeze()` changed nothing.
+  * *GIL contention.* The controller starts no Python threads, and its executor is single-threaded.
+  * *Guest CPU saturation.* WSL has 24 vCPUs, and the load average stayed between 1.3 and 6.2 during
+    the flight.
+  * *Intrinsically expensive ticks.* 484 reproduced TRANSIT ticks from Gate C S2 and Gate S S5, each
+    timed 30 times offline: per-tick median 0.34–1.13 ms, worst single call 2.7 ms. The two spike
+    ticks (491 and 337) are not among the ticks the planner reproduces exactly.
+* **Observed:**
+  * The controller process suffers external stalls of this size. In the same flight, a trivial
+    `clock_callback` with no disk write inside it took 10.29 ms (sim 114.2 s).
+  * In flight, the same reproduced ticks run a median 1.5× slower than offline, with a tail of 4–7×.
+  * The decision region is hit more often than the trivial callbacks per second of exposure. That fits
+    a region sitting at the end of the CPU-bound P4 planning burst of `mission_tick` (5–20 ms).
+  * The WSL kernel reports no steal time, so stalls caused at the hypervisor level would be invisible
+    to the guest.
+* **Conclusion:** the policy's own work is about 0.4–0.6 ms per decision. The cause of the 10.84 ms
+  spike is not established with certainty. The evidence points to host-level scheduling stalls that
+  land inside a long CPU burst, not to the policy computation. No change confined to the policy code
+  path was found that would bound wall-clock time against such stalls.
