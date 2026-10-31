@@ -679,3 +679,12 @@ rclpy):
   without state association only in the `policy_fault` scope. A test proves association stays on in
   P5 readiness, fixtures and flights. The package build `35eaccd0…` is unchanged. This needs a new
   candidate: Policy A re-approval for the new commit, a re-freeze, and a new Gate A authorization.
+
+### 13.9 New candidate `ab7b0c6`: Policy A approval and freeze (2026-10-31)
+
+* **Policy A** (`bf1ef9b1…`) approved for `ab7b0c6`: `state/p5-policy-A-approval-ab7b0c6.json`.
+* **Frozen:** `state/p5-candidate-ab7b0c6.json`, manifest SHA-256
+  **`db4c477901671fdf5f125e3b2c97948723dd761c725460a9aa3636d42ff070df`**, re-verified. It binds
+  the same model `ee006a80…`, build `35eaccd0…`, controller runtime, P3 and P4 baselines and MC
+  benchmark as `baef37a0`. The only source change is the `policy_fault` evaluator fix.
+* **Next:** a new Gate A authorization bound to `db4c4779…`. All seven rows rerun.
