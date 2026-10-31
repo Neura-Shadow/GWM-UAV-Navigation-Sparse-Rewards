@@ -16,7 +16,7 @@ outside every P3 and P4 manifest glob, so the accepted baselines keep verifying 
 | `validation/` | independent evaluator and the policy replays (run under the controller interpreter) |
 | `models/`, `training/` | content-addressed model artifacts and offline training (plan M3, separately authorized) |
 
-Status: offline milestones M0–M5 (contract revision 2). The candidate model `models/p5-ranker-ee006a80….npz` was trained
+Status: offline milestones M0–M6 (contract revision 2). The candidate model `models/p5-ranker-ee006a80….npz` was trained
 offline, meets the contract §4.2 readiness bar and was accepted by the operator. The `p5_control`
 node, `P5Mission`, the policy ledger, the runner, the gate sequencer and the evaluator are implemented
 (plan §13.3–13.4). Nothing is frozen, and no

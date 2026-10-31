@@ -1,7 +1,7 @@
 # v3-SIM P5 — fixed-weight policy substitution: plan and integration facts
 
 **Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
-Offline milestones M0–M5 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
+Offline milestones M0–M6 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
 It produced candidate artifact `p5-ranker-ee006a80…`, which meets the contract §4.2 readiness bar.
 The operator accepted that candidate as is, with its known yaw-oscillation limitation (§13.2).
 M4 (`P5Mission`, the policy ledger and `p5_control`) and M5 (runner, gates, evaluator; contract
@@ -309,7 +309,7 @@ These are listed with recommendations in contract §11, D1–D9:
 
 M3 (training) additionally needs its own authorization after the contract is approved.
 
-## 13. Implementation status: M0–M5 (offline, 2026-10-31)
+## 13. Implementation status: M0–M6 (offline, 2026-10-31)
 
 * **M0:** the `simulation/px4_gazebo_p5/` skeleton.
   * Configs: `p5_policy.yaml` (disabled, no fallback, no bound model), `p5_validation.yaml` (the
@@ -353,7 +353,8 @@ M3 (training) additionally needs its own authorization after the contract is app
 * **M3** (authorized 2026-10-31; offline, CPU only, no simulator): see §13.1–13.2.
 * **M4** (authorized 2026-10-31; offline, no simulator): see §13.3.
 * **M5** (authorized 2026-10-31; offline, no simulator): see §13.4.
-* **Next:** M6–M7 (comparison, build, freeze tooling) need operator authorization.
+* **M6** (authorized 2026-10-31; offline): see §13.5.
+* **Next:** M7 (build receipt, freeze tooling, full regression) needs operator authorization.
   Freezing, Policy A approval and the gates come after M7.
 
 ### 13.1 M3 tooling (`training/`, commit `13c7dde`)
@@ -569,3 +570,33 @@ rclpy):
   * checkpoint identity, the policy-fault refusal and the composition with the reused P4 checks;
   * runner, gate and manifest bookkeeping, with source drift guards against P4's runner and gate
     sequencer.
+
+### 13.5 M6: P4 vs P5 comparison (offline, 2026-10-31; reported, not acceptance evidence)
+
+* **Tool:** `validation/p5_comparison.py`.
+  * `offline` computes the paired held-out comparison from the hash-bound readiness report: the
+    same 300 layouts and seeds, under the same shield.
+  * `sitl` compares one evaluated P5 flight with the accepted P4 flight of the same scenario, from
+    the retained `c110bd30` evidence. It covers outcome, truth clearance, tracking, airborne
+    horizontal truth path, time to goal, supervisor lineage, controller CPU and RTF, and the P5
+    shadow disagreement.
+  * `accepted_p4_runs` maps S1–S6 to those flights.
+* **Offline report:** `docs/evidence/v3_sim_p5_offline_comparison.json`, with fixed-seed paired
+  bootstrap 95 % intervals (10,000 draws).
+
+  | Paired measure (P5 − P4) | Pairs | Mean | 95 % interval |
+  |---|---|---|---|
+  | Goal success (points) | 300 | +7.0 | +3.7 to +10.7 |
+  | Time to goal, both reached (s) | 210 | −0.51 | −0.84 to −0.23 |
+  | Path, both reached (m) | 210 | −0.025 | −0.036 to −0.014 |
+  | Minimum truth clearance (m) | 300 | −0.013 | −0.024 to −0.002 |
+  | Hover time (s) | 300 | −1.67 | −2.41 to −0.94 |
+
+  * **Discordant goal outcomes:** P5 only 26, P4 only 5; exact sign test p = 0.0002.
+  * **Safety, reported separately:** 0 collisions on both sides. Minimum clearance 0.544 m (P4)
+    and 0.547 m (P5). Aborts: P4 85 hover timeouts; P5 60 hover timeouts and 4 transit-deadline
+    aborts (the §13.2 yaw-oscillation limitation).
+  * **Per decision:** 241,224 policy calls, 0 failures, 0 executions outside the mask.
+    Disagreement with the shadow P4 choice is 0.694, and heading disagreement 0.246.
+* **Claim:** correct substitution only. A superiority claim needs P7's paired batches. These are
+  synthetic closed-loop figures, not SITL.

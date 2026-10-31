@@ -1,0 +1,146 @@
+{
+  "contract": "p5-comparison-v1",
+  "kind": "offline_paired_held_out",
+  "acceptance_evidence": false,
+  "source": {
+    "readiness_report": "p5-ranker-ee006a805ba9c327a29f8f97ef6a13d0608b8459b37f0ca873a5155c59eaf73c.readiness_report.json",
+    "sha256": "378b7788e217a9d8869265cb03cb93dcae12415bfd3167cc62466de0616ae62d",
+    "weights_sha256": "95a9c9b37c71d900137544ef5878625334708d2021192c7013491ad4ce27d349",
+    "layouts": 300
+  },
+  "method": {
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 20261031,
+    "interval": "paired percentile 95 %",
+    "same_shield": true,
+    "identical_layouts_and_seeds": true
+  },
+  "p4": {
+    "episodes": 300,
+    "goal_reached": 215,
+    "goal_success_pct": 71.66666666666667,
+    "safety": {
+      "collisions": 0,
+      "min_clearance_m": 0.5441659681047246,
+      "mean_min_clearance_m": 0.6984036903725884,
+      "outcomes": {
+        "abort:hover_timeout": 85,
+        "goal_reached": 215
+      },
+      "hover_or_abort": 85,
+      "mean_hover_s": 5.680833333333333
+    },
+    "decision_quality": {
+      "mean_time_to_goal_s": 42.0153488372093,
+      "mean_path_m": 8.058388889422552,
+      "mean_detour_ratio": 1.007298611177819
+    }
+  },
+  "p5": {
+    "episodes": 300,
+    "goal_reached": 236,
+    "goal_success_pct": 78.66666666666667,
+    "safety": {
+      "collisions": 0,
+      "min_clearance_m": 0.5467788483794747,
+      "mean_min_clearance_m": 0.6854657357542059,
+      "outcomes": {
+        "abort:hover_timeout": 60,
+        "abort:transit_deadline": 4,
+        "goal_reached": 236
+      },
+      "hover_or_abort": 64,
+      "mean_hover_s": 4.01
+    },
+    "decision_quality": {
+      "mean_time_to_goal_s": 41.652118644067805,
+      "mean_path_m": 8.066120731212253,
+      "mean_detour_ratio": 1.0082650914015316
+    }
+  },
+  "paired": {
+    "both_reached": 210,
+    "p5_only": 26,
+    "p4_only": 5,
+    "neither": 59,
+    "goal_success_difference_points": {
+      "pairs": 300,
+      "mean": 7.0,
+      "ci95": [
+        3.6666666666666665,
+        10.666666666666666
+      ]
+    },
+    "discordant_sign_test_p": 0.00019219517707824707,
+    "time_to_goal_difference_s": {
+      "pairs": 210,
+      "mean": -0.5088095238095239,
+      "ci95": [
+        -0.8378750000000003,
+        -0.23095238095238088
+      ]
+    },
+    "path_difference_m": {
+      "pairs": 210,
+      "mean": -0.024929807264141086,
+      "ci95": [
+        -0.03601473654858291,
+        -0.01426403478886279
+      ]
+    },
+    "detour_ratio_difference": {
+      "pairs": 210,
+      "mean": -0.0031162259080176357,
+      "ci95": [
+        -0.004517700942328245,
+        -0.0018155584598672516
+      ]
+    },
+    "min_clearance_difference_m": {
+      "pairs": 300,
+      "mean": -0.012937954618382394,
+      "ci95": [
+        -0.024437415083895225,
+        -0.0021650217410150384
+      ]
+    },
+    "hover_difference_s": {
+      "pairs": 300,
+      "mean": -1.6708333333333334,
+      "ci95": [
+        -2.406,
+        -0.9356666666666669
+      ]
+    }
+  },
+  "per_decision": {
+    "invocations": 241224,
+    "failures": 0,
+    "outside_mask": 0,
+    "disagreement_rate": 0.6939898185918483,
+    "heading_disagreement_rate": 0.2463187742513183
+  },
+  "by_family": {
+    "pillars": {
+      "layouts": 100,
+      "p4_goal": 67,
+      "p5_goal": 76
+    },
+    "partial_wall": {
+      "layouts": 54,
+      "p4_goal": 41,
+      "p5_goal": 49
+    },
+    "wall_with_gap": {
+      "layouts": 85,
+      "p4_goal": 80,
+      "p5_goal": 82
+    },
+    "mixed": {
+      "layouts": 61,
+      "p4_goal": 27,
+      "p5_goal": 29
+    }
+  },
+  "claim": "correct substitution only; a superiority claim needs P7's paired batches"
+}
