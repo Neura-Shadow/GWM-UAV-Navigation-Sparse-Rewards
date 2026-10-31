@@ -660,6 +660,22 @@ def test_the_refusal_exit_is_accepted_only_in_the_declared_policy_fault_scope(co
     assert out["failures"] == ["policy_fault:refusal_exit_not_recorded_by_cleanup"]
 
 
+def test_stream_association_is_skipped_only_where_no_controller_exists(composed, monkeypatch):
+    """Gate A baef37a0: association reads the controller's received ledger, which a refused controller never writes."""
+    seen = {}
+
+    def stream(run, window, limits, sensors, require_association=False):
+        seen[summary_scope[0]] = require_association
+        return {"status": "passed", "failures": []}
+    summary_scope = [None]
+    monkeypatch.setattr(p5_evaluate, "evaluate_stream", stream)
+    composed.cleanup[:] = [p5_evaluate.REFUSED_CONTROLLER_CLEANUP]
+    for scope in ("policy_fault", "p5_readiness", "fixture", "flight"):
+        summary_scope[0] = scope
+        composed(scope)
+    assert seen == {"policy_fault": False, "p5_readiness": True, "fixture": True, "flight": True}
+
+
 def test_baselines_must_be_the_accepted_p3_and_p4(composed):
     out, _ = composed("p5_readiness", p4_baseline={"sha256": "0" * 64})
     assert out["failures"] == ["p4_baseline_mismatch"]

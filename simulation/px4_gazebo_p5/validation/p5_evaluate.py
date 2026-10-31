@@ -273,7 +273,9 @@ def evaluate(run):
         if is_s6:
             out["fault_window"] = p4e.fault_window(run, summary, validation_p3, sensors, v4["outcomes"], f)
         else:
-            stream = evaluate_stream(run, window, validation_p3, sensors, require_association=True)
+            # State association proves reset brackets against the controller's received-PX4 ledger; a refused
+            # controller never creates it (Gate A baef37a0), so the policy_fault scope checks the stream without it.
+            stream = evaluate_stream(run, window, validation_p3, sensors, require_association=scope != "policy_fault")
             out["depth_stream"] = {"status": stream["status"], "failures": stream["failures"],
                                    "delivery": stream.get("delivery"), "processing": stream.get("processing")}
             f.items += ["depth:" + x for x in stream["failures"]]

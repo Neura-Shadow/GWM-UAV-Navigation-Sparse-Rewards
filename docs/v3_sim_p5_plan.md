@@ -628,3 +628,54 @@ rclpy):
   5. Then Gates B, S and C, one at a time.
 
   No simulator has been run for P5.
+
+### 13.7 Operator steps: Policy A approval and freeze (2026-10-31)
+
+* **Policy A approval:** the operator approved Policy A (`bf1ef9b1…`, unchanged from P4) for P5
+  commit `44ff340`. The receipt is `state/p5-policy-A-approval-44ff340.json`, scoped to this
+  candidate's Gates A/B/S/C. The P3 policy loader accepts it, and the QGC unattended ELF
+  `829942834b71…` matches.
+* **Freeze:** `state/p5-candidate-44ff340.json`, manifest SHA-256
+  **`baef37a0bc98ab72de2bd6d2b078d4b22f67eb476662eeaa3bafa4a4dc16d27b`**. `p5_manifest.py verify`
+  reproduces it. It binds:
+  * P3 `1e205fec…` and P4 `c110bd30…`;
+  * model `ee006a80…`;
+  * build `35eaccd0…`;
+  * the controller runtime (`/usr/bin/python3`, NumPy 1.26.4);
+  * Policy A with this approval;
+  * MC benchmark run `20261025T051926Z-mc-trace-benchmark-e6000074`;
+  * 45 P5 source files;
+  * gates A/B/S/C.
+* **Working-copy bytes:** the manifest binds the files as they are in this checkout. A few P5
+  files have CRLF line endings there. If git rewrites them, verification fails closed and a
+  re-freeze is needed.
+* **Next:** Gate A needs an operator authorization bound to `baef37a0…` (`p5_manifest.py
+  authorize --gate A`). Nothing has run in the simulator.
+
+### 13.8 P5 Gate A for manifest `baef37a0…`: FAILED (2026-10-31, one attempt, no retry)
+
+* **Authorization:** `state/p5-auth-A-baef37a0bc98.json`. Result:
+  `state/p5-gate-A-baef37a0….result.json`, `accepted: false`. No residual simulator processes.
+* **Passed, with independent evaluations:**
+  * `p3-readiness`;
+  * `p5-readiness`;
+  * `fixture-G2`, `fixture-G4` and `fixture-G6` (revision 2 item 4);
+  * the offline `policy-failure-replay` (revision 2 item 5).
+* **First failure, `policy-fault-checkpoint`:**
+  * The runtime behaved as designed: the bound checkpoint plus one byte was refused with
+    `checkpoint_sha256_mismatch`, no node or run file existed, the controller exited with 1, and
+    status was passed.
+  * The evaluator then raised `FileNotFoundError: ros-events.jsonl`. The P3 depth-stream
+    association check proves estimator-reset brackets against the controller's own ledger of
+    received PX4 messages, which a refused controller never creates.
+  * This is an evaluator design gap in the P5 `policy_fault` scope, not a runtime failure.
+* **Informational only (in memory; the recorded evaluation and the gate result stand):** with stream
+  association skipped in that scope, the same run passes every other check. That covers depth and
+  RGB streams, §6.1 performance (compute p99 31.8 ms), the refusal, Policy A and cleanup.
+* **Proposed fix (needs operator approval and a new candidate):** in the `policy_fault` scope,
+  evaluate the depth stream without controller-ledger association. Association stays required in
+  P3 readiness, P5 readiness and G2/G4/G6 of the same gate. No threshold changes.
+* **Fix approved and implemented (operator, 2026-10-31):** `p5_evaluate` evaluates the depth stream
+  without state association only in the `policy_fault` scope. A test proves association stays on in
+  P5 readiness, fixtures and flights. The package build `35eaccd0…` is unchanged. This needs a new
+  candidate: Policy A re-approval for the new commit, a re-freeze, and a new Gate A authorization.
