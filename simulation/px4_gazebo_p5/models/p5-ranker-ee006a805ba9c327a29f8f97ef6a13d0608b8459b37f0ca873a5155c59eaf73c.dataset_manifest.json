@@ -1,0 +1,92 @@
+{
+ "contract": "p5-acceptance-v1 revision 1 \u00a74.1",
+ "files": {
+  "data/round0/train/allowed.npy": "8845c34233ba8dbefac1dcf146c801848006c9d80089fb726bf174237c1c5092",
+  "data/round0/train/candidate.npy": "b56b99bc02aef98149c72b6f0ed74b85b6ba6222561461a720cf73de137bf3b3",
+  "data/round0/train/context.npy": "c1fb9f44e0e2d8a8327677fa0ca0204b530124351837f9d934b74980995d1e9b",
+  "data/round0/train/costs.npy": "43ddfc524aeb494246f600fa91529b70eaecabbd35ef45bde4e62f966956b43a",
+  "data/round0/train/driver_slot.npy": "14c6b910de88001bfdc2fe7c7f4aa5a7e04b1a818d09501bd610d76e3a3ee010",
+  "data/round0/train/episodes.json": "d2651259461c1aa05052a9bc823bfbdbde78444124a857e8bbcf32f17b02855a",
+  "data/round0/train/layout_index.npy": "6608b9e1b96d7b6e150c3194f3503844da4743ae3b480cfa41616b62bbed0d4c",
+  "data/round0/train/state.npy": "54b37d631f54af50728e0d741b4d87f8e36e48f643d47cc9cf108791a32657fc",
+  "data/round0/validation/allowed.npy": "e8bc043aca99fb8d15a6f80def77e6472010a1814cce7adc2b03b2c4a8aac3c9",
+  "data/round0/validation/candidate.npy": "6aba5c25020545884f91aaabb1a557ea894194254cc32e0594429afee0a977a2",
+  "data/round0/validation/context.npy": "2e37c450aab9670d297ad92b1a6e0f28a35696616fd83a713e027abd7c903d85",
+  "data/round0/validation/costs.npy": "f89568ce0a76106db2b7fe9b40807f166f805494c95707f2c741570e55ad95b0",
+  "data/round0/validation/driver_slot.npy": "8b645482a0959b64243effcc40380db62a6b147b722bfef9fabe7889c398683c",
+  "data/round0/validation/episodes.json": "78da5e798ddd264eb955c64501ce9eb103813562b26e6a3773d2fa5cb765c085",
+  "data/round0/validation/layout_index.npy": "6bbe4e46978950a4dadf8932b2e11ca91d5eb3b2ab227e49beff502f8a94da9b",
+  "data/round0/validation/state.npy": "3c92cc6a7f84a0188a7c645dce24e074c3e5a357a5798b4d920fa6e7309b61cb",
+  "data/round1/train/allowed.npy": "fd91646b7d66397ff0021cee4ff9c612cb0cf2bac0c3280c1783c8367c35daf8",
+  "data/round1/train/candidate.npy": "126efaea869ed40ac93b2e69b98eebe8fe3f10ea1df50c8b20cb3fdac4c45c58",
+  "data/round1/train/context.npy": "96ad52b4a7d4d6a269ab6ce44bb2be73d1675ca6dd6c88bb2742c1157af6abb0",
+  "data/round1/train/costs.npy": "08bbd2b81c8d5cc3b1d9bb27bf1346b95292296c4a812bbbb4a8ed82e9cfdf4d",
+  "data/round1/train/driver_slot.npy": "accd621225aad8bcd089b4c268ca5f9b4884e58666d7afbce4dd4cb682290ec0",
+  "data/round1/train/episodes.json": "003a810c5cecdbc83d90930d75efc88532d7838d7b41bce708e59c19534712b3",
+  "data/round1/train/layout_index.npy": "6ec9eaff1649a6520e94978803663673bda3dd9d650974c5a242f3ec1ca5c42f",
+  "data/round1/train/state.npy": "fa8ab13586d0ad0600f4d6b9d4eab25546d934f41268134b768d1559486aa1ca",
+  "data/round1/validation/allowed.npy": "2a61265c24889fd9d5316014243da8aea01a353995270b1007f372de28b5482e",
+  "data/round1/validation/candidate.npy": "ff729a740013d85031e48987637c93ecf4dbc14d9153d12de3813798f41fa618",
+  "data/round1/validation/context.npy": "2072655a1f448ab376ab80e23e9244f654b1f569e39583b146a8882b6a7a2d99",
+  "data/round1/validation/costs.npy": "8c922706c2c8c38d998161f308ec31d7173eae30c6090bdb39ec8ce51360c112",
+  "data/round1/validation/driver_slot.npy": "190f7ab2491e604e4091466689efc41eaafa4829ffd2b917cc14351613f3b127",
+  "data/round1/validation/episodes.json": "a544c2bc3e209a2dfc8f3110d46ccaabdb2ef66295ee6e3b0b476df2cbba25f9",
+  "data/round1/validation/layout_index.npy": "ff5bcd60f7dc89b83f8832ffe3a8b4a17051bc138b4ab24ced480e096300241d",
+  "data/round1/validation/state.npy": "24690b2a39eced1fbf9a36e41f15854f8ab352b96468003b54ca93d04258dd75",
+  "data/round2/train/allowed.npy": "aa2f9df8c56d6362b608c9785a653b10aad66d0d4effe9e2b3ffb42ce1c996cb",
+  "data/round2/train/candidate.npy": "aa06879e7167da14fae9303e4bdfc5d2958934254bee2b02f099c926a4c8da89",
+  "data/round2/train/context.npy": "47b11a876a6961d3fc967f14fc530234a33f96a09feab21b46abf5cf355e3edd",
+  "data/round2/train/costs.npy": "cfaac393a8fa1b0be4e233bf72cc8ba0b0a4bb2db842fa6ca2f4075220f9b460",
+  "data/round2/train/driver_slot.npy": "a0af045fc58982269160e4cfb4fbee841eb6eb44ba10df3fcfd8f8200c04d5a5",
+  "data/round2/train/episodes.json": "ead8654cd189618b2e644085c053123f3a546f74eedaac9c07673038599003ce",
+  "data/round2/train/layout_index.npy": "d4dfdb004ae8f1187252067d1804d60fffb06dacdc7c2a916fc0f5f4f061a85f",
+  "data/round2/train/state.npy": "364578642466d026050fa29e0b05bebae7a8612d939dd8b89261c18fbdd4b201",
+  "data/round2/validation/allowed.npy": "246bd0c497e51577958011c630959ec6d326c9a56f99458b777bd55a4999c0db",
+  "data/round2/validation/candidate.npy": "6ff1a3587d398e7e47dd3000f6cd0680a6a116785c205ae7b36322b1dd96930b",
+  "data/round2/validation/context.npy": "8ec55742b8cfa58d7eeb9693f10ebb6af405deddd0f6942b6325a7064b804f38",
+  "data/round2/validation/costs.npy": "2a0172d49bafe20ec7cc7ef139cfc946f0d578a80dd5cdbc88e59247b5170d6b",
+  "data/round2/validation/driver_slot.npy": "07a1649397a4a93128f9f941e70e7c72df08323d0f22acbf3f57912ca8288a9e",
+  "data/round2/validation/episodes.json": "24df5645d5dcdbd777bea092eb97516feb14fe957861879f5d076fa3229c9ed9",
+  "data/round2/validation/layout_index.npy": "55e03100d27af5b82e5d21964f78f9724af72a158b928baf3af534e085230548",
+  "data/round2/validation/state.npy": "7ee95de8f5f2f14eac7b8da9e1749ec67c6ed81cc159ce088c196e0328ae2efe",
+  "layouts.json": "8734353267a00ab5c8675cfa444575344e6d71615a7dcf8df55347587fb659b7",
+  "scans/held_out.npy": "04b972e25507c53e10b66b4fdfc8534d04a09d4192ed656f2b99810d1bf9f39d",
+  "scans/train.npy": "3a981ac5e20e070c9f3580ad5756339cd1c270c1f8d6cbe91d997f3449d89e29",
+  "scans/validation.npy": "21c9865f5e3861ddebdbd6ebd944100f3ca47043f959070387713c3bd5276db1"
+ },
+ "generator": "simulation/px4_gazebo_p5/training (p5_layouts, p5_episode, p5_dataset, p5_oracle)",
+ "note": "the dataset is regenerated from the generator and seeds; only this manifest is kept",
+ "rounds": 3,
+ "sample_stride": 8,
+ "splits": {
+  "held_out": {
+   "count": 300,
+   "rejected": {
+    "acceptance_layout": 1,
+    "goal_unreachable_inflated": 30,
+    "start_or_goal_disc": 80
+   },
+   "seed_base": 3000000,
+   "seeds_tried": 411
+  },
+  "train": {
+   "count": 1200,
+   "rejected": {
+    "acceptance_layout": 1,
+    "goal_unreachable_inflated": 108,
+    "start_or_goal_disc": 300
+   },
+   "seed_base": 1000000,
+   "seeds_tried": 1609
+  },
+  "validation": {
+   "count": 150,
+   "rejected": {
+    "goal_unreachable_inflated": 10,
+    "start_or_goal_disc": 44
+   },
+   "seed_base": 2000000,
+   "seeds_tried": 204
+  }
+ }
+}
