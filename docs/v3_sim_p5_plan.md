@@ -760,3 +760,30 @@ rclpy):
   reported only): same outcome and supervisor lineage in all three. S1 and S6 timing is within
   about 0.6 s of P4.
 * **Next:** Gate C (S2, S3, S4 in order, 3/3) needs its own operator authorization.
+
+### 13.13 P5 Gate C for manifest `db4c4779…`: FAILED (2026-10-31, one attempt, no retry)
+
+* **Authorization:** `state/p5-auth-C-db4c47790167.json`. Result:
+  `state/p5-gate-C-db4c4779….result.json`, `accepted: false`,
+  `first_failure: qualification-1:policy:inference_max`. S3 and S4 were not flown. No residual
+  simulator processes.
+* **Qualification-1, S2** (`20261031T121719Z-p5-flight-S2-2e9825f4`): the runtime passed and the
+  evaluation failed on one check only, `policy:inference_max`.
+  * Outcome `goal_reached_with_detour`, lineage OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL. Truth
+    clearance 0.375 m, 0 collisions, tracking 0.242 m.
+  * Policy: 833 invocations, 0 failures, 0 outside the mask, 0 fallbacks, 0 interventions,
+    participation 1.0.
+  * Inference (feature build + forward + selection, §5): p50 0.57 ms, p95 1.17 ms, p99 2.00 ms
+    (limit 5 ms), **max 10.84 ms (limit 10 ms)**.
+* **The breach is one tick.** Tick 491 at sim 99.244 s in RESUME took 10.84 ms. The next slowest
+  took 4.22 ms, and 9 of 833 exceeded 2 ms. The native clock shows no simulator stall at that time
+  (interval RTF ≥ 0.89 from 98.5 s to 100 s). The run's minimum interval RTF of 0.04 was at sim
+  3.5 s, during start-up. The recorded evidence does not identify the cause of the spike inside
+  the controller process. Earlier flights of this manifest had maxima of 6.0 ms (Gate B S2) and
+  5.08 ms (Gate S S5).
+* **Against the accepted P4 Gate C S2 flight** (`docs/evidence/v3_sim_p5_gate_c_s2_vs_p4.json`;
+  reported only): same outcome and lineage; clearance 0.071 m lower; path 0.06 m shorter; time to
+  goal 1.47 s shorter.
+* **The result is permanent.** Manifest `db4c4779…` cannot be re-run for Gate C. Any change needs
+  an operator decision, a new candidate, Policy A approval, a re-freeze and a new gate sequence.
+  The §5 thresholds are part of the preserved contract.
