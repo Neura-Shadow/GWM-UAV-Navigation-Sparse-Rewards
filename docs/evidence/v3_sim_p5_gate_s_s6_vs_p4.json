@@ -1,0 +1,127 @@
+{
+  "contract": "p5-comparison-v1",
+  "kind": "sitl_paired_flight",
+  "acceptance_evidence": false,
+  "scenario": "S6",
+  "p5": {
+    "run": "20261031T100443Z-p5-flight-S6-85366b4a",
+    "scenario": "S6",
+    "evaluation_status": "passed",
+    "controller": "p5_control",
+    "outcome": "safe_stop_on_sensor_loss",
+    "safety": {
+      "min_truth_clearance_m": 1.2084079138968036,
+      "collisions": 0,
+      "tracking_max_m": 0.21996644356541903,
+      "abort_reason": "stale_inputs:snapshot_stale"
+    },
+    "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+    ],
+    "reported": {
+      "path_length_m": 3.8844511631656036,
+      "detour_ratio": 0.48555639539570045,
+      "time_to_goal_sim_s": null,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.132000000000005,
+        "max": 10.332000000000008
+      },
+      "transit_setpoint_gap_max_sim_s": 0.05200000000000671,
+      "controller_cpu_fraction": 0.39190693733875714,
+      "controller_rss_max_kb": 180356
+    },
+    "rtf": {
+      "min_interval_rtf": 0.03935366930587298,
+      "rtf": 0.9981993842639824,
+      "samples": 1047,
+      "sim_s": 108.408,
+      "wall_s": 108.603553267
+    }
+  },
+  "p4": {
+    "run": "20261030T143657Z-p4-flight-S6-6f435d5e",
+    "scenario": "S6",
+    "evaluation_status": "passed",
+    "controller": "p4_control",
+    "outcome": "safe_stop_on_sensor_loss",
+    "safety": {
+      "min_truth_clearance_m": 1.186926791582337,
+      "collisions": 0,
+      "tracking_max_m": 0.23680336038362254,
+      "abort_reason": "stale_inputs:snapshot_stale"
+    },
+    "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+    ],
+    "reported": {
+      "path_length_m": 3.8068905644218827,
+      "detour_ratio": 0.47586132055273533,
+      "time_to_goal_sim_s": null,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.1560000000000059,
+        "max": 10.328000000000003
+      },
+      "transit_setpoint_gap_max_sim_s": 0.06400000000000716,
+      "controller_cpu_fraction": 0.42755925827243235,
+      "controller_rss_max_kb": 180220
+    },
+    "rtf": {
+      "min_interval_rtf": 0.005311684144611745,
+      "rtf": 0.9979086145830911,
+      "samples": 1050,
+      "sim_s": 108.516,
+      "wall_s": 108.743424412
+    }
+  },
+  "safety": {
+    "same_outcome": true,
+    "min_truth_clearance_difference_m": 0.02148112231446664,
+    "tracking_max_difference_m": -0.016836916818203512
+  },
+  "decision_quality": {
+    "path_difference_m": 0.0775605987437209,
+    "detour_ratio_difference": 0.009695074842965112,
+    "time_to_goal_difference_s": null,
+    "same_lineage": true
+  },
+  "per_decision": {
+    "invoked": 229,
+    "disagreements": 196,
+    "disagreement_rate": 0.8558951965065502,
+    "interventions": {
+      "none": 229
+    },
+    "participation_fraction": 1.0,
+    "inference_s": {
+      "count": 229,
+      "max": 0.001909647005959414,
+      "p50": 0.0005491429983521812,
+      "p95": 0.0011307559980195947,
+      "p99": 0.0016748319976613857
+    }
+  },
+  "host": {
+    "p5_controller_cpu_fraction": 0.39190693733875714,
+    "p4_controller_cpu_fraction": 0.42755925827243235,
+    "p5_rtf": {
+      "min_interval_rtf": 0.03935366930587298,
+      "rtf": 0.9981993842639824,
+      "samples": 1047,
+      "sim_s": 108.408,
+      "wall_s": 108.603553267
+    },
+    "p4_rtf": {
+      "min_interval_rtf": 0.005311684144611745,
+      "rtf": 0.9979086145830911,
+      "samples": 1050,
+      "sim_s": 108.516,
+      "wall_s": 108.743424412
+    }
+  }
+}

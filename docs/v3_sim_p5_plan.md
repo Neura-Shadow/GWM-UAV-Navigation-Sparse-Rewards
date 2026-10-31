@@ -737,3 +737,26 @@ rclpy):
   * RTF 0.998 in both flights.
 * **Next:** Gate S (S1, S5, S6 in order) needs its own operator authorization. S5 carries the known
   yaw-oscillation risk (§13.2).
+
+### 13.12 P5 Gate S for manifest `db4c4779…`: ACCEPTED (2026-10-31; S1, S5, S6 in order)
+
+* **Authorization:** `state/p5-auth-S-db4c47790167.json`. All three independent evaluations passed
+  with no failures. No residual simulator processes.
+
+  | Flight | Run | Outcome | Policy (invoked, failures / outside / fallback, participation, p99 / max) |
+  |---|---|---|---|
+  | S1 | `20261031T095654Z-p5-flight-S1-62ebe544` | `goal_reached`, no supervisor transition, tracking 0.238 m | 801, 0/0/0, 1.0, 1.20 / 2.50 ms |
+  | S5 | `20261031T100011Z-p5-flight-S5-046837cc` | `safe_refusal`: HOVER, ABORT `hover_timeout`, landed; clearance 0.922 m | 1,571, 0/0/0, 1.0, 1.88 / 5.08 ms |
+  | S6 | `20261031T100443Z-p5-flight-S6-85366b4a` | `safe_stop_on_sensor_loss`: HOVER, ABORT `stale_inputs:snapshot_stale`, landed | 229, 0/0/0, 1.0, 1.67 / 1.91 ms |
+
+* **The known yaw-oscillation limitation (§13.2) appeared in S5 and did not fail the gate.**
+  * The policy kept preferring headings outside the ±25° cone, and the L4 shield turned 1,271 of
+    its 1,571 decisions into YAW_TO.
+  * P5 therefore stayed in AVOIDING from 7.6 s to 78.6 s after TRANSIT. P4 reached HOVER at 15.4 s.
+  * The required outcome still held: HOVER, then `hover_timeout` at 98.6 s, 51 s before the 150 s
+    transit deadline.
+  * The S5 path was 1.44 m longer than P4's. Truth clearance stayed ≥ 0.92 m throughout.
+* **Against the accepted P4 flights** (`docs/evidence/v3_sim_p5_gate_s_{s1,s5,s6}_vs_p4.json`;
+  reported only): same outcome and supervisor lineage in all three. S1 and S6 timing is within
+  about 0.6 s of P4.
+* **Next:** Gate C (S2, S3, S4 in order, 3/3) needs its own operator authorization.
