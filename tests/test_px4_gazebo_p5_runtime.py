@@ -845,3 +845,55 @@ def test_policy_fault_scope_passes_only_on_a_refusal(runner_module, tmp_path):
         else:
             with pytest.raises(runner_module.base.Abort, match="not_refused"):
                 runner.run_controller({"wall_deadline_s": 1e9})
+
+
+# ---- M7: package build receipt and freeze / verify / authorize tooling -------------------------------------
+import p5_build  # noqa: E402
+
+
+def test_package_manifest_covers_the_whole_package_and_its_hash_tracks_content(tmp_path, monkeypatch):
+    manifest = p5_build.package_manifest()
+    assert {"setup.py", "package.xml", "test/test_installed.py", "gwm_policy_control/control_node.py",
+            "gwm_policy_control/policy_ledger.py"} <= set(manifest)
+    assert not any("__pycache__" in name for name in manifest)
+    copy = tmp_path / "gwm_policy_control"
+    shutil.copytree(p5_build.PACKAGE, copy, ignore=shutil.ignore_patterns("__pycache__"))
+    monkeypatch.setattr(p5_build, "PACKAGE", copy)
+    assert p5_build.package_hash(p5_build.package_manifest()) == p5_build.package_hash(manifest)
+    (copy / "gwm_policy_control/mission.py").write_text("# changed\n")
+    assert p5_build.package_hash(p5_build.package_manifest()) != p5_build.package_hash(manifest)
+
+
+def test_manifest_binds_the_build_receipt_of_the_current_source(tmp_path):
+    (tmp_path / "state").mkdir()
+    receipt = {"contract": p5_build.CONTRACT, "package_hash": p5_build.package_hash(p5_build.package_manifest())}
+    (tmp_path / "state/p5-built.json").write_text(json.dumps(receipt))
+    assert p5_manifest.p5_build(tmp_path)["package_hash"] == receipt["package_hash"]
+    (tmp_path / "state/p5-built.json").write_text(json.dumps(dict(receipt, package_hash="0" * 64)))
+    with pytest.raises(ValueError, match="build receipt"):
+        p5_manifest.p5_build(tmp_path)
+
+
+def test_freeze_is_exclusive_and_verify_names_every_differing_input(tmp_path, monkeypatch):
+    value = {"contract": "p5-candidate-manifest-v1", "model": {"sha256": "m"}, "p5_build": {"package_hash": "b"},
+             "runtime": {"native_command_policy": {"name": "A", "approval_path": "/a"}, "mc_benchmark": {"run": "/r"}}}
+    monkeypatch.setattr(p5_manifest, "candidate", lambda root, model, **kw: json.loads(json.dumps(value)))
+    output = tmp_path / "p5-candidate.json"
+    sha = p5_manifest.freeze(tmp_path, output, "m", policy_name="A")
+    with pytest.raises(FileExistsError):
+        p5_manifest.freeze(tmp_path, output, "m", policy_name="A")
+    assert p5_manifest.verify_current(tmp_path, output)[1] == sha
+    value["p5_build"] = {"package_hash": "changed"}
+    with pytest.raises(ValueError, match="p5_build"):
+        p5_manifest.verify_current(tmp_path, output)
+
+
+def test_authorize_requires_the_exact_confirmation_phrase(tmp_path, monkeypatch):
+    sha = "e" * 64
+    monkeypatch.setattr(p5_manifest, "verify_current", lambda root, manifest: ({}, sha))
+    common = ["authorize", str(tmp_path / "m.json"), "--gate", "A", "--operator", "op", "--output", str(tmp_path / "auth.json")]
+    with pytest.raises(SystemExit, match="Confirmation phrase"):
+        p5_manifest.main(common + ["--confirm", "authorize P4 Gate A " + sha])
+    assert not (tmp_path / "auth.json").exists()
+    p5_manifest.main(common + ["--confirm", "authorize P5 Gate A " + sha])
+    assert p5_manifest.require_authorization(tmp_path / "auth.json", "A", sha)["authorized_by"] == "op"

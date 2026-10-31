@@ -5,7 +5,8 @@ gwm_policy_control package), the frozen schema hash, the model artifact identity
 architecture, schema hash, `trained`, metadata and the three hash-bound reports), the controller
 runtime's NumPy, the P3 runtime identity (receipts, builds, assets, renderer profile and the
 per-candidate Policy A approval) and the accepted P3 and P4 baselines, which must still verify byte
-for byte. The P5 build receipt joins in M7. Never starts runtime.
+for byte, and the P5 package build receipt. Freezing and authorizing are operator steps
+(`freeze`, `authorize`); every runner and gate re-verifies with `verify_current`. Never starts runtime.
 """
 import argparse
 import json
@@ -94,12 +95,22 @@ def controller_runtime(python=CONTROLLER_PYTHON):
     return {"python": python, "numpy": version}
 
 
+def p5_build(root):
+    """The P5 package build receipt must match the current package source."""
+    receipt = strict_json(Path(root) / "state/p5-built.json")
+    sys.path.insert(0, str(P5 / "scripts"))
+    import p5_build as build
+    if receipt.get("contract") != build.CONTRACT or receipt.get("package_hash") != build.package_hash(build.package_manifest()):
+        raise ValueError("P5 package build receipt does not match the current source")
+    return {"receipt_sha256": canonical_sha256(receipt), "package_hash": receipt["package_hash"]}
+
+
 def candidate(root, model_sha256, policy_name="A", policy_approval=None, mc_benchmark_run=None):
     import p3_manifest
     v = validation()
     return {"contract": CONTRACT, "p5_contract": v["contract"], "p5_contract_revision": v["contract_revision"],
             "baselines": baselines(root), "p5_source_files": p5_source_files(), "schema_sha256": schema_identity(),
-            "model": model_identity(model_sha256), "controller_runtime": controller_runtime(),
+            "model": model_identity(model_sha256), "controller_runtime": controller_runtime(), "p5_build": p5_build(root),
             "runtime": p3_manifest.runtime_identity(root, policy_name=policy_name, policy_approval=policy_approval,
                                                     mc_benchmark_run=mc_benchmark_run),
             "gates": GATES, "qualification_flights": v["qualification_flights"],
@@ -108,6 +119,13 @@ def candidate(root, model_sha256, policy_name="A", policy_approval=None, mc_benc
 
 def manifest_sha(value):
     return canonical_sha256({k: v for k, v in value.items() if k != "frozen_unix_ns"})
+
+
+def freeze(root, output, model_sha256, **kwargs):
+    value = candidate(root, model_sha256, **kwargs)
+    value["frozen_unix_ns"] = time.time_ns()
+    atomic_json(output, value, exclusive=True)
+    return manifest_sha(value)
 
 
 def verify_current(root, manifest_path):
@@ -156,16 +174,41 @@ def consume(root, gate, sha, authorization_path):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="P5 source identity and baseline checks; never starts runtime.")
+    parser = argparse.ArgumentParser(description="Identify, freeze, verify or authorize the P5 candidate; never starts runtime.")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("sources")
-    b = sub.add_parser("baselines")
-    b.add_argument("--root", type=Path, default=Path(os.environ.get("GWM_SIM_ROOT", str(Path.home() / "uav_autonomy"))))
+    sub.add_parser("baselines")
+    f = sub.add_parser("freeze")
+    f.add_argument("--output", type=Path, required=True)
+    f.add_argument("--model-sha256", required=True)
+    f.add_argument("--policy-approval", type=Path, required=True)
+    f.add_argument("--mc-benchmark-run", type=Path, required=True)
+    v = sub.add_parser("verify")
+    v.add_argument("manifest", type=Path)
+    a = sub.add_parser("authorize")
+    a.add_argument("manifest", type=Path)
+    a.add_argument("--gate", choices=sorted(GATES), required=True)
+    a.add_argument("--operator", required=True)
+    a.add_argument("--confirm", required=True, help='Exactly: "authorize P5 Gate <G> <manifest-sha>"')
+    a.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
+    root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home() / "uav_autonomy")))
     if args.command == "sources":
         print(json.dumps({"schema_sha256": schema_identity(), "files": p5_source_files()}, indent=2))
+    elif args.command == "baselines":
+        print(json.dumps(baselines(root), indent=2))
+    elif args.command == "freeze":
+        print(freeze(root, args.output, args.model_sha256, policy_name="A", policy_approval=args.policy_approval,
+                     mc_benchmark_run=args.mc_benchmark_run))
+    elif args.command == "verify":
+        print(verify_current(root, args.manifest)[1])
     else:
-        print(json.dumps(baselines(args.root), indent=2))
+        _, sha = verify_current(root, args.manifest)
+        if args.confirm != f"authorize P5 Gate {args.gate} {sha}":
+            raise SystemExit("Confirmation phrase must be exactly: authorize P5 Gate %s %s" % (args.gate, sha))
+        atomic_json(args.output, authorization_template(args.gate, sha, args.operator), exclusive=True)
+        print(args.output)
+    return 0
 
 
 if __name__ == "__main__":

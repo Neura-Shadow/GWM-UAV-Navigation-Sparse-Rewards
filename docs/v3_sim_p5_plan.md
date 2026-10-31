@@ -1,7 +1,7 @@
 # v3-SIM P5 — fixed-weight policy substitution: plan and integration facts
 
 **Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
-Offline milestones M0–M6 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
+Offline milestones M0–M7 are complete (§13). M3 was authorized and run offline on 2026-10-31.
 It produced candidate artifact `p5-ranker-ee006a80…`, which meets the contract §4.2 readiness bar.
 The operator accepted that candidate as is, with its known yaw-oscillation limitation (§13.2).
 M4 (`P5Mission`, the policy ledger and `p5_control`) and M5 (runner, gates, evaluator; contract
@@ -309,7 +309,7 @@ These are listed with recommendations in contract §11, D1–D9:
 
 M3 (training) additionally needs its own authorization after the contract is approved.
 
-## 13. Implementation status: M0–M6 (offline, 2026-10-31)
+## 13. Implementation status: M0–M7 (offline, 2026-10-31)
 
 * **M0:** the `simulation/px4_gazebo_p5/` skeleton.
   * Configs: `p5_policy.yaml` (disabled, no fallback, no bound model), `p5_validation.yaml` (the
@@ -354,7 +354,8 @@ M3 (training) additionally needs its own authorization after the contract is app
 * **M4** (authorized 2026-10-31; offline, no simulator): see §13.3.
 * **M5** (authorized 2026-10-31; offline, no simulator): see §13.4.
 * **M6** (authorized 2026-10-31; offline): see §13.5.
-* **Next:** M7 (build receipt, freeze tooling, full regression) needs operator authorization.
+* **M7** (authorized 2026-10-31; offline): see §13.6.
+* **Next:** operator steps only (§13.6): Policy A approval, freeze, then Gates A, B, S and C.
   Freezing, Policy A approval and the gates come after M7.
 
 ### 13.1 M3 tooling (`training/`, commit `13c7dde`)
@@ -600,3 +601,30 @@ rclpy):
     Disagreement with the shadow P4 choice is 0.694, and heading disagreement 0.246.
 * **Claim:** correct substitution only. A superiority claim needs P7's paired batches. These are
   synthetic closed-loop figures, not SITL.
+
+### 13.6 M7: build receipt, freeze tooling, full regression (offline, 2026-10-31)
+
+* **Build:** `scripts/p5_build.py` and `build_p5.sh` follow the P4 build pattern. They mirror
+  `gwm_policy_control` into `p5_ws/<package-hash>`, run colcon build plus the installed tests
+  (`test/test_installed.py`), and write `state/p5-built.json`.
+  * Built: package `35eaccd0566d7413b2a41de27e4eac964709ee62d0f3df33dfab4d35b9bdae0e`, 3/3
+    installed tests passing. The `p5_control` entry point is installed.
+* **Freeze tooling (`p5_manifest`):**
+  * the candidate binds the P5 build receipt;
+  * the `freeze`, `verify` and `authorize` commands work as in P4;
+  * `authorize` requires the exact phrase `authorize P5 Gate <G> <manifest-sha>`;
+  * the output is exclusive-create, and every runner and gate re-verifies.
+* **Dry candidate** (computed in memory, not frozen or written):
+  * P3 `1e205fec…` and P4 `c110bd30…` verify;
+  * model `ee006a80…` (trained, schema `9a651447…`, readiness report `378b7788…`);
+  * P5 build `35eaccd0…`, receipt `7c855db2…`;
+  * controller runtime `/usr/bin/python3` with NumPy 1.26.4;
+  * 45 P5 source files, gates A/B/S/C, execution without authorization false.
+* **Operator steps, each separately authorized:**
+  1. Approve Policy A for the P5 commit.
+  2. Run `p5_manifest.py freeze --model-sha256 ee006a80… --policy-approval <approval> --mc-benchmark-run <run>`.
+  3. Authorize Gate A for that manifest SHA-256 (`p5_manifest.py authorize`).
+  4. Run Gate A.
+  5. Then Gates B, S and C, one at a time.
+
+  No simulator has been run for P5.
