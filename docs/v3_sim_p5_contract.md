@@ -3,7 +3,8 @@
 **Status: APPROVED (revision 1, commit `673d65e`) by the operator on 2026-10-31, with decisions
 D1–D9 as recommended in §11.** Training (plan M3) was authorized and run offline on 2026-10-31.
 It produced candidate `p5-ranker-ee006a80…`, which meets §4.2 on 300 held-out layouts (plan §13).
-The operator accepted this candidate on 2026-10-31. Nothing is frozen or launched. The design rationale and verified integration facts are in the
+The operator accepted this candidate on 2026-10-31. The offline controller milestone M4
+(`P5Mission`, the policy ledger and `p5_control`) is implemented. Nothing is frozen or launched. The design rationale and verified integration facts are in the
 [P5 plan](v3_sim_p5_plan.md).
 
 The baselines must stay independently verifiable and unchanged:

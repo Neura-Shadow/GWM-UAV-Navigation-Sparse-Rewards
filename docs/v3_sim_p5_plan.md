@@ -1,9 +1,10 @@
 # v3-SIM P5 — fixed-weight policy substitution: plan and integration facts
 
 **Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
-Offline milestones M0–M3 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
+Offline milestones M0–M4 are implemented (§13). M3 was authorized and run offline on 2026-10-31.
 It produced candidate artifact `p5-ranker-ee006a80…`, which meets the contract §4.2 readiness bar.
 The operator accepted that candidate as is, with its known yaw-oscillation limitation (§13.2).
+M4 (`P5Mission`, the policy ledger and `p5_control`) was authorized the same day (§13.3).
 Nothing is frozen, launched or pushed.
 
 Baseline, verified on 2026-10-31:
@@ -307,7 +308,7 @@ These are listed with recommendations in contract §11, D1–D9:
 
 M3 (training) additionally needs its own authorization after the contract is approved.
 
-## 13. Implementation status: M0–M3 (offline, 2026-10-31)
+## 13. Implementation status: M0–M4 (offline, 2026-10-31)
 
 * **M0:** the `simulation/px4_gazebo_p5/` skeleton.
   * Configs: `p5_policy.yaml` (disabled, no fallback, no bound model), `p5_validation.yaml` (the
@@ -348,9 +349,10 @@ M3 (training) additionally needs its own authorization after the contract is app
 
   The limits are p99 ≤ 5 ms and max ≤ 10 ms. The 7.25 ms S2 outlier is inside the maximum but is
   the margin to watch under SITL load.
-* **M3** (authorized 2026-10-31; offline, CPU only, no simulator): see below.
-* **Next:** M4–M7 (mission, controller, runner, evaluator, comparison, build) need operator
-  authorization. Freezing, Policy A approval and the gates come after M7.
+* **M3** (authorized 2026-10-31; offline, CPU only, no simulator): see §13.1–13.2.
+* **M4** (authorized 2026-10-31; offline, no simulator): see §13.3.
+* **Next:** M5–M7 (runner, gates, evaluator, comparison, build) need operator authorization.
+  Freezing, Policy A approval and the gates come after M7.
 
 ### 13.1 M3 tooling (`training/`, commit `13c7dde`)
 
@@ -466,3 +468,61 @@ tuning):**
 **Informational inference cost with the exported artifact** (runtime interpreter, synthetic closed
 loop, 10 held-out layouts, 8,097 invocations, no SITL load): p50 0.49 ms, p95 1.02 ms, p99 1.55 ms,
 max 5.84 ms. The limits are p99 ≤ 5 ms and max ≤ 10 ms. This is not acceptance evidence.
+
+### 13.3 M4: `P5Mission`, the policy ledger and `p5_control` (offline, 2026-10-31)
+
+| Module | Role |
+|---|---|
+| `mission.py` | `P5Mission(P4Mission)` overrides only `transition` and `_transit` and adds the ledger bookkeeping. At MAP_SCAN → TRANSIT it replaces P4's `Supervisor`, at the same simulation time and before its first step, with `LedgerSupervisor`. That class is the unchanged `PolicySupervisor`; it only keeps its last output |
+| `policy_ledger.py` | One record per TRANSIT supervisor step, `p5-policy-ledger-v1`. An invoked record holds the exact `(26, 46)` feature tensor (little-endian float64, base64), the raw scores, the allowed mask, the policy and shadow P4 slots, the failure, the inference time, the executed action and the shield intervention (`yaw_to_l4`, `hold:<reason>`, `policy_failure_hold`) |
+| `control_node.py` | `p5_control`, a replica of `p4_control`. It reuses P4's `outcome` and event topic |
+
+**How `p5_control` differs from `p4_control`:**
+
+* **Start-up integrity (contract §4):** before ROS is imported, it checks:
+  * the run configuration's checkpoint SHA-256 against `--model-sha256`;
+  * the frozen schema hash against `--schema-sha256`;
+  * `FrozenPolicy.load` (file SHA-256, architecture, shapes, schema hash, `trained: true`).
+
+  Any mismatch refuses to start, before a node, publisher or run file exists.
+* **Mission:** it runs `P5Mission`.
+* **Evidence:**
+  * a `p5_policy_verified` event;
+  * the ledger in `p5/policy-ledger.jsonl`;
+  * a `p5` block in `controller-result.json`.
+* **Ledger write:** after the dispatch guard, in a `policy_ledger_write` trace span. A write error
+  becomes an evidence error.
+* **Unchanged from P4:** the `p4_decision` events, `p4/decisions.jsonl` and the result keys that
+  P4's evaluator functions read.
+
+**Tests** (`test_px4_gazebo_p5_mission.py` offline; `test_px4_gazebo_p5_ros_harness.py` under real
+rclpy):
+
+* **Mission parity:** with P4's ranker plugged in, `P5Mission` equals `P4Mission` tick for tick
+  (actions, events, transitions) from MAP_SCAN to GOAL_HOVER.
+* **Trained policy:** `held_out-3000002` reaches GOAL_HOVER with ideal tracking. No acceptance
+  scenario is used.
+  * 801 ledger records for 801 `p4_decision` events, matched by time, action and state.
+  * Every invoked record's scores are reproduced bit for bit from its stored features.
+  * The masked argmax equals the recorded choice.
+  * The executed segment or heading equals the choice.
+* **Policy failures:** three consecutive failures give HOLD, HOLD, then `policy_unavailable` and one
+  LAND through revision 5, with the target and yaw frozen throughout.
+* **Start-up refusals,** all before ROS import: the configuration's SHA-256 differs; the schema hash
+  differs; the file differs; the file is missing; the model is untrained; P5 is disabled. The
+  exported checkpoint passes every check.
+* **Source drift guard:** `p5_control.main` differs from `p4_control.main` only in the declared
+  lines.
+* **ROS harness, P5:**
+  * the P2 `verify_timing` passes on a `p5_control` trace;
+  * BEST_EFFORT map and health are received;
+  * the graph check is traced as in P2;
+  * the node's publisher set equals `p4_control`'s;
+  * ledger records are written inside a control callback in their own span, and `verify_timing`
+    still passes.
+* **Limit:** the harness runs in ground-diagnostic mode, which never reaches TRANSIT. The live
+  TRANSIT ledger path is first exercised in SITL (Gate B).
+* **Evidence size:** about 14 KB per invoked record, about 11 MB for a 40 s transit, and at most
+  about 42 MB at the 150 s deadline.
+* **Informational inference cost in the rig** (801 calls, no load): p50 0.56 ms, p99 1.72 ms, max
+  3.43 ms.
