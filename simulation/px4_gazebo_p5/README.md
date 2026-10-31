@@ -15,4 +15,6 @@ outside every P3 and P4 manifest glob, so the accepted baselines keep verifying 
 | `scripts/` | source identity and baseline checks (freeze, runner and gates follow in later milestones) |
 | `models/`, `training/` | content-addressed model artifacts and offline training (plan M3, separately authorized) |
 
-Status: offline milestones M0–M2 (no trained model exists yet; no simulator has been run for P5).
+Status: offline milestones M0–M3. The candidate model `models/p5-ranker-ee006a80….npz` was trained
+offline and meets the contract §4.2 readiness bar (plan §13). Nothing is frozen, and no simulator
+has been run for P5.

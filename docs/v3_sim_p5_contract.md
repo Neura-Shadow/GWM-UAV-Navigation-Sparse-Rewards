@@ -1,8 +1,9 @@
 # v3-SIM P5 contract `p5-acceptance-v1` — fixed-weight policy substitution
 
 **Status: APPROVED (revision 1, commit `673d65e`) by the operator on 2026-10-31, with decisions
-D1–D9 as recommended in §11.** Training (plan M3) needs a separate authorization. Nothing is
-trained, frozen or launched. The design rationale and verified integration facts are in the
+D1–D9 as recommended in §11.** Training (plan M3) was authorized and run offline on 2026-10-31.
+It produced candidate `p5-ranker-ee006a80…`, which meets §4.2 on 300 held-out layouts (plan §13).
+Nothing is frozen or launched. The design rationale and verified integration facts are in the
 [P5 plan](v3_sim_p5_plan.md).
 
 The baselines must stay independently verifiable and unchanged:
