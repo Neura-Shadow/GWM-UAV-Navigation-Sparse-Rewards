@@ -679,3 +679,196 @@ rclpy):
   without state association only in the `policy_fault` scope. A test proves association stays on in
   P5 readiness, fixtures and flights. The package build `35eaccd0…` is unchanged. This needs a new
   candidate: Policy A re-approval for the new commit, a re-freeze, and a new Gate A authorization.
+
+### 13.9 New candidate `ab7b0c6`: Policy A approval and freeze (2026-10-31)
+
+* **Policy A** (`bf1ef9b1…`) approved for `ab7b0c6`: `state/p5-policy-A-approval-ab7b0c6.json`.
+* **Frozen:** `state/p5-candidate-ab7b0c6.json`, manifest SHA-256
+  **`db4c477901671fdf5f125e3b2c97948723dd761c725460a9aa3636d42ff070df`**, re-verified. It binds
+  the same model `ee006a80…`, build `35eaccd0…`, controller runtime, P3 and P4 baselines and MC
+  benchmark as `baef37a0`. The only source change is the `policy_fault` evaluator fix.
+* **Next:** a new Gate A authorization bound to `db4c4779…`. All seven rows rerun.
+
+### 13.10 P5 Gate A for manifest `db4c4779…`: ACCEPTED (2026-10-31, one attempt)
+
+* **Authorization:** `state/p5-auth-A-db4c47790167.json`. Result:
+  `state/p5-gate-A-db4c4779….result.json`, `accepted: true`, no first failure. No residual
+  simulator processes.
+
+  | Row | Run | Evaluation |
+  |---|---|---|
+  | p3-readiness | `20261031T092733Z-p5-p3_readiness-8d1c524a` | passed |
+  | p5-readiness | `20261031T092843Z-p5-p5_readiness-7433047e` | passed: checkpoint `ee006a80…` verified at start, NumPy 1.26.4, P2 timing passed, perception compute p99 28.1 ms |
+  | fixture-G2 | `20261031T093004Z-p5-G2-0031b247` | passed: 150 snapshots, all SCAN, policy not invoked, mask equals P4's, p99 0.77 ms |
+  | fixture-G4 | `20261031T093125Z-p5-G4-bd1f2142` | passed: 150 snapshots, all SCAN, p99 1.15 ms, max 1.68 ms |
+  | fixture-G6 | `20261031T093241Z-p5-G6-798410be` | passed: 150 snapshots, all SCAN, p99 0.99 ms |
+  | policy-failure-replay | `20261031T093337Z-p5-flight-snapshot-replay-1839274c` | passed: P4 S2 tick at 81.152 s (AVOIDING, 25 candidates); all six faults give HOLD, HOLD, `policy_unavailable` |
+  | policy-fault-checkpoint | `20261031T093404Z-p5-policy-fault-checkpoint_mismatch-0da6e13b` | passed: refused with `checkpoint_sha256_mismatch` before any node; Policy A and depth stream passed |
+
+* **Next:** Gate B, one S2 SITL smoke flight. It needs its own operator authorization bound to
+  `db4c4779…`.
+
+### 13.11 P5 Gate B for manifest `db4c4779…`: ACCEPTED (2026-10-31, one S2 SITL flight)
+
+* **Authorization:** `state/p5-auth-B-db4c47790167.json`. Run:
+  `20261031T095045Z-p5-flight-S2-934cd1b0`. The independent evaluation passed with no failures.
+  No residual simulator processes.
+* **Outcome:** `goal_reached_with_detour`, landed. The supervisor sequence matches P4's
+  (OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL). Response latency was 0.144 s.
+* **Safety (truth):** 0 collisions. Minimum clearance 0.356 m (limit ≥ 0.20). Tracking max 0.267 m
+  (limit ≤ 0.30).
+* **Policy participation (§6 limits):**
+  * 856 ledger records for 856 decisions; the policy was invoked on 833 of them.
+  * 0 failures, 0 choices outside the mask, 0 fallbacks; participation 1.0.
+  * Every score was reproduced bit for bit under the controller interpreter. The argmax and the
+    executed segment matched every time.
+  * Inference p50 0.70 ms, p99 1.73 ms, max 6.0 ms (limits 5 and 10 ms).
+  * Disagreement with the shadow P4 choice 0.65. No shield interventions.
+* **Unchanged limits:** checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 40.0 ms and max 74.9 ms (limits 50 and 90 ms).
+* **Against the accepted P4 Gate B S2 flight** (`docs/evidence/v3_sim_p5_gate_b_s2_vs_p4.json`;
+  reported, not acceptance evidence):
+  * same outcome and lineage;
+  * minimum clearance 0.053 m lower;
+  * tracking 0.015 m higher;
+  * path 0.20 m shorter (detour ratio 1.239 vs 1.264);
+  * time to goal 4.8 s shorter;
+  * controller CPU 0.51 vs 0.44;
+  * RTF 0.998 in both flights.
+* **Next:** Gate S (S1, S5, S6 in order) needs its own operator authorization. S5 carries the known
+  yaw-oscillation risk (§13.2).
+
+### 13.12 P5 Gate S for manifest `db4c4779…`: ACCEPTED (2026-10-31; S1, S5, S6 in order)
+
+* **Authorization:** `state/p5-auth-S-db4c47790167.json`. All three independent evaluations passed
+  with no failures. No residual simulator processes.
+
+  | Flight | Run | Outcome | Policy (invoked, failures / outside / fallback, participation, p99 / max) |
+  |---|---|---|---|
+  | S1 | `20261031T095654Z-p5-flight-S1-62ebe544` | `goal_reached`, no supervisor transition, tracking 0.238 m | 801, 0/0/0, 1.0, 1.20 / 2.50 ms |
+  | S5 | `20261031T100011Z-p5-flight-S5-046837cc` | `safe_refusal`: HOVER, ABORT `hover_timeout`, landed; clearance 0.922 m | 1,571, 0/0/0, 1.0, 1.88 / 5.08 ms |
+  | S6 | `20261031T100443Z-p5-flight-S6-85366b4a` | `safe_stop_on_sensor_loss`: HOVER, ABORT `stale_inputs:snapshot_stale`, landed | 229, 0/0/0, 1.0, 1.67 / 1.91 ms |
+
+* **The known yaw-oscillation limitation (§13.2) appeared in S5 and did not fail the gate.**
+  * The policy kept preferring headings outside the ±25° cone, and the L4 shield turned 1,271 of
+    its 1,571 decisions into YAW_TO.
+  * P5 therefore stayed in AVOIDING from 7.6 s to 78.6 s after TRANSIT. P4 reached HOVER at 15.4 s.
+  * The required outcome still held: HOVER, then `hover_timeout` at 98.6 s, 51 s before the 150 s
+    transit deadline.
+  * The S5 path was 1.44 m longer than P4's. Truth clearance stayed ≥ 0.92 m throughout.
+* **Against the accepted P4 flights** (`docs/evidence/v3_sim_p5_gate_s_{s1,s5,s6}_vs_p4.json`;
+  reported only): same outcome and supervisor lineage in all three. S1 and S6 timing is within
+  about 0.6 s of P4.
+* **Next:** Gate C (S2, S3, S4 in order, 3/3) needs its own operator authorization.
+
+### 13.13 P5 Gate C for manifest `db4c4779…`: FAILED (2026-10-31, one attempt, no retry)
+
+* **Authorization:** `state/p5-auth-C-db4c47790167.json`. Result:
+  `state/p5-gate-C-db4c4779….result.json`, `accepted: false`,
+  `first_failure: qualification-1:policy:inference_max`. S3 and S4 were not flown. No residual
+  simulator processes.
+* **Qualification-1, S2** (`20261031T121719Z-p5-flight-S2-2e9825f4`): the runtime passed and the
+  evaluation failed on one check only, `policy:inference_max`.
+  * Outcome `goal_reached_with_detour`, lineage OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL. Truth
+    clearance 0.375 m, 0 collisions, tracking 0.242 m.
+  * Policy: 833 invocations, 0 failures, 0 outside the mask, 0 fallbacks, 0 interventions,
+    participation 1.0.
+  * Inference (feature build + forward + selection, §5): p50 0.57 ms, p95 1.17 ms, p99 2.00 ms
+    (limit 5 ms), **max 10.84 ms (limit 10 ms)**.
+* **The breach is one tick.** Tick 491 at sim 99.244 s in RESUME took 10.84 ms. The next slowest
+  took 4.22 ms, and 9 of 833 exceeded 2 ms. The native clock shows no simulator stall at that time
+  (interval RTF ≥ 0.89 from 98.5 s to 100 s). The run's minimum interval RTF of 0.04 was at sim
+  3.5 s, during start-up. The recorded evidence does not identify the cause of the spike inside
+  the controller process. Earlier flights of this manifest had maxima of 6.0 ms (Gate B S2) and
+  5.08 ms (Gate S S5).
+* **Against the accepted P4 Gate C S2 flight** (`docs/evidence/v3_sim_p5_gate_c_s2_vs_p4.json`;
+  reported only): same outcome and lineage; clearance 0.071 m lower; path 0.06 m shorter; time to
+  goal 1.47 s shorter.
+* **The result is permanent.** Manifest `db4c4779…` cannot be re-run for Gate C. Any change needs
+  an operator decision, a new candidate, Policy A approval, a re-freeze and a new gate sequence.
+  The §5 thresholds are part of the preserved contract.
+
+### 13.14 Offline investigation of the Gate C inference spike (2026-10-31; no simulator, nothing re-run)
+
+Authorized by the operator after §13.13. The scripts read retained run evidence and run the production
+`PolicyRanker` under the controller interpreter (`/usr/bin/python3`, NumPy 1.26.4, OPENBLAS_NUM_THREADS=1).
+
+* **Spike pattern over the five P5 flights of `db4c4779…`:**
+  * Decisions over 3 ms are isolated, at 0 to 3 per flight. Per-quarter medians stay flat at 0.5–0.7 ms,
+    so there is no drift with flight length or memory growth.
+  * Maxima: 6.0 ms (Gate B S2), 2.5 (S1), 5.08 (S5), 1.91 (S6), 10.84 (Gate C S2).
+* **Ruled out:**
+  * *Garbage collection.* With the full `p5_control` import set, the heap holds about 23,000–27,000
+    tracked objects, and a full collection takes about 2 ms (6 ms when cold). Over 3,000 real decisions
+    (P4 `evaluate_candidates`, then `choose`, plus a ledger record each), no collection landed inside
+    the timed region. `gc.freeze()` changed nothing.
+  * *GIL contention.* The controller starts no Python threads, and its executor is single-threaded.
+  * *Guest CPU saturation.* WSL has 24 vCPUs, and the load average stayed between 1.3 and 6.2 during
+    the flight.
+  * *Intrinsically expensive ticks.* 484 reproduced TRANSIT ticks from Gate C S2 and Gate S S5, each
+    timed 30 times offline: per-tick median 0.34–1.13 ms, worst single call 2.7 ms. The two spike
+    ticks (491 and 337) are not among the ticks the planner reproduces exactly.
+* **Observed:**
+  * The controller process suffers external stalls of this size. In the same flight, a trivial
+    `clock_callback` with no disk write inside it took 10.29 ms (sim 114.2 s).
+  * In flight, the same reproduced ticks run a median 1.5× slower than offline, with a tail of 4–7×.
+  * The decision region is hit more often than the trivial callbacks per second of exposure. That fits
+    a region sitting at the end of the CPU-bound P4 planning burst of `mission_tick` (5–20 ms).
+  * The WSL kernel reports no steal time, so stalls caused at the hypervisor level would be invisible
+    to the guest.
+* **Conclusion:** the policy's own work is about 0.4–0.6 ms per decision. The cause of the 10.84 ms
+  spike is not established with certainty. The evidence points to host-level scheduling stalls that
+  land inside a long CPU burst, not to the policy computation. No change confined to the policy code
+  path was found that would bound wall-clock time against such stalls.
+
+### 13.15 Revision 3 pre-check: a thread-CPU-time maximum would not help (2026-10-31; offline)
+
+The operator asked for a revision 3 draft. The planned design kept wall p99 ≤ 5 ms and the 20 ms
+wall timeout, and applied the 10 ms maximum to the policy thread's CPU time. That design only helps
+if the thread CPU clock leaves out time the thread was not running. It was tested first, offline:
+the production `PolicyRanker.choose` on 120 reproduced Gate C S2 ticks, under the controller
+interpreter, with `perf_counter_ns` and `thread_time_ns` around each call.
+
+| Pacing | Decisions | Wall p50 / p99 / max (ms) | CPU p50 / p99 / max (ms) |
+|---|---|---|---|
+| Back to back | 57,133 | 0.43 / 0.86 / 4.96 | 0.46 / 0.92 / 5.28 |
+| 2 ms sleep between calls | 6,030 | 1.25 / 2.68 / 8.94 | 1.34 / 2.87 / 9.54 |
+| 50 ms sleep (the 20 Hz control timer) | 1,734 | 1.87 / 3.23 / 6.20 | 2.00 / 3.47 / 6.66 |
+
+* **Thread CPU time counts the spikes in full.** For every slow call, CPU time ≥ wall time (8.94 ms
+  wall vs 9.54 ms CPU). A CPU-time maximum would not have filtered out a stall like the Gate C one.
+  The revision 3 design was therefore **not drafted**.
+* **The same work is 3–4× slower when paced like the control loop** (median 1.87 ms vs 0.43 ms
+  back to back), and the thread is charged CPU for the extra time. That points to the core running
+  slower, not to the thread waiting. Known causes include frequency scaling, cold caches, and
+  efficiency-core placement or hypervisor time charged to the guest.
+* **Host:** 13th Gen Intel Core i7-13700HX (hybrid performance and efficiency cores, 24 logical
+  processors, all exposed to WSL). The Windows power plan is Balanced, on AC power. Read only;
+  nothing was changed.
+* **Not yet tested:** the same probes under a Windows performance power mode. Changing it is an
+  operator action on the host.
+
+### 13.16 P5 stopped by the operator (2026-10-31): not qualified
+
+The operator decided to stop P5 after §13.15 ("Stop P5 here"). There will be no contract revision 3,
+no new candidate and no further gates.
+
+* **Final state of manifest `db4c4779…`** (candidate `ab7b0c6`, model `p5-ranker-ee006a80…`):
+  * Gates A, B and S were accepted (§13.10–13.12).
+  * Gate C failed on `policy:inference_max` in S2: one tick took 10.84 ms against the 10 ms limit
+    (§13.13). S3 and S4 were not flown.
+  * **P5 is not qualified.** It makes no claim beyond what the accepted gates show.
+* **What the accepted evidence does show:**
+  * The frozen policy ran, without online updates, as the only ranker in 5 SITL flights across
+    Gates B, S and C.
+  * It had 0 policy failures, 0 choices outside the mask and 0 fallbacks, with 100%
+    participation.
+  * P4's safety layer was unchanged: 0 collisions, and every outcome matched P4's.
+  * Offline, on 300 held-out layouts, goal success was 7.0 points higher than P4 (§13.2).
+* **Open findings for any future phase:**
+  * The yaw-oscillation livelock (§13.2, seen in Gate S S5).
+  * Policy-path latency spikes on this hybrid-core WSL2 host under the Balanced power plan
+    (§13.14, §13.15). The 10 ms wall-clock maximum is sensitive to host scheduling and power
+    management, not only to the policy's own cost (median 0.4–0.6 ms).
+* **Kept unchanged:** all evidence (runs, gate results, consumption markers, authorizations), the
+  model files, and the P3, P4 and P5 manifests. Nothing was pushed.
