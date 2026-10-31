@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "contract": "p5-model-schema-v1",
+  "architecture": "p5-ranker-mlp-v1",
+  "dtype": "float64",
+  "slots": {
+    "count": 26,
+    "heading_steps": 6,
+    "lengths_m": [0.75, 1.5],
+    "order": "k from -heading_steps to +heading_steps (outer), nominal length ascending (inner); slot = 2*(k+6) + length index"
+  },
+  "candidate_features": [
+    {"name": "k", "scale": 6.0},
+    {"name": "nominal_length", "scale": 1.5},
+    {"name": "clipped_length", "scale": 1.5},
+    {"name": "progress", "scale": 1.5},
+    {"name": "endpoint_deviation", "scale": 3.0},
+    {"name": "turn", "scale": 3.141592653589793},
+    {"name": "clearance_term", "scale": 1.0, "rule": "min(clearance - r_infl, clearance_cap) / clearance_cap; 0 when not collision-valid"},
+    {"name": "observable", "rule": "turn <= observable_half_angle"},
+    {"name": "reaches_goal", "rule": "distance(end, goal) < 1e-9 and progress > 0"},
+    {"name": "collision_valid", "rule": "P4 L2"},
+    {"name": "progress_qualified", "rule": "collision_valid and (progress > min_progress or reaches_goal)"}
+  ],
+  "context_features": [
+    {"name": "goal_distance", "scale": 8.0},
+    {"name": "target_deviation", "scale": 3.0},
+    {"name": "sin_yaw_minus_path"},
+    {"name": "cos_yaw_minus_path"},
+    {"name": "state_one_hot", "values": ["NORMAL", "OBSTACLE_DETECTED", "AVOIDING", "RESUME", "HOVER"]},
+    {"name": "polar_profile", "count": 26}
+  ],
+  "polar_profile": {
+    "cap_m": 4.0,
+    "step_m": 0.05,
+    "order": "distance to the first OCCUPIED cell for k = -6..6, then distance to the first non-FREE cell for k = -6..6 (traversed counts as FREE, outside the grid counts as non-FREE); both capped at cap_m and divided by cap_m"
+  },
+  "features_per_slot": 46,
+  "layers": [[46, 64], [64, 64], [64, 1]],
+  "activation": "relu",
+  "selection": {"allowed": "progress_qualified", "tie_epsilon": 1e-9, "tie_order": "P4 L3: smaller |k|, then k >= 0, then shorter nominal length"}
+}

@@ -1,7 +1,8 @@
 # v3-SIM P5 — fixed-weight policy substitution: plan and integration facts
 
-**Status: PLANNING ONLY — awaiting operator approval of the [P5 contract](v3_sim_p5_contract.md).**
-Nothing is implemented, trained, frozen, launched or pushed.
+**Status: [P5 contract](v3_sim_p5_contract.md) APPROVED (revision 1, 2026-10-31, D1–D9 as recommended).**
+Offline milestones M0–M2 are implemented (§13). M3 (training) needs a separate authorization.
+Nothing is trained, frozen, launched or pushed.
 
 Baseline, verified on 2026-10-31:
 
@@ -302,3 +303,48 @@ These are listed with recommendations in contract §11, D1–D9:
 9. the gate structure.
 
 M3 (training) additionally needs its own authorization after the contract is approved.
+
+## 13. Implementation status: M0–M2 (offline, 2026-10-31)
+
+* **M0:** the `simulation/px4_gazebo_p5/` skeleton.
+  * Configs: `p5_policy.yaml` (disabled, no fallback, no bound model), `p5_validation.yaml` (the
+    P3/P4 baselines, the §6 limits, the gates) and the frozen `p5_model_schema.json`.
+  * The `gwm_policy_control` package metadata.
+  * `p5_manifest.py`: P5 source identity, schema hash and live P3/P4 baseline verification.
+  * Guard tests: the P3/P4 manifest-bound sources are unchanged since the accepted P4 commit, and
+    P3/P4 still verify to `1e205fec…` / `c110bd30…`.
+* **M1:**
+  * `policy_runtime.py`: a deterministic `.npz` artifact; loading checks the SHA-256, architecture,
+    schema hash, `trained`, shapes and finite weights; the weights are read-only; the float64 forward
+    pass is stateless.
+  * `observation_adapter.py`: the `(26, 46)` tensor and allowed mask, plus the polar occupancy
+    profile.
+  * Interface models (`trained: false`, fixed-seed random weights) are used in tests only and are
+    refused when a trained model is required.
+* **M2:**
+  * `candidate_ranker.py`: masked argmax with the P4 tie order, classified fail-closed records and the
+    shadow P4 choice.
+  * `decision.py`: the `plan` replica with the selection hook.
+  * `safety_shield.py`: the P5 supervisor (the P4 `step` replica plus the 3-failure
+    `policy_unavailable` rule).
+* **Parity:**
+  * The replica equals P4 `plan` on 40 structured random worlds, covering TRANSLATE, YAW_TO, SCAN and
+    HOLD.
+  * A source-level guard confirms the replica differs from P4 only in the hook.
+  * The P5 supervisor with the P4 ranker matches P4 tick for tick in lockstep closed loops for S2,
+    S4, S5 and S6.
+  * An untrained interface policy driving S2 still executes only P4-valid candidates, with truth
+    clearance ≥ 0.20 m.
+* **Offline per-tick policy cost** (feature build, forward pass and selection; interface model;
+  closed-loop S2/S4 states, about 1,066 ticks each; no simulator load):
+
+  | Scenario | p50 | p95 | p99 | Max |
+  |---|---|---|---|---|
+  | S2 | 0.48 ms | 0.94 ms | 1.42 ms | **7.25 ms** |
+  | S4 | 0.47 ms | 0.99 ms | 1.39 ms | 2.08 ms |
+
+  The limits are p99 ≤ 5 ms and max ≤ 10 ms. The 7.25 ms S2 outlier is inside the maximum but is
+  the margin to watch under SITL load.
+* **Next:** M3 (training) awaits a separate operator authorization. M4–M7 (mission, controller,
+  runner, evaluator, comparison, build) can be built against interface models first, but nothing can
+  be frozen without a trained model.

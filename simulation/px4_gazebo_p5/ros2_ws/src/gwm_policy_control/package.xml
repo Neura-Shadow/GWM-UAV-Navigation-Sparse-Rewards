@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>gwm_policy_control</name>
+  <version>0.5.0</version>
+  <description>P5 frozen fixed-weight candidate ranker behind the unchanged P4 safety shield (SITL only). Disabled unless an authorized P5 run enables it.</description>
+  <maintainer email="maintainer@example.invalid">GWM project</maintainer>
+  <license>MIT</license>
+  <buildtool_depend>ament_python</buildtool_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>
