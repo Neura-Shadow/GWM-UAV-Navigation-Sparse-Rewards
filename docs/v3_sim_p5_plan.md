@@ -820,3 +820,30 @@ Authorized by the operator after §13.13. The scripts read retained run evidence
   spike is not established with certainty. The evidence points to host-level scheduling stalls that
   land inside a long CPU burst, not to the policy computation. No change confined to the policy code
   path was found that would bound wall-clock time against such stalls.
+
+### 13.15 Revision 3 pre-check: a thread-CPU-time maximum would not help (2026-10-31; offline)
+
+The operator asked for a revision 3 draft. The planned design kept wall p99 ≤ 5 ms and the 20 ms
+wall timeout, and applied the 10 ms maximum to the policy thread's CPU time. That design only helps
+if the thread CPU clock leaves out time the thread was not running. It was tested first, offline:
+the production `PolicyRanker.choose` on 120 reproduced Gate C S2 ticks, under the controller
+interpreter, with `perf_counter_ns` and `thread_time_ns` around each call.
+
+| Pacing | Decisions | Wall p50 / p99 / max (ms) | CPU p50 / p99 / max (ms) |
+|---|---|---|---|
+| Back to back | 57,133 | 0.43 / 0.86 / 4.96 | 0.46 / 0.92 / 5.28 |
+| 2 ms sleep between calls | 6,030 | 1.25 / 2.68 / 8.94 | 1.34 / 2.87 / 9.54 |
+| 50 ms sleep (the 20 Hz control timer) | 1,734 | 1.87 / 3.23 / 6.20 | 2.00 / 3.47 / 6.66 |
+
+* **Thread CPU time counts the spikes in full.** For every slow call, CPU time ≥ wall time (8.94 ms
+  wall vs 9.54 ms CPU). A CPU-time maximum would not have filtered out a stall like the Gate C one.
+  The revision 3 design was therefore **not drafted**.
+* **The same work is 3–4× slower when paced like the control loop** (median 1.87 ms vs 0.43 ms
+  back to back), and the thread is charged CPU for the extra time. That points to the core running
+  slower, not to the thread waiting. Known causes include frequency scaling, cold caches, and
+  efficiency-core placement or hypervisor time charged to the guest.
+* **Host:** 13th Gen Intel Core i7-13700HX (hybrid performance and efficiency cores, 24 logical
+  processors, all exposed to WSL). The Windows power plan is Balanced, on AC power. Read only;
+  nothing was changed.
+* **Not yet tested:** the same probes under a Windows performance power mode. Changing it is an
+  operator action on the host.
