@@ -675,3 +675,7 @@ rclpy):
 * **Proposed fix (needs operator approval and a new candidate):** in the `policy_fault` scope,
   evaluate the depth stream without controller-ledger association. Association stays required in
   P3 readiness, P5 readiness and G2/G4/G6 of the same gate. No threshold changes.
+* **Fix approved and implemented (operator, 2026-10-31):** `p5_evaluate` evaluates the depth stream
+  without state association only in the `policy_fault` scope. A test proves association stays on in
+  P5 readiness, fixtures and flights. The package build `35eaccd0…` is unchanged. This needs a new
+  candidate: Policy A re-approval for the new commit, a re-freeze, and a new Gate A authorization.
