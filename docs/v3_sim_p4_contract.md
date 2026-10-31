@@ -1,9 +1,8 @@
 # v3-SIM P4 contract `p4-acceptance-v1` — deterministic non-learning obstacle avoidance
 
-**Status: APPROVED — revision 2 (commit `d3c06b4`) plus revision 3 (commit `ea2c9e3`,
-[proposal](v3_sim_p4_contract_revision3_proposal.md)) plus revision 4 (commit `65b99e4`,
-[proposal](v3_sim_p4_contract_revision4_proposal.md)) plus revision 5 (commit `ae0e037`,
-[proposal](v3_sim_p4_contract_revision5_proposal.md)).** Revision 2 added the S6 fault-injection window
+**Status: APPROVED and ACCEPTED — revisions 2 (commit `d3c06b4`), 3 (`ea2c9e3`), 4 (`65b99e4`)
+and 5 (`ae0e037`). P4 COMPLETE — Qualification 3/3 PASSED** (candidate `c110bd30`;
+[final acceptance](v3_sim_p4_final_acceptance.md)). Revision 2 added the S6 fault-injection window
 in §9.1, the separation of collision validity from translation authority in §5 L2–L6, and the
 runtime-performance limits in §6.1 and Gate A. Revision 3 makes the initial plan feasible: a 360°
 `MAP_SCAN`, traversed cells counting as free in L2, and free space observed only beyond the near clip. Revision 4 pins a P4 `TRANSIT` target speed of
@@ -160,7 +159,7 @@ A supervisor `ABORT` (`hover_timeout`, `stale_inputs:*`, `map_scan_stale_inputs:
 `RECOVERY` exactly as before and fails the run. Routing never makes a run pass: every scenario's §7
 outcome check still requires its own expected outcome and abort reason (revision 5).
 
-## 6. Safety envelope (proposed limits; derivation in plan §4)
+## 6. Safety envelope (derivation in plan §4)
 
 | Quantity | Limit |
 |---|---|
@@ -224,10 +223,10 @@ retries, and writes an immutable result. A Policy A approval is required per P4 
 |---|---|---|
 | **A** | (1) **P3 readiness unchanged** (P3 scope, RGB consumer, all P3 limits). (2) **P4 readiness under load:** the full P4 stack (P3 sensor stack, `p4_perception`, `p4_control` in ground-diagnostic mode, which streams setpoints but never arms or commands) for the 30 s ground window; every §6.1 limit must pass, proving the extra subscriber and perception keep P3 and P2 freshness before any flight. (3) **P4 ground fixtures:** vehicle on the ground facing S2, S4 and S5 obstacles at 2, 4 and 6 m; reconstructed scan and grid within `e_depth + e_grid` of truth; planner and L5/L6 yaw decisions equal the expected decision tables; §6.1 limits pass. (4) **Fault fixtures** (adapter stopped, bridge stopped, stale clock, calibration mismatch) reach `HOVER` with yaw frozen. (5) A single PX4 input owner in the graph; cleanup graceful | ground |
 | **B** | one S2 flight | smoke |
-| **S** (proposed) | S1, S5, S6 in fixed order; all must pass | safety behaviour |
+| **S** | S1, S5, S6 in fixed order; all must pass | safety behaviour |
 | **C** | three consecutive flights S2, S3, S4 in fixed order; 3/3 required | qualification |
 
-P4 is complete only with A, B, S (if approved) and C accepted for the same P4 manifest. No P3 gate
+P4 is complete only with A, B, S and C accepted for the same P4 manifest. No P3 gate
 result counts.
 
 ## 9. Independent evaluation and evidence
@@ -292,7 +291,7 @@ loss, in any scenario, fails under the unchanged P3 checks.
   * the adapter or perception stops for any reason other than the recorded injection;
   * any non-S6 run shows depth loss.
 
-## 10. Decisions requiring operator approval (recommendation first)
+## 10. Approved design decisions
 
 1. **Control authority:** an exclusive `p4_control` reusing P2 modules by import, with the P2 node
    not launched. The alternative, adding a reference interface to P2, changes accepted P2 and

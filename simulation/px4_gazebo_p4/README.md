@@ -1,7 +1,9 @@
 # P4 — deterministic non-learning obstacle avoidance (PX4 SITL)
 
-Contract: [`p4-acceptance-v1`](../../docs/v3_sim_p4_contract.md) (revisions 2 and 3).
-Design and integration facts: [plan](../../docs/v3_sim_p4_plan.md).
+**P4 COMPLETE — Qualification 3/3 PASSED** (candidate `c110bd30`, Gates A, B, S and C; PX4 SITL only).
+Final results: [final acceptance](../../docs/v3_sim_p4_final_acceptance.md).
+Contract: [`p4-acceptance-v1`](../../docs/v3_sim_p4_contract.md) (revisions 2–5).
+Design and integration facts: [design](../../docs/v3_sim_p4_plan.md).
 
 This tree lies outside every P3 manifest glob, so the accepted P3 candidate keeps verifying. P4 is
 disabled by default: its nodes refuse to start unless an authorized P4 run enables them in its

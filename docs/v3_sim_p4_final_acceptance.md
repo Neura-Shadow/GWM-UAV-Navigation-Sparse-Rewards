@@ -44,26 +44,47 @@ Every flight also passed the unchanged P2/P3 checks: P2 timing with its full fli
 the estimator reference and yaw ownership, ROS/ULog pairing, landed and disarmed, RGB absence, MC
 causality, Policy A (401 × 1, 512 × 34) and the D3D12 renderer.
 
-## How it got here (contract revisions and fixes; details in the plan)
+## Contract revisions
 
-* **Revisions:**
-  * 2 (`d3c06b4`): fault window, collision validity, performance limits.
-  * 3 (`ea2c9e3`): 360° map scan and initial feasibility.
-  * 4 (`65b99e4`): 0.20 m/s transit speed, so PX4's steady lag is about 0.21 m, inside 0.30 m.
-  * 5 (`ae0e037`): a supervisor abort lands through P2's nominal sequence to `COMPLETE`.
-* **Defects found by gates and fixed offline before re-freezing:**
-  * The runner's SITL gate environment.
-  * `p4_control` trace spans and BEST_EFFORT QoS.
-  * A world plugin that disabled PX4's server config.
-  * Perception compute; vectorized with identical outputs.
-  * The truth-observer shutdown race.
-  * Graph-check tracing.
-* **Intermittent environment events, re-frozen unchanged by operator decision:** a Gazebo forced stop
-  (§20), and one extra QGC request (§46).
+* **Revision 2** (`d3c06b4`): the S6 fault-injection window, collision validity separated from
+  translation authority, and the runtime-performance limits.
+* **Revision 3** (`ea2c9e3`): a 360° map scan, traversed cells counted as free, and free space only
+  beyond the near clip.
+* **Revision 4** (`65b99e4`): a pinned 0.20 m/s `TRANSIT` speed. With position-only setpoints PX4's
+  steady lag is about 0.21 m, inside the unchanged 0.30 m tracking bound.
+* **Revision 5** (`ae0e037`): a supervisor `ABORT` lands through P2's nominal sequence to `COMPLETE`.
+  P2 safety errors still use `RECOVERY` and fail the run.
+
+No threshold was relaxed in any revision.
+
+## Scope and limitations
+
+* Simulation only: PX4 SITL with Gazebo Harmonic. There was no hardware flight, and no claim is made
+  about real flight.
+* Static box obstacles in scenarios S1–S6, inside the P4 geofence, at a transit speed of 0.20 m/s.
+  Not claimed: moving obstacles, obstacles thinner than one depth pixel at range or outside the
+  flight band, unobserved space, speeds above 0.3 m/s, RGB use, and learning of any kind.
+* S7 (estimator reset / stale pose) is verified by offline replay only.
+* Operational sensitivities seen during acceptance. Each happened once in the unchanged P3/QGC
+  stack, and none involved P4 code:
+  * a Gazebo SIGINT shutdown hang (forced stop after the 15 s grace);
+  * one extra QGC `REQUEST_MESSAGE` (35 against the Policy A cap of 34);
+  * brief host-level preemption of the perception thread (a single 0.095 s frame).
 
 ## Retained evidence
 
-The accepted runs above and their gate, authorization, consumption, manifest and approval records
-are in `~/uav_autonomy/{runs,state}`. Earlier candidates' records also remain there as history; no
-cleanup has been done. Changing any manifest-bound P4 file (`simulation/px4_gazebo_p4/{configs,
-scripts,validation,ros2_ws/src/gwm_obstacle_avoidance}`) or P3 file breaks `verify`.
+* **Runs:** the 14 accepted runs listed above are in `~/uav_autonomy/runs`. Each holds its ULog,
+  rosbag, P4 ledgers (`p4/local_map.jsonl`, `p4/truth_poses.jsonl`, `p4/contacts.jsonl`, decisions),
+  sensor records, MAVLink capture and evaluation.
+* **State:** `~/uav_autonomy/state` holds the manifest, the Policy A approval, the P4 build receipt
+  (`p4-built.json`, workspace `p4_ws/c4bd5a55…`), and each gate's authorization, consumption marker
+  and result.
+* **Cleanup:** failed and superseded P4 candidates, runs and build mirrors were deleted at release
+  (2026-10-31); their history is in git.
+* **Frozen files:** changing any manifest-bound P4 file
+  (`simulation/px4_gazebo_p4/{configs,scripts,validation,ros2_ws/src/gwm_obstacle_avoidance}`) or any
+  P3 file breaks `verify`. Verify with:
+
+```bash
+GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 python3 simulation/px4_gazebo_p4/scripts/p4_manifest.py verify \n  "$HOME/uav_autonomy/state/p4-candidate-50d5002.json"
+```

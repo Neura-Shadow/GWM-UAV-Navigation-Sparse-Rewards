@@ -47,6 +47,17 @@ completed deterministic C2 extension. The v3 scope and permissions are frozen
 in documentation before any agent runtime, LLM/API integration, dashboard, or
 external-runtime work begins.
 
+### v3-SIM: PX4 SITL simulation track
+
+Measured PX4 SITL work (Gazebo Harmonic, ROS 2 Jazzy, WSL2) under frozen, gated acceptance
+contracts. There are no hardware flights. See the [roadmap](docs/roadmap.md) for the full list.
+
+| Phase | Status | Evidence |
+| --- | --- | --- |
+| P3 Depth sensing | **P3 COMPLETE — Contract v1.6 — Qualification 3/3 PASSED** | [final acceptance](docs/v3_sim_p3_final_acceptance_v1_6.md) |
+| P4 Non-learning obstacle avoidance | **P4 COMPLETE — Qualification 3/3 PASSED** (Gates A, B, S, C; seven SITL flights, 0 collisions) | [final acceptance](docs/v3_sim_p4_final_acceptance.md) |
+| P5 Fixed-weight policy substitution | Next | — |
+
 Completed mock-first and guarded-runtime slices:
 
 | Slice | Status | Key capability |
