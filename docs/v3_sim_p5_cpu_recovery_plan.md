@@ -1,0 +1,323 @@
+# P5 recovery plan: CPU tail-latency optimization, host diagnostics and new-candidate readiness
+
+**Status: PROPOSAL, offline evidence only (2026-11-01).**
+
+* P5 remains **stopped and not qualified** (plan §13.16).
+* Nothing here changes a frozen file, the model, a threshold or the failed Gate C result.
+* No gate, simulator or flight was run. No host setting was changed. Nothing was pushed.
+* The optimization below exists only as an isolated diagnostic module; it is **not** integrated.
+
+Builds on the benchmark report [v3_sim_p5_inference_benchmark.md](v3_sim_p5_inference_benchmark.md)
+(commit `a4b8f8f`). Code: [`diagnostics/p5_inference_benchmark/`](../diagnostics/p5_inference_benchmark/).
+Raw JSON results stay local (`results/` is ignored by the repository).
+
+## 1. Verified repository and manifest status (2026-11-01, read-only)
+
+| Check | Result |
+|---|---|
+| Branch / HEAD | `v3/gwm-uav-c2-agentops-planning` / `a4b8f8f` (benchmark commit); only `.codegraph/` untracked before this work |
+| Benchmark report and code | present (`docs/v3_sim_p5_inference_benchmark.md`, `diagnostics/p5_inference_benchmark/`) |
+| P3 manifest `p3_manifest.py verify` | `1e205feca482e11f…` ✔ |
+| P4 manifest `p4_manifest.py verify` | `c110bd30be22fb43…` ✔ |
+| P5 baselines (C4) | P3 and P4 verify byte for byte ✔ |
+| Frozen P5 manifest `db4c4779…` `p5_manifest.py verify` | `db4c477901671fdf…` ✔ (manifest file SHA-256 `ac456eb9…`) |
+| P5 sources since candidate `ab7b0c6` | unchanged (`git diff ab7b0c6 HEAD -- simulation/px4_gazebo_p5` is empty) |
+| Model `p5-ranker-ee006a80….npz` | SHA-256 `ee006a805ba9c327…` = file name = frozen policy SHA ✔; unchanged since `44811f2` |
+| Gate C result `p5-gate-C-db4c4779….result.json` | `accepted: false`, `first_failure: qualification-1:policy:inference_max`, 1 run; SHA-256 `018e03e5…`; mtime 2026-10-31 20:20:18 (the gate run) — unchanged |
+| Gate C consumption marker | present (2026-10-31 20:17:00) |
+| Simulator processes | none |
+
+## 2. Host power mode
+
+Read only, on 2026-11-01:
+* plan *Balanced* (`381b4222…`);
+* power-mode overlay **`961cc777-2547-4f9d-8174-7d86181b8a7a` = "Best power efficiency"**, set for both
+  AC and DC;
+* on AC power (battery status 2, 79 %).
+
+This is unchanged from 2026-10-31. **Every measurement in this plan and in the benchmark report was taken
+in "Best power efficiency" mode. No performance-mode measurement exists.**
+
+**Operator action to enable a performance-mode test.** Windows Settings → System → Power & battery →
+*Power mode* → **Best performance**, with the laptop on AC. Then confirm in chat that the mode is set and
+the offline comparison may run (§9, approval 1). The mode can be checked read-only with
+`reg query HKLM\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes /v ActiveOverlayAcPowerScheme`.
+Best performance is `ded574b5-45a0-4f42-8737-46345c09c238`.
+
+## 3. The optimization under evaluation (CPU-D)
+
+[`optimized.polar_profile`](../diagnostics/p5_inference_benchmark/optimized.py) replaces the production
+per-heading loop in `observation_adapter.polar_profile` (13 headings x ~15 small NumPy calls) with one 2-D
+array expression over all headings:
+* `math.cos` and `math.sin` per heading, as in production;
+* then the same multiply, add, subtract, divide, floor, bounds test, cell lookup, traversed lookup and
+  first-hit search per element, in the same order.
+
+Per element the IEEE operations are identical, so the output is identical; only the NumPy call overhead
+changes. Nothing else in the decision path changes:
+* the model, weights, schema `(26, 46)`, candidate order, feature scaling and occupancy semantics;
+* the mask, selection, shield, supervisor and timeout.
+
+The preallocated-buffer forward pass also measured in the benchmark is **not** proposed: it gave no
+measurable gain.
+
+## 4. Numerical and decision equivalence (CPU-A production vs CPU-D)
+
+[`differential.py`](../diagnostics/p5_inference_benchmark/differential.py), controller interpreter, no tolerance anywhere:
+
+| Test | Set | Result |
+|---|---|---|
+| Scores on exact flight tensors | every invoked record of all 5 retained P5 flight ledgers | **4,267 / 4,267** bit-exact (frozen and CPU-D forward); recorded choice 4,267 / 4,267 |
+| Observation tensors | 5,713 reproduced TRANSIT ticks of 12 retained P4 and P5 flights (S1-S6) | **5,713 / 5,713** bit-identical `(26, 46)` tensors |
+| Allowed masks | same | 5,713 / 5,713 |
+| Scores and selected slot | same | 5,713 / 5,713 |
+| Executed action (`plan_with_ranker`: action, heading, length, end, reason, best, counts) | same | 5,713 / 5,713 |
+| Supervisor decisions (sequential `PolicySupervisor` replay per run) | 5,713 steps, 12 runs | **5,713 / 5,713** steps (state, action, heading, end, frozen_yaw, reason, policy record); transitions equal in **12 / 12** runs |
+| Ground snapshots (Gate A item 4 frame) | 2,945 usable snapshots of 12 retained G2/G4/G6 and readiness runs | features, masks and decisions 2,945 / 2,945 (policy never invoked on the ground, as revision 2 found) |
+| Polar-profile fuzz on real grids | 200,000 cases on 48 recorded grids: random and cell-boundary starts (36,413 outside the grid), axis and heading-step angles, traversed density 0-90 % | **200,000 / 200,000** bit-exact |
+| Checkpoint identity | before and after | `ee006a80…` unchanged; equals the frozen policy SHA |
+| No ground truth or I/O | audit hook over 2,000 calls; static imports | 0 file, directory, socket or subprocess events; imports only `math`, `numpy`, `gwm_obstacle_avoidance`, `gwm_obstacle_avoidance.local_map` (FREE, OCCUPIED, planner.wrap) |
+
+**No numerical or behavioral mismatch was found.**
+
+## 5. Timing: matched CPU-A vs CPU-D
+
+**Method** ([`recovery_bench.py`](../diagnostics/p5_inference_benchmark/recovery_bench.py)):
+* Both variants run through the **unchanged production `PolicyRanker.choose`**, measured by its own
+  `inference_s` (the gated quantity). Only the polar-profile function is swapped, inside the benchmark
+  process.
+* Calls come in pairs on the same tick, in alternating order (A,D then D,A), so data, order and time of run
+  are matched.
+* 20 Hz pacing uses an absolute 50 ms schedule. A missed slot is a wake-up lateness of at least 50 ms.
+* Per call the harness records:
+  * thread CPU time;
+  * **run-queue wait** from `/proc/thread-self/schedstat`: time runnable but not running, the direct
+    signature of guest-scheduler preemption;
+  * voluntary and involuntary context switches;
+  * the Linux CPU before and after;
+  * the guest's runnable tasks (`procs_running`);
+  * polar-profile and `FrozenPolicy.scores` time.
+
+**Sample counts.** Pooled p50 is the median of per-trial p50s. p95, p99 and max are the largest per-trial
+value.
+
+| Condition | Trials x s | Calls per variant | A p50 / p95 / p99 / max (ms) | D p50 / p95 / p99 / max (ms) | > 10 ms A / D | > 20 ms A / D |
+|---|---|---|---|---|---|---|
+| Back to back | 3 x 30 | 102,675 / 102,674 | 0.428 / 0.784 / 1.200 / 5.615 | **0.228 / 0.430 / 0.644 / 4.156** | 0 / 0 | 0 / 0 |
+| 20 Hz, idle | 5 x 120 | 6,005 / 6,000 | 0.669 / 2.618 / 2.910 / 4.955 | **0.464 / 1.552 / 1.787 / 3.200** | 0 / 0 | 0 / 0 |
+| 20 Hz, pinned to vCPU 4 | 2 x 120 | 2,402 / 2,400 | 1.665 / 2.591 / 2.939 / 5.900 | 1.004 / 1.680 / 1.837 / **9.908** | 0 / 0 | 0 / 0 |
+| 20 Hz, host contention (24 Windows busy processes) | 1 x 120 | 1,201 / 1,200 | 1.494 / 2.255 / 2.688 / 3.431 | 0.891 / 1.380 / 1.660 / 3.417 | 0 / 0 | 0 / 0 |
+| 20 Hz, guest oversubscription (30 busy processes on 24 vCPUs), run 1 | 1 x 120 | 1,201 / 1,200 | 1.332 / 2.796 / 7.754 / 16.356 | 0.802 / 1.421 / 4.209 / 12.211 | 6 / 1 | 0 / 0 |
+| same, run 2 | 1 x 120 | 1,201 / 1,200 | 1.316 / 2.614 / 7.385 / 29.354 | 0.791 / 1.358 / 3.081 / 8.219 | 2 / 0 | 1 / 0 |
+| same, run 3 | 1 x 120 | 1,201 / 1,200 | 1.335 / 3.212 / 8.679 / 26.006 | 0.805 / 1.558 / 5.272 / 31.906 | 7 / 7 | 1 / 1 |
+
+**Phase medians, 20 Hz idle** (ms):
+
+| Variant | polar profile | `FrozenPolicy.scores` (validation + forward) | rest (candidate features, mask, rank, select) |
+|---|---|---|---|
+| A | 0.378 | 0.112 | 0.182 |
+| D | 0.164 | 0.115 | 0.183 |
+
+**Wake-up lateness at 20 Hz** (scheduling delay before each call):
+* Idle: p99 0.62 ms, max 4.73 ms, 0 missed slots.
+* Host contention: max 28.0 ms.
+* Guest oversubscription: p99 6.2-7.5 ms, max 75.3 and 77.7 ms, **5 missed slots** (the thread could not
+  even start on time).
+
+**Repeatability.** Absolute values drift between trials of the same condition: the A median ranged from
+0.63 to 1.40 ms over the five idle 20 Hz trials. D was below A on every quantile in every idle and
+host-contention trial. The matched design is what makes the A-to-D comparison valid despite the drift.
+
+**What D buys:**
+* *Algorithmic speedup:* polar profile 2.3x faster at 20 Hz, 4x back to back.
+* *End-to-end decision speedup:*
+  * median -31 % at 20 Hz, -47 % back to back;
+  * p99 -39 % at 20 Hz, -46 % back to back;
+  * maximum -35 % at 20 Hz idle.
+* *Under guest oversubscription:* fewer calls over 10 ms in total (8 vs 15), but not zero, and one D call
+  reached 31.9 ms.
+
+## 6. Scheduling and tail-latency analysis
+
+The run-queue wait separates every slow call (> 3 ms) into one of two classes, with no exceptions:
+
+| Class | Where | Count (A + D) | Signature | Interpretation |
+|---|---|---|---|---|
+| **Guest preemption** | guest oversubscription only | 217 / 217 slow calls | run-queue wait > 0 (up to 30.4 ms), wall ≫ CPU, involuntary switches, `procs_running` 31-47 | **Measured:** the WSL guest scheduler ran something else while the decision was runnable |
+| **Charged slowness** | idle, back to back, host contention, affinity | 45 / 45 slow calls | run-queue wait = 0, no involuntary switch, CPU time ≥ wall time | The guest believes the thread was running the whole time, yet the same work took up to 10x longer. **Hypothesis** (not proven): host frequency or power state ("Best power efficiency"), cold caches after sleep, or hypervisor vCPU descheduling charged to the guest (WSL reports no steal time) |
+
+Consequences:
+
+1. **The optimization cannot bound either class.** A stall of either class is not computation, so making
+   the computation shorter only lowers the chance that a stall lands inside it. In matched trials D halved
+   the class-1 exceedances (8 vs 15 over 10 ms). In class 2, one D call reached **9.91 ms** on an idle,
+   pinned process (10.2 ms CPU, zero wait), 0.09 ms below the limit.
+2. **Which class caused the in-flight 10.84 ms is unknown.** The flight recorded neither run-queue wait
+   nor `procs_running` for policy calls. Earlier analysis (plan §13.14) found guest load averages of
+   1.3-6.2. That is a one-minute mean, and it can hide short bursts above 24 runnable tasks.
+3. **A finite clean trial is not proof.** About 120,000 offline calls per variant had no breach outside
+   guest oversubscription. That bounds the rate only loosely: with zero events in about 6,000 idle 20 Hz
+   calls per variant, the 95 % upper bound is about 5 in 10,000 calls. The flight's 1 in 4,267 is within
+   reach of that.
+
+## 7. Production integration feasibility
+
+**Smallest change: one function in one manifest-bound file.**
+
+| File | Change | Manifest / receipt effect |
+|---|---|---|
+| `simulation/px4_gazebo_p5/ros2_ws/src/gwm_policy_control/gwm_policy_control/observation_adapter.py` | replace the body of `polar_profile` with the 2-D form in §3. Drop the diagnostic step cache so the function stays stateless; computing the ~40-element step array per call costs about 1 µs. Signature, docstring contract and return value unchanged | changes `p5_source_files`; changes the P5 package hash, so `state/p5-built.json` must be regenerated with `build_p5.sh --build` |
+| `tests/test_px4_gazebo_p5_policy.py` | add a differential test that keeps the current loop as an in-test oracle and checks bit equality on recorded and fuzzed inputs, as in §4 | test file only; not manifest-bound |
+| `simulation/px4_gazebo_p5/configs/p5_validation.yaml` | `contract_revision` string, only if revision 3 (§10) is approved | bound by the manifest (`p5_contract_revision`) |
+
+**Unchanged:** the model and checkpoint; `policy_runtime.py`, `candidate_ranker.py`, `decision.py`,
+`safety_shield.py`, `mission.py` and `control_node.py`; every P2, P3 and P4 file; the model schema; all
+thresholds; PX4 ownership. The function has no ROS import and creates no publisher, so **no additional
+PX4 control path is possible**.
+
+The training code (`training/p5_dataset.py`) builds features through the same adapter. Its outputs would
+be bit-identical. The model's dataset, training and readiness reports do not bind the adapter source.
+
+**Candidate identity.** Any source change produces a new candidate. Required sequence:
+1. a new commit;
+2. `build_p5.sh --build`;
+3. Policy A approval for that commit;
+4. `p5_manifest.py freeze`, giving a new manifest SHA;
+5. fresh, separately authorized Gates A, B, S and C.
+
+The Gate A, B and S results of `db4c4779…` cannot be transferred. The failed Gate C stays preserved.
+
+## 8. New-candidate readiness assessment
+
+| # | Required evidence | Status |
+|---|---|---|
+| 1 | P3 manifest verifies | ✔ (§1) |
+| 2 | P4 manifest verifies | ✔ (§1) |
+| 3 | P5 checkpoint unchanged | ✔ (§1, §4) |
+| 4 | Bit-exact scoring and decision equivalence | ✔ (§4: 4,267 tensors, 5,713 flight ticks, 2,945 ground snapshots, 200,000 fuzz cases, 12 supervisor replays) |
+| 5 | No additional direct PX4 control publishers | ✔ (pure function; no ROS import; §7) |
+| 6 | Safety and failure behaviour unchanged | ✔ by construction and replay (supervisor 5,713 / 5,713); the 20 ms timeout and HOLD/ABORT rules untouched |
+| 7 | Focused P5 regression tests pass with the optimization | see §8.1 |
+| 8 | Linux and Windows suites remain compatible | see §8.1 |
+| 9 | Offline performance improves under representative pacing | ✔ at 20 Hz: p99 -39 %, max -35 % (matched, 5 trials) |
+| 10 | Scheduling and tail-latency risks documented | ✔ (§6) — **the risk is not removed** |
+
+### 8.1 Regression results with the optimization patched in
+
+The existing suites ran unmodified, with
+[`polar_patch_plugin.py`](../diagnostics/p5_inference_benchmark/polar_patch_plugin.py) swapping in the
+CPU-D polar profile for the whole session. The plugin counts calls, so a session that never exercised the
+optimized function cannot pass silently.
+
+| Suite | Interpreter | Result | Optimized calls |
+|---|---|---|---|
+| P5 offline suites (8 files: contract, policy, shield, training, mission, runtime, comparison, …; ROS harness excluded) | Linux `/usr/bin/python3` (controller env) | **198 passed** | 2,767 |
+| ROS harness, P4 + P5 (real rclpy, offline) | Linux controller env | **8 passed** | 0: the harness runs never reach a TRANSIT policy decision, so they cover start-up integrity, not this path |
+| Windows full suite (`tests/`) | Windows Python 3.13.5 | **1,538 passed, 48 skipped**, the same counts as the accepted baseline | 2,767 |
+
+No source file was modified for these runs (`git status` clean apart from the new diagnostics and docs).
+
+**Readiness conclusion.**
+* The CPU-D change is **technically ready to integrate** as a bit-exact, minimal source change.
+* It is **not sufficient evidence for another acceptance attempt**:
+  * The measured tail mechanisms are external to the computation.
+  * One of them reached 9.91 ms on the optimized path even with no load.
+  * The in-flight cause is unattributed.
+* A new candidate built on CPU-D alone would face the same failure mode at a lower, but unquantified,
+  rate. It would need about 7 flights plus Gate A at 0 exceedances.
+
+**Evidence still missing, and obtainable only with a loaded simulator:**
+* which class (guest preemption or charged slowness) produces policy-call spikes during a real flight;
+* how often each occurs;
+* whether CPU-D plus a host setting keeps those calls under 10 ms.
+
+## 9. Recommendation: Path B — host scheduling investigation, with the Path A change prepared
+
+**Why not Path A now.** Its conditions on equivalence, improvement, safety and documentation are met.
+But significant spikes remain under load, the in-flight mechanism is unattributed, and an idle optimized
+call came within 0.09 ms of the limit. Another acceptance attempt now would consume a candidate on an
+unquantified risk.
+
+**Why not Path C.** Equivalence holds, nothing unsafe was introduced, and credible timing validation is
+feasible: the run-queue instrumentation cleanly attributes stalls.
+
+**Proposed Path B sequence (none started; each step needs explicit operator approval):**
+
+1. **Performance-mode offline comparison (approval 1, operator action first).**
+   * The operator sets *Best performance* on AC (§2) and confirms.
+   * Then repeat `recovery_bench.py` for back to back, 20 Hz x 5 and guest oversubscription x 3 (about
+     25 minutes, no simulator).
+   * Decision value: if the charged-slowness class disappears or shrinks markedly, the host setting
+     becomes a candidate runtime prerequisite.
+2. **Loaded-SITL scheduling diagnostic (approval 2; not an acceptance gate).**
+   * Run a diagnostic copy of `p5_control` outside the frozen sources, under a separate diagnostic
+     namespace and run directory, never bound to a manifest or gate.
+   * The copy has CPU-D integrated and records, for each policy call:
+     * `inference_s`;
+     * thread CPU time;
+     * run-queue wait and timeslices from schedstat, read just before and after the timed region and never
+       inside it;
+     * context switches;
+     * the Linux CPU;
+     * guest `procs_running`.
+   * In parallel it samples per-process CPU for Gazebo, PX4 and perception at 10 Hz.
+   * Flights: S2 x 3 in the current power mode and, if approval 1 showed a benefit, S2 x 3 in Best
+     performance.
+   * Outputs:
+     * the spike class distribution in real flight;
+     * the D-path margin under real load;
+     * whether the simulator's thread bursts oversubscribe the 24 vCPUs.
+   * Same safety envelope as the accepted stack. No gate credit, and no change to any frozen candidate.
+3. **Then decide:**
+   * **Path A (new candidate)** if loaded flights show the D path with comfortable margin, for example no
+     call above about 5 ms over several flights, under a documented host configuration.
+   * **Path A plus a runner mitigation** if guest preemption dominates, for example reserving vCPUs for
+     the controller or bounding simulator worker threads. That is a P5 runner change with its own
+     evidence; P3 and P4 stay untouched.
+   * **Path C** if neither brings the spike rate to a level where about 7 flights pass with high
+     confidence.
+
+The 10 ms maximum is not proposed for change at any step.
+
+## 10. Contract revision 3 proposal (draft for review; NOT approved, nothing applied)
+
+Needed only when a new candidate is pursued (Path A). It changes no threshold.
+
+1. **Root-cause statement** (§6): two measured stall classes external to the computation; in-flight
+   attribution pending the approval-2 diagnostic. The remaining uncertainty is stated in the revision.
+2. **Implementation:** `observation_adapter.polar_profile` in the vectorized form of §3. It must be
+   bit-identical to the revision 1 loop, enforced by a regression test that keeps the loop as an oracle.
+   The model, weights, normalization, schema `(26, 46)`, candidate order, mask, selection, shield,
+   supervisor and timeout are unchanged.
+3. **Thresholds unchanged:** inference p99 ≤ 5 ms and max ≤ 10 ms (wall, feature build + forward +
+   selection, as measured today); 20 ms runtime timeout; 0 policy failures; participation 1.0; and all
+   P2, P3 and P4 limits.
+4. **Identity:** new commit, `build_p5.sh --build` receipt, `p5_source_files`, Policy A approval for the
+   new commit, and a fresh freeze with a new manifest SHA.
+5. **Runtime prerequisites (only if approvals 1 and 2 justify them):**
+   * the runner records the Windows power overlay, AC state and WSL vCPU count in every run's evidence;
+   * flight gates refuse to start unless the documented host configuration is present;
+   * any reserved-vCPU or thread-bound runner setting is recorded and verified the same way.
+6. **Evidence additions, reported only and never limited:** per policy call, the run-queue wait,
+   timeslices and thread CPU time, read outside the timed region, recorded in a `p5-policy-ledger-v2`. Any
+   future breach could then be attributed.
+7. **Required regression:**
+   * the §4 differential tests;
+   * the P5 offline suites;
+   * the ROS harness (P4 + P5);
+   * the Windows full suite;
+   * the P3 and P4 manifest verification;
+   * a drift guard proving no P2, P3 or P4 file changed.
+8. **Sequence:** revision 3 approval, then implementation and tests, Policy A approval, freeze, and Gates
+   A → B → S → C, each separately authorized, one run each, no retries. No credit from `db4c4779…`; its
+   failed Gate C stays preserved.
+
+## 11. Explicit operator approvals needed next
+
+| # | Decision | What happens on approval |
+|---|---|---|
+| 1 | Set Windows *Best performance* (your action) and authorize the offline performance-mode comparison | about 25 minutes of offline benchmarks; results added to this plan |
+| 2 | Authorize the loaded-SITL scheduling diagnostic (§9 step 2) | a diagnostic controller copy and up to 6 S2 SITL flights; no gate, no manifest, no frozen change |
+| 3 | Later, after 1 and 2: approve revision 3 and production integration of CPU-D | source change, tests, build receipt; then Policy A and freeze, each asked separately |
+
+Nothing in this plan authorizes integration, re-freezing or any gate.
