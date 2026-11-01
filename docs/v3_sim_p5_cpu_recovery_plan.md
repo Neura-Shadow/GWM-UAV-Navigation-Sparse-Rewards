@@ -36,7 +36,9 @@ Read only, on 2026-11-01:
 * on AC power (battery status 2, 79 %).
 
 This is unchanged from 2026-10-31. **Every measurement in this plan and in the benchmark report was taken
-in "Best power efficiency" mode. No performance-mode measurement exists.**
+in "Best power efficiency" mode**, except §5.1. There the operator set PredatorSense *Performance*, but
+Windows still reported the power-efficiency overlay. **A verified Windows Best performance measurement
+still does not exist.**
 
 **Operator action to enable a performance-mode test.** Windows Settings → System → Power & battery →
 *Power mode* → **Best performance**, with the laptop on AC. Then confirm in chat that the mode is set and
@@ -128,6 +130,57 @@ value.
 0.63 to 1.40 ms over the five idle 20 Hz trials. D was below A on every quantile in every idle and
 host-contention trial. The matched design is what makes the A-to-D comparison valid despite the drift.
 
+### 5.1 Approval 1: comparison in the operator-set mode (2026-11-01)
+
+**What the operator did.**
+* Set Windows *Best performance*, re-applied it once.
+* On this **Acer Predator PHN16-71**, also set **PredatorSense** to *Performance*.
+
+**What Windows reported throughout** (read only): the power overlay stayed
+`961cc777…` (*Best power efficiency*). `PowerGetEffectiveOverlayScheme` and `PowerGetActualOverlayScheme`
+agree with the registry. A PredatorSense mode can change CPU power limits through firmware without moving
+the Windows overlay. This condition is therefore labelled **"operator-set PredatorSense Performance; Windows
+overlay unchanged"**, not "Windows Best performance".
+
+**Run.** The same matched chain was repeated (`recovery-P-*` results).
+
+| Condition | Mode | A p50 / p95 / p99 / max | D p50 / p95 / p99 / max | > 10 ms A / D | Slow calls with run-queue wait / charged as CPU |
+|---|---|---|---|---|---|
+| Back to back (3 x 30 s) | power-efficiency | 0.428 / 0.784 / 1.200 / 5.615 | 0.228 / 0.430 / 0.644 / 4.156 | 0 / 0 | 0 / 11 |
+| | operator-set | 0.408 / 0.705 / 1.048 / 9.656 | 0.217 / 0.388 / 0.573 / 6.414 | 0 / 0 | 0 / 40 |
+| 20 Hz (5 x 120 s) | power-efficiency | 0.669 / 2.618 / 2.910 / 4.955 | 0.464 / 1.552 / 1.787 / 3.200 | 0 / 0 | 0 / 17 |
+| | operator-set | 1.380 / 1.914 / 2.602 / 4.791 | 0.888 / 1.195 / 1.695 / 2.972 | 0 / 0 | 0 / 12 |
+| 20 Hz, guest oversubscription (3 x 120 s) | power-efficiency | 1.332 / 3.212 / 8.679 / 29.354 | 0.802 / 1.558 / 5.272 / 31.906 | 15 / 8 | 217 / 0 |
+| | operator-set | 1.335 / 5.596 / 10.913 / 21.661 | 0.809 / 2.514 / 7.938 / 17.827 | 38 / 15 | 379 / 2 |
+| 20 Hz, host contention (1 x 120 s) | power-efficiency | 1.494 / 2.255 / 2.688 / 3.431 | 0.891 / 1.380 / 1.660 / 3.417 | 0 / 0 | 0 / 3 |
+| | operator-set | 1.392 / 1.899 / 2.675 / 5.540 | 0.874 / 1.189 / 1.564 / 2.764 | 0 / 0 | 0 / 8 |
+| 20 Hz, pinned to vCPU 4 (2 x 120 s) | power-efficiency | 1.665 / 2.591 / 2.939 / 5.900 | 1.004 / 1.680 / 1.837 / **9.908** | 0 / 0 | 0 / 14 |
+| | operator-set | 1.314 / 2.052 / 3.307 / **16.594** | 0.845 / 1.307 / 1.740 / 2.625 | **2** / 0 | 0 / 15 |
+
+Findings:
+
+* **No measurable benefit from the operator-set mode.**
+  * The 20 Hz median of the production path was *higher* (per-trial A p50 1.18-1.56 ms, against
+    0.63-1.40 ms before).
+  * p95 and p99 were somewhat tighter at 20 Hz.
+  * Maxima did not improve.
+  * The Windows overlay never changed, so whether the intended host setting was in force cannot be
+    confirmed from inside the machine.
+* **The charged-slowness class alone can exceed 10 ms.**
+  * In the pinned idle run, the production path had two calls over 10 ms (max 16.6 ms).
+  * Both had zero run-queue wait, no involuntary switch, and CPU time ≥ wall time.
+  * This is the first offline reproduction of an in-flight-sized breach **without any guest load**.
+  * The optimized path had no breach in that run.
+* **Guest oversubscription again dominated breaches**: 379 of 381 slow calls had run-queue wait.
+  * D halved the exceedances again (15 vs 38).
+  * D still reached 17.8 ms.
+* **Pooled over all paced conditions without guest oversubscription in both modes**
+  (20 Hz, host contention, pinned; 9,600 calls per variant per mode, 19,200 per variant in total):
+  * production: **2** calls over 10 ms;
+  * optimized: **0**, worst 9.91 ms.
+  * Zero in 19,200 bounds D's rate below about 1.6 in 10,000 at 95 % confidence. That is an upper bound,
+    not a guarantee, and the flight's observed production rate (1 in 4,267) is of the same order.
+
 **What D buys:**
 * *Algorithmic speedup:* polar profile 2.3x faster at 20 Hz, 4x back to back.
 * *End-to-end decision speedup:*
@@ -152,6 +205,8 @@ Consequences:
    the computation shorter only lowers the chance that a stall lands inside it. In matched trials D halved
    the class-1 exceedances (8 vs 15 over 10 ms). In class 2, one D call reached **9.91 ms** on an idle,
    pinned process (10.2 ms CPU, zero wait), 0.09 ms below the limit.
+   §5.1 then showed the class-2 mechanism alone pushing the *production* path to 16.6 ms on an idle,
+   pinned process. Either class can therefore produce a breach of the in-flight size.
 2. **Which class caused the in-flight 10.84 ms is unknown.** The flight recorded neither run-queue wait
    nor `procs_running` for policy calls. Earlier analysis (plan §13.14) found guest load averages of
    1.3-6.2. That is a one-minute mean, and it can hide short bursts above 24 runnable tasks.
@@ -243,12 +298,13 @@ feasible: the run-queue instrumentation cleanly attributes stalls.
 
 **Proposed Path B sequence (none started; each step needs explicit operator approval):**
 
-1. **Performance-mode offline comparison (approval 1, operator action first).**
-   * The operator sets *Best performance* on AC (§2) and confirms.
-   * Then repeat `recovery_bench.py` for back to back, 20 Hz x 5 and guest oversubscription x 3 (about
-     25 minutes, no simulator).
-   * Decision value: if the charged-slowness class disappears or shrinks markedly, the host setting
-     becomes a candidate runtime prerequisite.
+1. **Performance-mode offline comparison (approval 1): done, §5.1.**
+   * With PredatorSense *Performance* set by the operator, the charged-slowness class did **not** shrink.
+   * The production path even showed two idle calls over 10 ms in that class.
+   * The Windows overlay stayed at power efficiency.
+   * **A host power setting is therefore not supported as a fix.** If one is to be pursued, it first needs
+     a setting the machine itself reports, for example a firmware or PredatorSense state readable by the
+     runner.
 2. **Loaded-SITL scheduling diagnostic (approval 2; not an acceptance gate).**
    * Run a diagnostic copy of `p5_control` outside the frozen sources, under a separate diagnostic
      namespace and run directory, never bound to a manifest or gate.
@@ -316,7 +372,7 @@ Needed only when a new candidate is pursued (Path A). It changes no threshold.
 
 | # | Decision | What happens on approval |
 |---|---|---|
-| 1 | Set Windows *Best performance* (your action) and authorize the offline performance-mode comparison | about 25 minutes of offline benchmarks; results added to this plan |
+| 1 | ~~Set Windows *Best performance* and authorize the offline comparison~~ **Done (§5.1).** The Windows overlay never changed; PredatorSense Performance showed no measurable benefit | — |
 | 2 | Authorize the loaded-SITL scheduling diagnostic (§9 step 2) | a diagnostic controller copy and up to 6 S2 SITL flights; no gate, no manifest, no frozen change |
 | 3 | Later, after 1 and 2: approve revision 3 and production integration of CPU-D | source change, tests, build receipt; then Policy A and freeze, each asked separately |
 
