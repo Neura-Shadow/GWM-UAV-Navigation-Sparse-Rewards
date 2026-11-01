@@ -1,6 +1,8 @@
 # P5 recovery plan: CPU tail-latency optimization, host diagnostics and new-candidate readiness
 
-**Status: PROPOSAL, offline evidence only (2026-11-01).**
+**Status: PROPOSAL (2026-11-01).** Offline evidence, plus 3 operator-approved diagnostic S2 SITL flights
+that earn no acceptance credit (§9.1). **After those flights the recommendation is Path A** (§9.1); §8 and
+the start of §9 record the earlier, pre-diagnostic Path B reasoning.
 
 * P5 remains **stopped and not qualified** (plan §13.16).
 * Nothing here changes a frozen file, the model, a threshold or the failed Gate C result.
@@ -335,6 +337,79 @@ feasible: the run-queue instrumentation cleanly attributes stalls.
 
 The 10 ms maximum is not proposed for change at any step.
 
+### 9.1 Approval 2: loaded-SITL scheduling diagnostic — results (2026-11-01)
+
+**Authorization and scope.**
+* Operator approval in chat ("Authorize diagnostic"), recorded in
+  `~/uav_autonomy/diag/p5-sched-diag-approval.json`: S2 only, variant D, at most 3 flights, no acceptance
+  credit, no automatic retry.
+* The approval record itself enforces the flight cap.
+
+**Implementation** ([`diagnostics/p5_sched_diag/`](../diagnostics/p5_sched_diag/)):
+* `diag_runner.py` subclasses the accepted `P5Runner`, imported unchanged from its file. Through it, the
+  accepted P4 and P3 runners launch the identical stack: private namespace, loopback only, exclusive
+  workspace lock, the same PX4, Gazebo, QGC, DDS, sensor and P4 perception processes, and ordered shutdown.
+* Preconditions keep every environment, namespace, lock, disk and WSL check, and re-verify manifest
+  `db4c4779…` (model, schema, P3 and P4 baselines). No gate authorization, marker or result is read or
+  written.
+* `diag_control.py` runs the installed `control_node.main` unchanged, with two in-process changes:
+  * the CPU-D polar profile is swapped in;
+  * `PolicyRanker.choose` is wrapped to log scheduler evidence read before and after each call, never
+    inside its timed region.
+* A 10 Hz host sampler records the guest's runnable tasks, steal time and per-process runnable threads.
+* The namespace owner is a byte-identical copy (`0d1c2d27…`) of the owner the QGC build pins.
+* The offline dry check (`dry_check.py`) proved:
+  * the refusals outside the namespace;
+  * the wrapper logs every call;
+  * scores and choices stay bit-identical before any flight.
+
+**Flights.** Three S2 flights, sequential: all `status: passed`, no residual processes, no retry needed.
+
+| Run | Evaluator (standard `p5_evaluate`, in memory) | Clearance / collisions / tracking | Policy calls, failures, outside mask, fallbacks, participation, replay mismatches | Inference p50 / p99 / max (ms) |
+|---|---|---|---|---|
+| `20261101T071454Z-p5diag-flight-S2-c95389ca` | passed, no failures; `goal_reached_with_detour` | 0.410 m / 0 / 0.246 m | 834, 0, 0, 0, 1.0, 0 | 0.354 / 1.366 / **2.898** |
+| `20261101T071758Z-p5diag-flight-S2-d8202341` | passed, no failures; `goal_reached_with_detour` | 0.489 m / 0 / 0.242 m | 832, 0, 0, 0, 1.0, 0 | 0.354 / 1.212 / **3.040** |
+| `20261101T072058Z-p5diag-flight-S2-de524fca` | passed, no failures; `goal_reached_with_detour` | 0.407 m / 0 / 0.255 m | 832, 0, 0, 0, 1.0, 0 | 0.353 / 1.366 / **3.040** |
+
+Previous S2 flights of the production path, for reference: Gate B S2 p50 0.70 ms, max 6.00 ms; Gate C S2
+p50 0.57 ms, max **10.84 ms**.
+
+**Scheduling evidence over the decision window** (first to last policy call, about 42 s per flight;
+2,498 calls; 1,246 host samples):
+* Guest runnable tasks peaked at 14, 16 and 21. No sample exceeded the 24 vCPUs.
+* Run-queue wait occurred on 3 of 2,498 calls, at most 0.027 ms. Involuntary switches: 3 calls.
+* Steal time: 0.
+* Calls over 3 ms: 2 (3.04 ms each). Both were CPU-charged: zero run-queue wait, CPU ≥ wall.
+* Calls over 5 ms: **0**.
+* In each flight, the only host sample above 24 runnable tasks came from `gst-plugin-scan` (the GStreamer
+  plugin scanner, up to 24 runnable threads). It ran for 0.1-0.5 s at stack start-up, about 82 s
+  before the first policy decision, and never overlapped decisions.
+* The Gazebo server (`ruby`) peaked at 11-19 runnable threads, PX4 at 6-8.
+
+**Interpretation.**
+1. **In these loaded S2 flights, the guest was not oversubscribed while decisions ran.** Guest
+   preemption, the class 1 mechanism of §6, was effectively absent from the decision path.
+2. **The optimized path's in-flight tail is small:** max 3.04 ms over 2,498 calls, about 3.3x below the
+   limit. The production path's per-flight maxima on S2 were 6.0 ms and 10.84 ms.
+3. **By elimination, the Gate C 10.84 ms breach was most likely class 2 (CPU-charged slowness).** §5.1
+   reproduced that class offline at 16.6 ms on the production path. This remains a **hypothesis**: Gate
+   C was not instrumented, and its host conditions on 2026-10-31 may have differed.
+4. **Limits of this evidence.**
+   * Zero calls over 5 ms in 2,498 bounds the per-call rate below about 1.2 in 1,000 at 95 % confidence.
+     That is far from proving zero over a full gate sequence of about 5,900 policy calls.
+   * Offline, class 2 produced a 9.91 ms call on the optimized path once (§5) in about 19,200 paced calls.
+   * The residual risk is lower than for the production path, but not zero, and no measure inside the
+     policy code removes it.
+
+**Updated recommendation: Path A is now supported**, with the residual risk documented. The criteria are
+met:
+* bit-exact equivalence (§4, plus 0 replay mismatches in all three flights);
+* improved p99 and maximum under representative load (in flight: max 3.04 ms against 6.0-10.84 ms);
+* no safety or controller regression (evaluator passed, clearance ≥ 0.41 m);
+* the remaining tail risk characterized (class 2, rare, external to the computation).
+
+The next step is approval 3, below.
+
 ## 10. Contract revision 3 proposal (draft for review; NOT approved, nothing applied)
 
 Needed only when a new candidate is pursued (Path A). It changes no threshold.
@@ -350,13 +425,19 @@ Needed only when a new candidate is pursued (Path A). It changes no threshold.
    P2, P3 and P4 limits.
 4. **Identity:** new commit, `build_p5.sh --build` receipt, `p5_source_files`, Policy A approval for the
    new commit, and a fresh freeze with a new manifest SHA.
-5. **Runtime prerequisites (only if approvals 1 and 2 justify them):**
-   * the runner records the Windows power overlay, AC state and WSL vCPU count in every run's evidence;
-   * flight gates refuse to start unless the documented host configuration is present;
-   * any reserved-vCPU or thread-bound runner setting is recorded and verified the same way.
-6. **Evidence additions, reported only and never limited:** per policy call, the run-queue wait,
-   timeslices and thread CPU time, read outside the timed region, recorded in a `p5-policy-ledger-v2`. Any
-   future breach could then be attributed.
+5. **Runtime prerequisites: none proposed.**
+   * Approval 1 found no benefit from the host power setting, and Windows never reported a change (§5.1).
+   * Approval 2 found no guest oversubscription during decisions (§9.1).
+   * Neither justifies a host or runner prerequisite. The Windows power overlay and PredatorSense state
+     are documented as observed conditions only.
+6. **Optional evidence addition (operator's choice; not part of the minimal change):**
+   * Per policy call, record the run-queue wait, timeslices and thread CPU time, read outside the timed
+     region, in a `p5-policy-ledger-v2`. Reported only, never limited.
+   * It would make any future breach attributable, as §9.1 did for the diagnostic.
+   * Cost: it touches `candidate_ranker.py` or `mission.py`, `policy_ledger.py` and the evaluator, which
+     widens the change and its regression scope.
+   * Recommendation: keep the minimal change. The diagnostic runner remains available for attribution if
+     a gate fails again.
 7. **Required regression:**
    * the §4 differential tests;
    * the P5 offline suites;
@@ -373,7 +454,7 @@ Needed only when a new candidate is pursued (Path A). It changes no threshold.
 | # | Decision | What happens on approval |
 |---|---|---|
 | 1 | ~~Set Windows *Best performance* and authorize the offline comparison~~ **Done (§5.1).** The Windows overlay never changed; PredatorSense Performance showed no measurable benefit | — |
-| 2 | Authorize the loaded-SITL scheduling diagnostic (§9 step 2) | a diagnostic controller copy and up to 6 S2 SITL flights; no gate, no manifest, no frozen change |
-| 3 | Later, after 1 and 2: approve revision 3 and production integration of CPU-D | source change, tests, build receipt; then Policy A and freeze, each asked separately |
+| 2 | ~~Authorize the loaded-SITL scheduling diagnostic~~ **Done (§9.1).** 3 S2 flights, all passed; max 3.04 ms; no guest oversubscription during decisions | — |
+| 3 | **Approve revision 3 (§10) and production integration of CPU-D**: the one-function change in `observation_adapter.py`, plus the in-test oracle differential test | implementation, the §10 regression set, `build_p5.sh --build`. Then Policy A approval and freeze are each asked separately, and Gates A → B → S → C each need their own authorization |
 
 Nothing in this plan authorizes integration, re-freezing or any gate.
