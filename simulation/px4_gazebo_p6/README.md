@@ -13,5 +13,5 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 | `configs/p6_faults.yaml` | the 86 fault IDs: mechanism, detection, expected behaviour codes, tier and class (M1) |
 | `configs/p6_scenarios.yaml` | the gate rows A/B/S/C, triggers, parameters and expected outcomes, and the characterization registry (M1) |
 
-Status: M0 and M1 complete; nothing is implemented beyond these specifications, and no simulator has
+Status: M0 and M1 complete (scenario list approved 2026-11-06); nothing is implemented beyond these specifications, and no simulator has
 been run for P6. Consistency test: `tests/test_px4_gazebo_p6_specs.py`.

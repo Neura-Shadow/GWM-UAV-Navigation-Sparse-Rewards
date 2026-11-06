@@ -103,8 +103,8 @@ def test_counts_match_the_approved_gate_structure(faults, scenarios):
     gates, counts = scenarios["gates"], scenarios["counts"]
     fixtures = [row for row in gates["A"] if row["id"].startswith("A-5.")]
     live_ground = [row for row in gates["A"] if row["scope"] in ("p3_readiness", "ground_readiness")] + fixtures
-    assert len(fixtures) == counts["gate_a_fault_fixtures"] == 13
-    assert len(live_ground) == counts["gate_a_live_ground_runs"] == 15
+    assert len(fixtures) == counts["gate_a_fault_fixtures"] == 14  # M1 correction 1 added F2.09
+    assert len(live_ground) == counts["gate_a_live_ground_runs"] == 16
     assert [row["id"] for row in gates["B"]] == ["B-0", "B-1"]
     assert [row["id"] for row in gates["S"]] == ["S-1", "S-2'", "S-3", "S-4", "S-5'"]
     assert [row["id"] for row in gates["C"]] == ["C-1", "C-2", "C-3", "C-4", "C-5"]

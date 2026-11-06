@@ -2,7 +2,7 @@
   "schema_version": 1,
   "contract": "p6-scenarios-v1",
   "acceptance_contract": "p6-acceptance-v1",
-  "status": "M1 frozen specification (2026-11-06); nothing implemented or run; operator approval of this list is the M1 exit",
+  "status": "M1 frozen specification, scenario list approved by the operator 2026-11-06 with the four M1 corrections; nothing implemented or run",
   "faults": "configs/p6_faults.yaml",
   "worlds": {
     "source": "simulation/px4_gazebo_p4/configs/p4_scenarios.json",
@@ -23,7 +23,7 @@
     "declared_fault_changes": {
       "p3_sensor_bridge.yaml": ["[image_raw].ros_topic_name", "[camera_info].ros_topic_name"]
     },
-    "note": "M1 correction: the accepted P4/P5 runners already rewrite these keys in every run; C11 must allow them besides the declared fault keys"
+    "note": "M1 correction 4 (approved): the accepted P4/P5 runners already rewrite these keys in every run; C11 allows them besides the declared fault keys"
   },
   "triggers": {
     "ground_window": "the declared 15 s sim ground window has elapsed (P4 fault-scope pattern), vehicle never armed",
@@ -46,6 +46,7 @@
       {"id": "A-5.F1.06", "role": "fixture-depth-stamps", "scope": "ground_fixture", "fault": "F1.06", "trigger": "ground_window", "parameters": {"duplicate": 5, "backwards": 5, "missing": 5, "future_offset_s": 0.5, "future_window_sim_s": 5.0}, "expected": ["adapter rejected counters equal 5/5/5", "perception unusable for the future window", "replayed HOVER"]},
       {"id": "A-5.F1.07", "role": "fixture-depth-dimension", "scope": "ground_fixture", "fault": "F1.07", "trigger": "ground_window", "parameters": {"frames": 10, "width": 320}, "expected": ["adapter rejected dimension_mismatch = 10", "replayed HOVER"]},
       {"id": "A-5.F1.11", "role": "fixture-calibration", "scope": "ground_fixture", "fault": "F1.11", "trigger": "ground_window", "parameters": {"camera_info_fx_scale": 1.01}, "expected": ["calibration_mismatch or calibration_unavailable", "replayed HOVER"]},
+      {"id": "A-5.F2.09", "role": "fixture-pose-to-perception", "scope": "ground_fixture", "fault": "F2.09", "trigger": "ground_window", "parameters": {"withheld_topics": ["vehicle_local_position", "vehicle_attitude"], "window_sim_s": 5.0}, "expected": ["witness: true /px4_71 state continues while the relayed perception state stops", "perception association unusable for the window", "replayed HOVER (snapshot_stale)"]},
       {"id": "A-5.F3.01", "role": "fixture-checkpoint-missing", "scope": "startup_refusal", "fault": "F3.01", "parameters": {"model_path": "absent"}, "expected": ["REF", "reason checkpoint_missing"]},
       {"id": "A-5.F3.02", "role": "fixture-checkpoint-mismatch", "scope": "startup_refusal", "fault": "F3.02", "parameters": {"model": "mismatched copy (P5 pattern)"}, "expected": ["REF", "reason checkpoint_sha256_mismatch"]},
       {"id": "A-5.F3.03", "role": "fixture-schema-mismatch", "scope": "startup_refusal", "fault": "F3.03", "parameters": {"schema": "run-local copy with one changed description byte"}, "expected": ["REF", "reason p5_model_schema_differs_from_frozen_hash"]},
@@ -76,7 +77,7 @@
     ]
   },
   "predecessor": {"B": "A", "S": "B", "C": "S"},
-  "counts": {"gate_a_live_ground_runs": 15, "gate_a_fault_fixtures": 13, "flights": 12, "offline_required_items": 31},
+  "counts": {"gate_a_live_ground_runs": 16, "gate_a_fault_fixtures": 14, "flights": 12, "offline_required_items": 31},
   "characterization": {
     "authorization": "each live run separately authorized; never gated; every safety check evaluated and reported",
     "flights": [
@@ -91,10 +92,11 @@
     "other": ["F1.02-S", "F1.04-S", "F1.08-S", "F1.10-S", "F2.07-S", "F3.09-S", "F4.02-S", "F4.05", "F4.07-S", "F5.03-prearm", "F5.04", "F6.01-sweep", "F6.05", "F7.02-S",
               "F1.05-G", "F4.04-G", "F4.08-G", "F4.09-G", "F6.08-G", "F6.09-G", "F8.06-G"]
   },
-  "open_items_for_operator": [
-    "F2.09: the matrix lists a Gate A ground rehearsal (R-A) but contract 8.1 does not; this spec follows the contract (13 fixtures). Recommended: add it (14 fixtures, 16 live ground runs)",
-    "L45R: P2 RECOVERY landings (S-5', F3.09, F4.07 in flight) end in RECOVERY, not COMPLETE; contract 8.3 S-5' and the matrix rows should read L45R",
-    "Offline required items: 31, not 30 (F3.03 was missed in the matrix count)",
-    "C11: must also allow the accepted runners' own run-local changes (p4_avoidance.yaml enabled; p5_policy.yaml enabled, model.path, model.sha256)"
-  ]
+  "m1_corrections_approved": [
+    "1: F2.09 ground rehearsal added to Gate A (14 fixtures, 16 live ground runs)",
+    "2: L45R for P2 RECOVERY landings (S-5', and F3.09 and F4.07 in flight)",
+    "3: 31 required offline items (F3.03 had been missed)",
+    "4: C11 allows the accepted runners' own run-local changes"
+  ],
+  "approved": {"by": "operator", "date": "2026-11-06", "statement": "Approve as recommended"}
 }
