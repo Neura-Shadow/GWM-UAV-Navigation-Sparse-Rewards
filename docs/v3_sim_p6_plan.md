@@ -341,7 +341,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | M | Content | Exit criterion |
 |---|---|---|
 | **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised and approved |
-| **M1** taxonomy and scenarios | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
+| **M1** taxonomy and scenarios — **specifications written 2026-11-06** (§11), awaiting the operator's approval of the scenario list | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
@@ -415,3 +415,40 @@ The decisions, with the recommendation first for each, are in contract §10:
 * **D8:** load-window exceptions.
 * **D9:** the backup storage target.
 * **D10:** retention.
+
+## 11. M1 record: frozen specifications (2026-11-06, authorized by the operator: "Authorize M1")
+
+* **Files** (outside every P3, P4 and P5 manifest scope; LF bytes pinned by
+  `simulation/px4_gazebo_p6/.gitattributes`):
+
+  | File | SHA-256 | Content |
+  |---|---|---|
+  | `simulation/px4_gazebo_p6/configs/p6_faults.yaml` | `dd7b5ce1ba90c497…` | 86 fault IDs with mechanism, detection, expected-behaviour codes, tiers and classes; the code definitions (S0, H35, A10, HT20, L45, L45R, PH3, R2, PX, H12, REF, INJ, LOAD) with their numbers; the precedence order |
+  | `simulation/px4_gazebo_p6/configs/p6_scenarios.yaml` | `0d7e2d8b6de78a28…` | Gate A rows (2 readiness, 2 offline, 13 fault fixtures, 2 evaluation rows), B-0/B-1, S-1/S-2′/S-3/S-4/S-5′, C-1…C-5, with world, trigger, parameters and expected outcome; the characterization registry; the C11 baseline of the runners' own run-local changes; the P3/P4/P5 baselines and the P4 world file SHA-256 |
+  | `tests/test_px4_gazebo_p6_specs.py` | `6cad72f0abaf38db…` | offline consistency test, 7 checks; passed on Windows and Linux |
+
+* **The consistency test checks:**
+  * IDs per category;
+  * aliases;
+  * that every gate row's fault carries that gate's class, and that every required fault is flown,
+    directly or inside a compound row;
+  * that worlds exist and the world file hash matches;
+  * triggers;
+  * the P3/P4 baselines against `p5_validation.yaml`;
+  * the counts: 13 fixtures, 15 live ground runs, 12 flights, 31 offline items;
+  * that the injected timings fall between the accepted limits: 25 ms sits above the 20 ms policy
+    timeout and below the 50 ms dispatch budget, and 60 ms sits above the budget;
+  * that no gated row expects a PX4-managed outcome.
+* **Corrections found while freezing** (they need the operator's confirmation; none changes a
+  limit):
+  1. **The F2.09 ground rehearsal.** The matrix row lists R-A, but contract §8.1 has no F2.09
+     fixture. The spec follows the contract (13 fixtures). *Recommended:* add it, giving 14 fixtures
+     and 16 live ground runs.
+  2. **`L45R` for P2 `RECOVERY` landings.** S-5′, F3.09 and F4.07 in flight end in `RECOVERY`,
+     never `COMPLETE`, so their landing is proven from the ULog only (`L45R`). Contract §8.3 S-5′
+     says "L45" and should say "L45R".
+  3. **The offline required items** number **31**, not 30. F3.03 was missed in the matrix count,
+     which is now corrected.
+  4. **C11 must also allow the accepted runners' own run-local changes:** `p4_avoidance.yaml`
+     `enabled`; `p5_policy.yaml` `enabled`, `model.path`, `model.sha256`. Without that, every run
+     would fail C11.

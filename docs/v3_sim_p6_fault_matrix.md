@@ -187,7 +187,7 @@ channels are listed per row.
 
   | Group | Count | Content |
   |---|---|---|
-  | R-O | 30 items, plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
+  | R-O | 31 items (M1 correction: F3.03 had been missed), plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
   | R-A | 15 live ground runs | 2 readiness runs + 13 fault fixtures (contract §8.1) |
   | R-B | 2 flights | B-0 pass-through, B-1 F3.08 |
   | R-S | 5 flights | S-1 F1.01, S-2′ F2.09, S-3 F3.04, S-4 F4.01, S-5′ F6.03 |
