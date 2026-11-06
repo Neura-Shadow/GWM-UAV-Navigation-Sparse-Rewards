@@ -30,6 +30,8 @@ import common
 import optimized
 
 FUZZ = int(sys.argv[1]) if len(sys.argv) > 1 else 200000
+# "revision1": reference = the revision 1 loop (oracle), candidate = the current production polar profile
+MODE = sys.argv[2] if len(sys.argv) > 2 else "optimized"
 
 
 def main():
@@ -42,11 +44,16 @@ def main():
     sha_before = hashlib.sha256(common.MODEL.read_bytes()).hexdigest()
     policy, schema = common.load_policy()
     production_polar = observation_adapter.polar_profile
+    if MODE == "revision1":
+        import revision1_adapter
+        reference_polar, candidate_polar = revision1_adapter.polar_profile, production_polar
+    else:
+        reference_polar, candidate_polar = production_polar, optimized.polar_profile
     fast_forward = optimized.Forward(policy)
-    report = {"model_sha256_before": sha_before}
+    report = {"model_sha256_before": sha_before, "mode": MODE}
 
     def use(variant):
-        observation_adapter.polar_profile = production_polar if variant == "A" else optimized.polar_profile
+        observation_adapter.polar_profile = reference_polar if variant == "A" else candidate_polar
 
     def canon(value):
         """JSON-stable form with exact float bits (repr round-trips float64)."""
@@ -179,8 +186,8 @@ def main():
             heading = rng.choice([0.0, math.pi / 2, -math.pi / 2, math.pi, -math.pi])
         traversed = rng.random((grid.nx, grid.ny)) < (0.0, 0.05, 0.3, 0.9)[k % 4]
         outside = not (grid.x_min <= x < grid.x_min + grid.nx * grid.resolution and grid.y_min <= y < grid.y_min + grid.ny * grid.resolution)
-        a = production_polar(grid, traversed, (x, y), heading, settings, profile)
-        b = optimized.polar_profile(grid, traversed, (x, y), heading, settings, profile)
+        a = reference_polar(grid, traversed, (x, y), heading, settings, profile)
+        b = candidate_polar(grid, traversed, (x, y), heading, settings, profile)
         z["cases"] += 1
         z["start_outside_grid"] += outside
         if a.dtype == b.dtype and np.array_equal(a, b) and np.array_equal(np.signbit(a), np.signbit(b)):
@@ -214,7 +221,7 @@ def main():
     report["isolation"]["checkpoint_unchanged"] = report["isolation"]["model_sha256_after"] == sha_before == common.MODEL_SHA256
     print("5", json.dumps(report["isolation"]), flush=True)
     common.RESULTS.mkdir(exist_ok=True)
-    (common.RESULTS / "differential.json").write_text(json.dumps(report, indent=1, default=str))
+    (common.RESULTS / ("differential.json" if MODE == "optimized" else f"differential-{MODE}.json")).write_text(json.dumps(report, indent=1, default=str))
 
 
 if __name__ == "__main__":

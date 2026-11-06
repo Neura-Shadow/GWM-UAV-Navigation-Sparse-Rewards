@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "p5-acceptance-v1",
-  "contract_revision": "revision 1 (operator-approved 2026-10-31, commit 673d65e; decisions D1-D9 as recommended); revision 2 (Gate A items 4 and 5, operator-approved 2026-10-31)",
+  "contract_revision": "revision 1 (operator-approved 2026-10-31, commit 673d65e; decisions D1-D9 as recommended); revision 2 (Gate A items 4 and 5, operator-approved 2026-10-31); revision 3 (bit-exact vectorized polar profile, operator-approved 2026-11-06)",
   "p3_baseline_manifest": "state/p3-candidate-087722b.json",
   "p3_baseline_manifest_sha256": "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c",
   "p4_baseline_manifest": "state/p4-candidate-50d5002.json",

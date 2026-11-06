@@ -872,3 +872,34 @@ no new candidate and no further gates.
     management, not only to the policy's own cost (median 0.4–0.6 ms).
 * **Kept unchanged:** all evidence (runs, gate results, consumption markers, authorizations), the
   model files, and the P3, P4 and P5 manifests. Nothing was pushed.
+
+### 13.17 Contract revision 3 approved and implemented (2026-11-06)
+
+* **Approval.** After the [CPU recovery plan](v3_sim_p5_cpu_recovery_plan.md), which covers the benchmark,
+  the matched timing, the operator-set mode and 3 diagnostic S2 SITL flights with no gate credit, the
+  operator approved [revision 3](v3_sim_p5_contract_revision3.md) ("Approve revision 3").
+* **Change.** One function: `gwm_policy_control/observation_adapter.py` `polar_profile` now evaluates all
+  headings as one array expression. It is bit-identical to the revision 1 loop. `p5_validation.yaml`
+  `contract_revision` names revision 3. No limit, model, schema, shield, supervisor or P2, P3 or P4 file
+  changed.
+* **Regression** (all on the revision 3 source):
+
+  | Check | Result |
+  |---|---|
+  | Oracle test against the verbatim revision 1 loop (`test_polar_profile_is_bit_identical_to_the_revision1_loop`) | 3,000 fuzzed cases bit-identical |
+  | Differential against revision 1 (`differential.py 200000 revision1`) | 4,267 / 4,267 flight tensors; 5,713 / 5,713 flight ticks (features, masks, scores, choices, decisions, supervisor steps; transitions equal in 12 / 12 runs); 2,945 / 2,945 ground snapshots; 200,000 / 200,000 fuzz cases; checkpoint `ee006a80…` unchanged |
+  | Linux P5 offline suites | 199 passed |
+  | ROS harness (P4 + P5) | 8 passed |
+  | Windows full suite | 1,539 passed, 48 skipped |
+  | P3 / P4 manifests | verify (`1e205fec…` / `c110bd30…`) |
+  | P2, P3 and P4 files since `ab7b0c6` | unchanged (drift guard) |
+
+* **Identity.**
+  * The old manifest `db4c4779…` now refuses to verify, because its build receipt no longer matches the
+    source. Its Gate A, B and S results and the failed Gate C stay preserved; its build receipt is
+    archived as `state/p5-built-35eaccd0.json`.
+  * A new P5 package build receipt follows this commit.
+* **Next, each separately approved:**
+  1. Policy A approval for this candidate commit;
+  2. `p5_manifest.py freeze`;
+  3. Gates A → B → S → C, bound to the new manifest SHA.

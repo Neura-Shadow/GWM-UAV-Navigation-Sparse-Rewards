@@ -26,26 +26,30 @@ def progress_qualified(row, ctx, settings):
 def polar_profile(grid, traversed, start, path_heading, settings, profile):
     """Per candidate heading: distance to the first OCCUPIED cell, then to the first non-FREE cell
     (traversed counts as FREE unless OCCUPIED; outside the grid is non-FREE), capped and scaled."""
+    # Revision 3: all headings as one (headings, steps) array. Per element this is the revision 1 per-heading
+    # loop's exact IEEE sequence (math.cos/sin per heading, then multiply, add, subtract, divide, floor), so
+    # the result is bit-identical; a regression test keeps the loop as its oracle.
     cap, ds = profile["cap_m"], profile["step_m"]
     s = np.arange(1, int(round(cap / ds)) + 1) * ds
     n = settings["heading_steps"]
     step = math.radians(settings["heading_step_deg"])
+    headings = [planner.wrap(path_heading + k * step) for k in range(-n, n + 1)]
+    cos = np.array([math.cos(h) for h in headings])[:, None]
+    sin = np.array([math.sin(h) for h in headings])[:, None]
+    i = np.floor((start[0] + s * cos - grid.x_min) / grid.resolution).astype(np.int64)
+    j = np.floor((start[1] + s * sin - grid.y_min) / grid.resolution).astype(np.int64)
+    inside = (i >= 0) & (i < grid.nx) & (j >= 0) & (j < grid.ny)
+    states = np.full(i.shape, -1, dtype=np.int64)
+    states[inside] = grid.cells[i[inside], j[inside]]
+    walked = np.zeros(i.shape, dtype=bool)
+    walked[inside] = traversed[i[inside], j[inside]]
+    hit = states == OCCUPIED
+    nonfree_cells = ~((states == FREE) | (walked & inside & ~hit))
     occupied, nonfree = np.full(2 * n + 1, cap), np.full(2 * n + 1, cap)
-    for idx, k in enumerate(range(-n, n + 1)):
-        heading = planner.wrap(path_heading + k * step)
-        i = np.floor((start[0] + s * math.cos(heading) - grid.x_min) / grid.resolution).astype(np.int64)
-        j = np.floor((start[1] + s * math.sin(heading) - grid.y_min) / grid.resolution).astype(np.int64)
-        inside = (i >= 0) & (i < grid.nx) & (j >= 0) & (j < grid.ny)
-        states = np.full(s.size, -1, dtype=np.int64)
-        states[inside] = grid.cells[i[inside], j[inside]]
-        walked = np.zeros(s.size, dtype=bool)
-        walked[inside] = traversed[i[inside], j[inside]]
-        hit = states == OCCUPIED
-        free = (states == FREE) | (walked & inside & ~hit)
-        if hit.any():
-            occupied[idx] = s[int(np.argmax(hit))]
-        if (~free).any():
-            nonfree[idx] = s[int(np.argmax(~free))]
+    rows = hit.any(axis=1)
+    occupied[rows] = s[np.argmax(hit, axis=1)][rows]
+    rows = nonfree_cells.any(axis=1)
+    nonfree[rows] = s[np.argmax(nonfree_cells, axis=1)][rows]
     return np.concatenate([occupied, nonfree]) / cap
 
 
