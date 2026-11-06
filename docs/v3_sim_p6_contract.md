@@ -1,12 +1,20 @@
 # v3-SIM P6 contract `p6-acceptance-v1` — fault injection and safety validation
 
-**Status: DRAFT, NOT APPROVED (2026-11-06).** This is a planning proposal. The operator answered
-decisions D1–D10 on 2026-11-06, all as recommended (§10). M0 is complete
-([audit](v3_sim_p6_m0_audit.md)). It raised D1a, D4a and C11, which the operator approved as
-recommended on 2026-11-06, and proposed the §5.2 values, which are still PENDING. The contract as a
-whole is still not approved. Nothing here authorizes implementation, freezing, simulator use or any gate. Every limit
-marked **PENDING** is a new proposal awaiting operator approval. All other limits are reused
-unchanged from P2–P5. See the
+**Status: APPROVED by the operator on 2026-11-06 ("Approve contract").** The approval covers the
+whole contract, including:
+
+* the new thresholds §5.1, §5.2 and §5.4 (§5.3 was already approved under D8);
+* rule C11;
+* decisions D1–D10, D1a and D4a (§10).
+
+The operator answered D1–D10 on 2026-11-06, all as recommended. M0 is complete
+([audit](v3_sim_p6_m0_audit.md)); it raised D1a, D4a and C11, also approved as recommended.
+
+**What approval does not authorize.** Implementation, freezing, simulator use and gates are still
+not authorized. Each milestone (M1 onward), each freeze and each gate needs its own operator
+authorization.
+
+All limits not introduced in §5 are reused unchanged from P2–P5. See the
 [P6 plan](v3_sim_p6_plan.md) and the [fault matrix](v3_sim_p6_fault_matrix.md).
 
 ## 1. Scope and claims
@@ -74,7 +82,7 @@ Each run declares `t_inj` (activation) and, where applicable, `t_clear`.
 | Limit | In `W_fault` | Replaced by (stricter or equal fault-response check) |
 |---|---|---|
 | P3 delivery and rate, for depth faults only (F1.01–F1.04) | not applied | P4 §9.1 F1 attributable, F2 detected; H12 |
-| P4 tracking ≤ 0.30 m | applied while the app commands; **not applied** during PX4-managed failsafe (no app setpoints) | PX4-managed: horizontal drift from the last app target ≤ **PENDING** (D4), and clearance ≥ 0.20 m |
+| P4 tracking ≤ 0.30 m | applied while the app commands; **not applied** during PX4-managed failsafe (no app setpoints) | PX4-managed: horizontal drift from the last app target **reported, not limited**, because under D4a these runs are characterization only; clearance ≥ 0.20 m and 0 collisions still evaluated |
 | P5 inference p99 and max | applied to every non-injected tick | injected tick IDs (from the shim ledger, cross-checked by `inference_s` in the accepted ledger) excluded, and only those |
 | P5 0 policy failures | applied outside declared failing ticks | declared failing ticks must show exactly the declared failure reason |
 | P4 perception compute and latency, inside a declared load window (F6, F8.03) | evaluated and reported | §5.3: every breach is followed by a safe response within the stated latency, or the run fails |
@@ -91,7 +99,7 @@ Each run declares `t_inj` (activation) and, where applicable, `t_clear`.
 | truth clearance and collisions | Gazebo sim time | `p4/truth_poses.jsonl`, `p4/contacts.jsonl` |
 | injection activation | sim and wall both recorded by the injector; **confirmed** by the witness or ULog in their own clocks | fault ledger, witness |
 
-## 5. New thresholds (all PENDING operator approval)
+## 5. New thresholds (approved with the contract, 2026-11-06)
 
 ### 5.1 Policy-fault timing (derived from P5 §5 and the 20 Hz rate)
 
@@ -104,7 +112,9 @@ Each run declares `t_inj` (activation) and, where applicable, `t_clear`.
 
 ### 5.2 PX4-managed outcomes (D4)
 
-**Derived in M0** ([audit](v3_sim_p6_m0_audit.md) §5–§6). The values are still PENDING approval.
+**Derived in M0** ([audit](v3_sim_p6_m0_audit.md) §5–§6) and approved with the contract on
+2026-11-06. Under D4a, they are the reporting thresholds for the PX4-managed characterization
+flights. No gate counts them as a pass.
 
 * **What PX4 does.** An offboard loss gives an immediate **Return** (`AUTO_RTL`), with no 5 s Hold.
   It returns at `max(d, 4 m)` for 2 m < d ≤ 10 m from home, flies straight home, lands and
@@ -351,7 +361,7 @@ Any change after freeze is a new P6 candidate.
 | D1 | relays + controller shim + process signals + bounded load harness | plan §4.2 rows M-DR, M-MR, M-CS, M-PS, M-LH; no PX4-native row |
 | D2 | shim runs accepted as "accepted code plus a declared, hashed shim" | pass-through bit identity is required (Gate A row 3, B-0) |
 | D3 | gates require only implemented behaviour | the matrix C items stay characterization |
-| D4 | derive PX4-managed expectations in M0, then approve | §5.2 stays PENDING; S-2 and S-5 stay contingent (§8.3) |
+| D4 | derive PX4-managed expectations in M0, then approve | §5.2 derived in M0 and approved with the contract; S-2 and S-5 resolved by D4a (§8.3) |
 | D5 | no PX4-native failure injection in v1 | F2.10 and F5.08 deferred; Policy A unchanged |
 | D6 | Gate B = B-0 pass-through + B-1 smoke | §8.2 as written |
 | D7 | GCS link loss by source analysis only, never flown | F5.12 stays D |
@@ -382,13 +392,13 @@ The options as presented:
     0.5 m" inside the PX4-managed window only.
 * **C11.** Run-local config equality (§2).
 
-These answers fix the design choices only. Still to approve or authorize, each separately:
+**The contract as a whole**, including §5.1, §5.2 and §5.4, was approved on 2026-11-06. Still to
+authorize, each separately:
 
-* the contract as a whole;
-* the remaining PENDING limits (§5.1, §5.2, §5.4);
-* each milestone, starting with M0;
-* any freeze or gate;
-* the backup paths.
+* each milestone from M1 onward (M0 is complete);
+* any freeze, Policy A approval or gate;
+* each characterization run;
+* the backup paths and the backup step.
 
 The original options are kept below.
 

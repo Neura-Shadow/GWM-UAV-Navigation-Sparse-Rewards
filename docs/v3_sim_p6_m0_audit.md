@@ -2,7 +2,7 @@
 
 **Status: M0 complete (2026-11-06), authorized by the operator ("Authorize M0").** The operator
 approved the decisions it raised (D1a, D4a, C11) as recommended on 2026-11-06. The record is in
-contract §10. The §6 values remain PENDING with the contract.
+contract §10. The §6 values were approved with the contract on 2026-11-06.
 
 **Read-only.** This audit used:
 * source reading;
@@ -134,7 +134,7 @@ set: the historical P2 run `20260911T171449Z-p2-flight-802425c9`, which failed w
   just past an obstacle (4.0 m < d < 4.4 m) crosses its top with a vertical gap of
   `d − 4.23 m` < 0.20 m. The truth clearance limit could then be violated by PX4's own behaviour.
 
-## 6. Proposed §5.2 values (PENDING operator approval)
+## 6. Proposed §5.2 values (approved with the contract on 2026-11-06)
 
 | Quantity | Proposed limit | Derivation |
 |---|---|---|

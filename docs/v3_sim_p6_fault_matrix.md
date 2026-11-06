@@ -1,4 +1,4 @@
-# v3-SIM P6 fault matrix — PROPOSED (planning only, 2026-11-06)
+# v3-SIM P6 fault matrix — APPROVED with the P6 contract (2026-11-06; nothing implemented)
 
 Companion to the [P6 plan](v3_sim_p6_plan.md) and the draft [P6 contract](v3_sim_p6_contract.md).
 
@@ -8,8 +8,8 @@ Companion to the [P6 plan](v3_sim_p6_plan.md) and the draft [P6 contract](v3_sim
 * No item has been executed.
 
 **Thresholds:**
-* Numeric limits are reused P2–P5 limits unless marked **PENDING**.
-* A PENDING limit is a new proposal awaiting operator approval (contract §5).
+* Numeric limits are reused P2–P5 limits, except the new thresholds of contract §5. Those were approved
+  with the contract on 2026-11-06.
 
 ## Legend
 
@@ -43,7 +43,7 @@ replaying the recorded ground inputs through the frozen supervisor); S = SITL fl
 | **L45** | exactly one LAND (21) accepted; `COMPLETE` within 45 s wall of it; ULog landed and disarmed (P4 rev 5) |
 | **PH3** | HOLD on each failing tick (target and yaw unchanged), `ABORT policy_unavailable` on the 3rd consecutive failing tick, i.e. 0.10 s sim after the first at 20 Hz; then L45 (P5 §5) |
 | **R2** | P2 `RECOVERY` with the stated reason; one LAND only if the validated sample is armed, nav 14 and airborne (P2 `Mission.abort`) |
-| **PX** | PX4-managed: the controller stops publishing, and PX4 enters an immediate **Return** (`AUTO_RTL`, no 5 s Hold; M0 Finding D). It returns at `max(d, 4 m)`, lands at home and disarms. Proposed limits: onset ≤ 1.2 s after the last `offboard_control_mode`; `AUTO_RTL` ≤ 0.1 s after onset; landed and disarmed ≤ 45 s wall; S0 unexempted (contract §5.2, PENDING). It always breaches the P4 3.0 m ceiling, so it is characterization under D4a (approved 2026-11-06) |
+| **PX** | PX4-managed: the controller stops publishing, and PX4 enters an immediate **Return** (`AUTO_RTL`, no 5 s Hold; M0 Finding D). It returns at `max(d, 4 m)`, lands at home and disarms. Proposed limits: onset ≤ 1.2 s after the last `offboard_control_mode`; `AUTO_RTL` ≤ 0.1 s after onset; landed and disarmed ≤ 45 s wall; S0 unexempted (contract §5.2, approved 2026-11-06; reported, not gated). It always breaches the P4 3.0 m ceiling, so it is characterization under D4a (approved 2026-11-06) |
 | **H12** | adapter health leaves `fresh` within 1.2 s wall (P3 `interruption_detect_wall_s`) |
 | **REF** | P3 refusal before any ROS node or publisher exists; exit ≠ 0 accepted only in that declared scope (P5 rev 2 pattern) |
 | **INJ** | the independent injection proof required for that mechanism (plan §4.3) |
@@ -80,7 +80,7 @@ channels are listed per row.
 | F2.04 | Estimator reset with counters (P4/P5 S7, frame rejection only) | CS (counters plus a shift); O: recorded frames | TRANSIT | P2 reference manager; P3 `reset_epoch_bracket`; supervisor `estimator_reset_since_last_usable_frame` | HOVER until a fresh matched frame; **then the pre-reset grid is reused, with no invalidation** | H35 | S0 | grid frame versus truth after the reset | O: extends S7 to the full perception, map and supervisor path; measures stale-geometry reuse | O | R-O (detection), C (map reuse) | **highest**; no SITL before M3 |
 | F2.05 | State stamp backwards or non-finite (none) | CS | TRANSIT | `state_time_backwards`, `invalid_timestamp` | R2 | same tick | S0 | ledger | reason equality | O | R-O | low |
 | F2.06 | Future stamp > 0.1 s (none) | CS | TRANSIT | `clock_epoch_mismatch` | R2 | same tick | S0 | ledger | reason equality | O | R-O | low |
-| F2.07 | `xy_valid` false or estimator flags (none) | CS | TRANSIT | `invalid_estimate`, `estimator_failsafe_flags` | R2 with no LAND, then PX | same tick | S0; PX PENDING | ULog | reason; PX outcome | O, S | R-O; S: C | medium |
+| F2.07 | `xy_valid` false or estimator flags (none) | CS | TRANSIT | `invalid_estimate`, `estimator_failsafe_flags` | R2 with no LAND, then PX | same tick | S0; PX limits reported (§5.2) | ULog | reason; PX outcome | O, S | R-O; S: C | medium |
 | F2.08 | ENU/NED frame mismatch (none) | CS | TRANSIT | none, unless geofence | — | — | S0 evaluated | — | characterization | O | C | medium |
 | F2.09 | Pose-to-depth association failure, pose withheld from perception (none) | SR: perception `--px4-prefix /gwm/p6/px4_71` (M0 Finding A) | TRANSIT | `association:*` unusable frames; then `snapshot_stale` (first in `stale_reason` order) | HOVER, then `ABORT stale_inputs:snapshot_stale`, then LAND | H35, A10 | S0, L45 | perception `unusable_reasons`; witness: true versus relayed state | replay | O, G, S | R-O, R-A; R-S (S-2′, D4a approved) | low; app-managed |
 | F2.10 | PX4-native estimator or GPS failure (none) | PX4 `failure` / MAV_CMD 420 (`SYS_FAILURE_EN` 1 observed) | — | PX4 estimator flags, then P2 checks | — | — | — | ULog | — | — | D (D5) | needs a command outside Policy A |
@@ -98,7 +98,7 @@ channels are listed per row.
 | F3.07 | Isolated slow inference, 25 ms on single ticks, ≥ 5 s apart (none) | CS sleep | TRANSIT, S4 | `timeout` | HOLD that tick; counter resets; mission continues | each injected tick gives `timeout` HOLD, and no ABORT | S0; inference p99/max limits on **all non-injected ticks** | ledger `inference_s` (accepted clock); timing trace | exclusion only of declared tick IDs | O, S | R-C (C-2) | low |
 | F3.08 | Repeated slow inference, 3 consecutive 25 ms ticks (P5 offline, one tick) | CS | `AVOIDING`, S2 | `timeout` | PH3, then L45 | PH3 | S0, L45 | ledger; trace | as F3.04 | O, S | R-B (B-1 smoke) | low |
 | F3.09 | One inference of 60 ms, above the dispatch budget (none) | CS | TRANSIT | ledger `timeout` **and** P2 dispatch guard (0.050 s) | R2, one LAND (valid Offboard sample) | same tick | S0, L45 | trace span, P2 abort reason | precedence check: both records present | O, S | R-O; S: C | low |
-| F3.10 | Policy hang, 3.0 s blocking (none) | CS | NORMAL | no tick completes; PX4 offboard loss at 1.0 s; afterwards the guard trips and nav ≠ 14 | PX | ULog failsafe onset ≤ 1.0 s + **PENDING** tolerance | S0; PX PENDING | ULog; trace gap | PX outcome | O, S | C (S only after D4) | **high** |
+| F3.10 | Policy hang, 3.0 s blocking (none) | CS | NORMAL | no tick completes; PX4 offboard loss at 1.0 s; afterwards the guard trips and nav ≠ 14 | PX | ULog failsafe onset ≤ 1.2 s (§5.2) | S0; PX limits reported (§5.2) | ULog; trace gap | PX outcome | O, S | C (D4a) | **high** |
 | F3.11 | Exception in the forward pass (P5 class) | CS raises | AVOIDING | `exception:RuntimeError` | PH3 | PH3 | S0 | ledger | as F3.04 | O | R-O | low |
 | F3.12 | Non-finite features (P5 class) | CS | AVOIDING | `input_not_finite` | PH3 | PH3 | S0 | ledger | as F3.04 | O | R-O | low |
 | F3.13 | Valid but adversarial choice: the worst allowed slot every tick (none) | CS around `policy_choice` | TRANSIT, S2 | **none, by design** (in the mask) | shield-limited behaviour; goal or deadline ABORT | — | **S0 required**; outcome reported | ledger, decisions, truth | safety only; mission outcome reported, not gated | O, S | R-C (C-3) | medium; tests the shield, not the policy |
@@ -119,7 +119,7 @@ channels are listed per row.
 | F4.09 | QoS incompatibility (none) | relay with incompatible QoS | ground | not reachable for the controller's BEST_EFFORT/VOLATILE subscriptions; a RELIABLE probe receives 0 | — | — | — | witness probe | documented N/A with ground proof | G | C | low |
 | F4.10 | Perception restarted in flight (none) | PS kill and restart | — | **none**: new grid anchored at the in-flight pose, same shape; traversed mask kept | misaligned traversed cells | — | — | — | characterization; runners never restart processes | O | C | medium |
 | F4.11 | Health versus map freshness disagreement (P4 rules) | MR | TRANSIT | independent checks | HOVER on either | replay | S0 | — | replay | O | R-O | low |
-| F4.12 | DDS agent stopped (none) | PS SIGINT `MicroXRCEAgent` | NORMAL | `stale_state` gives R2 (no LAND); PX4 offboard loss | PX | as F2.01 | S0; PX PENDING | ULog | PX outcome | S | C (after D4) | **high** |
+| F4.12 | DDS agent stopped (none) | PS SIGINT `MicroXRCEAgent` | NORMAL | `stale_state` gives R2 (no LAND); PX4 offboard loss | PX | as F2.01 | S0; PX limits reported (§5.2) | ULog | PX outcome | S | C (D4a) | **high** |
 | F4.13 | `/clock` stall (named in P4 §8 A(4)) | PS SIGSTOP clock bridge (bounded) | ground | `clock_stalled` (1.0 s wall) | ground: fail closed | ≤ 1.0 s wall + 1 tick | S0 | trace | reason equality | G | R-A | low |
 
 ## F5 — PX4 Offboard and flight control
@@ -130,12 +130,12 @@ channels are listed per row.
 | F5.02 | Short controller stall 0.3 s (none) | PS SIGSTOP 0.3 s | NORMAL | on resume, **either** `stale_state` (giving R2 with no LAND, then PX) **or** `observation_gap` (giving R2 with one LAND), depending on the callback order after SIGCONT (M0 §7) | to be settled in M3 | — | S0 | trace gap | precedence | O, S | C | low |
 | F5.03 | Mode rejection: ACK of 176 rewritten to DENIED (none) | CS on `Mission.ack` | pre-arm (vehicle on the ground) | `command_ack_denied` | R2 before arming | same tick | no arming | ULog: PX4 accepted it in reality | app-view-only fault, declared | O, S (pre-arm) | R-O; S: C | low |
 | F5.04 | LAND ACK dropped (none) | CS | after ABORT | ACK deadline 3.0 s sim | R2; **PX4 still lands** (it accepted LAND) | deadline | landed and disarmed **from the ULog** | ULog | "landed" claimed only from the ULog | S | C | low |
-| F5.05 | Wrong nav_state reported, app-side (none) | CS | TRANSIT | `offboard_armed_state_lost` | R2 with no LAND; controller stops; PX | same tick | S0; PX PENDING | ULog | PX outcome | O | R-O | medium |
+| F5.05 | Wrong nav_state reported, app-side (none) | CS | TRANSIT | `offboard_armed_state_lost` | R2 with no LAND; controller stops; PX | same tick | S0; PX limits reported (§5.2) | ULog | PX outcome | O | R-O | medium |
 | F5.06 | LAND rejected (none natively) | CS (ACK) | ABORT | `command_ack_denied` | R2 | same tick | ULog truth | ULog | app view only | O | R-O | low |
 | F5.07 | Stale `vehicle_status` (none) | CS | TRANSIT | `stale_state:vehicle_status` (1.5 s sim / 2.0 s wall) | R2 | limit + 1 tick | S0 | ledger | reason | O | R-O | low |
 | F5.08 | Unexpected disarm (none) | PX4 command | — | — | — | — | — | — | — | — | D (D5) | command outside Policy A |
-| F5.09 | Controller killed (none) | PS SIGKILL `p5_control` | NORMAL | PX4 offboard loss; no app response | PX; no restart (runner never relaunches; P2 refuses when armed) | ULog ≤ 1.0 s + PENDING | S0; PX PENDING | ULog | PX outcome; no second controller ever starts | S | C (after D4) | **high** |
-| F5.10 | `vehicle_status.failsafe` true, app-side (none) | CS | TRANSIT | `vehicle_health_invalid` | R2 with no LAND, then PX | same tick | PX PENDING | ULog | reason | O | R-O | medium |
+| F5.09 | Controller killed (none) | PS SIGKILL `p5_control` | NORMAL | PX4 offboard loss; no app response | PX; no restart (runner never relaunches; P2 refuses when armed) | ULog onset ≤ 1.2 s (§5.2) | S0; PX limits reported (§5.2) | ULog | PX outcome; no second controller ever starts | S | C (D4a) | **high** |
+| F5.10 | `vehicle_status.failsafe` true, app-side (none) | CS | TRANSIT | `vehicle_health_invalid` | R2 with no LAND, then PX | same tick | PX limits reported (§5.2) | ULog | reason | O | R-O | medium |
 | F5.11 | Commander or estimator transitions | merged into F5.05, F5.10, F2.07 | | | | | | | | | — | |
 | F5.12 | GCS link loss: QGC stopped (none) | PS SIGTERM `qgc-monitor` | NORMAL | PX4 data-link loss after 10 s; `NAV_DLL_ACT` 2 = Return *(verify M0)* | Return climbs toward `RTL_RETURN_ALT` 30 m, above the 3.0 m P4 ceiling | — | geofence violation expected | ULog | — | O (source analysis) | D (D7) | **high**; never flown before D7 |
 

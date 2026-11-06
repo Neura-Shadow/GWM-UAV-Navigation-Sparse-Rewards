@@ -1,11 +1,12 @@
 # v3-SIM P6 — failure injection, fault-tolerant control and safety validation: plan
 
-**Status: PLANNING ONLY (2026-11-06).** Nothing in P6 is implemented, frozen, launched or accepted.
-The [P6 contract](v3_sim_p6_contract.md) is a draft. The operator answered decisions D1–D10 on
+**Status: CONTRACT APPROVED, NOTHING IMPLEMENTED (2026-11-06).** Nothing in P6 is implemented,
+frozen, launched or accepted.
+The [P6 contract](v3_sim_p6_contract.md) is approved. The operator answered decisions D1–D10 on
 2026-11-06, all as recommended (contract §10 decision record). **M0 (the read-only audit) is
 complete**; its results are in the [M0 audit](v3_sim_p6_m0_audit.md). It raised decisions D1a and
-D4a and rule C11; the operator approved all three as recommended on 2026-11-06. The contract itself
-is not yet approved. The fault
+D4a and rule C11; the operator approved all three as recommended on 2026-11-06. **The contract
+was approved as a whole on 2026-11-06.** No milestone after M0 is authorized yet. The fault
 list is in the [fault matrix](v3_sim_p6_fault_matrix.md), and the preservation of P3–P5 evidence
 in the [evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The milestones in §7 are
 proposals, not permission to implement or execute them.
@@ -395,10 +396,12 @@ Two consequences, verified from code and to be confirmed in M3:
 
 ## 10. Decisions requiring operator approval
 
-**Answered 2026-11-06, all as recommended.** The record is in contract §10. The next approvals are:
+**Answered 2026-11-06, all as recommended.** The record is in contract §10. The approvals so far, and the next one:
 
-1. the contract as a whole, with its remaining PENDING limits;
-2. M0, a read-only audit: source, ULogs and evaluator checks, with no simulator.
+1. the contract as a whole, with its new limits: **approved 2026-11-06**;
+2. M0, a read-only audit: source, ULogs and evaluator checks, with no simulator: **complete
+   2026-11-06**;
+3. next: M1, freezing the scenario specifications. It needs its own authorization.
 
 The decisions, with the recommendation first for each, are in contract §10:
 

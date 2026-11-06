@@ -290,8 +290,9 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   model `ee006a80`, no fallback, no online learning; PX4 SITL only, no hardware). Seven flights,
   0 collisions, 0 policy failures. [Contract](v3_sim_p5_contract.md), [plan](v3_sim_p5_plan.md).
   The earlier candidate `db4c4779` failed Gate C and remains on record.
-- [ ] P6 Failure validation — **planning underway** (2026-11-06; nothing implemented or accepted):
-  [plan](v3_sim_p6_plan.md), draft [contract](v3_sim_p6_contract.md),
+- [ ] P6 Failure validation — **planning underway; contract approved, M0 audit complete**
+  (2026-11-06; nothing implemented, run or accepted): [plan](v3_sim_p6_plan.md),
+  [contract](v3_sim_p6_contract.md), [M0 audit](v3_sim_p6_m0_audit.md),
   [fault matrix](v3_sim_p6_fault_matrix.md),
   [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md).
 - [ ] P7 Batch evaluation
