@@ -1,6 +1,8 @@
 # v3-SIM P6 M0 — baseline and contract audit
 
-**Status: M0 complete (2026-11-06), authorized by the operator ("Authorize M0").**
+**Status: M0 complete (2026-11-06), authorized by the operator ("Authorize M0").** The operator
+approved the decisions it raised (D1a, D4a, C11) as recommended on 2026-11-06. The record is in
+contract §10. The §6 values remain PENDING with the contract.
 
 **Read-only.** This audit used:
 * source reading;

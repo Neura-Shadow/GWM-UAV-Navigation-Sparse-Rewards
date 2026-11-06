@@ -4,7 +4,8 @@
 The [P6 contract](v3_sim_p6_contract.md) is a draft. The operator answered decisions D1–D10 on
 2026-11-06, all as recommended (contract §10 decision record). **M0 (the read-only audit) is
 complete**; its results are in the [M0 audit](v3_sim_p6_m0_audit.md). It raised decisions D1a and
-D4a and rule C11, which await the operator. The contract itself is not yet approved. The fault
+D4a and rule C11; the operator approved all three as recommended on 2026-11-06. The contract itself
+is not yet approved. The fault
 list is in the [fault matrix](v3_sim_p6_fault_matrix.md), and the preservation of P3–P5 evidence
 in the [evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The milestones in §7 are
 proposals, not permission to implement or execute them.
@@ -69,7 +70,7 @@ QGC monitor (Policy A) ──MAVLink──> PX4          p4_truth_observer ─�
     sees it.
 
   Topics come only from configuration and from the adapter's and perception's `--px4-prefix`
-  argument. §4.2 is adjusted accordingly (D1a, pending).
+  argument. §4.2 is adjusted accordingly (D1a, approved 2026-11-06).
 
 ### 1.3 Existing fault handling, verified from source
 
@@ -257,8 +258,8 @@ outside P6.
 | Mechanism | Injection point | Reaches the production safety path | Timing / ownership effect | Removal | Independent proof the fault occurred |
 |---|---|---|---|---|---|
 | **M-DR depth relay** | Bridge output moved to `/gwm/p6/raw/front_depth/*` through the run-local `p3_sensor_bridge.yaml` (`ros_topic_name`, 2 keys, declared and checked under C11; M0 Finding A); the relay republishes on the accepted `/gwm/sensors/front_depth/*` names (drop, delay, repeat, stamp, dimension, NaN/inf, `camera_info` faults) | Yes: the unchanged adapter and perception consume it | Adds one copy of about 37 MB/s; latency is measured in pass-through (Gate A row 3, Gate B-0). No PX4 effect | Not launched → the accepted topology | Native Gazebo headers (P3 source probe) versus relay output, recorded by a separate passive witness subscribed to both topics |
-| **M-MR map/health input faults** (M0, D1a pending: inside the controller shim, not a DDS relay) | The P6 entry point wraps `P5Mission.on_snapshot`, `on_adapter_health` and `tick` (drop, delay, reorder, burst) | Yes: the accepted mission and supervisor receive the faulted sequence | No topology change and no extra hop | Off = the accepted entry point | Perception's own `p4/local_map.jsonl` versus the controller's `snapshot_acquisition_sim_s` in `p4/decisions.jsonl` |
-| **M-SR state relay to perception** (M0, D1a pending) | Perception started with `--px4-prefix /gwm/p6/px4_71` (an accepted argument); the relay republishes the six `fmu/out` state topics (delay, drop, stamp) | Yes: perception's association | One relay; the adapter and controller keep `/px4_71` | Prefix not changed | The bagged true `/px4_71` topics versus the relay output, recorded by the witness |
+| **M-MR map/health input faults** (M0, D1a approved: inside the controller shim, not a DDS relay) | The P6 entry point wraps `P5Mission.on_snapshot`, `on_adapter_health` and `tick` (drop, delay, reorder, burst) | Yes: the accepted mission and supervisor receive the faulted sequence | No topology change and no extra hop | Off = the accepted entry point | Perception's own `p4/local_map.jsonl` versus the controller's `snapshot_acquisition_sim_s` in `p4/decisions.jsonl` |
+| **M-SR state relay to perception** (M0, D1a approved) | Perception started with `--px4-prefix /gwm/p6/px4_71` (an accepted argument); the relay republishes the six `fmu/out` state topics (delay, drop, stamp) | Yes: perception's association | One relay; the adapter and controller keep `/px4_71` | Prefix not changed | The bagged true `/px4_71` topics versus the relay output, recorded by the witness |
 | **M-CS controller shim** | A P6 entry point imports the accepted `p5_control` and, before `main`, wraps `FrozenPolicy.scores`, `PolicyRanker.clock`, `StateCache.update` inputs or `Mission.ack` (policy faults F3; app-side state and ACK faults F2, F5) | Yes, in the same process, through the accepted classes | No new publisher. Delays are bounded and declared. With the shim pass-through, decisions must equal the P5 replay bit for bit | Off = the accepted entry point | The policy ledger (accepted code: `failure`, `inference_s`), the timing trace and `ros-events.jsonl`; for state faults, the bagged true PX4 messages versus the shim-modified values in the fault ledger |
 | **M-PS process signals** | SIGINT, SIGSTOP/SIGCONT (bounded) or SIGKILL to one owned process (bridge, adapter, perception, controller, DDS agent, clock bridge) | Yes | None until injection | Signal not sent | `processes.txt`, exit codes, `/proc` state, P3 cleanup classification, and the PX4 side in the ULog |
 | **M-LH load harness** | N bounded CPU or memory workers inside the owned namespace | Indirectly, through scheduling | Intended. No host or WSL setting is changed | Workers exit at their deadline, or are killed in cleanup | `resources.jsonl` (per-process CPU and RSS), `/proc/pressure`, schedstat as in the P5 diagnostic |
@@ -338,7 +339,7 @@ Two consequences, verified from code and to be confirmed in M3:
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised |
+| **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised and approved |
 | **M1** taxonomy and scenarios | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
