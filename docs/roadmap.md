@@ -286,7 +286,10 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   [Final acceptance](v3_sim_p4_final_acceptance.md), [contract](v3_sim_p4_contract.md),
   [design](v3_sim_p4_plan.md). P5 is the next phase.
 - [ ] P5 Fixed-weight policy substitution
-- [ ] P6 Failure validation
+- [ ] P6 Failure validation — **planning underway** (2026-11-06; nothing implemented or accepted):
+  [plan](v3_sim_p6_plan.md), draft [contract](v3_sim_p6_contract.md),
+  [fault matrix](v3_sim_p6_fault_matrix.md),
+  [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md).
 - [ ] P7 Batch evaluation
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
