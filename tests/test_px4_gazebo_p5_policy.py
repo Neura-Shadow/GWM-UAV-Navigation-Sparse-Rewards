@@ -125,6 +125,51 @@ def test_polar_profile_reports_first_occupied_and_first_non_free_distances():
     assert occupied[0] == 4.0 and nonfree[0] == 4.0  # k = -6: clear to the cap
 
 
+def revision1_polar_profile(grid, traversed, start, path_heading, settings, profile):
+    """Oracle: the revision 1 per-heading loop, verbatim (contract revision 3 requires bit identity with it)."""
+    cap, ds = profile["cap_m"], profile["step_m"]
+    s = np.arange(1, int(round(cap / ds)) + 1) * ds
+    n = settings["heading_steps"]
+    step = math.radians(settings["heading_step_deg"])
+    occupied, nonfree = np.full(2 * n + 1, cap), np.full(2 * n + 1, cap)
+    for idx, k in enumerate(range(-n, n + 1)):
+        heading = planner.wrap(path_heading + k * step)
+        i = np.floor((start[0] + s * math.cos(heading) - grid.x_min) / grid.resolution).astype(np.int64)
+        j = np.floor((start[1] + s * math.sin(heading) - grid.y_min) / grid.resolution).astype(np.int64)
+        inside = (i >= 0) & (i < grid.nx) & (j >= 0) & (j < grid.ny)
+        states = np.full(s.size, -1, dtype=np.int64)
+        states[inside] = grid.cells[i[inside], j[inside]]
+        walked = np.zeros(s.size, dtype=bool)
+        walked[inside] = traversed[i[inside], j[inside]]
+        hit = states == local_map.OCCUPIED
+        free = (states == local_map.FREE) | (walked & inside & ~hit)
+        if hit.any():
+            occupied[idx] = s[int(np.argmax(hit))]
+        if (~free).any():
+            nonfree[idx] = s[int(np.argmax(~free))]
+    return np.concatenate([occupied, nonfree]) / cap
+
+
+def test_polar_profile_is_bit_identical_to_the_revision1_loop():
+    rng = np.random.default_rng(20261106)
+    profile, step = p5.SCHEMA["polar_profile"], math.radians(PL["heading_step_deg"])
+    base = free_grid()
+    for case in range(3000):
+        grid = local_map.Grid(base.x_min, base.y_min, base.nx, base.ny, base.resolution,
+                              rng.choice(np.array([local_map.FREE, local_map.OCCUPIED, local_map.UNKNOWN], dtype=np.uint8),
+                                         size=base.cells.shape, p=(0.80, 0.08, 0.12)))
+        traversed = rng.random(grid.cells.shape) < (0.0, 0.05, 0.3, 0.9)[case % 4]
+        width, height = grid.nx * grid.resolution, grid.ny * grid.resolution
+        if case % 3 == 0:  # anywhere around the grid, including outside it
+            start = (rng.uniform(grid.x_min - 2.0, grid.x_min + width + 2.0), rng.uniform(grid.y_min - 2.0, grid.y_min + height + 2.0))
+        else:              # exactly on cell boundaries
+            start = (grid.x_min + rng.integers(-3, grid.nx + 3) * grid.resolution, grid.y_min + rng.integers(-3, grid.ny + 3) * grid.resolution)
+        heading = (rng.integers(-24, 25) * step, rng.uniform(-math.pi, math.pi), (0.0, math.pi / 2, -math.pi, math.pi)[case % 4])[case % 3]
+        expected = revision1_polar_profile(grid, traversed, start, heading, PL, profile)
+        actual = observation_adapter.polar_profile(grid, traversed, start, heading, PL, profile)
+        assert actual.dtype == expected.dtype and actual.shape == expected.shape and np.array_equal(actual, expected), case
+
+
 def test_adapter_rejects_non_planning_states_and_incomplete_candidate_sets():
     grid, c = free_grid(), ctx()
     traversed = np.zeros(grid.cells.shape, dtype=bool)
