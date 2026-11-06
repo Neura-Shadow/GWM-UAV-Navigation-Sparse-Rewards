@@ -1,8 +1,9 @@
 # v3-SIM P6 contract `p6-acceptance-v1` — fault injection and safety validation
 
 **Status: DRAFT, NOT APPROVED (2026-11-06).** This is a planning proposal. The operator answered
-decisions D1–D10 on 2026-11-06, all as recommended (§10). The contract as a whole is still not
-approved. Nothing here authorizes implementation, freezing, simulator use or any gate. Every limit
+decisions D1–D10 on 2026-11-06, all as recommended (§10). M0 is complete
+([audit](v3_sim_p6_m0_audit.md)). It raised D1a, D4a and C11, and proposed the §5.2 values. The
+contract as a whole is still not approved. Nothing here authorizes implementation, freezing, simulator use or any gate. Every limit
 marked **PENDING** is a new proposal awaiting operator approval. All other limits are reused
 unchanged from P2–P5. See the
 [P6 plan](v3_sim_p6_plan.md) and the [fault matrix](v3_sim_p6_fault_matrix.md).
@@ -46,6 +47,11 @@ unchanged from P2–P5. See the
   intended fault occurred (§7.2). The injector's own success record is never sufficient.
 * **C9.** Simulation only. No hardware. All live runs need operator authorization.
 * **C10.** Code lives in `simulation/px4_gazebo_p6/`, plus tests in `tests/test_px4_gazebo_p6_*.py`.
+* **C11 (proposed by M0, PENDING).** Every run-local config must equal its frozen original byte for
+  byte, except the keys declared in the run's fault declaration (for example the two
+  `ros_topic_name` values of `p3_sensor_bridge.yaml`). Each declared key's before and after values
+  are recorded. The P3–P5 evaluators do not make this check (M0 Finding C), so the P6 evaluator
+  owns it.
 
 ## 3. Limits carried over unchanged
 
@@ -96,6 +102,20 @@ Each run declares `t_inj` (activation) and, where applicable, `t_clear`.
   `_land_after_abort`), within ≤ 0.05 s sim.
 
 ### 5.2 PX4-managed outcomes (D4)
+
+**Derived in M0** ([audit](v3_sim_p6_m0_audit.md) §5–§6). The values are still PENDING approval.
+
+* **What PX4 does.** An offboard loss gives an immediate **Return** (`AUTO_RTL`), with no 5 s Hold.
+  It returns at `max(d, 4 m)` for 2 m < d ≤ 10 m from home, flies straight home, lands and
+  disarms. One retained run shows it: 1.05 s to detection, 6.3 s from onset to disarm.
+* **Proposed limits:**
+  * onset ≤ 1.0 + 0.2 s after the last `offboard_control_mode`;
+  * `AUTO_RTL` within 0.1 s of onset;
+  * landed and disarmed within 45 s wall of onset (P2 `recovery_wall_s`), ULog only;
+  * 0 collisions and truth clearance ≥ 0.20 m, with no exemption.
+* **What cannot hold.** The P4 3.0 m ceiling cannot hold in this window, which is decision D4a.
+
+The text below was written before M0 and is kept for the record.
 
 * **To be derived in M0.** The values come from the pinned PX4 v1.17 source and the parameters
   read from the accepted ULog: `COM_OF_LOSS_T` 1.0 s, `COM_FAIL_ACT_T` 5.0 s, `COM_OBL_RC_ACT` 0,
@@ -276,11 +296,19 @@ Plan §8 states what the sample sizes do and do not support.
 | S-4 | S3 | F4.01 local-map loss 1.0 s in `AVOIDING` | H35; recovery only with §6.5; goal reached; S0 |
 | S-5 | S1 | F5.01 controller SIGSTOP 1.5 s in NORMAL | PX4 offboard-loss failsafe, then the §5.2 outcome (**contingent on D4**) |
 
-If D4 shows that PX4 does not land, S-2 and S-5 become characterization and are replaced by:
+**M0 result.** PX4 lands, through Return, but breaches the 3.0 m ceiling and can pass within
+0.20 m over obstacle tops. The recommended D4a resolution (PENDING) makes S-2 and S-5 separately
+authorized characterization flights, with full truth-safety evaluation and the §5.2 values
+reported. They are replaced in Gate S by:
 
-* **S-2′:** F2.04 with the counters reset (supervisor HOVER, then ABORT, A10).
-* **S-5′:** F4.13 in flight is not proposed. Instead, F5.02 (a 0.3 s stall, giving
-  `observation_gap`, R2 and one LAND), whose outcome is app-managed.
+* **S-2′:** F2.09. Pose withheld from perception through its `--px4-prefix` state relay. Expected:
+  H35, then `ABORT stale_inputs:snapshot_stale` (A10), then L45, with S0.
+* **S-5′:** F6.03. One 60 ms mission-tick stall in NORMAL. Expected: P2 dispatch-budget abort
+  with a valid Offboard sample, then exactly one LAND, then L45, with S0.
+
+The earlier replacements are withdrawn:
+* S-2′ = F2.04, because no SITL use is allowed before M3;
+* S-5′ = F5.02, because its outcome depends on the callback order (M0 §7).
 
 ### 8.4 Gate C — fault-tolerance qualification (fixed order, all required)
 
@@ -327,6 +355,20 @@ Any change after freeze is a new P6 candidate.
 | D8 | bounded load windows | §5.3 approved with its bounds |
 | D9 | two backup copies: external disk + versioned cloud store | the paths and destination still need naming before any copy or upload |
 | D10 | keep all accepted, failed and cited diagnostic evidence indefinitely | no deletion |
+
+**Raised by M0 (PENDING; see the [audit](v3_sim_p6_m0_audit.md) §7):**
+
+* **D1a.**
+  * **Recommended:** the depth relay through a declared 2-key run-local bridge config (C11); map
+    and health input faults inside the controller shim; pose faults to perception through
+    `--px4-prefix` and a state relay.
+  * *Alternative:* a second run-local `p4_avoidance.yaml` for a map relay.
+* **D4a.**
+  * **Recommended:** PX4-managed S-2 and S-5 become characterization, with S-2′ = F2.09 and
+    S-5′ = F6.03 in Gate S.
+  * *Alternative:* keep them required with a narrow ceiling exemption, "≤ the Return altitude +
+    0.5 m" inside the PX4-managed window only.
+* **C11.** Run-local config equality (§2).
 
 These answers fix the design choices only. Still to approve or authorize, each separately:
 

@@ -2,8 +2,9 @@
 
 **Status: PLANNING ONLY (2026-11-06).** Nothing in P6 is implemented, frozen, launched or accepted.
 The [P6 contract](v3_sim_p6_contract.md) is a draft. The operator answered decisions D1–D10 on
-2026-11-06, all as recommended (contract §10 decision record). The contract itself and M0 are not
-yet approved. The fault
+2026-11-06, all as recommended (contract §10 decision record). **M0 (the read-only audit) is
+complete**; its results are in the [M0 audit](v3_sim_p6_m0_audit.md). It raised decisions D1a and
+D4a and rule C11, which await the operator. The contract itself is not yet approved. The fault
 list is in the [fault matrix](v3_sim_p6_fault_matrix.md), and the preservation of P3–P5 evidence
 in the [evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The milestones in §7 are
 proposals, not permission to implement or execute them.
@@ -62,10 +63,13 @@ QGC monitor (Policy A) ──MAVLink──> PX4          p4_truth_observer ─�
   `DiagRunner(P5Runner)` with a byte-identical namespace-owner copy.
 * **The controller is single-threaded.** `rclpy.spin_once` runs one 20 Hz timer tick:
   `mission.tick` (P2 checks → supervisor → policy), then `send` (dispatch guard → publish).
-* **Remapping.** Both controllers call `rclpy.init(args=[])`, so command-line ROS remaps cannot
-  reach them. The sensor adapter and `p4_perception` call `rclpy.init(args=None)`, so they may
-  accept `--ros-args` remaps if their own argument parsers allow it; **M0 must verify this**. The
-  injection design in §4 depends on it.
+* **Remapping (M0 Finding A).** No accepted node accepts command-line remaps:
+  * the controllers call `rclpy.init(args=[])`;
+  * the adapter and `p4_perception` reject `--ros-args` in their strict `argparse` before ROS
+    sees it.
+
+  Topics come only from configuration and from the adapter's and perception's `--px4-prefix`
+  argument. §4.2 is adjusted accordingly (D1a, pending).
 
 ### 1.3 Existing fault handling, verified from source
 
@@ -167,8 +171,10 @@ confirmed against the pinned PX4 source in M0):**
 | Checkpoint mismatch at start | P5 Gate A item 5, live refusal | ground |
 
 The P4 contract §8 Gate A(4) also names "stale clock" and "calibration mismatch" fault fixtures. The
-accepted P4 Gate A ran only `adapter_stop` and `bridge_stop` (runner `FAULTS`). M0 must establish
-where the other two were covered (offline tests or not at all), not assume it.
+accepted P4 Gate A ran only `adapter_stop` and `bridge_stop` (runner `FAULTS`). **M0 Finding B:**
+the other two were covered only offline, by unit tests with synthetic inputs
+(`tests/test_px4_gazebo_p4_planner.py`, `tests/test_px4_gazebo_p2_contract.py`). They were never
+exercised live.
 
 ## 2. Highest-priority uncovered failure modes
 
@@ -199,10 +205,12 @@ offline confirmation in M3 before any SITL use.
    * **Why:** P2 `RECOVERY` sends no LAND without a validated Offboard sample. A hung tick, a
      stopped or killed controller, or a stopped DDS agent leaves PX4's offboard-loss failsafe as
      the only safety path.
-   * **Unknown:** what PX4 v1.17 actually does with `COM_OBL_RC_ACT` 0 and no RC (Position, Hold or
-     Land) **has not been established**.
-   * **Consequence:** if it holds instead of landing, these faults end airborne, as a terminal
-     failure rather than a safe landing.
+   * **Established in M0 (Finding D)**, from the pinned source and the one historical failsafe
+     ULog: PX4 enters **Return** immediately, with no 5 s Hold.
+   * **The Return altitude** is `max(d, 4 m)` for d up to 10 m from home. It flies straight home,
+     lands and disarms.
+   * **Consequence:** it lands, but always above the P4 3.0 m ceiling, and it can cross 4 m
+     obstacle tops with less than 0.20 m vertical gap. Hence decision D4a.
 7. **GCS link loss triggers Return to 30 m (F5.12).**
    * With `NAV_DLL_ACT` 2 and `RTL_RETURN_ALT` 30 m, QGC loss would command Return after 10 s,
      climbing far above the P4 3.0 m geofence ceiling.
@@ -248,8 +256,9 @@ outside P6.
 
 | Mechanism | Injection point | Reaches the production safety path | Timing / ownership effect | Removal | Independent proof the fault occurred |
 |---|---|---|---|---|---|
-| **M-DR depth relay** | Bridge output remapped to `/gwm/p6/raw/front_depth/*`; the relay republishes on the accepted `/gwm/sensors/front_depth/*` names (drop, delay, repeat, stamp, dimension, NaN/inf, `camera_info` faults) | Yes: the unchanged adapter and perception consume it | Adds one copy of about 37 MB/s; latency is measured in pass-through (Gate A row 3, Gate B-0). No PX4 effect | Not launched → the accepted topology | Native Gazebo headers (P3 source probe) versus relay output, recorded by a separate passive witness subscribed to both topics |
-| **M-MR map/health relay** | `p4_perception` output remapped (if M0 confirms remap support); the relay publishes `/gwm/p4/local_map` (drop, delay, reorder, burst). Health likewise | Yes: the unchanged controller consumes it | Small JSON; the controller sees one publisher, as before | As above | The witness records both topics; `p4/local_map.jsonl` (perception) versus the controller's `snapshot_acquisition_sim_s` in `p4/decisions.jsonl` |
+| **M-DR depth relay** | Bridge output moved to `/gwm/p6/raw/front_depth/*` through the run-local `p3_sensor_bridge.yaml` (`ros_topic_name`, 2 keys, declared and checked under C11; M0 Finding A); the relay republishes on the accepted `/gwm/sensors/front_depth/*` names (drop, delay, repeat, stamp, dimension, NaN/inf, `camera_info` faults) | Yes: the unchanged adapter and perception consume it | Adds one copy of about 37 MB/s; latency is measured in pass-through (Gate A row 3, Gate B-0). No PX4 effect | Not launched → the accepted topology | Native Gazebo headers (P3 source probe) versus relay output, recorded by a separate passive witness subscribed to both topics |
+| **M-MR map/health input faults** (M0, D1a pending: inside the controller shim, not a DDS relay) | The P6 entry point wraps `P5Mission.on_snapshot`, `on_adapter_health` and `tick` (drop, delay, reorder, burst) | Yes: the accepted mission and supervisor receive the faulted sequence | No topology change and no extra hop | Off = the accepted entry point | Perception's own `p4/local_map.jsonl` versus the controller's `snapshot_acquisition_sim_s` in `p4/decisions.jsonl` |
+| **M-SR state relay to perception** (M0, D1a pending) | Perception started with `--px4-prefix /gwm/p6/px4_71` (an accepted argument); the relay republishes the six `fmu/out` state topics (delay, drop, stamp) | Yes: perception's association | One relay; the adapter and controller keep `/px4_71` | Prefix not changed | The bagged true `/px4_71` topics versus the relay output, recorded by the witness |
 | **M-CS controller shim** | A P6 entry point imports the accepted `p5_control` and, before `main`, wraps `FrozenPolicy.scores`, `PolicyRanker.clock`, `StateCache.update` inputs or `Mission.ack` (policy faults F3; app-side state and ACK faults F2, F5) | Yes, in the same process, through the accepted classes | No new publisher. Delays are bounded and declared. With the shim pass-through, decisions must equal the P5 replay bit for bit | Off = the accepted entry point | The policy ledger (accepted code: `failure`, `inference_s`), the timing trace and `ros-events.jsonl`; for state faults, the bagged true PX4 messages versus the shim-modified values in the fault ledger |
 | **M-PS process signals** | SIGINT, SIGSTOP/SIGCONT (bounded) or SIGKILL to one owned process (bridge, adapter, perception, controller, DDS agent, clock bridge) | Yes | None until injection | Signal not sent | `processes.txt`, exit codes, `/proc` state, P3 cleanup classification, and the PX4 side in the ULog |
 | **M-LH load harness** | N bounded CPU or memory workers inside the owned namespace | Indirectly, through scheduling | Intended. No host or WSL setting is changed | Workers exit at their deadline, or are killed in cleanup | `resources.jsonl` (per-process CPU and RSS), `/proc/pressure`, schedstat as in the P5 diagnostic |
@@ -329,7 +338,7 @@ Two consequences, verified from code and to be confirmed in M3:
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** baseline and contract audit | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered |
+| **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised |
 | **M1** taxonomy and scenarios | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
@@ -376,8 +385,8 @@ Two consequences, verified from code and to be confirmed in M3:
 * **The relays add load.** That is about 37 MB/s for depth, in a host already near its limits (the
   P5 history). Pass-through runs must re-establish every P2–P5 limit before fault runs mean
   anything.
-* **PX4-managed outcomes are unknown** until M0 (D4). Some required scenarios may become
-  characterization.
+* **PX4-managed outcomes.** M0 showed they end in a Return that lands but breaches the P4 ceiling
+  and may pass close over obstacle tops (D4a).
 * **Load harness risk.** It can push WSL into the class 1 and class 2 stalls seen in P5. It must
   be bounded, and stop before the stack does.
 * **No host changes.** No hardware, no host configuration change and no real-flight
