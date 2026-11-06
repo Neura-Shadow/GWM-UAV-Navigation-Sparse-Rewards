@@ -898,7 +898,12 @@ no new candidate and no further gates.
   * The old manifest `db4c4779…` now refuses to verify, because its build receipt no longer matches the
     source. Its Gate A, B and S results and the failed Gate C stay preserved; its build receipt is
     archived as `state/p5-built-35eaccd0.json`.
-  * A new P5 package build receipt follows this commit.
+  * Built from candidate commit `40a109b` with `build_p5.sh --build`:
+    * P5 package hash `e7a59f3506ea655d…`;
+    * receipt SHA-256 `4ad00688bb88bb19…`;
+    * colcon installed tests 3 / 3 passed.
+    The receipt matches the source (`p5_manifest.p5_build`), and the installed `observation_adapter.py`
+    equals the source (`842e0d9f…`). The previous install `p5_ws/35eaccd0…` is retained.
 * **Next, each separately approved:**
   1. Policy A approval for this candidate commit;
   2. `p5_manifest.py freeze`;
