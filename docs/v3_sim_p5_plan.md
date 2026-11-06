@@ -909,11 +909,19 @@ no new candidate and no further gates.
   2. `p5_manifest.py freeze`;
   3. Gates A → B → S → C, bound to the new manifest SHA.
 
-### 13.18 Candidate `40a109b`: Policy A approval (2026-11-06)
+### 13.18 Candidate `40a109b`: Policy A approval and freeze (2026-11-06)
 
 * **Policy A** (`bf1ef9b1…`) approved by the operator for `40a109b`:
   `state/p5-policy-A-approval-40a109b.json` (SHA-256 `34783fb092c5309f…`). The policy hash, QGC source
   commit `4568b585…` and unattended QGC ELF `82994283…` were re-checked and are unchanged.
-* **Not yet done:** the freeze. No manifest exists for this candidate, and no gate is authorized.
-* **Next, each separately approved:** `p5_manifest.py freeze`, then Gates A → B → S → C bound to the new
-  manifest SHA.
+* **Frozen** on operator authorization ("Authorize freeze", 2026-11-06): `state/p5-candidate-40a109b.json`,
+  manifest SHA-256 **`2becfbbb794006833d0a224b819db702135b0a0c9ff25da6577a7c1dd5238632`**, re-verified.
+  * Same as `db4c4779…`: model `ee006a80…`, schema, controller runtime, P3 and P4 baselines, MC benchmark
+    run `20261025T051926Z-mc-trace-benchmark-e6000074`, Policy A hash, QGC build, gates and qualification
+    flights.
+  * Different, as expected: `p5_contract_revision` (names revision 3), `p5_source_files`
+    (`observation_adapter.py` and `p5_validation.yaml` only), `p5_build` (package `e7a59f35…`, receipt
+    `4ad00688…`) and the Policy A approval path.
+* **No acceptance credit** transfers from `db4c4779…`.
+* **Next:** a Gate A authorization bound to `2becfbbb…`, then B → S → C, each separately authorized, one
+  run each, no retries.
