@@ -925,3 +925,25 @@ no new candidate and no further gates.
 * **No acceptance credit** transfers from `db4c4779…`.
 * **Next:** a Gate A authorization bound to `2becfbbb…`, then B → S → C, each separately authorized, one
   run each, no retries.
+
+### 13.19 P5 Gate A for manifest `2becfbbb…`: ACCEPTED (2026-11-06, one attempt)
+
+* **Authorization:** operator "Authorize Gate A", 2026-11-06; `state/p5-auth-A-2becfbbb7940.json`
+  (SHA-256 `39110249…`). Result: `state/p5-gate-A-2becfbbb….result.json` (SHA-256 `3a30744c…`),
+  `accepted: true`, no first failure, no automatic retry. Ran 12:41:38–12:49:24 UTC. No residual
+  simulator processes.
+
+  | Row | Run | Evaluation |
+  |---|---|---|
+  | p3-readiness | `20261106T124223Z-p5-p3_readiness-203a1692` | passed |
+  | p5-readiness | `20261106T124337Z-p5-p5_readiness-9fbea523` | passed: checkpoint `ee006a80…` verified at start, NumPy 1.26.4, P2 timing passed, perception compute p99 40.6 ms, max 42.9 ms |
+  | fixture-G2 | `20261106T124455Z-p5-G2-a791c2e6` | passed: 150 snapshots, all SCAN, policy not invoked, mask equals P4's, p99 0.51 ms, max 0.79 ms |
+  | fixture-G4 | `20261106T124612Z-p5-G4-06148172` | passed: 150 snapshots, all SCAN, p99 0.54 ms, max 0.82 ms |
+  | fixture-G6 | `20261106T124727Z-p5-G6-cefb6bca` | passed: 150 snapshots, all SCAN, p99 0.43 ms, max 0.58 ms |
+  | policy-failure-replay | `20261106T124823Z-p5-flight-snapshot-replay-e1457e47` | passed: all six faults give HOLD, HOLD, `policy_unavailable` |
+  | policy-fault-checkpoint | `20261106T124846Z-p5-policy-fault-checkpoint_mismatch-c4c7ec00` | passed: refused with `checkpoint_sha256_mismatch` before any node |
+
+* The ground inference times are about half of `db4c4779`'s Gate A (fixture p99 0.43–0.54 ms against
+  0.77–1.15 ms), consistent with revision 3. Ground fixtures do not invoke the policy on a progress
+  candidate, so this says nothing about the flight tail.
+* **Next:** Gate B, one S2 SITL smoke flight, with its own operator authorization bound to `2becfbbb…`.
