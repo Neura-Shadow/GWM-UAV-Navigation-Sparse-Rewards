@@ -342,7 +342,7 @@ Two consequences, verified from code and to be confirmed in M3:
 |---|---|---|
 | **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised and approved |
 | **M1** taxonomy and scenarios — **COMPLETE 2026-11-06** (§11; the scenario list and four corrections approved by the operator) | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
-| **M2** injection infrastructure | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
+| **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
@@ -454,3 +454,79 @@ The decisions, with the recommendation first for each, are in contract §10:
      `enabled`; `p5_policy.yaml` `enabled`, `model.path`, `model.sha256`. Without that, every run
      would fail C11. **Applied:** contract §2 C11.
 * **M1 is complete.** M2 (the injection infrastructure) is next and needs its own authorization.
+
+## 12. M2 record: fault-injection infrastructure (2026-11-06, authorized by the operator: "Authorize M2")
+
+Nothing was launched. No simulator, PX4, QGC or ROS node ran, and no P2–P5 file changed. The work
+is code and offline tests only, all in `simulation/px4_gazebo_p6/` and `tests/`.
+
+### 12.1 What was built
+
+| Module (`injection/`) | Role |
+|---|---|
+| `specs.py`, `declaration.py` | Read the frozen M1 specs. A run's fault declaration is built only from a frozen row (with its row digest), and every injector refuses a declaration that differs. The D8 load bounds are checked at declaration time. Modes: `off`, `pass-through`, `active` |
+| `fault_ledger.py` | One append-only ledger per injector process (`p6/fault-ledger-<injector>.jsonl`): exclusive create, strict JSON, sequenced kinds (declared, armed, activated, affected, cleared, finished) |
+| `schedule.py` | Pure triggers on the controller's own `p4_decision` and `transition` events (`transit_start`, `avoiding_first`, `avoiding_near`, `normal_2m`; `ground_window` fired by the runner), fault windows and invocation plans |
+| `depth_faults.py`, `depth_relay.py` | DR: the F1 transforms. The relay node copies the bridge's QoS and republishes the received object itself whenever a frame is untouched. Activated by SIGUSR1 |
+| `state_faults.py`, `state_relay.py` | SR: pose withheld from perception, through `--px4-prefix`. CS: app-side state and ACK faults. MR: snapshot and health drop, delay, reorder and burst |
+| `policy_faults.py`, `controller_shim.py` | CS and MR: the accepted `p5_control` with wrappers on `P5Mission.tick`, `on_snapshot`, `on_adapter_health` and `ack`, `FrozenPolicy.scores`, `candidate_ranker.policy_choice` and `StateCache.update`. Delays are real sleeps, measured by the accepted `PolicyRanker` clock. Uninstall restores every original |
+| `witness.py` | A passive recorder of raw and relayed topics (CRC-32 fingerprints). It contains no publisher |
+| `competing_publisher.py` | F4.07: advertises a PX4-input topic and contains no publish call |
+| `process_faults.py` | PS: one declared signal. SIGSTOP is bounded and proven from `/proc/<pid>/stat` |
+| `load_harness.py` | LH: CPU and memory workers inside the D8 bounds, which stop themselves at their deadline |
+
+### 12.2 Offline tests
+
+`tests/test_px4_gazebo_p6_injection.py` has 29 tests; with the 7 spec checks that is 36 P6 tests.
+
+* **Windows:** 34 passed, 2 skipped (POSIX-only).
+* **Linux:** 36 passed.
+
+Every injected fault is checked against the accepted code it targets:
+* the P3 decoder and pipeline: `dimension_mismatch`, and the exact 5/5/5 stamp rejections;
+* the P3 calibration cache;
+* the P2 `StateCache`: `state_time_backwards`, `clock_epoch_mismatch`, `invalid_estimate`,
+  `vehicle_health_invalid`;
+* the P5 selection: `output_not_finite`, `output_shape`, `input_not_finite`.
+
+Seven rig flights use the accepted P5 mission rig with the trained model and a deterministic policy
+clock:
+* **B-0:** pass-through is bit-identical to the unwrapped mission, in every event, ledger record,
+  action and counter.
+* **B-1 and S-3:** HOLD for 3 consecutive ticks, then `policy_unavailable`, then LAND.
+* **C-2:** exactly 5 isolated timeouts; the mission completes.
+* **C-3:** every choice is the worst allowed slot, inside the mask.
+* **S-4:** a stale HOVER, then recovery and the goal.
+* **S-5′:** exactly one 60 ms tick delay.
+
+The static checks cover: no `/fmu/in` use outside the competing publisher; no accepted file refers to
+P6.
+
+### 12.3 Bug found and fixed while testing
+
+Map faults (mechanism MR) are implemented in the shim, but the shim had enabled itself only for
+mechanism CS. The S-4 rig flight dropped nothing, and the test caught it. The shim now serves both
+mechanisms, and a test pins that.
+
+### 12.4 Exit criterion: pass-through bit identity on recorded inputs
+
+`validation/p6_passthrough_check.py` ran under the controller interpreter (NumPy 1.26.4), read-only,
+on two accepted `2becfbbb` flights:
+
+| Block | Gate C S2 `20261106T132442Z-…-184a5a5e` | Gate S S5 `20261106T130920Z-…-aa867e25` |
+|---|---|---|
+| Policy-ledger tensors: shim identical; equal to the recorded scores and argmax | 831 / 831 | 649 / 649 |
+| Reproduced decision ticks through `PolicyRanker.choose` | 265, identical | 160, identical |
+| PX4 state receipts through `StateCache.update` | 19,318, identical | 20,093, identical |
+| Local-map snapshots through `P5Mission.on_snapshot` | 1,328, identical | 1,369, identical |
+| Recorded raw depth frames (each checked against its recorded SHA-256): pass-through returns the same object | 300 | 300 |
+| Active F1.07 / F1.06 on recorded frames | 10 `dimension_mismatch`; 5/5/5 stamp rejections | same |
+
+The reports are `docs/evidence/v3_sim_p6_m2_passthrough_2becfbbb_gate_{c_s2,s_s5}.json`. Both
+report `passed: true`.
+
+### 12.5 Not yet exercised
+
+The ROS node wrappers (`depth_relay`, `state_relay`, `witness`, `competing_publisher`) are only
+import-tested; they have never run against ROS. Their first live use is M5 (ground integration),
+which needs its own authorization. The P6 runner, manifest and evaluators are M4/M5 work.

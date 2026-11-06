@@ -1,0 +1,40 @@
+{
+  "contract": "p6-passthrough-check-v1",
+  "run": "20261106T132442Z-p5-flight-S2-184a5a5e",
+  "numpy": "1.26.4",
+  "policy": {
+    "records": 831,
+    "shim_identical": true,
+    "recorded_scores_equal": 831,
+    "recorded_argmax_equal": 831
+  },
+  "decisions": {
+    "ticks": 265,
+    "shim_identical": true,
+    "failures": 0
+  },
+  "state": {
+    "receipts": 19318,
+    "shim_identical": true
+  },
+  "map": {
+    "snapshots": 1328,
+    "usable": 1314,
+    "shim_identical": true
+  },
+  "depth": {
+    "frames": 300,
+    "integrity_checked": 300,
+    "pass_through_same_object": true,
+    "f1_07_reasons": {
+      "dimension_mismatch": 10,
+      "decoded": 10
+    },
+    "f1_06_rejections": {
+      "duplicate_acquisition_stamp": 5,
+      "acquisition_stamp_backwards": 5,
+      "missing_acquisition_stamp": 5
+    }
+  },
+  "passed": true
+}
