@@ -969,3 +969,22 @@ no new candidate and no further gates.
   compute p99 27.3 ms and max 58.3 ms (limits 50 and 90 ms).
 * One flight bounds nothing about the rare-stall rate; Gate C flies S2 again with S3 and S4.
 * **Next:** Gate S (S1, S5, S6 in order), with its own operator authorization bound to `2becfbbb…`.
+
+### 13.21 P5 Gate S for manifest `2becfbbb…`: ACCEPTED (2026-11-06; S1, S5, S6 in order)
+
+* **Authorization:** operator "Authorize Gate S", 2026-11-06; `state/p5-auth-S-2becfbbb7940.json`
+  (SHA-256 `45c434e4…`). Result: `state/p5-gate-S-2becfbbb….result.json` (SHA-256 `9df073fd…`),
+  `accepted: true`, no first failure. Ran 13:05:21–13:15:06 UTC. No residual simulator processes.
+
+  | Flight | Run | Outcome | Safety (truth) | Policy | Inference p99 / max |
+  |---|---|---|---|---|---|
+  | S1 | `20261106T130613Z-p5-flight-S1-ab86576e` | `goal_reached`, no supervisor transitions, final goal distance 0.061 m | 0 collisions, tracking max 0.246 m | 801 of 827 invoked, participation 1.0, no interventions | 0.91 / 2.11 ms |
+  | S5 | `20261106T130920Z-p5-flight-S5-aa867e25` | `safe_refusal`: OBSTACLE_DETECTED, AVOIDING, HOVER, ABORT `hover_timeout` | 0 collisions, clearance 0.916 m, tracking max 0.225 m | 649 of 1,051 invoked, participation 1.0, shield `yaw_to_l4` on 351 | 0.85 / 1.69 ms |
+  | S6 | `20261106T131246Z-p5-flight-S6-d907451a` | `safe_stop_on_sensor_loss`: OBSTACLE_DETECTED, AVOIDING, HOVER, ABORT `stale_inputs:snapshot_stale` | 0 collisions, clearance 1.240 m, tracking max 0.244 m | 232 of 434 invoked, participation 1.0, no interventions | 0.93 / 1.22 ms |
+
+* In all three flights: 0 failure ticks, 0 choices outside the mask, 0 fallbacks, 0 score, argmax or
+  executed-segment mismatches; checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 27.0–30.0 ms, max ≤ 45.5 ms.
+* The `db4c4779` Gate S had an inference maximum of 5.08 ms (S5). Across Gates B and S of `2becfbbb`
+  the maximum is 2.11 ms over 2,516 invocations.
+* **Next:** Gate C (S2, S3, S4 in order), with its own operator authorization bound to `2becfbbb…`.
