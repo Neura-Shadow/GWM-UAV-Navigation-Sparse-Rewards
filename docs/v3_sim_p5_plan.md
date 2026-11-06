@@ -947,3 +947,25 @@ no new candidate and no further gates.
   0.77–1.15 ms), consistent with revision 3. Ground fixtures do not invoke the policy on a progress
   candidate, so this says nothing about the flight tail.
 * **Next:** Gate B, one S2 SITL smoke flight, with its own operator authorization bound to `2becfbbb…`.
+
+### 13.20 P5 Gate B for manifest `2becfbbb…`: ACCEPTED (2026-11-06, one S2 SITL flight)
+
+* **Authorization:** operator "Authorize Gate B", 2026-11-06; `state/p5-auth-B-2becfbbb7940.json`
+  (SHA-256 `42a2be94…`). Result: `state/p5-gate-B-2becfbbb….result.json` (SHA-256 `3c53a7e2…`),
+  `accepted: true`, no first failure. Run: `20261106T130044Z-p5-flight-S2-679dd050`. The independent
+  evaluation passed with no failures. Ran 12:59:52–13:03:34 UTC. No residual simulator processes.
+* **Outcome:** `goal_reached_with_detour`. The supervisor sequence matches P4's (OBSTACLE_DETECTED and
+  AVOIDING at 81.7 s, RESUME at 97.3 s, NORMAL at 114.6 s). Response latency 0.092 s.
+* **Safety (truth):** 0 collisions. Minimum clearance 0.420 m (limit ≥ 0.20). Tracking max 0.241 m
+  (limit ≤ 0.30).
+* **Policy participation (§6 limits):**
+  * 859 ledger records for 859 decisions; the policy was invoked on 834 of them.
+  * 0 failure ticks, 0 choices outside the mask, 0 fallbacks; participation 1.0.
+  * 0 score, argmax, executed-segment or checkpoint mismatches under the controller interpreter.
+  * Inference p50 0.36 ms, p95 0.66 ms, p99 1.06 ms, **max 2.07 ms** (limits 5 and 10 ms). The
+    `db4c4779` Gate B S2 flight had p99 1.73 ms and max 6.0 ms.
+  * Disagreement with the shadow P4 choice 0.64. No shield interventions.
+* **Unchanged limits:** checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 27.3 ms and max 58.3 ms (limits 50 and 90 ms).
+* One flight bounds nothing about the rare-stall rate; Gate C flies S2 again with S3 and S4.
+* **Next:** Gate S (S1, S5, S6 in order), with its own operator authorization bound to `2becfbbb…`.
