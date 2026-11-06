@@ -1,7 +1,9 @@
 # v3-SIM P6 — failure injection, fault-tolerant control and safety validation: plan
 
 **Status: PLANNING ONLY (2026-11-06).** Nothing in P6 is implemented, frozen, launched or accepted.
-The [P6 contract](v3_sim_p6_contract.md) is a draft awaiting operator decisions (§10). The fault
+The [P6 contract](v3_sim_p6_contract.md) is a draft. The operator answered decisions D1–D10 on
+2026-11-06, all as recommended (contract §10 decision record). The contract itself and M0 are not
+yet approved. The fault
 list is in the [fault matrix](v3_sim_p6_fault_matrix.md), and the preservation of P3–P5 evidence
 in the [evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The milestones in §7 are
 proposals, not permission to implement or execute them.
@@ -383,7 +385,12 @@ Two consequences, verified from code and to be confirmed in M3:
 
 ## 10. Decisions requiring operator approval
 
-These are in contract §10, with a recommendation first for each:
+**Answered 2026-11-06, all as recommended.** The record is in contract §10. The next approvals are:
+
+1. the contract as a whole, with its remaining PENDING limits;
+2. M0, a read-only audit: source, ULogs and evaluator checks, with no simulator.
+
+The decisions, with the recommendation first for each, are in contract §10:
 
 * **D1:** injection architecture.
 * **D2:** shim identity.

@@ -285,7 +285,11 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   hardware). Candidate `c110bd30`; safety S1/S5/S6 3/3; seven flights, 0 collisions.
   [Final acceptance](v3_sim_p4_final_acceptance.md), [contract](v3_sim_p4_contract.md),
   [design](v3_sim_p4_plan.md). P5 is the next phase.
-- [ ] P5 Fixed-weight policy substitution
+- [x] P5 Fixed-weight policy substitution — **P5 COMPLETE — Qualification 3/3 PASSED** (contract
+  `p5-acceptance-v1`, revisions 1–3; Gates A, B, S and C passed for manifest `2becfbbb`; frozen
+  model `ee006a80`, no fallback, no online learning; PX4 SITL only, no hardware). Seven flights,
+  0 collisions, 0 policy failures. [Contract](v3_sim_p5_contract.md), [plan](v3_sim_p5_plan.md).
+  The earlier candidate `db4c4779` failed Gate C and remains on record.
 - [ ] P6 Failure validation — **planning underway** (2026-11-06; nothing implemented or accepted):
   [plan](v3_sim_p6_plan.md), draft [contract](v3_sim_p6_contract.md),
   [fault matrix](v3_sim_p6_fault_matrix.md),

@@ -1,8 +1,10 @@
 # v3-SIM P6 contract `p6-acceptance-v1` — fault injection and safety validation
 
-**Status: DRAFT, NOT APPROVED (2026-11-06).** This is a planning proposal. Nothing here authorizes
-implementation, freezing, simulator use or any gate. Every limit marked **PENDING** is a new
-proposal awaiting operator approval. All other limits are reused unchanged from P2–P5. See the
+**Status: DRAFT, NOT APPROVED (2026-11-06).** This is a planning proposal. The operator answered
+decisions D1–D10 on 2026-11-06, all as recommended (§10). The contract as a whole is still not
+approved. Nothing here authorizes implementation, freezing, simulator use or any gate. Every limit
+marked **PENDING** is a new proposal awaiting operator approval. All other limits are reused
+unchanged from P2–P5. See the
 [P6 plan](v3_sim_p6_plan.md) and the [fault matrix](v3_sim_p6_fault_matrix.md).
 
 ## 1. Scope and claims
@@ -108,8 +110,9 @@ Each run declares `t_inj` (activation) and, where applicable, `t_clear`.
   * that is a documented gap;
   * no required gate may count it as a pass.
 
-### 5.3 Load-window rule (D8)
+### 5.3 Load-window rule (D8; approved by the operator 2026-11-06)
 
+The approved bounds are at most 24 workers, at most 60 s per window, and memory ≤ 25 % of free RAM.
 Inside a declared load window, a breach of a P4 perception or P5 inference limit is acceptable
 only if the declared safe response for the resulting input condition follows:
 
@@ -309,6 +312,31 @@ The P6 manifest binds:
 Any change after freeze is a new P6 candidate.
 
 ## 10. Decisions requiring operator approval (recommendation first)
+
+**Decision record.** The operator answered all ten in chat on 2026-11-06, each as recommended:
+
+| Decision | Answer | Effect |
+|---|---|---|
+| D1 | relays + controller shim + process signals + bounded load harness | plan §4.2 rows M-DR, M-MR, M-CS, M-PS, M-LH; no PX4-native row |
+| D2 | shim runs accepted as "accepted code plus a declared, hashed shim" | pass-through bit identity is required (Gate A row 3, B-0) |
+| D3 | gates require only implemented behaviour | the matrix C items stay characterization |
+| D4 | derive PX4-managed expectations in M0, then approve | §5.2 stays PENDING; S-2 and S-5 stay contingent (§8.3) |
+| D5 | no PX4-native failure injection in v1 | F2.10 and F5.08 deferred; Policy A unchanged |
+| D6 | Gate B = B-0 pass-through + B-1 smoke | §8.2 as written |
+| D7 | GCS link loss by source analysis only, never flown | F5.12 stays D |
+| D8 | bounded load windows | §5.3 approved with its bounds |
+| D9 | two backup copies: external disk + versioned cloud store | the paths and destination still need naming before any copy or upload |
+| D10 | keep all accepted, failed and cited diagnostic evidence indefinitely | no deletion |
+
+These answers fix the design choices only. Still to approve or authorize, each separately:
+
+* the contract as a whole;
+* the remaining PENDING limits (§5.1, §5.2, §5.4);
+* each milestone, starting with M0;
+* any freeze or gate;
+* the backup paths.
+
+The original options are kept below.
 
 * **D1 — injection architecture.**
   * **Recommended:** producer-side relays (DR, MR) where M0 confirms remap support, the in-process

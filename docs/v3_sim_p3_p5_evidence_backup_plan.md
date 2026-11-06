@@ -1,8 +1,14 @@
 # v3-SIM P3–P5 raw-evidence inventory and backup plan — PROPOSED
 
 **Status: planning only (2026-11-06).** The inventory below was taken read-only. Nothing was
-deleted, moved, compressed, copied or uploaded, and no backup exists yet. The storage target and
-retention need operator decisions D9 and D10 ([P6 contract](v3_sim_p6_contract.md) §10).
+deleted, moved, compressed, copied or uploaded, and no backup exists yet.
+
+**Decided by the operator on 2026-11-06** ([P6 contract](v3_sim_p6_contract.md) §10):
+* **D9:** two copies, on an external disk and in a versioned cloud object store.
+* **D10:** keep all accepted, failed and cited diagnostic evidence indefinitely.
+
+**Still needed before any copy or upload:** the external disk path, the cloud destination and
+authorization of the backup step.
 
 **Why a backup.** GitHub holds the sources, contracts, reports and small evidence summaries
 (`docs/evidence/`). The raw acceptance evidence exists only on this machine, under
