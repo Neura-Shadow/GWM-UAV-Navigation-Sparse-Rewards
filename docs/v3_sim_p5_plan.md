@@ -908,3 +908,12 @@ no new candidate and no further gates.
   1. Policy A approval for this candidate commit;
   2. `p5_manifest.py freeze`;
   3. Gates A → B → S → C, bound to the new manifest SHA.
+
+### 13.18 Candidate `40a109b`: Policy A approval (2026-11-06)
+
+* **Policy A** (`bf1ef9b1…`) approved by the operator for `40a109b`:
+  `state/p5-policy-A-approval-40a109b.json` (SHA-256 `34783fb092c5309f…`). The policy hash, QGC source
+  commit `4568b585…` and unattended QGC ELF `82994283…` were re-checked and are unchanged.
+* **Not yet done:** the freeze. No manifest exists for this candidate, and no gate is authorized.
+* **Next, each separately approved:** `p5_manifest.py freeze`, then Gates A → B → S → C bound to the new
+  manifest SHA.
