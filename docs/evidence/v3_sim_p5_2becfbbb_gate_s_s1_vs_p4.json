@@ -1,0 +1,117 @@
+{
+  "contract": "p5-comparison-v1",
+  "kind": "sitl_paired_flight",
+  "acceptance_evidence": false,
+  "scenario": "S1",
+  "p5": {
+    "run": "20261106T130613Z-p5-flight-S1-ab86576e",
+    "scenario": "S1",
+    "evaluation_status": "passed",
+    "controller": "p5_control",
+    "outcome": "goal_reached",
+    "safety": {
+      "min_truth_clearance_m": null,
+      "collisions": 0,
+      "tracking_max_m": 0.24645447569700404,
+      "abort_reason": null
+    },
+    "lineage": [],
+    "reported": {
+      "path_length_m": 9.430542390675331,
+      "detour_ratio": 1.1788177988344164,
+      "time_to_goal_sim_s": 41.336,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.08800000000000807,
+        "max": 0.16800000000000637
+      },
+      "transit_setpoint_gap_max_sim_s": 0.055999999999997385,
+      "controller_cpu_fraction": 0.37602495424016186,
+      "controller_rss_max_kb": 203096
+    },
+    "rtf": {
+      "min_interval_rtf": 0.045956149779295345,
+      "rtf": 0.9986005086031421,
+      "samples": 1292,
+      "sim_s": 133.56,
+      "wall_s": 133.747178025
+    }
+  },
+  "p4": {
+    "run": "20261030T143104Z-p4-flight-S1-24276ada",
+    "scenario": "S1",
+    "evaluation_status": "passed",
+    "controller": "p4_control",
+    "outcome": "goal_reached",
+    "safety": {
+      "min_truth_clearance_m": null,
+      "collisions": 0,
+      "tracking_max_m": 0.23276198316280178,
+      "abort_reason": null
+    },
+    "lineage": [],
+    "reported": {
+      "path_length_m": 9.500410848560866,
+      "detour_ratio": 1.1875513560701083,
+      "time_to_goal_sim_s": 41.224000000000004,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.09999999999999432,
+        "max": 0.1840000000000117
+      },
+      "transit_setpoint_gap_max_sim_s": 0.05999999999998806,
+      "controller_cpu_fraction": 0.4629516620702386,
+      "controller_rss_max_kb": 198492
+    },
+    "rtf": {
+      "min_interval_rtf": 0.026032462699659184,
+      "rtf": 0.9979385445649266,
+      "samples": 1291,
+      "sim_s": 133.304,
+      "wall_s": 133.579367914
+    }
+  },
+  "safety": {
+    "same_outcome": true,
+    "min_truth_clearance_difference_m": null,
+    "tracking_max_difference_m": 0.013692492534202266
+  },
+  "decision_quality": {
+    "path_difference_m": -0.0698684578855353,
+    "detour_ratio_difference": -0.008733557235691913,
+    "time_to_goal_difference_s": 0.11199999999999477,
+    "same_lineage": true
+  },
+  "per_decision": {
+    "invoked": 801,
+    "disagreements": 441,
+    "disagreement_rate": 0.550561797752809,
+    "interventions": {
+      "none": 801
+    },
+    "participation_fraction": 1.0,
+    "inference_s": {
+      "count": 801,
+      "max": 0.0021114760002092225,
+      "p50": 0.00034373000016785227,
+      "p95": 0.0005987770000501769,
+      "p99": 0.000909492000573664
+    }
+  },
+  "host": {
+    "p5_controller_cpu_fraction": 0.37602495424016186,
+    "p4_controller_cpu_fraction": 0.4629516620702386,
+    "p5_rtf": {
+      "min_interval_rtf": 0.045956149779295345,
+      "rtf": 0.9986005086031421,
+      "samples": 1292,
+      "sim_s": 133.56,
+      "wall_s": 133.747178025
+    },
+    "p4_rtf": {
+      "min_interval_rtf": 0.026032462699659184,
+      "rtf": 0.9979385445649266,
+      "samples": 1291,
+      "sim_s": 133.304,
+      "wall_s": 133.579367914
+    }
+  }
+}

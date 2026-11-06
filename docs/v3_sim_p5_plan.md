@@ -988,3 +988,31 @@ no new candidate and no further gates.
 * The `db4c4779` Gate S had an inference maximum of 5.08 ms (S5). Across Gates B and S of `2becfbbb`
   the maximum is 2.11 ms over 2,516 invocations.
 * **Next:** Gate C (S2, S3, S4 in order), with its own operator authorization bound to `2becfbbb…`.
+
+### 13.22 P5 Gate C for manifest `2becfbbb…`: ACCEPTED (2026-11-06; S2, S3, S4 in order). P5 complete
+
+* **Authorization:** operator "Authorize Gate C", 2026-11-06; `state/p5-auth-C-2becfbbb7940.json`
+  (SHA-256 `d22b2f3b…`). Result: `state/p5-gate-C-2becfbbb….result.json` (SHA-256 `189710d1…`),
+  `accepted: true`, no first failure. Ran 13:24:01–13:33:47 UTC. No residual simulator processes.
+
+  | Flight | Run | Outcome | Safety (truth) | Policy | Inference p99 / max |
+  |---|---|---|---|---|---|
+  | S2 | `20261106T132442Z-p5-flight-S2-184a5a5e` | `goal_reached_with_detour`, OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL; response 0.100 s | 0 collisions, clearance 0.374 m, tracking max 0.260 m | 831 of 855 invoked, no interventions | 1.01 / 2.93 ms |
+  | S3 | `20261106T132750Z-p5-flight-S3-a8cf4c3b` | `goal_reached_with_detour`, same lineage; response 0.152 s | 0 collisions, clearance 1.032 m, tracking max 0.237 m | 840 of 868 invoked, no interventions | 1.04 / 2.18 ms |
+  | S4 | `20261106T133057Z-p5-flight-S4-ad589abe` | `goal_reached_with_detour`, same lineage; response 0.164 s | 0 collisions, clearance 0.419 m, tracking max 0.245 m | 833 of 857 invoked, shield `yaw_to_l4` on 2 | 1.17 / 2.23 ms |
+
+* In all three flights: 0 failure ticks, 0 choices outside the mask, 0 fallbacks, participation 1.0,
+  0 score, argmax or executed-segment mismatches; checkpoint `ee006a80…` verified at start; P2 timing
+  passed; perception compute p99 23.0–24.3 ms, max ≤ 32.5 ms.
+* **P5 is complete** (contract §9: A, B, S and C accepted for the same manifest, `2becfbbb…`). The
+  manifest re-verifies after the gates.
+* **Inference across the seven flights of `2becfbbb`:** max 2.93 ms over 5,020 invocations; every
+  flight's p99 ≤ 1.17 ms. This is evidence for revision 3, not a bound on rare stalls: the recovery
+  plan's class 2 stalls are outside the policy code and were not seen in these flights.
+* **Against the accepted P4 flights** (reported only, `p5-comparison-v1`,
+  `docs/evidence/v3_sim_p5_2becfbbb_*_vs_p4.json`, one file per flight of Gates B, S and C): the same
+  outcome and supervisor lineage as P4 in all seven. Gate C clearance differences −0.072, +0.151 and
+  −0.055 m; time to goal −1.4, −10.2 and −2.1 s. P5 claims correct substitution only; superiority
+  needs P7's paired batches.
+* **Preserved:** the `db4c4779…` evidence (Gates A, B and S accepted, Gate C failed) and the
+  `baef37a0…` failed Gate A remain on record, unchanged.
