@@ -898,8 +898,121 @@ no new candidate and no further gates.
   * The old manifest `db4c4779…` now refuses to verify, because its build receipt no longer matches the
     source. Its Gate A, B and S results and the failed Gate C stay preserved; its build receipt is
     archived as `state/p5-built-35eaccd0.json`.
-  * A new P5 package build receipt follows this commit.
+  * Built from candidate commit `40a109b` with `build_p5.sh --build`:
+    * P5 package hash `e7a59f3506ea655d…`;
+    * receipt SHA-256 `4ad00688bb88bb19…`;
+    * colcon installed tests 3 / 3 passed.
+    The receipt matches the source (`p5_manifest.p5_build`), and the installed `observation_adapter.py`
+    equals the source (`842e0d9f…`). The previous install `p5_ws/35eaccd0…` is retained.
 * **Next, each separately approved:**
   1. Policy A approval for this candidate commit;
   2. `p5_manifest.py freeze`;
   3. Gates A → B → S → C, bound to the new manifest SHA.
+
+### 13.18 Candidate `40a109b`: Policy A approval and freeze (2026-11-06)
+
+* **Policy A** (`bf1ef9b1…`) approved by the operator for `40a109b`:
+  `state/p5-policy-A-approval-40a109b.json` (SHA-256 `34783fb092c5309f…`). The policy hash, QGC source
+  commit `4568b585…` and unattended QGC ELF `82994283…` were re-checked and are unchanged.
+* **Frozen** on operator authorization ("Authorize freeze", 2026-11-06): `state/p5-candidate-40a109b.json`,
+  manifest SHA-256 **`2becfbbb794006833d0a224b819db702135b0a0c9ff25da6577a7c1dd5238632`**, re-verified.
+  * Same as `db4c4779…`: model `ee006a80…`, schema, controller runtime, P3 and P4 baselines, MC benchmark
+    run `20261025T051926Z-mc-trace-benchmark-e6000074`, Policy A hash, QGC build, gates and qualification
+    flights.
+  * Different, as expected: `p5_contract_revision` (names revision 3), `p5_source_files`
+    (`observation_adapter.py` and `p5_validation.yaml` only), `p5_build` (package `e7a59f35…`, receipt
+    `4ad00688…`) and the Policy A approval path.
+* **No acceptance credit** transfers from `db4c4779…`.
+* **Next:** a Gate A authorization bound to `2becfbbb…`, then B → S → C, each separately authorized, one
+  run each, no retries.
+
+### 13.19 P5 Gate A for manifest `2becfbbb…`: ACCEPTED (2026-11-06, one attempt)
+
+* **Authorization:** operator "Authorize Gate A", 2026-11-06; `state/p5-auth-A-2becfbbb7940.json`
+  (SHA-256 `39110249…`). Result: `state/p5-gate-A-2becfbbb….result.json` (SHA-256 `3a30744c…`),
+  `accepted: true`, no first failure, no automatic retry. Ran 12:41:38–12:49:24 UTC. No residual
+  simulator processes.
+
+  | Row | Run | Evaluation |
+  |---|---|---|
+  | p3-readiness | `20261106T124223Z-p5-p3_readiness-203a1692` | passed |
+  | p5-readiness | `20261106T124337Z-p5-p5_readiness-9fbea523` | passed: checkpoint `ee006a80…` verified at start, NumPy 1.26.4, P2 timing passed, perception compute p99 40.6 ms, max 42.9 ms |
+  | fixture-G2 | `20261106T124455Z-p5-G2-a791c2e6` | passed: 150 snapshots, all SCAN, policy not invoked, mask equals P4's, p99 0.51 ms, max 0.79 ms |
+  | fixture-G4 | `20261106T124612Z-p5-G4-06148172` | passed: 150 snapshots, all SCAN, p99 0.54 ms, max 0.82 ms |
+  | fixture-G6 | `20261106T124727Z-p5-G6-cefb6bca` | passed: 150 snapshots, all SCAN, p99 0.43 ms, max 0.58 ms |
+  | policy-failure-replay | `20261106T124823Z-p5-flight-snapshot-replay-e1457e47` | passed: all six faults give HOLD, HOLD, `policy_unavailable` |
+  | policy-fault-checkpoint | `20261106T124846Z-p5-policy-fault-checkpoint_mismatch-c4c7ec00` | passed: refused with `checkpoint_sha256_mismatch` before any node |
+
+* The ground inference times are about half of `db4c4779`'s Gate A (fixture p99 0.43–0.54 ms against
+  0.77–1.15 ms), consistent with revision 3. Ground fixtures do not invoke the policy on a progress
+  candidate, so this says nothing about the flight tail.
+* **Next:** Gate B, one S2 SITL smoke flight, with its own operator authorization bound to `2becfbbb…`.
+
+### 13.20 P5 Gate B for manifest `2becfbbb…`: ACCEPTED (2026-11-06, one S2 SITL flight)
+
+* **Authorization:** operator "Authorize Gate B", 2026-11-06; `state/p5-auth-B-2becfbbb7940.json`
+  (SHA-256 `42a2be94…`). Result: `state/p5-gate-B-2becfbbb….result.json` (SHA-256 `3c53a7e2…`),
+  `accepted: true`, no first failure. Run: `20261106T130044Z-p5-flight-S2-679dd050`. The independent
+  evaluation passed with no failures. Ran 12:59:52–13:03:34 UTC. No residual simulator processes.
+* **Outcome:** `goal_reached_with_detour`. The supervisor sequence matches P4's (OBSTACLE_DETECTED and
+  AVOIDING at 81.7 s, RESUME at 97.3 s, NORMAL at 114.6 s). Response latency 0.092 s.
+* **Safety (truth):** 0 collisions. Minimum clearance 0.420 m (limit ≥ 0.20). Tracking max 0.241 m
+  (limit ≤ 0.30).
+* **Policy participation (§6 limits):**
+  * 859 ledger records for 859 decisions; the policy was invoked on 834 of them.
+  * 0 failure ticks, 0 choices outside the mask, 0 fallbacks; participation 1.0.
+  * 0 score, argmax, executed-segment or checkpoint mismatches under the controller interpreter.
+  * Inference p50 0.36 ms, p95 0.66 ms, p99 1.06 ms, **max 2.07 ms** (limits 5 and 10 ms). The
+    `db4c4779` Gate B S2 flight had p99 1.73 ms and max 6.0 ms.
+  * Disagreement with the shadow P4 choice 0.64. No shield interventions.
+* **Unchanged limits:** checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 27.3 ms and max 58.3 ms (limits 50 and 90 ms).
+* One flight bounds nothing about the rare-stall rate; Gate C flies S2 again with S3 and S4.
+* **Next:** Gate S (S1, S5, S6 in order), with its own operator authorization bound to `2becfbbb…`.
+
+### 13.21 P5 Gate S for manifest `2becfbbb…`: ACCEPTED (2026-11-06; S1, S5, S6 in order)
+
+* **Authorization:** operator "Authorize Gate S", 2026-11-06; `state/p5-auth-S-2becfbbb7940.json`
+  (SHA-256 `45c434e4…`). Result: `state/p5-gate-S-2becfbbb….result.json` (SHA-256 `9df073fd…`),
+  `accepted: true`, no first failure. Ran 13:05:21–13:15:06 UTC. No residual simulator processes.
+
+  | Flight | Run | Outcome | Safety (truth) | Policy | Inference p99 / max |
+  |---|---|---|---|---|---|
+  | S1 | `20261106T130613Z-p5-flight-S1-ab86576e` | `goal_reached`, no supervisor transitions, final goal distance 0.061 m | 0 collisions, tracking max 0.246 m | 801 of 827 invoked, participation 1.0, no interventions | 0.91 / 2.11 ms |
+  | S5 | `20261106T130920Z-p5-flight-S5-aa867e25` | `safe_refusal`: OBSTACLE_DETECTED, AVOIDING, HOVER, ABORT `hover_timeout` | 0 collisions, clearance 0.916 m, tracking max 0.225 m | 649 of 1,051 invoked, participation 1.0, shield `yaw_to_l4` on 351 | 0.85 / 1.69 ms |
+  | S6 | `20261106T131246Z-p5-flight-S6-d907451a` | `safe_stop_on_sensor_loss`: OBSTACLE_DETECTED, AVOIDING, HOVER, ABORT `stale_inputs:snapshot_stale` | 0 collisions, clearance 1.240 m, tracking max 0.244 m | 232 of 434 invoked, participation 1.0, no interventions | 0.93 / 1.22 ms |
+
+* In all three flights: 0 failure ticks, 0 choices outside the mask, 0 fallbacks, 0 score, argmax or
+  executed-segment mismatches; checkpoint `ee006a80…` verified at start; P2 timing passed; perception
+  compute p99 27.0–30.0 ms, max ≤ 45.5 ms.
+* The `db4c4779` Gate S had an inference maximum of 5.08 ms (S5). Across Gates B and S of `2becfbbb`
+  the maximum is 2.11 ms over 2,516 invocations.
+* **Next:** Gate C (S2, S3, S4 in order), with its own operator authorization bound to `2becfbbb…`.
+
+### 13.22 P5 Gate C for manifest `2becfbbb…`: ACCEPTED (2026-11-06; S2, S3, S4 in order). P5 complete
+
+* **Authorization:** operator "Authorize Gate C", 2026-11-06; `state/p5-auth-C-2becfbbb7940.json`
+  (SHA-256 `d22b2f3b…`). Result: `state/p5-gate-C-2becfbbb….result.json` (SHA-256 `189710d1…`),
+  `accepted: true`, no first failure. Ran 13:24:01–13:33:47 UTC. No residual simulator processes.
+
+  | Flight | Run | Outcome | Safety (truth) | Policy | Inference p99 / max |
+  |---|---|---|---|---|---|
+  | S2 | `20261106T132442Z-p5-flight-S2-184a5a5e` | `goal_reached_with_detour`, OBSTACLE_DETECTED, AVOIDING, RESUME, NORMAL; response 0.100 s | 0 collisions, clearance 0.374 m, tracking max 0.260 m | 831 of 855 invoked, no interventions | 1.01 / 2.93 ms |
+  | S3 | `20261106T132750Z-p5-flight-S3-a8cf4c3b` | `goal_reached_with_detour`, same lineage; response 0.152 s | 0 collisions, clearance 1.032 m, tracking max 0.237 m | 840 of 868 invoked, no interventions | 1.04 / 2.18 ms |
+  | S4 | `20261106T133057Z-p5-flight-S4-ad589abe` | `goal_reached_with_detour`, same lineage; response 0.164 s | 0 collisions, clearance 0.419 m, tracking max 0.245 m | 833 of 857 invoked, shield `yaw_to_l4` on 2 | 1.17 / 2.23 ms |
+
+* In all three flights: 0 failure ticks, 0 choices outside the mask, 0 fallbacks, participation 1.0,
+  0 score, argmax or executed-segment mismatches; checkpoint `ee006a80…` verified at start; P2 timing
+  passed; perception compute p99 23.0–24.3 ms, max ≤ 32.5 ms.
+* **P5 is complete** (contract §9: A, B, S and C accepted for the same manifest, `2becfbbb…`). The
+  manifest re-verifies after the gates.
+* **Inference across the seven flights of `2becfbbb`:** max 2.93 ms over 5,020 invocations; every
+  flight's p99 ≤ 1.17 ms. This is evidence for revision 3, not a bound on rare stalls: the recovery
+  plan's class 2 stalls are outside the policy code and were not seen in these flights.
+* **Against the accepted P4 flights** (reported only, `p5-comparison-v1`,
+  `docs/evidence/v3_sim_p5_2becfbbb_*_vs_p4.json`, one file per flight of Gates B, S and C): the same
+  outcome and supervisor lineage as P4 in all seven. Gate C clearance differences −0.072, +0.151 and
+  −0.055 m; time to goal −1.4, −10.2 and −2.1 s. P5 claims correct substitution only; superiority
+  needs P7's paired batches.
+* **Preserved:** the `db4c4779…` evidence (Gates A, B and S accepted, Gate C failed) and the
+  `baef37a0…` failed Gate A remain on record, unchanged.

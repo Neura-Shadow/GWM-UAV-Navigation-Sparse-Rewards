@@ -1,0 +1,127 @@
+{
+  "contract": "p5-comparison-v1",
+  "kind": "sitl_paired_flight",
+  "acceptance_evidence": false,
+  "scenario": "S6",
+  "p5": {
+    "run": "20261106T131246Z-p5-flight-S6-d907451a",
+    "scenario": "S6",
+    "evaluation_status": "passed",
+    "controller": "p5_control",
+    "outcome": "safe_stop_on_sensor_loss",
+    "safety": {
+      "min_truth_clearance_m": 1.2396407298773433,
+      "collisions": 0,
+      "tracking_max_m": 0.2443532120767971,
+      "abort_reason": "stale_inputs:snapshot_stale"
+    },
+    "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+    ],
+    "reported": {
+      "path_length_m": 3.7677179708913724,
+      "detour_ratio": 0.47096474636142155,
+      "time_to_goal_sim_s": null,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.14399999999999125,
+        "max": 10.307999999999993
+      },
+      "transit_setpoint_gap_max_sim_s": 0.055999999999997385,
+      "controller_cpu_fraction": 0.4291802832080715,
+      "controller_rss_max_kb": 180640
+    },
+    "rtf": {
+      "min_interval_rtf": 0.002666384093945929,
+      "rtf": 0.9964941947062934,
+      "samples": 1053,
+      "sim_s": 108.696,
+      "wall_s": 109.078407659
+    }
+  },
+  "p4": {
+    "run": "20261030T143657Z-p4-flight-S6-6f435d5e",
+    "scenario": "S6",
+    "evaluation_status": "passed",
+    "controller": "p4_control",
+    "outcome": "safe_stop_on_sensor_loss",
+    "safety": {
+      "min_truth_clearance_m": 1.186926791582337,
+      "collisions": 0,
+      "tracking_max_m": 0.23680336038362254,
+      "abort_reason": "stale_inputs:snapshot_stale"
+    },
+    "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+    ],
+    "reported": {
+      "path_length_m": 3.8068905644218827,
+      "detour_ratio": 0.47586132055273533,
+      "time_to_goal_sim_s": null,
+      "decision_snapshot_age_sim_s": {
+        "p50": 0.1560000000000059,
+        "max": 10.328000000000003
+      },
+      "transit_setpoint_gap_max_sim_s": 0.06400000000000716,
+      "controller_cpu_fraction": 0.42755925827243235,
+      "controller_rss_max_kb": 180220
+    },
+    "rtf": {
+      "min_interval_rtf": 0.005311684144611745,
+      "rtf": 0.9979086145830911,
+      "samples": 1050,
+      "sim_s": 108.516,
+      "wall_s": 108.743424412
+    }
+  },
+  "safety": {
+    "same_outcome": true,
+    "min_truth_clearance_difference_m": 0.05271393829500637,
+    "tracking_max_difference_m": 0.00754985169317457
+  },
+  "decision_quality": {
+    "path_difference_m": -0.03917259353051028,
+    "detour_ratio_difference": -0.004896574191313785,
+    "time_to_goal_difference_s": null,
+    "same_lineage": true
+  },
+  "per_decision": {
+    "invoked": 232,
+    "disagreements": 212,
+    "disagreement_rate": 0.9137931034482759,
+    "interventions": {
+      "none": 232
+    },
+    "participation_fraction": 1.0,
+    "inference_s": {
+      "count": 232,
+      "max": 0.0012237990013090894,
+      "p50": 0.000425626998548978,
+      "p95": 0.0007611979999637697,
+      "p99": 0.0009333830003015464
+    }
+  },
+  "host": {
+    "p5_controller_cpu_fraction": 0.4291802832080715,
+    "p4_controller_cpu_fraction": 0.42755925827243235,
+    "p5_rtf": {
+      "min_interval_rtf": 0.002666384093945929,
+      "rtf": 0.9964941947062934,
+      "samples": 1053,
+      "sim_s": 108.696,
+      "wall_s": 109.078407659
+    },
+    "p4_rtf": {
+      "min_interval_rtf": 0.005311684144611745,
+      "rtf": 0.9979086145830911,
+      "samples": 1050,
+      "sim_s": 108.516,
+      "wall_s": 108.743424412
+    }
+  }
+}
