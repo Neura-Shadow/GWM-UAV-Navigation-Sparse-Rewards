@@ -343,7 +343,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised and approved |
 | **M1** taxonomy and scenarios — **COMPLETE 2026-11-06** (§11; the scenario list and four corrections approved by the operator) | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
-| **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
+| **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
@@ -530,3 +530,21 @@ report `passed: true`.
 The ROS node wrappers (`depth_relay`, `state_relay`, `witness`, `competing_publisher`) are only
 import-tested; they have never run against ROS. Their first live use is M5 (ground integration),
 which needs its own authorization. The P6 runner, manifest and evaluators are M4/M5 work.
+
+## 13. M3 record: offline fault validation (2026-11-07, authorized by the operator: "Authorize M3")
+
+* **Run:** the suite runner `validation/p6_offline_suite.py`, at commit `60093c8`, under the
+  controller interpreter.
+* **Result:** 87 tests passed, 0 failed, 0 skipped; **31 of 31 required offline items; 12 of 12
+  flight-row rehearsals**. The result is bound to every P6 source, spec and test hash:
+  `docs/evidence/v3_sim_p6_m3_offline_suite_60093c8.json` (SHA-256 `988da4341fff18cd…`).
+* **Inputs:** read-only, from one retained accepted flight. The offline perception replay reproduced
+  every recorded grid bit for bit before any corruption was measured.
+* **Settled:** F5.02, from the rclpy executor order. The first tick after a stall sees pre-stop state
+  and pre-stop sim time, so a short stall most likely goes undetected in flight.
+* **Measured:** the characterized gaps, with risk statements. The most serious is F2.04: after a 1.0 m
+  XY reset, 3 collision-valid candidates enter the real obstacle until the next fresh frame re-marks it;
+  0.5 m gives none.
+* **Fixed:** the shim no longer invents a selection index (F3.06).
+* **Full report:** [M3 report](v3_sim_p6_m3_offline_report.md).
+* **Next:** M4, the evaluators, which needs its own authorization.
