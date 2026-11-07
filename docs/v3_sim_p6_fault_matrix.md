@@ -41,6 +41,7 @@ replaying the recorded ground inputs through the frozen supervisor); S = SITL fl
 | **H35** | supervisor `HOVER`, yaw frozen, by `t_last` + 0.35 s sim (`t_last` = acquisition of the last usable snapshot). While stale, target motion ≤ 0.01 m and yaw ≤ 0.5° (P4 §9.1 F3) |
 | **A10** | `ABORT stale_inputs:<reason>` 10.0 ± 0.10 s sim after staleness began (P4 §9.1 F3) |
 | **L45** | exactly one LAND (21) accepted; `COMPLETE` within 45 s wall of it; ULog landed and disarmed (P4 rev 5) |
+| **L45R** | a P2 `RECOVERY` landing: exactly one LAND; the controller ends in `RECOVERY` (never `COMPLETE`); ULog landed and disarmed within 45 s wall of the LAND (M1 correction 2) |
 | **PH3** | HOLD on each failing tick (target and yaw unchanged), `ABORT policy_unavailable` on the 3rd consecutive failing tick, i.e. 0.10 s sim after the first at 20 Hz; then L45 (P5 §5) |
 | **R2** | P2 `RECOVERY` with the stated reason; one LAND only if the validated sample is armed, nav 14 and airborne (P2 `Mission.abort`) |
 | **PX** | PX4-managed: the controller stops publishing, and PX4 enters an immediate **Return** (`AUTO_RTL`, no 5 s Hold; M0 Finding D). It returns at `max(d, 4 m)`, lands at home and disarms. Proposed limits: onset ≤ 1.2 s after the last `offboard_control_mode`; `AUTO_RTL` ≤ 0.1 s after onset; landed and disarmed ≤ 45 s wall; S0 unexempted (contract §5.2, approved 2026-11-06; reported, not gated). It always breaches the P4 3.0 m ceiling, so it is characterization under D4a (approved 2026-11-06) |
@@ -82,7 +83,7 @@ channels are listed per row.
 | F2.06 | Future stamp > 0.1 s (none) | CS | TRANSIT | `clock_epoch_mismatch` | R2 | same tick | S0 | ledger | reason equality | O | R-O | low |
 | F2.07 | `xy_valid` false or estimator flags (none) | CS | TRANSIT | `invalid_estimate`, `estimator_failsafe_flags` | R2 with no LAND, then PX | same tick | S0; PX limits reported (§5.2) | ULog | reason; PX outcome | O, S | R-O; S: C | medium |
 | F2.08 | ENU/NED frame mismatch (none) | CS | TRANSIT | none, unless geofence | — | — | S0 evaluated | — | characterization | O | C | medium |
-| F2.09 | Pose-to-depth association failure, pose withheld from perception (none) | SR: perception `--px4-prefix /gwm/p6/px4_71` (M0 Finding A) | TRANSIT | `association:*` unusable frames; then `snapshot_stale` (first in `stale_reason` order) | HOVER, then `ABORT stale_inputs:snapshot_stale`, then LAND | H35, A10 | S0, L45 | perception `unusable_reasons`; witness: true versus relayed state | replay | O, G, S | R-O, R-A; R-S (S-2′, D4a approved) | low; app-managed |
+| F2.09 | Pose-to-depth association failure, pose withheld from perception (none) | SR: perception `--px4-prefix /gwm/p6/px4_71` (M0 Finding A) | TRANSIT | `association:*` unusable frames; then `snapshot_stale` (first in `stale_reason` order) | HOVER, then `ABORT stale_inputs:snapshot_stale`, then LAND | H35, A10 | S0, L45 | perception `unusable_reasons`; witness: true versus relayed state | replay | O, G, S | R-O, R-A (M1 correction 1), R-S (S-2′, D4a approved) | low; app-managed |
 | F2.10 | PX4-native estimator or GPS failure (none) | PX4 `failure` / MAV_CMD 420 (`SYS_FAILURE_EN` 1 observed) | — | PX4 estimator flags, then P2 checks | — | — | — | ULog | — | — | D (D5) | needs a command outside Policy A |
 
 ## F3 — Policy and inference (in-process; the policy has no separate worker)
@@ -97,7 +98,7 @@ channels are listed per row.
 | F3.06 | Selection outside the mask (P5 offline) | CS around `policy_choice` | AVOIDING | `selection_outside_mask` | PH3 | PH3 | S0 | ledger | as F3.04 | O | R-O | low |
 | F3.07 | Isolated slow inference, 25 ms on single ticks, ≥ 5 s apart (none) | CS sleep | TRANSIT, S4 | `timeout` | HOLD that tick; counter resets; mission continues | each injected tick gives `timeout` HOLD, and no ABORT | S0; inference p99/max limits on **all non-injected ticks** | ledger `inference_s` (accepted clock); timing trace | exclusion only of declared tick IDs | O, S | R-C (C-2) | low |
 | F3.08 | Repeated slow inference, 3 consecutive 25 ms ticks (P5 offline, one tick) | CS | `AVOIDING`, S2 | `timeout` | PH3, then L45 | PH3 | S0, L45 | ledger; trace | as F3.04 | O, S | R-B (B-1 smoke) | low |
-| F3.09 | One inference of 60 ms, above the dispatch budget (none) | CS | TRANSIT | ledger `timeout` **and** P2 dispatch guard (0.050 s) | R2, one LAND (valid Offboard sample) | same tick | S0, L45 | trace span, P2 abort reason | precedence check: both records present | O, S | R-O; S: C | low |
+| F3.09 | One inference of 60 ms, above the dispatch budget (none) | CS | TRANSIT | ledger `timeout` **and** P2 dispatch guard (0.050 s) | R2, one LAND (valid Offboard sample) | same tick | S0, L45R | trace span, P2 abort reason | precedence check: both records present | O, S | R-O; S: C | low |
 | F3.10 | Policy hang, 3.0 s blocking (none) | CS | NORMAL | no tick completes; PX4 offboard loss at 1.0 s; afterwards the guard trips and nav ≠ 14 | PX | ULog failsafe onset ≤ 1.2 s (§5.2) | S0; PX limits reported (§5.2) | ULog; trace gap | PX outcome | O, S | C (D4a) | **high** |
 | F3.11 | Exception in the forward pass (P5 class) | CS raises | AVOIDING | `exception:RuntimeError` | PH3 | PH3 | S0 | ledger | as F3.04 | O | R-O | low |
 | F3.12 | Non-finite features (P5 class) | CS | AVOIDING | `input_not_finite` | PH3 | PH3 | S0 | ledger | as F3.04 | O | R-O | low |
@@ -114,7 +115,7 @@ channels are listed per row.
 | F4.04 | Burst delivery: hold 0.2 s, then release (none) | MR | TRANSIT | age rule | as the age rule; the last received wins | legality replay | S0 | witness | replay | O, G | C | low |
 | F4.05 | Perception process lost (none) | PS SIGINT `p4_perception` | TRANSIT | `snapshot_stale` (health stays fresh) | HOVER, then ABORT | H35, A10 | S0, L45 | process table | P3 cleanup classification shows only the declared process exited | S | C | low |
 | F4.06 | Adapter health topic lost only (none) | MR | ground / TRANSIT | `adapter_health_missing` (2.0 s sim) | HOVER, then ABORT | as F1.02 | S0 | witness | replay | G | R-A | low |
-| F4.07 | Competing PX4-input publisher, advertise-only (P2/P4 rule, never live-tested) | foreign node advertises `/px4_71/fmu/in/trajectory_setpoint` and never publishes | ground; S: NORMAL | `competing_control_publisher` at the next graph check | ground: diagnostic fails closed; S: R2 with one LAND | ≤ 1.0 s wall + graph-query time after advertisement | S0; 0 foreign setpoints in the ULog | `ros-graph.json`; ULog setpoint count versus controller sends | ownership proof | G, S | R-A; S: C | low (no message is ever published) |
+| F4.07 | Competing PX4-input publisher, advertise-only (P2/P4 rule, never live-tested) | foreign node advertises `/px4_71/fmu/in/trajectory_setpoint` and never publishes | ground; S: NORMAL | `competing_control_publisher` at the next graph check | ground: diagnostic fails closed; S: R2 with one LAND, L45R | ≤ 1.0 s wall + graph-query time after advertisement | S0; 0 foreign setpoints in the ULog | `ros-graph.json`; ULog setpoint count versus controller sends | ownership proof | G, S | R-A; S: C | low (no message is ever published) |
 | F4.08 | Rogue publisher on `/gwm/p4/local_map` (none) | a second publisher with a fabricated usable snapshot | ground only | **none**: internal topics are not graph-checked or authenticated | accepted as input | — | — | — | characterization of the architecture gap | O, G | C | **high**; never flown |
 | F4.09 | QoS incompatibility (none) | relay with incompatible QoS | ground | not reachable for the controller's BEST_EFFORT/VOLATILE subscriptions; a RELIABLE probe receives 0 | — | — | — | witness probe | documented N/A with ground proof | G | C | low |
 | F4.10 | Perception restarted in flight (none) | PS kill and restart | — | **none**: new grid anchored at the in-flight pose, same shape; traversed mask kept | misaligned traversed cells | — | — | — | characterization; runners never restart processes | O | C | medium |
@@ -145,7 +146,7 @@ channels are listed per row.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | F6.01 | CPU oversubscription: 8 or 24 busy workers (P5 recovery work offline) | LH | TRANSIT | existing freshness, dispatch and stale rules | limits hold, **or** a declared safe response (HOVER, R2 with LAND); never silent | — | S0 | `resources.jsonl`, schedstat | every breached limit is matched by a safe response inside the load window (contract §5.3) | O, S | R-C (inside C-5), C sweep | medium |
 | F6.02 | WSL scheduling stall | represented by F5.02 and F6.01 | | | | | | | | | D | no host control |
-| F6.03 | Control-loop deadline violation: mission tick +60 ms | CS | NORMAL | dispatch guard (the sample was validated earlier in the same tick) | R2, exactly one LAND | same tick | S0, L45 | trace | as F3.09 | O, S | R-O; R-S (S-5′, D4a approved) | low; app-managed |
+| F6.03 | Control-loop deadline violation: mission tick +60 ms | CS | NORMAL | dispatch guard (the sample was validated earlier in the same tick) | R2, exactly one LAND | same tick | S0, L45R | trace | as F3.09 | O, S | R-O; R-S (S-5′, D4a approved) | low; app-managed |
 | F6.04 | Inference spikes | = F3.07 | | | | | | | | | — | |
 | F6.05 | Perception delay under load | LH pinned to perception's CPUs *(affinity only; verify allowed)* | TRANSIT | snapshot latency, then age | HOVER if age > 0.25 s | replay | S0 | perception compute trace | replay | S | C | medium |
 | F6.06 | Long perception callbacks | as F6.05 | | | | | | | | | C | |
@@ -187,8 +188,8 @@ channels are listed per row.
 
   | Group | Count | Content |
   |---|---|---|
-  | R-O | 30 items, plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
-  | R-A | 15 live ground runs | 2 readiness runs + 13 fault fixtures (contract §8.1) |
+  | R-O | 31 items (M1 correction: F3.03 had been missed), plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
+  | R-A | 16 live ground runs | 2 readiness runs + 14 fault fixtures (contract §8.1; F2.09 added by M1 correction 1) |
   | R-B | 2 flights | B-0 pass-through, B-1 F3.08 |
   | R-S | 5 flights | S-1 F1.01, S-2′ F2.09, S-3 F3.04, S-4 F4.01, S-5′ F6.03 |
   | R-C | 5 flights | C-1 F1.03, C-2 F3.07, C-3 F3.13, C-4 F8.01, C-5 F8.03 |

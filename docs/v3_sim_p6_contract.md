@@ -57,10 +57,14 @@ All limits not introduced in §5 are reused unchanged from P2–P5. See the
 * **C9.** Simulation only. No hardware. All live runs need operator authorization.
 * **C10.** Code lives in `simulation/px4_gazebo_p6/`, plus tests in `tests/test_px4_gazebo_p6_*.py`.
 * **C11 (proposed by M0; approved 2026-11-06).** Every run-local config must equal its frozen original byte for
-  byte, except the keys declared in the run's fault declaration (for example the two
-  `ros_topic_name` values of `p3_sensor_bridge.yaml`). Each declared key's before and after values
-  are recorded. The P3–P5 evaluators do not make this check (M0 Finding C), so the P6 evaluator
-  owns it.
+  byte, except two sets of keys. Each declared key's before and after values are recorded.
+  * The keys declared in the run's fault declaration, for example the two `ros_topic_name`
+    values of `p3_sensor_bridge.yaml`.
+  * The accepted runners' own run-local changes: `p4_avoidance.yaml` `enabled`;
+    `p5_policy.yaml` `enabled`, `model.path` and `model.sha256` (M1 correction 4, approved
+    2026-11-06).
+
+  The P3–P5 evaluators do not make this check (M0 Finding C), so the P6 evaluator owns it.
 
 ## 3. Limits carried over unchanged
 
@@ -197,8 +201,12 @@ The required count is **0**.
 
 ### 6.4 Landing completion
 
-The controller reaches `COMPLETE`, **and** the ULog shows `landed` and `arming_state` disarmed.
-For PX4-managed cases, only the ULog counts.
+* **Supervisor aborts and goal landings (`L45`).** The controller reaches `COMPLETE`, **and**
+  the ULog shows `landed` and `arming_state` disarmed.
+* **P2 `RECOVERY` landings (`L45R`, M1 correction 2).** The controller ends in `RECOVERY` and never
+  reaches `COMPLETE`. Exactly one LAND is sent, and the ULog shows landed and disarmed within 45 s
+  wall of it.
+* **PX4-managed cases.** Only the ULog counts.
 
 ### 6.5 Recovery eligibility
 
@@ -280,8 +288,9 @@ Plan §8 states what the sample sizes do and do not support.
    * decisions on the recorded ground snapshots bit-identical to the P5 replay.
 4. **The M3 offline suite**, run in its declared scope and bound by hash: every R-O item of the
    matrix, including precedence (F8.04, F8.05) and the F7 properties.
-5. **Ground fault fixtures, 13 live runs:**
+5. **Ground fault fixtures, 14 live runs** (F2.09 added by M1 correction 1, approved 2026-11-06):
    * F1.01, F1.02, F1.04, F1.06, F1.07, F1.11;
+   * F2.09;
    * F3.01, F3.02, F3.03;
    * F4.02, F4.06, F4.07, F4.13.
 
@@ -306,7 +315,7 @@ Plan §8 states what the sample sizes do and do not support.
 | S-2′ | S2 | F2.09 pose withheld from perception (`--px4-prefix` state relay) in TRANSIT | H35, then `ABORT stale_inputs:snapshot_stale` (A10), then L45; S0 |
 | S-3 | S2 | F3.04 non-finite scores × 3 in `AVOIDING` | PH3, L45, S0 |
 | S-4 | S3 | F4.01 local-map loss 1.0 s in `AVOIDING` | H35; recovery only with §6.5; goal reached; S0 |
-| S-5′ | S1 | F6.03 one 60 ms mission-tick stall in NORMAL | P2 dispatch-budget abort with a valid Offboard sample, then exactly one LAND, then L45; S0 |
+| S-5′ | S1 | F6.03 one 60 ms mission-tick stall in NORMAL | P2 dispatch-budget abort with a valid Offboard sample, then exactly one LAND, then L45R; S0 |
 
 **D4a, approved by the operator 2026-11-06.** M0 found that PX4 lands through Return, but breaches
 the 3.0 m ceiling and can pass within 0.20 m over obstacle tops. The original rows are therefore
