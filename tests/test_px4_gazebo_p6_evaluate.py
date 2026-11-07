@@ -286,8 +286,12 @@ def test_pose_to_perception_proof_needs_true_state_to_continue_and_relayed_to_st
 
 
 def test_controller_input_faults_cannot_be_proved_on_the_ground(tmp_path):
+    """Why A-5.F4.02/F4.06 left Gate A (M4 decision): with no decisions logged, the proof refuses, never trusts the shim."""
     from p6_fault_evaluate import prove
-    for row in ("A-5.F4.02", "A-5.F4.06"):
-        d = declaration.build(row)
-        out = prove(synthetic_run(tmp_path / row, d, "controller_shim"), d)
+    for fault, params in (("F4.02", {"delay_s": 0.30, "window_sim_s": 5.0}), ("F4.06", {"window_sim_s": 5.0})):
+        d = {"row": "ground-" + fault, "fault": fault, "mechanisms": ["MR"], "mode": "active", "parameters": params}
+        out = prove(synthetic_run(tmp_path / fault, d, "controller_shim"), d)
         assert not out["proved"] and "proof:no_independent_ground_evidence_for_a_controller_input_fault" in out["failures"]
+    from injection import specs
+    rows = [r["id"] for r in specs.strict_json(specs.SCENARIOS)["gates"]["A"]]
+    assert "A-5.F4.02" not in rows and "A-5.F4.06" not in rows

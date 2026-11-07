@@ -50,8 +50,6 @@
       {"id": "A-5.F3.01", "role": "fixture-checkpoint-missing", "scope": "startup_refusal", "fault": "F3.01", "parameters": {"model_path": "absent"}, "expected": ["REF", "reason checkpoint_missing"]},
       {"id": "A-5.F3.02", "role": "fixture-checkpoint-mismatch", "scope": "startup_refusal", "fault": "F3.02", "parameters": {"model": "mismatched copy (P5 pattern)"}, "expected": ["REF", "reason checkpoint_sha256_mismatch"]},
       {"id": "A-5.F3.03", "role": "fixture-schema-mismatch", "scope": "startup_refusal", "fault": "F3.03", "parameters": {"schema": "run-local copy with one changed description byte"}, "expected": ["REF", "reason p5_model_schema_differs_from_frozen_hash"]},
-      {"id": "A-5.F4.02", "role": "fixture-map-delay", "scope": "ground_fixture", "fault": "F4.02", "trigger": "ground_window", "parameters": {"delay_s": 0.30, "window_sim_s": 5.0}, "expected": ["replayed HOVER (snapshot_stale)"]},
-      {"id": "A-5.F4.06", "role": "fixture-health-loss", "scope": "ground_fixture", "fault": "F4.06", "trigger": "ground_window", "parameters": {"window_sim_s": 5.0}, "expected": ["replayed adapter_health_missing HOVER within 2.0 + 0.10 s sim"]},
       {"id": "A-5.F4.07", "role": "fixture-competing-publisher", "scope": "ground_fixture", "fault": "F4.07", "trigger": "ground_window", "parameters": {"topic": "/px4_71/fmu/in/trajectory_setpoint", "advertise_s": 5.0, "messages_published": 0}, "expected": ["competing_control_publisher within 1.0 s wall plus graph query", "ground diagnostic fails closed (declared scope)", "0 foreign setpoints in the ULog"]},
       {"id": "A-5.F4.13", "role": "fixture-clock-stall", "scope": "ground_fixture", "fault": "F4.13", "trigger": "ground_window", "parameters": {"process": "clock-bridge", "signal": "SIGSTOP", "resume_after_wall_s": 2.0}, "expected": ["clock_stalled within 1.0 s wall plus one tick", "ground diagnostic fails closed (declared scope)", "clock bridge resumes and exits gracefully at cleanup"]},
       {"id": "A-6", "role": "injector-activation-cleanup", "scope": "evaluation", "expected": ["off: no injector process", "pass-through: no topology change beyond the declared relay", "active: matches the declaration"]},
@@ -77,7 +75,7 @@
     ]
   },
   "predecessor": {"B": "A", "S": "B", "C": "S"},
-  "counts": {"gate_a_live_ground_runs": 16, "gate_a_fault_fixtures": 14, "flights": 12, "offline_required_items": 31},
+  "counts": {"gate_a_live_ground_runs": 14, "gate_a_fault_fixtures": 12, "flights": 12, "offline_required_items": 32},
   "characterization": {
     "authorization": "each live run separately authorized; never gated; every safety check evaluated and reported",
     "flights": [
@@ -98,5 +96,7 @@
     "3: 31 required offline items (F3.03 had been missed)",
     "4: C11 allows the accepted runners' own run-local changes"
   ],
-  "approved": {"by": "operator", "date": "2026-11-06", "statement": "Approve as recommended"}
+  "approved": {"by": "operator", "date": "2026-11-06", "statement": "Approve as recommended"},
+  "m4_decision_approved": {"date": "2026-11-07", "statement": "Remove them",
+    "change": "A-5.F4.02 and A-5.F4.06 removed from Gate A: a fault in the controller's own map or health input leaves no record outside the injector on the ground (no decisions are logged), so it cannot be proved independently (contract C8). Their supervisor response is proven offline (M3); map input faults are flown in S-4 and C-5. F4.06 becomes R-O; F4.02 stays characterization in flight."}
 }

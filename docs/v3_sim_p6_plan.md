@@ -622,7 +622,7 @@ exceptions.
   this was fixed.
 * **A check-name mismatch** (`UNSAFE`) that would have refused C-3's outcome exception.
 
-### 14.4 Decision needed: two Gate A fixtures cannot be proved
+### 14.4 Decision: two Gate A fixtures removed (operator: "Remove them", 2026-11-07)
 
 A-5.F4.02 (map delay) and A-5.F4.06 (health loss) are faults in the controller's own inputs. On the
 ground the controller logs no decisions, so no record outside the injector shows the fault. The
@@ -635,6 +635,15 @@ rather than trusting the shim.
 * **Recommended:** remove A-5.F4.02 and A-5.F4.06 from Gate A, giving 12 fixtures and 14 live ground
   runs. Keep F4.06 as R-O.
 * **Alternative:** keep them, with a replay-only proof. That conflicts with C8.
+* **Applied:**
+  * `p6_scenarios.yaml`: the rows are gone; counts are 12 fixtures, 14 live ground runs, 32 offline items.
+  * `p6_faults.yaml`: F4.02 is now C with tier S; F4.06 is now R-O.
+  * Contract §8.1 and the §10 record.
+  * The evaluator's ground rules.
+  * The offline-suite coverage map: F4.06 is covered by the `adapter_health_missing` stale rule and F4.11.
+  * The tests.
+
+  The evaluator still refuses any controller-input fault on the ground.
 
 ### 14.5 Not yet exercised
 

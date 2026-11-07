@@ -103,14 +103,14 @@ def test_counts_match_the_approved_gate_structure(faults, scenarios):
     gates, counts = scenarios["gates"], scenarios["counts"]
     fixtures = [row for row in gates["A"] if row["id"].startswith("A-5.")]
     live_ground = [row for row in gates["A"] if row["scope"] in ("p3_readiness", "ground_readiness")] + fixtures
-    assert len(fixtures) == counts["gate_a_fault_fixtures"] == 14  # M1 correction 1 added F2.09
-    assert len(live_ground) == counts["gate_a_live_ground_runs"] == 16
+    assert len(fixtures) == counts["gate_a_fault_fixtures"] == 12  # +F2.09 (M1), -F4.02/F4.06 (M4 decision)
+    assert len(live_ground) == counts["gate_a_live_ground_runs"] == 14
     assert [row["id"] for row in gates["B"]] == ["B-0", "B-1"]
     assert [row["id"] for row in gates["S"]] == ["S-1", "S-2'", "S-3", "S-4", "S-5'"]
     assert [row["id"] for row in gates["C"]] == ["C-1", "C-2", "C-3", "C-4", "C-5"]
     assert len(gates["B"]) + len(gates["S"]) + len(gates["C"]) == counts["flights"] == 12
     required_offline = [f for f in faults["faults"] if "R-O" in f["classes"]]
-    assert len(required_offline) == counts["offline_required_items"] == 31
+    assert len(required_offline) == counts["offline_required_items"] == 32  # F4.06 moved to R-O (M4 decision)
     assert scenarios["predecessor"] == {"B": "A", "S": "B", "C": "S"}
 
 

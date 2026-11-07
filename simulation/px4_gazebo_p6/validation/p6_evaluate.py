@@ -63,8 +63,7 @@ GROUND = {
     "A-5.F1.01": ["snapshot_stale"], "A-5.F1.02": ["adapter_health_missing"], "A-5.F1.04": ["snapshot_stale"],
     "A-5.F1.06": ["snapshot_stale", "unusable_frames"], "A-5.F1.07": ["snapshot_stale"],
     "A-5.F1.11": ["adapter_health_not_fresh", "calibration_mismatch", "snapshot_stale"],
-    "A-5.F2.09": ["snapshot_stale", "unusable_frames"], "A-5.F4.02": ["snapshot_stale"],
-    "A-5.F4.06": ["adapter_health_missing"]}
+    "A-5.F2.09": ["snapshot_stale", "unusable_frames"]}  # A-5.F4.02/F4.06 removed (M4 decision): not provable on the ground
 for _row, _reasons in GROUND.items():
     ROWS[_row] = {"response": ["GROUND_REPLAY:" + ",".join(_reasons)], "exceptions": GROUND_EXCEPTIONS}
 for _row in ("A-5.F3.01", "A-5.F3.02", "A-5.F3.03", "A-5.F4.07", "A-5.F4.13"):
@@ -130,11 +129,7 @@ def respond(run, row, rules, proof, window):
             response.unsafe_setpoints(run, c)
         elif code == "GROUND_REPLAY":
             config = json.loads(run.file("p4_avoidance.yaml").read_text(encoding="utf-8"))
-            p = (run.declaration or {}).get("parameters", {}) if run.declaration else {}
-            fault = row.split(".", 1)[-1] if row.startswith("A-5.") else None
-            mt = response.delay_window(p["delay_s"], p["window_sim_s"]) if fault == "F4.02" else None
-            ht = response.drop_window(p["window_sim_s"]) if fault == "F4.06" else None
-            response.ground_replay(run, c, arg.split(","), config, mt, ht)
+            response.ground_replay(run, c, arg.split(","), config)
             if run.exists("p4/fault_injection.json"):  # cross-check against the unchanged P4 ground replay
                 import p4_evaluate as p4e
                 f = response._Failures()

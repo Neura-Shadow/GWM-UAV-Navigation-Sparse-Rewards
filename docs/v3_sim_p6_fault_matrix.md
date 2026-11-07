@@ -110,11 +110,11 @@ channels are listed per row.
 | ID | Fault (prior) | Injection | Preconditions | Detection | Expected | Detection limit | Safety limit | Decisive evidence | Evaluation | Tier | Class | Risk |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | F4.01 | `/gwm/p4/local_map` loss for 1.0 s, then restored (none) | MR | `AVOIDING`, S3 | `snapshot_stale` | H35; resume only on a fresh matched snapshot; goal | H35; legality replay | S0; no stale run ≥ 10 s, so no ABORT | witness versus perception ledger | replay over the window; recovery recorded as `HOVER → AVOIDING` on a fresh snapshot | O, S | R-S (S-4) | low |
-| F4.02 | Map delay 0.3 s (none) | MR | TRANSIT | age > 0.25 s | HOVER, then ABORT | H35, A10 | S0, L45 | witness | replay | G, S | R-A (ground replay); S: C | low |
+| F4.02 | Map delay 0.3 s (none) | MR | TRANSIT | age > 0.25 s | HOVER, then ABORT | H35, A10 | S0, L45 | witness | replay | S | C (M4 decision: ground fixture removed, no independent ground evidence) | low |
 | F4.03 | Reordering: two consecutive snapshots swapped (none) | MR | TRANSIT | **none**: `on_snapshot` keeps the newest received | an older grid in use for ≤ 1 cycle | — | S0 evaluated | witness order versus decisions' `snapshot_acquisition_sim_s` | characterization: any OCCUPIED → FREE regression seen by the controller | O | C | **high-medium** |
 | F4.04 | Burst delivery: hold 0.2 s, then release (none) | MR | TRANSIT | age rule | as the age rule; the last received wins | legality replay | S0 | witness | replay | O, G | C | low |
 | F4.05 | Perception process lost (none) | PS SIGINT `p4_perception` | TRANSIT | `snapshot_stale` (health stays fresh) | HOVER, then ABORT | H35, A10 | S0, L45 | process table | P3 cleanup classification shows only the declared process exited | S | C | low |
-| F4.06 | Adapter health topic lost only (none) | MR | ground / TRANSIT | `adapter_health_missing` (2.0 s sim) | HOVER, then ABORT | as F1.02 | S0 | witness | replay | G | R-A | low |
+| F4.06 | Adapter health topic lost only (none) | MR | ground / TRANSIT | `adapter_health_missing` (2.0 s sim) | HOVER, then ABORT | as F1.02 | S0 | witness | replay | O | R-O (M4 decision: ground fixture removed; offline stale rules and F4.11) | low |
 | F4.07 | Competing PX4-input publisher, advertise-only (P2/P4 rule, never live-tested) | foreign node advertises `/px4_71/fmu/in/trajectory_setpoint` and never publishes | ground; S: NORMAL | `competing_control_publisher` at the next graph check | ground: diagnostic fails closed; S: R2 with one LAND, L45R | ≤ 1.0 s wall + graph-query time after advertisement | S0; 0 foreign setpoints in the ULog | `ros-graph.json`; ULog setpoint count versus controller sends | ownership proof | G, S | R-A; S: C | low (no message is ever published) |
 | F4.08 | Rogue publisher on `/gwm/p4/local_map` (none) | a second publisher with a fabricated usable snapshot | ground only | **none**: internal topics are not graph-checked or authenticated | accepted as input | — | — | — | characterization of the architecture gap | O, G | C | **high**; never flown |
 | F4.09 | QoS incompatibility (none) | relay with incompatible QoS | ground | not reachable for the controller's BEST_EFFORT/VOLATILE subscriptions; a RELIABLE probe receives 0 | — | — | — | witness probe | documented N/A with ground proof | G | C | low |
@@ -188,8 +188,8 @@ channels are listed per row.
 
   | Group | Count | Content |
   |---|---|---|
-  | R-O | 31 items (M1 correction: F3.03 had been missed), plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
-  | R-A | 16 live ground runs | 2 readiness runs + 14 fault fixtures (contract §8.1; F2.09 added by M1 correction 1) |
+  | R-O | 32 items (M1: F3.03 had been missed; M4 decision: F4.06 moved here), plus an offline rehearsal of each of the 12 flight scenarios | the offline suite, bound by Gate A |
+  | R-A | 14 live ground runs | 2 readiness runs + 12 fault fixtures (contract §8.1; F2.09 added by M1; F4.02 and F4.06 removed by the M4 decision) |
   | R-B | 2 flights | B-0 pass-through, B-1 F3.08 |
   | R-S | 5 flights | S-1 F1.01, S-2′ F2.09, S-3 F3.04, S-4 F4.01, S-5′ F6.03 |
   | R-C | 5 flights | C-1 F1.03, C-2 F3.07, C-3 F3.13, C-4 F8.01, C-5 F8.03 |

@@ -288,11 +288,13 @@ Plan §8 states what the sample sizes do and do not support.
    * decisions on the recorded ground snapshots bit-identical to the P5 replay.
 4. **The M3 offline suite**, run in its declared scope and bound by hash: every R-O item of the
    matrix, including precedence (F8.04, F8.05) and the F7 properties.
-5. **Ground fault fixtures, 14 live runs** (F2.09 added by M1 correction 1, approved 2026-11-06):
+5. **Ground fault fixtures, 12 live runs.** F2.09 was added by M1 correction 1 (approved 2026-11-06).
+   F4.02 and F4.06 were removed by the M4 decision (approved 2026-11-07), because a controller-input
+   fault leaves no independent record on the ground (C8). The fixtures:
    * F1.01, F1.02, F1.04, F1.06, F1.07, F1.11;
    * F2.09;
    * F3.01, F3.02, F3.03;
-   * F4.02, F4.06, F4.07, F4.13.
+   * F4.07, F4.13.
 
    Each needs its detection in the live component and the replayed supervisor/policy response.
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
@@ -386,6 +388,7 @@ Any change after freeze is a new P6 candidate.
 | D1a | depth relay through a declared 2-key run-local bridge config; map and health input faults inside the controller shim; pose faults to perception through `--px4-prefix` and a state relay | plan §4.2 rows M-DR, M-MR (shim), M-SR |
 | D4a | the PX4-managed S-2 and S-5 become characterization; Gate S uses S-2′ = F2.09 and S-5′ = F6.03 | §8.3 as now written; no ceiling exemption |
 | C11 | run-local config equality, except declared keys | §2 C11 in force for P6 evaluation |
+| M4 Gate A (2026-11-07, "Remove them") | A-5.F4.02 and A-5.F4.06 removed from Gate A | 12 fixtures, 14 live ground runs. F4.06 becomes R-O (covered offline by the stale rules and F4.11); F4.02 stays characterization in flight. Plan §14.4 |
 
 The options as presented:
 

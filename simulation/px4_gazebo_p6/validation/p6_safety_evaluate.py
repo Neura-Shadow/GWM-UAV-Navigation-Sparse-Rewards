@@ -215,11 +215,11 @@ GROUND_LIMIT_S = {"snapshot_stale": 0.35, "adapter_health_missing": 2.0 + 0.10, 
                   "calibration_mismatch": 0.35, "unusable_frames": 0.35}
 
 
-def ground_replay(run, c, expected, config, map_transform=None, health_transform=None):
+def ground_replay(run, c, expected, config):
     """From the trigger on, step the accepted `Supervisor.stale_reason` at 20 Hz over perception's recorded
-    snapshots and the adapter's recorded health (as the controller would have received them; for the
-    controller-side faults F4.02/F4.06 with the declared transform applied by the evaluator). The first stale
-    reason must be one of `expected`, within that reason's detection limit."""
+    snapshots and the adapter's recorded health, as the controller received them. The first stale reason must be
+    one of `expected`, within that reason's detection limit. (Controller-input faults are not ground fixtures:
+    their input change leaves no record outside the injector on the ground, M4 decision.)"""
     from gwm_obstacle_avoidance import supervisor
     injection = run.injection or {}
     t0 = injection.get("t_inj_sim_s")
@@ -229,11 +229,7 @@ def ground_replay(run, c, expected, config, map_transform=None, health_transform
     if t0 is None:
         return c.record("GROUND_REPLAY", False, error="no_trigger_time")
     snapshots = [s for s in run.local_map if s.get("usable")]
-    if map_transform is not None:
-        snapshots = map_transform(snapshots, t0)
     health = [h for h in run.health if h.get("sim_s") is not None]
-    if health_transform is not None:
-        health = health_transform(health, t0)
     sup = supervisor.Supervisor(config, t0)
     end = max([s.get("received_sim_s", s["processing_sim_s"]) for s in snapshots] + [h["sim_s"] for h in health] + [t0]) + 3.0
     t, found = t0, None
@@ -258,19 +254,3 @@ def ground_replay(run, c, expected, config, map_transform=None, health_transform
     limit = GROUND_LIMIT_S.get(reason, 0.35)
     ok = reason in expected and found[0] <= anchor + limit + 1e-9
     c.record("GROUND_REPLAY", ok, reason=reason, hover_sim_s=found[0], anchor_sim_s=anchor, limit_s=limit)
-
-
-def drop_window(window_s):
-    def transform(records, t0):
-        return [r for r in records if not t0 < r.get("processing_sim_s", r.get("sim_s")) < t0 + window_s]
-    return transform
-
-
-def delay_window(delay_s, window_s):
-    def transform(records, t0):
-        out = []
-        for r in records:
-            arrive = r["processing_sim_s"]
-            out.append(dict(r, received_sim_s=arrive + delay_s if t0 < arrive < t0 + window_s else arrive))
-        return out
-    return transform
