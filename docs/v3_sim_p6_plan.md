@@ -345,7 +345,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration — **IN PROGRESS** (§15; offline recovery done, candidate `ce73e574` prepared, its dry run awaits authorization) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M5** ground and integration — **IN PROGRESS** (§15; the `ce73e574` dry run passed 16 of 18 rows; F4.07 and F4.13 await two operator decisions, §15.11) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -657,8 +657,12 @@ rather than trusting the shim.
 ## 15. M5 record: ground integration and Gate A content dry runs (2026-11-07, authorized by the operator: "Authorize M5")
 
 **Status: in progress.**
-* **Done:** the offline recovery, and a fresh development candidate (`ce73e574…`, §15.7).
-* **Not done:** the confirming live dry run, which needs a new operator authorization (§15.8).
+* **Done:**
+  * the offline recovery;
+  * a fresh development candidate (`ce73e574…`, §15.7);
+  * its authorized confirming dry run: 16 of 18 rows passed (§15.11).
+* **Not done:** F4.07 and F4.13. They need two operator decisions (§15.11), then a new development
+  candidate and its own dry-run authorization.
 * **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
 
 Scope as authorized:
@@ -700,6 +704,7 @@ P6 has no build package: its nodes run from the manifest-bound tree under `/usr/
 | `f6048036` | `7fe1917` | A-3 | **failed**: the relays could not create publishers, and `/clock` never matched (§15.4, items 1–2) |
 | `08e79d05` | `04c1a95` | A-3 | **passed** |
 | `ef5ce69e` | `9ce6443` | all 18 Gate A rows | **failed**: 6 passed, 12 failed or not run (below) |
+| `ce73e574` | `68ccf30` | all 18 Gate A rows | **failed**: 16 passed; F4.07 and F4.13 failed on P5 items (§15.11) |
 
 A-3 on `08e79d05`:
 * the P5 evaluation had 0 failures, so every §3 limit held with three relays, the witness and the
@@ -779,7 +784,9 @@ How the items were derived:
 * **The two cleanup items:** from the accepted `main` (exit 1 unless connectivity passed). Both
   faults fire during WAIT_FOR_VALID_ESTIMATION, before connectivity passes.
 
-Still to be pinned from live evidence: any further items for F4.07 and F4.13, such as `p2:timing`.
+Pinned from live evidence on `ce73e574` (§15.11):
+* `p2:timing` on both rows;
+* on F4.13 only, four more items, caused by the trigger point rather than by the fault.
 
 The fail-closed proofs require:
 * the declared reason;
@@ -817,9 +824,14 @@ P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
 
 ### 15.8 Authorization status
 
-The earlier dry-run approvals are bound to their own manifest SHA-256s and do not cover `ce73e574`.
-None has been written for it. A confirming dry run of all 18 rows on this candidate needs a new
-operator authorization. M5 exits only when that run passes under one unchanged candidate.
+* Each earlier dry-run approval is bound to its own manifest SHA-256.
+* **`ce73e574`.**
+  * Authorized by the operator on 2026-11-07, "Authorize dry run", answering: "Authorize the full
+    Gate A content dry run on development candidate ce73e574?"
+  * Approval: `state/p6-dry-run-approval-ce73e57458fa.json`.
+  * It ran once (§15.11).
+* **Next candidate:** it needs its own approval.
+* **M5 exits** only when a complete dry run passes under one unchanged candidate.
 
 ### 15.9 PX4-managed characterization on the ground
 
@@ -828,6 +840,94 @@ outcomes stay separately authorized characterization flights.
 
 ### 15.10 Remaining
 
-* The confirming dry run, with F1.07, F1.11, F3.0x, F4.07 and F4.13 live for the first time.
-* Pinning any further P5 items those rows produce.
+* The two operator decisions of §15.11.
+* Then:
+  1. a new development candidate (offline regression first);
+  2. its own authorized dry run of all 18 rows.
 * M6 and the real P6 freeze, each with its own authorization.
+
+### 15.11 The `ce73e574` dry run (2026-11-07, no credit)
+
+**Run facts:**
+* Started 10:50:40Z and took 25 min.
+* No simulator processes were running before or after it.
+* The live lock was held for the whole sequence and then released.
+* The candidate was unchanged at every row and at the end; `not_run` is empty.
+* Result: `state/p6-dryrun-A-ce73e57458fa-20261107T105106Z.result.json`; the evidence is retained
+  unchanged.
+
+**Passed (16):**
+* A-1 and A-2.
+* A-3.
+* A-4: 87/87, 32/32, 12/12.
+* F1.01.
+* F1.02:
+  * own exit, 0 health records after the exit, 169 native headers after the stop;
+  * the P5 items it is allowed are covered by that proof.
+* F1.04: 141 delayed frames, minimum lag 0.296 s.
+* F1.06.
+* **F1.07, live for the first time:** the adapter rejected exactly the 10 declared frames.
+* **F1.11, live for the first time:** the adapter invalidated the calibration with
+  `calibration_rejected_after_lock:focal_length_inconsistent_with_pinned_fov`, and the relay
+  continued.
+* F2.09:
+  * 0 of 230 position and 0 of 460 attitude messages were relayed in the window;
+  * perception was unassociated 46 times.
+* **F3.01–F3.03, live for the first time:**
+  * each refused with exactly the reason in §15.5, and no node started;
+  * the P5 items were exactly those predicted.
+* A-6 and A-7.
+
+**F4.07 and F4.13 (failed).** Both fail-closed proofs passed:
+
+| Row | Declared detection | Detected after |
+|---|---|---|
+| F4.07 | `competing_control_publisher:/px4_71/fmu/in/trajectory_setpoint` | 0.14 s from the advertisement, 1.04 s from the advertiser's launch |
+| F4.13 | `clock_stalled` | 1.016 s wall from the stop |
+
+* The controller exited 1 with connectivity "failed".
+* Decision 3 replaced the `cleanup:ros-controller:nonzero_exit_1` item.
+* The P5 items no exception covers are below.
+
+1. **`p2:timing`, both rows. Certain, from the accepted P2 code.**
+   * The P2 timing check (`timing_evidence.trace_metrics`) reports failed whenever the
+     controller's result carries a failure, and a fail-closed row always carries one.
+   * Every reconciliation check passed: the trace was complete with no overflow, and the counts and
+     ordering matched. The evaluator raised no `p2_integrity_error`.
+   * No current exception covers the item.
+2. **`p2:bag_received_ledger_count:vehicle_attitude`, F4.13. Caused by the trigger point.**
+   * PX4 first publishes `vehicle_attitude` at about 5.5 s PX4 time; on this candidate's runs it was
+     5.46–5.56 s.
+   * F4.13 stalls `/clock` at the controller's first transition (4.37 s). The controller's ledger
+     ends at about 4.85 s PX4 time, before PX4's first attitude message.
+   * F4.07's controller exited later and holds 393 attitude messages.
+3. **`depth:state_association_incomplete`, `depth:reset_bracket_not_single_reset` and
+   `depth:reset_bracket_bound`, F4.13. A P6 runner defect: the window placement.**
+   * `live_trigger` holds the unchanged ground window from the controller's exit. For F4.13 that was
+     6.172 s, inside PX4's estimator start-up.
+   * On every run of this candidate the estimate is invalid until about 6.6 s, and start-up
+     reset-epoch brackets occur at 5.2–6.7 s.
+   * So 3 `estimate_invalid` observations (6.172–6.372) and one start-up reset bracket (6.472) fell
+     in the window. The ledger of a controller that has already exited cannot corroborate that reset.
+   * F4.07's window began at 9.604 and was clean: 150 of 150 observations matched. The accepted
+     ground rows begin their window at about 16 s.
+
+**Open decisions:**
+1. **The trigger point.** Recommended: inject at the controller's transition into
+   PRESTREAM_SAFE_SETPOINTS.
+   * At that transition the estimate has been valid for 5 s (P2 `estimator_stable_sim_s`) and every
+     PX4 stream is in the ledger. The window after the exit starts after the estimator start-up,
+     so items 2 and 3 cannot arise.
+   * The ground diagnostic then holds PRESTREAM for 3.0 s sim, which covers about 1.1 s of
+     detection.
+   * The accepted `main` exits 0 after connectivity passes (ground `p4_outcome` is `not_run`), so
+     the designed exit becomes 0. That is already accepted by the fail-closed proof, and decision 3
+     is no longer exercised.
+   * The alternative: keep the first transition, hold the window until after the estimator start-up,
+     and add a proof-backed exception for item 2.
+2. **`p2:timing` on F4.07 and F4.13.** Recommended: allow exactly this item on these two rows,
+   replaced by the fail-closed proof. The replacement would also require:
+   * the P2 timing reconciliation completed (no `p2_integrity_error`);
+   * its `controller_failure` is the declared detection.
+
+   Without this exception no fail-closed row can pass under the accepted P2 rule.
