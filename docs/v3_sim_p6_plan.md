@@ -345,7 +345,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration — **IN PROGRESS** (§15; the `ce73e574` dry run passed 16 of 18 rows; F4.07 and F4.13 await two operator decisions, §15.11) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M5** ground and integration — **IN PROGRESS** (§15; the `ce73e574` dry run passed 16 of 18 rows; both F4.07/F4.13 decisions implemented; candidate `44fa1111` awaits its dry-run authorization, §15.12) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -660,9 +660,10 @@ rather than trusting the shim.
 * **Done:**
   * the offline recovery;
   * a fresh development candidate (`ce73e574…`, §15.7);
-  * its authorized confirming dry run: 16 of 18 rows passed (§15.11).
-* **Not done:** F4.07 and F4.13. They need two operator decisions (§15.11), then a new development
-  candidate and its own dry-run authorization.
+  * its authorized confirming dry run: 16 of 18 rows passed (§15.11);
+  * the two F4.07/F4.13 decisions, adopted and implemented offline;
+  * a new development candidate, `44fa1111…` (§15.12).
+* **Not done:** that candidate's dry run, which needs its own operator authorization.
 * **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
 
 Scope as authorized:
@@ -696,6 +697,10 @@ P6 has no build package: its nodes run from the manifest-bound tree under `/usr/
    * Exactly `cleanup:ros-controller:nonzero_exit_1`, on those two rows only, is replaced by the
      fail-closed proof.
    * Every other cleanup item stays never excepted (§15.5).
+4. **F4.07 and F4.13 inject at the `ground_prestream` trigger** (the controller's transition into
+   PRESTREAM_SAFE_SETPOINTS). Answer: "Adopt both" (§15.11, open decision 1).
+5. **Exactly `p2:timing` on F4.07 and F4.13** is replaced by the fail-closed proof, which also requires
+   the timing reconciliation to have completed. Answer: "Adopt both" (§15.11, open decision 2).
 
 ### 15.3 Live dry runs (no credit; evidence retained unchanged)
 
@@ -830,7 +835,8 @@ P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
     Gate A content dry run on development candidate ce73e574?"
   * Approval: `state/p6-dry-run-approval-ce73e57458fa.json`.
   * It ran once (§15.11).
-* **Next candidate:** it needs its own approval.
+* **`44fa1111` (§15.12):** no approval has been written. Its dry run needs a new operator
+  authorization.
 * **M5 exits** only when a complete dry run passes under one unchanged candidate.
 
 ### 15.9 PX4-managed characterization on the ground
@@ -840,10 +846,9 @@ outcomes stay separately authorized characterization flights.
 
 ### 15.10 Remaining
 
-* The two operator decisions of §15.11.
-* Then:
-  1. a new development candidate (offline regression first);
-  2. its own authorized dry run of all 18 rows.
+* The authorized dry run of all 18 rows on `44fa1111`.
+  * F4.07 and F4.13 run at `ground_prestream` for the first time.
+  * Any further P5 items they produce must be pinned from that evidence.
 * M6 and the real P6 freeze, each with its own authorization.
 
 ### 15.11 The `ce73e574` dry run (2026-11-07, no credit)
@@ -931,3 +936,50 @@ outcomes stay separately authorized characterization flights.
    * its `controller_failure` is the declared detection.
 
    Without this exception no fail-closed row can pass under the accepted P2 rule.
+
+Both decisions were adopted on 2026-11-07 ("Adopt both"); see §15.12.
+
+### 15.12 The two decisions implemented, and candidate `44fa1111` (2026-11-07)
+
+**Code (`f74b71f`):**
+* **The trigger.** `injection/schedule.py` and `configs/p6_scenarios.yaml` replace
+  `ground_controller` with `ground_prestream` (record `m5_prestream_decision_approved`).
+  `p6_runner.live_trigger_due` fires only on the controller's transition into
+  PRESTREAM_SAFE_SETPOINTS.
+* **The fail-closed proofs** (`validation/p6_fault_evaluate.py`) now also require:
+  * the runner's injection request at or after that transition, and connectivity "passed";
+  * the P2 timing reconciliation completed: a timing status in the P5 evaluation and no
+    `p2_integrity_error`.
+* **The evaluator** (`validation/p6_evaluate.py`): on A-5.F4.07 and A-5.F4.13 only, exactly
+  `=p2:timing` is replaced by PROOF.
+* **What did not change:** the rows' faults, parameters and expected outcomes, and every accepted
+  P2–P5 source, threshold and model.
+
+**Read from the accepted sources** (regression tests):
+* connectivity passes on the estimator-stability rule just before PRESTREAM;
+* the ground diagnostic then holds PRESTREAM for `ground_prestream_sim_s` (3.0 s);
+* `main` exits 0 once connectivity has passed (ground `p4_outcome` is `not_run`), so the designed exit
+  is 0;
+* `trace_metrics` reports failed exactly when the controller's result carries a failure.
+
+**Offline regression on `f74b71f`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 139 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 103 passed, 36 skipped (Linux-only; not counted as passes) |
+
+**Development candidate:** `44fa111162307b240af152105f266896b96ff5e30c460e08c42c36d3dfb2d5a0`
+* frozen at `f74b71f` from a clean P6 tree; it verifies;
+* P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` re-verified;
+* binds 41 files (16 injector modules), faults `172b8219…`, scenarios `a451bb21…`, and the
+  development Policy A approval;
+* Gate A: 18 rows, 14 of them live;
+* no dry-run approval has been written.
+
+**Expected on its dry run:**
+* F4.07 and F4.13 detect at PRESTREAM and exit 0, so no cleanup item arises.
+* `p2:timing` is replaced by the proof.
+* Any other item is a P6 failure, to be diagnosed from evidence and not excepted.
