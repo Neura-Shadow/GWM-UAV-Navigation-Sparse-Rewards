@@ -16,6 +16,10 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 | `validation/p6_passthrough_check.py` | M2 exit check: pass-through bit identity on a recorded accepted flight |
 | `validation/p6_offline_suite.py`, `validation/recorded.py` | M3: the hash-bound offline suite (Gate A row 4) and the read-only recorded-flight reader |
 | `validation/p6_evaluate.py` and `p6_run`, `p6_fault_evaluate`, `p6_safety_evaluate`, `p6_timing_evaluate`, `p6_coverage_report` | M4: the independent evaluator (occurrence proof, response checks, composition with the unchanged P5 evaluator, timing, coverage) |
+| `validation/p6_integration_evaluate.py` | M5: rule C11, the injector-process check (A-6), the A-3 relay figures and ground policy replay |
+| `scripts/p6_runner.py`, `p6_manifest.py`, `run_p6_gates.py`, `run_p6.sh`, `verify_p6_evidence.sh`, `p6_node.py` | M5: the runner (built on the accepted P5 runner), the candidate manifest (development candidates, dry-run approvals, live-run lock, drift check), the Gate A sequencer with its dry-run mode, the namespace launch, the evaluation wrapper |
 
-Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. No simulator has been run for P6; the ROS node wrappers
-are not yet exercised live (M5). Tests: `tests/test_px4_gazebo_p6_specs.py`, `tests/test_px4_gazebo_p6_injection.py`, `tests/test_px4_gazebo_p6_offline.py`, `tests/test_px4_gazebo_p6_evaluate.py`.
+Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 in progress (plan §15): three ground dry runs of
+development candidates (no credit; A-3 passed live), their defects fixed offline; the fresh development candidate
+`ce73e574` (commit `68ccf30`) awaits authorization for its confirming dry run. No P6 gate has run.
+Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

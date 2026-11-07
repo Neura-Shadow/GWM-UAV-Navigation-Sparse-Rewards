@@ -345,7 +345,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M5** ground and integration — **IN PROGRESS** (§15; offline recovery done, candidate `ce73e574` prepared, its dry run awaits authorization) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -648,8 +648,186 @@ rather than trusting the shim.
 ### 14.5 Not yet exercised
 
 * **Real P6 runs (M5/M6).** Each row's exception table is prefix-based and narrow. The exact P5 item
-  names a real faulted run produces will be pinned in the M5 dry run.
+  names a real faulted run produces will be pinned in the M5 dry run (progress in §15.5).
 * **L45R** on real PX4 data, the **load-harness** proof, and the proofs for the characterization
   flights:
   * not yet defined: X-F2.01, X-F5.01, X-F3.10, X-F5.09, X-F4.12, X-F5.02, X-F7.03;
   * they must be defined before each is authorized.
+
+## 15. M5 record: ground integration and Gate A content dry runs (2026-11-07, authorized by the operator: "Authorize M5")
+
+**Status: in progress.**
+* **Done:** the offline recovery, and a fresh development candidate (`ce73e574…`, §15.7).
+* **Not done:** the confirming live dry run, which needs a new operator authorization (§15.8).
+* **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
+
+Scope as authorized:
+* the P6 runner and manifest;
+* a ground dry run of Gate A content on development candidates, with no credit.
+
+No run set `GWM_ALLOW_SITL_COMMANDS`, and the vehicle was never armed.
+
+### 15.1 What was built
+
+| File | Role |
+|---|---|
+| `scripts/p6_runner.py` | `P6Runner(P5Runner)` for the Gate A ground rows: relays, witness, controller shim, process signals, competing publisher, start-up refusals |
+| `scripts/p6_manifest.py` | the P6 candidate: P3/P4/P5 re-verified (C1), P6 sources and tests, injectors, specs, owner copy, per-candidate Policy A; development candidates, dry-run approvals, the live-run lock and the drift check |
+| `scripts/run_p6_gates.py` | the Gate A sequencer; `--dry-run` for development candidates (every row recorded, no gate result, no credit) |
+| `scripts/run_p6.sh`, `p6_namespace_owner.py`, `p3_runner.py`, `p6_node.py` | namespace launch with the byte-identical owner copy; injector entry point |
+| `scripts/verify_p6_evidence.sh` | the unchanged P5 evaluation, then the P6 evaluation |
+| `validation/p6_integration_evaluate.py` | C11, INJECTORS (A-6), RELAY and GROUND_POLICY (A-3) |
+| `injection/qos.py` | relay and `/clock` QoS (§15.4) |
+
+P6 has no build package: its nodes run from the manifest-bound tree under `/usr/bin/python3`.
+
+### 15.2 Operator decisions (2026-11-07)
+
+1. **Policy A for M5 development candidates only.** Answer: "Approve for M5 (Recommended)".
+   * Recorded in `state/p6-policy-A-approval-m5-development.json`.
+   * The manifest refuses it for a real candidate, and a real candidate refuses it.
+2. **F4.07 and F4.13 use the `ground_controller` trigger.** Answer: "Change the trigger (Recommended)".
+   * Under `ground_window` the controller had already exited, so nothing could detect either fault.
+3. **The designed fail-closed exit of F4.07 and F4.13.** Answer: "Allow that one item (Recommended)".
+   * Exactly `cleanup:ros-controller:nonzero_exit_1`, on those two rows only, is replaced by the
+     fail-closed proof.
+   * Every other cleanup item stays never excepted (§15.5).
+
+### 15.3 Live dry runs (no credit; evidence retained unchanged)
+
+| Candidate | Commit | Rows | Outcome |
+|---|---|---|---|
+| `f6048036` | `7fe1917` | A-3 | **failed**: the relays could not create publishers, and `/clock` never matched (§15.4, items 1–2) |
+| `08e79d05` | `04c1a95` | A-3 | **passed** |
+| `ef5ce69e` | `9ce6443` | all 18 Gate A rows | **failed**: 6 passed, 12 failed or not run (below) |
+
+A-3 on `08e79d05`:
+* the P5 evaluation had 0 failures, so every §3 limit held with three relays, the witness and the
+  shim in the loop;
+* relayed images arrived after a median of 3.5 ms, p95 9.6 ms, max 23 ms;
+* CPU: depth relay 27 %, state relay 22 %, witness 44 %;
+* the ground policy replay was bit-exact on 150 snapshots.
+
+Rows of the `ef5ce69e` run:
+* **Passed:** A-1, A-2, A-3, A-4 (87/87, 32/32, 12/12), F1.01, F1.06.
+* **Failed on defects in M5 code:** F1.02, F1.04, F1.07, F1.11, F2.09; see §15.4.
+* **Not run:** F3.01, F3.02, F3.03, F4.07, F4.13. Fixes were committed to bound files while the
+  sequence ran, so the runner's manifest check refused each row before launching anything
+  (`injectors,p6_source_files` differed). They are neither failures nor passes of their fixtures.
+* **Failed through F1.11 only:** A-6 and A-7, whose aggregates include the crashed relay.
+
+### 15.4 Root causes and fixes
+
+Each fix has a regression test in `tests/test_px4_gazebo_p6_runner.py` or the injection tests.
+
+1. **Relay QoS (`f6048036`).** Graph endpoint QoS has no history or depth, so `create_publisher`
+   refused it.
+   * **Fix:** the relays copy only reliability and durability, with keep-last depth (8, the bridge's
+     queue).
+2. **`/clock` (`f6048036`).** The P6 nodes subscribed to `/clock` as reliable, but the bridge
+   publishes it best-effort, so no relay could ever activate.
+   * **Fix:** every P6 node now takes `/clock` best-effort.
+3. **F1.02, evaluator.** The P4 §9.1 window is the bridge-stop window. It was applied to the adapter
+   stop as well.
+   * **Fix:** `p4_window_applies` limits it to `sensor-bridge`.
+   * **Re-evaluated on the retained evidence:** passes. The only P5 item allowed is
+     `fault_injection_outside_s6`, covered by the adapter-stop proof (own exit, no health after
+     exit, 166 native headers after the stop).
+4. **F1.04, evaluator.** The delay proof had no upper bound, so it also judged frames after the 5 s
+   window, which are correctly undelayed.
+   * **Boundaries on the retained evidence:**
+     * the relay activated at 31.092;
+     * delayed frames run from 31.092 to 36.076, with lags of 0.300–0.304 s;
+     * the first undelayed frame is at 36.108, past the window end of 36.092.
+   * **Fix:** the proof now judges frames from the trigger to the window end minus the delay.
+   * **Re-evaluated:** passes on 141 frames.
+5. **F1.07, injector.** The 10-frame budget was counted from the `affected` list, which the relay
+   drains into its ledger after each frame, so 161 frames were cut.
+   * **Fix:** a separate counter.
+   * **Offline in the relay's own pattern:** exactly 10 frames are cut, then every received object is
+     relayed untouched.
+   * **Still to prove live:** the old evidence correctly still fails.
+6. **F1.11, injector.** Images went through the image transform, which had no F1.11 case, and the
+   relay exited.
+   * **Fix:** images pass untouched; only `camera_info` changes, from the trigger on.
+   * **Still to prove live:** relay continuity, witness and cleanup.
+7. **F2.09, evaluator boundary.**
+   * **The fault reached its consumer:** in the window 0 position and 1 attitude message were
+     relayed, against 240 and 481 true ones; perception was unassociated 46 times; the replayed
+     supervisor hovered at 31.360 (`snapshot_stale`, within 0.35 s).
+   * **The single "continued" attitude message** arrived at 36.080, exactly the trigger (31.080) plus
+     5.000 s. The relay's last withheld message was at 36.068.
+   * **The relay withholds on the half-open window [t, t+5)** of `schedule.Windows`, so releasing that
+     message was correct. The proof's window was closed at the end.
+   * **Fix:** both ends get the same 0.2 s settle margin, for messages in flight and for the relay's
+     and the witness's separate `/clock` views. The expectation is unchanged: relayed state silent
+     while true state continues.
+   * **Re-evaluated:** passes.
+
+### 15.5 F3.01–F3.03, F4.07 and F4.13: expected identities from the accepted code
+
+| Row | Accepted controller refusal or failure | P5 evaluator items (unchanged `policy_fault`) | Allowed by |
+|---|---|---|---|
+| F3.01 | `PolicyError: checkpoint_missing` (`FrozenPolicy.load`, unreadable file) | `policy_fault:not_a_checkpoint_mismatch`, `:mismatched_checkpoint_record`, `:refusal_reason` | PROOF (refusal text, no node started) |
+| F3.02 | `PolicyError: checkpoint_sha256_mismatch` (as in accepted P5 Gate A) | none | — |
+| F3.03 | `ValueError: p5_model_schema_differs_from_frozen_hash` (`verified_policy`, before any load) | `policy_fault:not_a_checkpoint_mismatch`, `:refusal_reason` | PROOF |
+| F4.07 | `competing_control_publisher:/px4_71/fmu/in/trajectory_setpoint` (`inspect_graph`; the topic is unversioned, per `topic-contract.json`) | `cleanup:ros-controller:nonzero_exit_1` (certain) | PROOF (decision 3) |
+| F4.13 | `clock_stalled` (P2 mission stall check) | `cleanup:ros-controller:nonzero_exit_1` (certain) | PROOF (decision 3) |
+
+How the items were derived:
+* **F3 rows:** with the unchanged P5 check, in a test on the records the runner writes.
+* **The two cleanup items:** from the accepted `main` (exit 1 unless connectivity passed). Both
+  faults fire during WAIT_FOR_VALID_ESTIMATION, before connectivity passes.
+
+Still to be pinned from live evidence: any further items for F4.07 and F4.13, such as `p2:timing`.
+
+The fail-closed proofs require:
+* the declared reason;
+* the advertiser's lifetime, or the `/proc` stop window;
+* detection within 1.0 s plus one tick (plus the graph query for F4.07);
+* the designed exit: 0, or 1 with connectivity "failed".
+
+### 15.6 Live-run lifecycle (no manifest drift)
+
+* **The live lock.** The sequencer holds `state/p6-live-run.lock` for the whole of a live sequence.
+  While it exists, a freeze and a second sequence are refused.
+* **The drift check.** Before every row the sequencer re-checks every hash-bound P6 file. A changed
+  candidate ends the sequence; the remaining rows are recorded under `not_run`, never as passed.
+* **During a live run:** no bound file changes, no commits, no CPU-heavy tests. If a change is needed,
+  the run ends first, its evidence is kept, and a new candidate follows.
+
+### 15.7 Offline regression on `68ccf30` (no simulator)
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests (specs, injection, offline, evaluate, runner) | 135 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 99 passed, 36 skipped (Linux-only: `fcntl`, ROS, retained WSL runs) |
+
+The Windows skips are not counted as passes.
+
+P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
+
+**New development candidate:** `ce73e57458fa7f1a743a58f64c8f612b96712829fd83d237a9fe4809daf145e1`
+* frozen at `68ccf30` from a clean P6 tree;
+* binds 41 files (16 injector modules), faults `172b8219…`, scenarios `699d29f1…`, and the
+  development Policy A approval;
+* Gate A: 18 rows, 14 of them live.
+
+### 15.8 Authorization status
+
+The earlier dry-run approvals are bound to their own manifest SHA-256s and do not cover `ce73e574`.
+None has been written for it. A confirming dry run of all 18 rows on this candidate needs a new
+operator authorization. M5 exits only when that run passes under one unchanged candidate.
+
+### 15.9 PX4-managed characterization on the ground
+
+None is possible without arming. M0 settled the D4 values from source and ULogs. The PX4-managed
+outcomes stay separately authorized characterization flights.
+
+### 15.10 Remaining
+
+* The confirming dry run, with F1.07, F1.11, F3.0x, F4.07 and F4.13 live for the first time.
+* Pinning any further P5 items those rows produce.
+* M6 and the real P6 freeze, each with its own authorization.
