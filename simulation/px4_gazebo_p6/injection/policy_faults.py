@@ -32,9 +32,11 @@ def worst_allowed(scores, allowed, rows_by_slot):
 
 
 def outside_mask(allowed):
-    """F3.06: a slot the mask forbids (the accepted ranker must classify it `selection_outside_mask`)."""
+    """F3.06: a slot the mask forbids (the accepted ranker must classify it `selection_outside_mask`).
+    None when every slot is allowed: there is nothing to inject, and an invented index (such as -1, which
+    `allowed[-1]` would wrap to the last slot) must never be produced."""
     forbidden = np.flatnonzero(~np.asarray(allowed, dtype=bool))
-    return int(forbidden[0]) if forbidden.size else -1
+    return int(forbidden[0]) if forbidden.size else None
 
 
 def corrupt_scores(fault_id, scores):

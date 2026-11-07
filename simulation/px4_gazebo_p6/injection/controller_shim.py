@@ -153,10 +153,15 @@ class Shim:
         def choice_wrapper(values, allowed, rows_by_slot):
             if not shim.active() or shim.fault not in CHOICE:
                 return choice(values, allowed, rows_by_slot)
-            shim._log("affected", shim.now, item="policy_choice", what=shim.fault)
             if shim.fault == "F3.13":
+                shim._log("affected", shim.now, item="policy_choice", what=shim.fault)
                 return worst_allowed(values, allowed, rows_by_slot)
-            return outside_mask(allowed)
+            forbidden = outside_mask(allowed)
+            if forbidden is None:  # every slot allowed on this tick: nothing to inject, the accepted choice stands
+                shim._log("affected", shim.now, item="policy_choice", what="F3.06_not_injectable")
+                return choice(values, allowed, rows_by_slot)
+            shim._log("affected", shim.now, item="policy_choice", what=shim.fault)
+            return forbidden
 
         def update_wrapper(cache, name, data, wall):
             if shim.state is None:
