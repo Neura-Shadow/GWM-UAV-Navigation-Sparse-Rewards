@@ -15,7 +15,7 @@ POLICY_REASON = {"F3.04": "output_not_finite", "F3.05": "output_shape", "F3.06":
 FAMILY = {**{f: "policy" for f in POLICY_REASON}, "F3.13": "adversarial",
           "F4.01": "map_drop", "F4.02": "map_delay", "F8.03": "map_drop", "F4.06": "health_drop",
           "F2.09": "pose_to_perception", "F6.03": "tick_delay",
-          "F1.01": "bridge_stop", "F1.03": "depth_drop", "F1.04": "depth_delay", "F1.06": "depth_counters",
+          "F1.01": "bridge_stop", "F1.02": "adapter_stop", "F1.03": "depth_drop", "F1.04": "depth_delay", "F1.06": "depth_counters",
           "F1.07": "depth_counters", "F1.12": "depth_counters", "F1.11": "calibration",
           "F3.01": "refusal", "F3.02": "refusal", "F3.03": "refusal", "F4.07": "competing_publisher",
           "F4.13": "clock_stall"}
@@ -186,16 +186,20 @@ def _pose_to_perception(run, d, p, _):
     if act is None:
         return
     t = act["sim_s"]
+    end = t + d["parameters"].get("window_sim_s", float("inf"))  # a ground fixture withholds for its window only
+    inside = lambda w: t + 0.2 < (w.get("receipt_sim_s") or 0) <= end  # noqa: E731
     for kind in ("position", "attitude"):
-        true = [w for w in run.witness("true_" + kind) if (w.get("receipt_sim_s") or 0) > t + 0.2]
-        relayed = [w for w in run.witness("relayed_" + kind) if (w.get("receipt_sim_s") or 0) > t + 0.2]
-        p.evidence(**{kind + "_true_after": len(true), kind + "_relayed_after": len(relayed)})
+        true = [w for w in run.witness("true_" + kind) if inside(w)]
+        relayed = [w for w in run.witness("relayed_" + kind) if inside(w)]
+        p.evidence(**{kind + "_true_in_window": len(true), kind + "_relayed_in_window": len(relayed)})
         p.check(bool(true), "true_%s_stopped_too" % kind)
         p.check(not relayed, "relayed_%s_continued" % kind)
-    perception = run.optional("p4/perception-result.json") or {}
-    reasons = perception.get("unusable_reasons") or {}
-    p.evidence(perception_unusable_reasons=reasons)
-    p.check(any(k.startswith("association:") for k in reasons), "perception_never_unassociated")
+    # Perception's own per-snapshot record, inside the window (start-up association misses do not count).
+    unassociated = [s for s in run.local_map if t + 0.2 < s["processing_sim_s"] <= end
+                    and str(s.get("reason", "")).startswith("association:")]
+    p.evidence(perception_unassociated_in_window=len(unassociated),
+               reasons=sorted({s["reason"] for s in unassociated}))
+    p.check(bool(unassociated), "perception_never_unassociated_in_window")
 
 
 # ---- control tick (accepted timing trace and controller failure) ---------------------------------------------
@@ -225,6 +229,26 @@ def _bridge_stop(run, d, p, fault_window):
     p.evidence(t_inj_sim_s=fault_window.get("t_inj_sim_s"), native_headers_after=fault_window.get("native_headers_after_injection"))
     for item in f1:
         p.check(False, item)
+
+
+def _adapter_stop(run, d, p, _):
+    """F1.02: the adapter's own process record and health stream end at the requested stop, while the native
+    source (the probe, not the adapter) keeps producing frames. The unchanged P4 injection record names it."""
+    injection = run.optional("p4/fault_injection.json")
+    p.check(injection is not None, "injection_record_missing")
+    if injection is None:
+        return
+    adapter = _process(run, "sensor-adapter") or {}
+    exited = adapter.get("exit_observed_monotonic_s")
+    late = [h for h in run.health if exited is not None and (h.get("wall_s") or 0) > exited]
+    headers = [r for r in __import__("p6_run").jsonl(run.file("source/depth-headers.jsonl"))
+               if r["stamp_ns"] / 1e9 > injection["t_inj_sim_s"]]
+    p.evidence(adapter_exit_code=adapter.get("exit_code"), health_after_exit=len(late), native_headers_after=len(headers))
+    p.check(injection.get("process") == "sensor-adapter" and injection.get("signal") == "SIGINT", "wrong_injection")
+    p.check(adapter.get("stop_requested_monotonic_s") == injection["request_monotonic_s"] and adapter.get("exit_code") == 0
+            and exited is not None, "adapter_exit")
+    p.check(not late, "adapter_health_after_exit")
+    p.check(bool(headers), "native_source_stopped_too")
 
 
 def _relay_pairs(run, d):

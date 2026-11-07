@@ -306,3 +306,44 @@ def test_every_p6_node_takes_the_clock_best_effort_and_no_relay_copies_graph_qos
         text = (P6 / "injection" / (name + ".py")).read_text(encoding="utf-8")
         assert 'create_subscription(Clock, "/clock", self.clock, clock_profile())' in text, name
         assert "return infos[0].qos_profile\n" not in text, name
+
+
+# ---- ground proofs completed in M5 (F1.02, the F2.09 window) ------------------------------------------------
+def ground_run(tmp, decl, files):
+    for name, rows in files.items():
+        target = tmp / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("".join(json.dumps(r) + "\n" for r in rows) if name.endswith(".jsonl") else json.dumps(rows))
+    (tmp / "p6").mkdir(parents=True, exist_ok=True)
+    (tmp / "p6/fault-declaration.json").write_text(json.dumps(decl))
+    return Run(tmp)
+
+
+def test_the_adapter_stop_proof_needs_its_own_exit_and_a_live_native_source(tmp_path):
+    from p6_fault_evaluate import prove
+    d = declaration.build("A-5.F1.02")
+    injection = {"process": "sensor-adapter", "signal": "SIGINT", "request_monotonic_s": 100.0, "t_inj_sim_s": 30.0}
+    adapter = dict(process("sensor-adapter"), stop_requested_monotonic_s=100.0, exit_observed_monotonic_s=100.4)
+    files = {"p4/fault_injection.json": injection, "summary.json": {"processes": [adapter]},
+             "sensors/health.jsonl": [{"wall_s": 99.9, "sim_s": 29.9, "status": "fresh"}],
+             "source/depth-headers.jsonl": [{"stamp_ns": int(t * 1e9)} for t in (29.9, 30.5, 31.0)]}
+    assert prove(ground_run(tmp_path / "ok", d, files), d)["proved"]
+    late = dict(files, **{"sensors/health.jsonl": files["sensors/health.jsonl"] + [{"wall_s": 101.0, "sim_s": 31.0, "status": "fresh"}]})
+    assert "proof:adapter_health_after_exit" in prove(ground_run(tmp_path / "late", d, late), d)["failures"]
+    quiet = dict(files, **{"source/depth-headers.jsonl": [{"stamp_ns": int(29.9e9)}]})
+    assert "proof:native_source_stopped_too" in prove(ground_run(tmp_path / "quiet", d, quiet), d)["failures"]
+
+
+def test_the_ground_pose_proof_is_bounded_by_its_window(tmp_path):
+    from p6_fault_evaluate import prove
+    d = declaration.build("A-5.F2.09")  # withheld for 5 s, then the relay resumes
+    true = [{"receipt_sim_s": 30.0 + 0.01 * k} for k in range(1000)]
+    relayed = [w for w in true if not 30.0 < w["receipt_sim_s"] <= 35.0]
+    files = {"p6/fault-ledger-state_relay.jsonl": [{"kind": "activated", "sim_s": 30.0}],
+             "p6/witness/true_position.jsonl": true, "p6/witness/true_attitude.jsonl": true,
+             "p6/witness/relayed_position.jsonl": relayed, "p6/witness/relayed_attitude.jsonl": relayed,
+             "p4/local_map.jsonl": [{"processing_sim_s": 31.0, "usable": False, "reason": "association:position:pending_newer_state"}]}
+    assert prove(ground_run(tmp_path / "ok", d, files), d)["proved"]
+    startup = dict(files, **{"p4/local_map.jsonl": [{"processing_sim_s": 5.0, "usable": False,
+                                                        "reason": "association:position:missing_history"}]})
+    assert "proof:perception_never_unassociated_in_window" in prove(ground_run(tmp_path / "startup", d, startup), d)["failures"]

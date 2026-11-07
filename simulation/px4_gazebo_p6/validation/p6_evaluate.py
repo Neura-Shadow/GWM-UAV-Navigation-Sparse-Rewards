@@ -69,6 +69,11 @@ for _row, _reasons in GROUND.items():
     ROWS[_row] = {"response": ["GROUND_REPLAY:" + ",".join(_reasons)], "exceptions": GROUND_EXCEPTIONS}
 for _row in ("A-5.F3.01", "A-5.F3.02", "A-5.F3.03", "A-5.F4.07", "A-5.F4.13"):
     ROWS[_row] = {"response": [], "exceptions": FAIL_CLOSED}
+# The P5 policy_fault checks describe P5's own fixture (a mismatched checkpoint copy); for the absent checkpoint
+# and the changed schema they cannot hold, and the P6 refusal proof (declared reason, no node started) replaces them.
+for _row in ("A-5.F3.01", "A-5.F3.03"):
+    ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "policy_fault:not_a_checkpoint_mismatch": "PROOF",
+                                                 "policy_fault:mismatched_checkpoint_record": "PROOF"}}
 ROWS["A-1"] = {"response": [], "exceptions": {}}  # P3 readiness unchanged: the P3 evaluation, no exception
 ROWS["A-3"] = {"response": ["GROUND_POLICY", "RELAY"], "exceptions": {}}  # every contract 3 limit, nothing excepted
 

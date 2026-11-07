@@ -298,7 +298,7 @@ def test_pose_to_perception_proof_needs_true_state_to_continue_and_relayed_to_st
     relayed = [r for r in true if r["receipt_sim_s"] <= 10.0]
     files = {"p6/witness/true_position.jsonl": true, "p6/witness/relayed_position.jsonl": relayed,
              "p6/witness/true_attitude.jsonl": true, "p6/witness/relayed_attitude.jsonl": relayed,
-             "p4/perception-result.json": {"unusable_reasons": {"association:position:pending_newer_state": 40}}}
+             "p4/local_map.jsonl": [{"processing_sim_s": 10.5, "usable": False, "reason": "association:position:pending_newer_state"}]}
     assert prove(synthetic_run(tmp_path / "ok", d, "state_relay", files=files), d)["proved"]
     files["p6/witness/true_position.jsonl"] = relayed  # PX4 itself went quiet: not the declared fault
     assert not prove(synthetic_run(tmp_path / "bad", d, "state_relay", files=files), d)["proved"]
