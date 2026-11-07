@@ -148,7 +148,9 @@ def test_depth_dimension_fault_is_rejected_by_the_accepted_decoder_as_declared()
     injector.activate(0.0)
     reasons = []
     for i in range(15):
-        for out in injector.image(frame(i), 1.0):
+        outputs = injector.image(frame(i), 1.0)
+        injector.affected.clear()  # the relay drains this list into its ledger after every frame (M5 live finding)
+        for out in outputs:
             try:
                 depth.decode(out, SENSORS)
                 reasons.append("decoded")
@@ -189,6 +191,8 @@ def test_calibration_fault_changes_or_invalidates_the_accepted_calibration():
     injector.activate(0.0)
     original = p3t.info_fields()
     changed = injector.camera_info(original, 1.0)
+    image = frame(0)
+    assert injector.image(image, 1.0) == [image]  # images pass untouched (the relay crashed here in M5)
     cache = camera_info.CalibrationCache(SENSORS)
     cache.update(original)
     cache.update(changed)

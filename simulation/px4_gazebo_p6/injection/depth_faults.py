@@ -26,6 +26,7 @@ class DepthInjector:
         self.last_out_stamp = None
         self.frozen_data = None
         self.queue = []
+        self.used = {}  # per-kind fault budget; never read back from `affected`, which the relay drains
         self.stamp_plan = self._stamp_plan() if fault_id == "F1.06" else None
         self.windows = self._windows()
 
@@ -64,6 +65,8 @@ class DepthInjector:
 
     def _transform(self, frame, now_sim):
         f = self.fault_id
+        if f == "F1.11":
+            return [frame]  # a calibration fault changes camera_info only; every image passes untouched
         if f == "F1.06":
             return self._stamps(frame, now_sim)
         if not self._active(now_sim):
@@ -81,7 +84,7 @@ class DepthInjector:
             self.affected.append((self.count, "frozen"))
             return [dict(frame, data=self.frozen_data)]
         if f == "F1.07":
-            if self._budget("frames"):
+            if self._budget("dimension", "frames"):
                 width = self.p["width"]
                 rows = np.frombuffer(frame["data"], dtype="<f4").reshape(frame["height"], -1)[:, :width]
                 self.affected.append((self.count, "dimension"))
@@ -103,9 +106,12 @@ class DepthInjector:
             return [dict(frame, frame_id=self.p["frame_id"])]
         raise ValueError("no depth transform for " + f)
 
-    def _budget(self, key):
-        used = sum(1 for _, what in self.affected if what == "dimension")
-        return used < self.p[key]
+    def _budget(self, kind, key):
+        """Take one unit of the declared budget `key` for `kind`; False once it is spent."""
+        if self.used.get(kind, 0) >= self.p[key]:
+            return False
+        self.used[kind] = self.used.get(kind, 0) + 1
+        return True
 
     def _region(self, frame, value):
         r0, r1 = self.p["rows"]

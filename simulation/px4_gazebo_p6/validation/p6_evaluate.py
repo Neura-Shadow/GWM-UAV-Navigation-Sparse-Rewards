@@ -203,7 +203,9 @@ def evaluate(run_path, declaration=None, strict=True, integration_checks=True):
     if rules is None:
         out.update(status="failed", failures=["no_evaluation_rules_for_row"])
         return out
-    window = run_fault_window(run) if run.exists("p4/fault_injection.json") else None
+    # The accepted P4 §9.1 window is the bridge-stop window; an adapter stop (F1.02) has its own proof (M5 finding).
+    injected = run.optional("p4/fault_injection.json") or {}
+    window = run_fault_window(run) if injected.get("process") == "sensor-bridge" else None
     proof = proof_module.prove(run, declaration, window)
     checks = respond(run, declaration, rules, proof, window)
     if integration_checks:

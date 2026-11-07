@@ -282,9 +282,10 @@ def _depth_delay(run, d, p, _):
     if act is None:
         return
     delay = d["parameters"]["delay_s"]
+    end = act["sim_s"] + d["parameters"].get("window_sim_s", float("inf"))  # frames after the window are not delayed
     raw = {w["stamp_ns"]: w["receipt_sim_s"] for w in run.witness("raw_image")}
     lags = [w["receipt_sim_s"] - raw[w["stamp_ns"]] for w in run.witness("relayed_image")
-            if w["stamp_ns"] in raw and raw[w["stamp_ns"]] > act["sim_s"] + 0.05]
+            if w["stamp_ns"] in raw and act["sim_s"] + 0.05 < raw[w["stamp_ns"]] <= end - delay]
     p.evidence(delayed_frames=len(lags), min_lag_s=min(lags, default=None))
     p.check(lags and min(lags) >= delay - 0.05, "relayed_frames_not_delayed")
 
