@@ -67,7 +67,8 @@ STATE_PREFIX = "/gwm/p6/px4_71"
 REFUSALS = {"F3.01": "checkpoint_missing", "F3.02": "checkpoint_sha256_mismatch",
             "F3.03": "p5_model_schema_differs_from_frozen_hash"}
 LIVE_DETECTION = {"F4.07": "competing_control_publisher", "F4.13": "clock_stalled"}
-LIVE_TRIGGER = "ground_controller"  # only if the frozen specification declares it (see live_trigger)
+LIVE_TRIGGER = "ground_prestream"  # only if the frozen specification declares it (see live_trigger)
+PRESTREAM = "PRESTREAM_SAFE_SETPOINTS"
 OBSERVE_SIM_S = 5.0  # after the injection: the accepted P4 ground-fault observation, or the declared window + margin
 OBSERVE_MARGIN_SIM_S = 3.0
 
@@ -104,8 +105,10 @@ def observation_end(declared, t_inj):
 
 
 def live_trigger_due(rows):
-    """`ground_controller`: the ground-diagnostic controller's first state transition (its ros-events.jsonl)."""
-    return any(r.get("event") == "transition" for r in rows)
+    """`ground_prestream`: the ground-diagnostic controller's transition into PRESTREAM_SAFE_SETPOINTS (its
+    ros-events.jsonl). Its estimate has then been valid for the accepted P2 stability time, connectivity has passed,
+    every PX4 stream is in its ledger, and it holds the state for its accepted ground duration (M5 decision)."""
+    return any(r.get("event") == "transition" and r.get("to") == PRESTREAM for r in rows)
 
 
 def uses(declared, mechanism):
@@ -278,9 +281,10 @@ class P6Runner(p5r.P5Runner):
         self.summary["status"] = "passed"
 
     def live_trigger(self, config):
-        """A fault the running ground-diagnostic controller must detect: inject at its first state transition
-        (it is then running its graph and clock checks), accept only the declared detection as its failure, then
-        hold the unchanged ground window so the sensor checks still apply (the P5 policy_fault pattern)."""
+        """A fault the running ground-diagnostic controller must detect: inject at its transition into
+        PRESTREAM_SAFE_SETPOINTS (it is then running its graph and clock checks on a valid estimate), accept only the
+        declared detection as its failure, then hold the unchanged ground window so the sensor checks still apply (the
+        P5 policy_fault pattern); the window therefore begins after the estimator start-up."""
         deadline = self.start + config["wall_deadline_s"] + 90
         events = base.Tail(self.run / "ros-events.jsonl")
         while self.controller.poll() is None:

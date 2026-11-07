@@ -74,11 +74,17 @@ for _row in ("A-5.F3.01", "A-5.F3.02", "A-5.F3.03", "A-5.F4.07", "A-5.F4.13"):
 # F4.07/F4.13 (operator decision, 2026-11-07, "Allow that one item"): the accepted controller fails closed before its
 # connectivity check passes, so it exits 1 by design, which the unchanged P3 classifier reports as this one item (the
 # accepted P5 evaluator treats the same item as its own refusal fixture's designed exit). Exactly this item, for these
-# two rows only, is replaced by the fail-closed proof; every other cleanup item stays never excepted.
+# two rows only, is replaced by the fail-closed proof; every other cleanup item stays never excepted. At the later
+# `ground_prestream` trigger connectivity has passed, so the designed exit is 0 and this item does not arise.
+# Operator decision, 2026-11-07, "Adopt both": the accepted P2 timing check reports failed whenever the controller's
+# result carries a failure (`timing_evidence.trace_metrics`), so exactly `p2:timing`, for these two rows only, is
+# replaced by the fail-closed proof, which then also requires the timing reconciliation to have completed.
 FAIL_CLOSED_EXIT = "cleanup:ros-controller:nonzero_exit_1"
+FAIL_CLOSED_TIMING = "p2:timing"
 FAIL_CLOSED_EXIT_ROWS = ("A-5.F4.07", "A-5.F4.13")
 for _row in FAIL_CLOSED_EXIT_ROWS:
-    ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "=" + FAIL_CLOSED_EXIT: "PROOF"}}
+    ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "=" + FAIL_CLOSED_EXIT: "PROOF",
+                                                 "=" + FAIL_CLOSED_TIMING: "PROOF"}}
 for _row in ("A-5.F3.01", "A-5.F3.03"):
     ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "policy_fault:not_a_checkpoint_mismatch": "PROOF",
                                                  "policy_fault:mismatched_checkpoint_record": "PROOF"}}

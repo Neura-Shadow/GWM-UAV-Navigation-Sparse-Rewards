@@ -249,14 +249,24 @@ def test_a6_and_a7_aggregate_every_evaluated_live_row():
 
 
 # ---- live fail-closed proofs (F4.07, F4.13) ---------------------------------------------------------------
-def fail_closed_run(tmp, decl, failure, abort_wall, processes=(), ledgers=None, trace=()):
+def fail_closed_run(tmp, decl, failure, abort_wall, processes=(), ledgers=None, trace=(), requested=None, entered=None,
+                    p5=None, code=0, connectivity="passed"):
+    """A live ground fixture as the `ground_prestream` trigger produces it: the controller entered PRESTREAM (its own
+    transition event), the runner requested the injection after it, the controller aborted and (connectivity having
+    passed) exited 0; the unchanged P5 evaluation reports `p2:timing` with a completed timing reconciliation."""
+    requested = abort_wall - 1.5 if requested is None else requested
+    entered = requested - 0.05 if entered is None else entered
     (tmp / "p6").mkdir(parents=True)
     (tmp / "p6/fault-declaration.json").write_text(json.dumps(decl))
-    (tmp / "ros-events.jsonl").write_text(json.dumps({"event": "abort", "reason": failure, "sim_s": 9.0,
-                                                      "monotonic_s": abort_wall}) + "\n")
+    (tmp / "p6/injection.json").write_text(json.dumps({"row": decl["row"], "request_monotonic_s": requested}))
+    events = [{"event": "transition", "from": "WAIT_FOR_VALID_ESTIMATION", "to": "PRESTREAM_SAFE_SETPOINTS", "sim_s": 8.0,
+               "monotonic_s": entered}, {"event": "abort", "reason": failure, "sim_s": 9.0, "monotonic_s": abort_wall}]
+    (tmp / "ros-events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events if e["monotonic_s"] is not None))
     (tmp / "timing-trace.jsonl").write_text("".join(json.dumps(s) + "\n" for s in trace))
-    (tmp / "summary.json").write_text(json.dumps({"processes": list(processes), "controller_exit_code": 1,
-                                                  "controller_result": {"failure": failure, "connectivity": "failed"}}))
+    (tmp / "summary.json").write_text(json.dumps({"processes": list(processes), "controller_exit_code": code,
+                                                  "controller_result": {"failure": failure, "connectivity": connectivity}}))
+    (tmp / "p5-evaluation.json").write_text(json.dumps(p5 if p5 is not None else
+                                                       {"p2_timing_status": "failed", "failures": ["p2:timing"]}))
     for name, records in (ledgers or {}).items():
         (tmp / ("p6/fault-ledger-%s.jsonl" % name)).write_text("".join(json.dumps(r) + "\n" for r in records))
     return Run(tmp)
@@ -436,12 +446,83 @@ def test_the_p4_bridge_window_applies_to_bridge_stops_only(tmp_path):
     assert p6_evaluate.p4_window_applies(ground_run(tmp_path / "none", declaration.build("A-5.F2.09"), {})) is False
 
 
-def test_the_ground_controller_trigger_fires_on_the_controllers_first_transition():
+def test_the_ground_prestream_trigger_fires_only_on_the_transition_into_prestream():
+    """M5 decision ("Adopt both"): not the first transition (ce73e574: PX4 had published no attitude yet and its
+    estimator was still starting up), but the controller's transition into PRESTREAM_SAFE_SETPOINTS."""
+    from injection import schedule
     r = runner()
     assert not r.live_trigger_due([{"event": "received"}, {"event": "p5_policy_verified"}])
-    assert r.live_trigger_due([{"event": "transition", "from": "WAIT_FOR_CLOCK_AND_CONNECTION", "to": "WAIT_FOR_VALID_ESTIMATION"}])
+    assert not r.live_trigger_due([{"event": "transition", "from": "WAIT_FOR_CLOCK_AND_CONNECTION", "to": "WAIT_FOR_VALID_ESTIMATION"}])
+    assert r.live_trigger_due([{"event": "transition", "from": "WAIT_FOR_VALID_ESTIMATION", "to": "PRESTREAM_SAFE_SETPOINTS"}])
     triggers = {row["id"]: row["trigger"] for row in GATE_A if row.get("fault") in ("F4.07", "F4.13")}
-    assert triggers == {"A-5.F4.07": r.LIVE_TRIGGER, "A-5.F4.13": r.LIVE_TRIGGER}
+    assert triggers == {"A-5.F4.07": r.LIVE_TRIGGER, "A-5.F4.13": r.LIVE_TRIGGER} and r.LIVE_TRIGGER == "ground_prestream"
+    assert r.LIVE_TRIGGER in schedule.GROUND and "ground_controller" not in schedule.TRIGGERS
+    assert r.LIVE_TRIGGER in specs.strict_json(specs.SCENARIOS)["triggers"]
+
+
+def test_at_prestream_the_accepted_ground_diagnostic_has_passed_connectivity_holds_3_s_and_exits_0():
+    """Read from the accepted sources, not assumed: connectivity passes on the estimator-stability rule just before the
+    PRESTREAM transition, the ground diagnostic then holds PRESTREAM for `ground_prestream_sim_s`, and `main` exits 0
+    once connectivity has passed (ground `p4_outcome` is `not_run`), so the designed fail-closed exit is 0."""
+    mission = (REPO / "simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control/mission.py").read_text(encoding="utf-8")
+    node = (REPO / "simulation/px4_gazebo_p5/ros2_ws/src/gwm_policy_control/gwm_policy_control/control_node.py").read_text(encoding="utf-8")
+    p4_node = (REPO / "simulation/px4_gazebo_p4/ros2_ws/src/gwm_obstacle_avoidance/gwm_obstacle_avoidance/control_node.py").read_text(encoding="utf-8")
+    timing = json.loads((REPO / "simulation/px4_gazebo/configs/p2_timing.yaml").read_text(encoding="utf-8"))
+    assert 'required = c["estimator_stable_sim_s"] if self.flight else c["observation_sim_s"]' in mission
+    assert "self.connectivity_passed = True" in mission
+    assert "sim-self.prestream_first_sim >= self.ground_duration" in mission
+    assert 'args.ground_diagnostic, tc["ground_prestream_sim_s"])' in node and timing["ground_prestream_sim_s"] == 3.0
+    assert 'ok = result["connectivity"] == "passed" and result["p4_outcome"] in ("completed", "supervisor_abort", "not_run")' in node
+    assert 'return "not_run" if not flight else "failed"' in p4_node
+
+
+def test_p2_timing_reports_failed_exactly_when_the_controller_result_carries_a_failure():
+    """The accepted `timing_evidence.trace_metrics`: the status follows the controller's failure alone once every
+    reconciliation `require` has passed, so a fail-closed row always reports `p2:timing`."""
+    from timing_evidence import trace_metrics
+    traces = [{"seq": 1, "operation": "clock_callback", "call_index": 1, "start_wall_s": 0.0, "end_wall_s": 0.001,
+               "duration_wall_s": 0.001, "sim_s": 1.0}]
+    receipt = {"complete": True, "overflow": 0, "records": 1, "calls": {"clock_callback": 1}}
+    streams = {key: [] for key in ("offboard_control_mode", "trajectory_setpoint", "vehicle_command", "vehicle_local_position")}
+    for failure, status in (("clock_stalled", "failed"), ("competing_control_publisher:/px4_71/fmu/in/trajectory_setpoint", "failed"),
+                            (None, "passed")):
+        result = {"trace": receipt, "failure": failure, "flight": "not_run"}
+        assert trace_metrics(traces, result, streams, [], {})["status"] == status, failure
+
+
+def test_p2_timing_is_allowed_only_on_the_two_fail_closed_rows_and_only_with_the_proof():
+    import p6_evaluate
+    for row in ("A-5.F4.07", "A-5.F4.13"):
+        rules = p6_evaluate.ROWS[row]["exceptions"]
+        allowed, refused = p6_evaluate.compose(["p2:timing", "p2:timing_extra", "p2:bag_received_ledger_count:vehicle_attitude"],
+                                               rules, {"PROOF": {"passed": True}})
+        assert [a["item"] for a in allowed] == ["p2:timing"], row
+        assert refused == ["p2:timing_extra", "p2:bag_received_ledger_count:vehicle_attitude"], row
+        assert p6_evaluate.compose(["p2:timing"], rules, {"PROOF": {"passed": False}})[1] == ["p2:timing"]
+    for row in ("A-5.F1.01", "A-5.F3.02", "A-3", "A-1"):
+        assert p6_evaluate.compose(["p2:timing"], p6_evaluate.ROWS[row]["exceptions"], {"PROOF": {"passed": True},
+                                   "GROUND_REPLAY": {"passed": True}})[1] == ["p2:timing"], row
+
+
+def test_the_fail_closed_proofs_need_a_prestream_injection_and_a_completed_timing_reconciliation(tmp_path):
+    from p6_fault_evaluate import prove
+    d = declaration.build("A-5.F4.13")
+    act = {"kind": "activated", "signal": "SIGSTOP", "proved": True, "request_wall_s": 100.0, "stopped_seen_wall_s": 100.01,
+           "resumed_seen_wall_s": 102.02}
+    ledger = {"process_signal": [{"kind": "declared"}, act]}
+
+    def failures(name, **kw):
+        return prove(fail_closed_run(tmp_path / name, d, "clock_stalled", 101.03, ledgers=ledger, **kw), d)["failures"]
+    assert failures("ok", requested=100.0) == []
+    assert "proof:fault_not_injected_after_prestream" in failures("early", requested=100.0, entered=100.2)
+    no_transition = fail_closed_run(tmp_path / "none", d, "clock_stalled", 101.03, ledgers=ledger, requested=100.0)
+    no_transition.file("ros-events.jsonl").write_text(json.dumps({"event": "abort", "reason": "clock_stalled",
+                                                                 "monotonic_s": 101.03}) + "\n")
+    assert "proof:fault_not_injected_after_prestream" in prove(Run(no_transition.path), d)["failures"]
+    error = {"failures": ["p2:timing", "p2_integrity_error:ValueError:Trace call count mismatch"]}
+    assert "proof:p2_timing_reconciliation_not_completed" in failures("integrity", requested=100.0, p5=error)
+    assert "proof:p2_timing_reconciliation_not_completed" in failures("missing", requested=100.0, p5={})
+    assert "proof:connectivity_not_passed_before_the_fault" in failures("conn", requested=100.0, code=1, connectivity="failed")
 
 
 def test_the_live_detections_are_the_accepted_controllers_own_reasons():
@@ -521,9 +602,12 @@ def test_a_fail_closed_proof_refuses_an_exit_the_accepted_controller_does_not_de
     d = declaration.build("A-5.F4.13")
     act = {"kind": "activated", "signal": "SIGSTOP", "proved": True, "request_wall_s": 100.0, "stopped_seen_wall_s": 100.01,
            "resumed_seen_wall_s": 102.02}
-    run = fail_closed_run(tmp_path / "x", d, "clock_stalled", 101.03, ledgers={"process_signal": [{"kind": "declared"}, act]})
+    run = fail_closed_run(tmp_path / "x", d, "clock_stalled", 101.03, ledgers={"process_signal": [{"kind": "declared"}, act]},
+                          requested=100.0)
     summary = json.loads(run.file("summary.json").read_text())
-    for code, connectivity, ok in ((1, "failed", True), (0, "passed", True), (1, "passed", False), (-9, "failed", False)):
+    # At the `ground_prestream` trigger connectivity has passed, so only exit 0 is the designed one; exit 1 with
+    # connectivity "failed" is still designed by `main` but means the fault was not injected after PRESTREAM.
+    for code, connectivity, ok in ((1, "failed", False), (0, "passed", True), (1, "passed", False), (-9, "failed", False)):
         summary.update(controller_exit_code=code, controller_result=dict(summary["controller_result"], connectivity=connectivity))
         run.file("summary.json").write_text(json.dumps(summary))
         assert prove(Run(run.path), d)["proved"] is ok, (code, connectivity)

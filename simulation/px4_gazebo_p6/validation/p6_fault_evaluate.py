@@ -9,6 +9,7 @@ SOURCE_GAP_SIM_S = 0.12  # P3 source-gap limit, the P4 §9.1 pre-window trim
 CLOCK_STALL_WALL_S, TICK_S = 1.0, 0.05  # P2 clock stall (contract §3) and one 20 Hz control tick
 GRAPH_PERIOD_WALL_S = 1.0  # the accepted controller re-checks the PX4-input graph every 1.0 s wall
 SETTLE_S = 0.2  # relay windows: margin at each end for in-flight messages and per-process /clock views
+PRESTREAM = "PRESTREAM_SAFE_SETPOINTS"  # the live ground trigger state (M5 decision, `ground_prestream`)
 POLICY_REASON = {"F3.04": "output_not_finite", "F3.05": "output_shape", "F3.06": "selection_outside_mask",
                  "F3.07": "timeout", "F3.08": "timeout", "F3.09": "timeout", "F3.10": "timeout",
                  "F3.11": "exception:RuntimeError", "F3.12": "input_not_finite", "F7.02": "exception:RuntimeError",
@@ -337,6 +338,31 @@ def _designed_exit(run, p):
     p.check(code == 0 or (code == 1 and connectivity == "failed"), "controller_exit_not_the_designed_fail_closed_exit")
 
 
+def _after_prestream(run, p):
+    """M5 decision ("Adopt both"): the live ground faults are injected at the controller's own transition into
+    PRESTREAM_SAFE_SETPOINTS (its ros-events.jsonl), when its estimate is valid and its connectivity check has passed;
+    the runner's injection request (CLOCK_MONOTONIC, as the controller's events) must not precede it."""
+    entered = next((e.get("monotonic_s") for e in run.events
+                    if e.get("event") == "transition" and e.get("to") == PRESTREAM), None)
+    requested = (run.injection or {}).get("request_monotonic_s")
+    p.evidence(prestream_entered_monotonic_s=entered, injection_requested_monotonic_s=requested)
+    p.check(entered is not None and requested is not None and entered <= requested, "fault_not_injected_after_prestream")
+    p.check(run.result.get("connectivity") == "passed", "connectivity_not_passed_before_the_fault")
+
+
+def _designed_timing(run, p):
+    """M5 decision ("Adopt both"): the accepted P2 timing check (`timing_evidence.trace_metrics`) reports failed
+    whenever the controller's result carries a failure, and raises on any reconciliation mismatch, which the P5
+    evaluator records as `p2_integrity_error:` without a timing status. So `p2:timing` is the designed consequence of
+    the fail-closed detection only when the timing status exists, no integrity error was recorded, and the
+    controller's failure (the timing report's `controller_failure`) is the declared detection, which the caller checks."""
+    p5 = run.p5_evaluation or {}
+    status = p5.get("p2_timing_status")
+    errors = [x for x in p5.get("failures") or [] if str(x).startswith("p2_integrity_error")]
+    p.evidence(p2_timing_status=status, p2_integrity_errors=errors)
+    p.check(status in ("passed", "failed") and not errors, "p2_timing_reconciliation_not_completed")
+
+
 def _competing_publisher(run, d, p, _):
     """F4.07. The accepted controller raises inside its graph check before it rewrites `ros-graph.json`, so that
     file keeps the previous (clean) check (M5 finding). The proof is the controller's own fail-closed reason
@@ -354,6 +380,8 @@ def _competing_publisher(run, d, p, _):
                detection_after_advertise_wall_s=(abort["monotonic_s"] - advertiser["launched_monotonic_s"]) if alive else None)
     p.check(failure == "competing_control_publisher:" + topic, "controller_did_not_detect_the_declared_topic")
     _designed_exit(run, p)
+    _after_prestream(run, p)
+    _designed_timing(run, p)
     p.check(alive, "detection_outside_the_advertiser_lifetime")
     p.check(advertiser is not None and advertiser.get("exit_code") == 0, "advertiser_process_record")
     p.check(finished is not None and finished.get("messages_published") == 0, "advertiser_published")
@@ -380,6 +408,8 @@ def _clock_stall(run, d, p, _):
     p.evidence(controller_failure=failure, activation=act, abort_monotonic_s=abort and abort["monotonic_s"])
     p.check(failure == "clock_stalled", "controller_did_not_report_clock_stalled")
     _designed_exit(run, p)
+    _after_prestream(run, p)
+    _designed_timing(run, p)
     p.check(act is not None and act.get("signal") == "SIGSTOP" and act.get("proved") is True, "no_proc_evidence_of_the_stop")
     if act is None or abort is None or not act.get("proved"):
         return

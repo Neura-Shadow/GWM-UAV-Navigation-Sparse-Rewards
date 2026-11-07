@@ -297,19 +297,31 @@ Plan §8 states what the sample sizes do and do not support.
    * F4.07, F4.13.
 
    Each needs its detection in the live component and the replayed supervisor/policy response.
-   F4.07 and F4.13 are injected at the `ground_controller` trigger, the ground-diagnostic controller's
-   first state transition, so the running controller detects them and fails closed. The unchanged
-   15 s ground window follows (M5 decision, approved 2026-11-07). The other ground fixtures keep
+   F4.07 and F4.13 are injected at the `ground_prestream` trigger, so the running controller detects
+   them and fails closed. The unchanged 15 s ground window follows. The other ground fixtures keep
    `ground_window`.
+   * **The trigger point** is the ground-diagnostic controller's transition into
+     PRESTREAM_SAFE_SETPOINTS (M5 decisions, approved 2026-11-07).
+   * **By then:** its estimate has been valid for P2 `estimator_stable_sim_s`, connectivity has
+     passed, and every PX4 stream is in its ledger.
+   * **It holds that state** for `ground_prestream_sim_s` (3.0 s).
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
    process, pass-through causes no topology change beyond the declared relay, and active matches
    the declaration.
 7. One PX4-input owner; no unintended vehicle commands (Policy A); graceful cleanup. The one
    exception is the designed fail-closed exit of F4.07 and F4.13 (M5 decision, approved 2026-11-07).
-   The accepted controller fails closed before its connectivity check passes and exits 1, which the
-   unchanged P3 classifier reports as `cleanup:ros-controller:nonzero_exit_1`. That exact item, on
-   those two rows only, is replaced by the fail-closed proof. Every other cleanup item is never
-   excepted.
+   * If the accepted controller fails closed before its connectivity check passes, it exits 1. The
+     unchanged P3 classifier reports that as `cleanup:ros-controller:nonzero_exit_1`.
+   * That exact item, on those two rows only, is replaced by the fail-closed proof.
+   * At the `ground_prestream` trigger connectivity has already passed, so the designed exit is 0
+     and the item does not arise.
+   * Every other cleanup item is never excepted.
+
+   **`p2:timing` (M5 decision, approved 2026-11-07, "Adopt both").** The accepted P2 timing check
+   reports failed whenever the controller's result carries a failure.
+   * On F4.07 and F4.13 only, exactly `p2:timing` is replaced by the fail-closed proof.
+   * The proof then also requires the timing reconciliation to have completed: a timing status
+     exists, and there is no `p2_integrity_error`.
 
 ### 8.2 Gate B — smoke
 
@@ -400,6 +412,8 @@ Any change after freeze is a new P6 candidate.
 | M4 Gate A (2026-11-07, "Remove them") | A-5.F4.02 and A-5.F4.06 removed from Gate A | 12 fixtures, 14 live ground runs. F4.06 becomes R-O (covered offline by the stale rules and F4.11); F4.02 stays characterization in flight. Plan §14.4 |
 | M5 trigger (2026-11-07, "Change the trigger (Recommended)") | A-5.F4.07 and A-5.F4.13: `ground_window` → `ground_controller` | under `ground_window` the controller has already exited, so nothing could detect either fault. Faults, parameters and expected outcomes unchanged. Plan §15 |
 | M5 fail-closed exit (2026-11-07, "Allow that one item (Recommended)") | A-5.F4.07 and A-5.F4.13 may report exactly `cleanup:ros-controller:nonzero_exit_1` | replaced by the fail-closed proof (declared reason, timing, `/proc` or advertiser evidence, exit 0 or exit 1 with connectivity "failed"); every other cleanup item stays never excepted. Plan §15 |
+| M5 trigger point (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13: `ground_controller` (first transition) → `ground_prestream` (the transition into PRESTREAM_SAFE_SETPOINTS) | at the first transition PX4 had published no attitude yet and its estimator was still starting up, so F4.13's ledger lacked attitude and its window began inside the start-up (`ce73e574` dry run). The proof also requires the injection after that transition and connectivity "passed". Plan §15.11–15.12 |
+| M5 `p2:timing` (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13 may report exactly `p2:timing` | replaced by the fail-closed proof, which also requires the timing reconciliation to have completed; the accepted P2 check reports failed whenever the controller failed. Plan §15.11–15.12 |
 | M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 
 The options as presented:

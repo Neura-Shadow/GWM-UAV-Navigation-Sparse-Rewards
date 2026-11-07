@@ -6,8 +6,8 @@ plans are relative to the trigger's simulation time.
 """
 import math
 
-TRIGGERS = ("ground_window", "ground_controller", "transit_start", "avoiding_first", "avoiding_near", "normal_2m")
-GROUND = ("ground_window", "ground_controller")  # fired by the runner, never by a decision event
+TRIGGERS = ("ground_window", "ground_prestream", "transit_start", "avoiding_first", "avoiding_near", "normal_2m")
+GROUND = ("ground_window", "ground_prestream")  # fired by the runner, never by a decision event
 AVOIDING_NEAR_M = 1.5
 NORMAL_DISTANCE_M = 2.0
 
