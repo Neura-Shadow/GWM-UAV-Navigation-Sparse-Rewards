@@ -25,6 +25,7 @@ for path in (HERE, HERE.parent, ROOT / "simulation/px4_gazebo_p4/validation", RO
         sys.path.insert(0, str(path))
 
 import p6_fault_evaluate as proof_module  # noqa: E402
+import p6_integration_evaluate as integration  # noqa: E402
 import p6_safety_evaluate as response  # noqa: E402
 import p6_timing_evaluate as timing  # noqa: E402
 from p6_run import Run  # noqa: E402
@@ -68,7 +69,8 @@ for _row, _reasons in GROUND.items():
     ROWS[_row] = {"response": ["GROUND_REPLAY:" + ",".join(_reasons)], "exceptions": GROUND_EXCEPTIONS}
 for _row in ("A-5.F3.01", "A-5.F3.02", "A-5.F3.03", "A-5.F4.07", "A-5.F4.13"):
     ROWS[_row] = {"response": [], "exceptions": FAIL_CLOSED}
-ROWS["A-3"] = {"response": [], "exceptions": {}}
+ROWS["A-1"] = {"response": [], "exceptions": {}}  # P3 readiness unchanged: the P3 evaluation, no exception
+ROWS["A-3"] = {"response": ["GROUND_POLICY", "RELAY"], "exceptions": {}}  # every contract 3 limit, nothing excepted
 
 
 def codes():
@@ -82,7 +84,8 @@ def p5_limits():
 
 
 def run_fault_window(run):
-    """The unchanged P4 §9.1 window function on the run's `p4/fault_injection.json` (bridge-stop rows)."""
+    """The unchanged P4 §9.1 window function on the run's `p4/fault_injection.json` (bridge-stop rows).
+    Any error is kept as a failure item, so a proof that reads the window cannot pass on missing evidence."""
     import p3_evaluate
     import p4_evaluate as p4e
     f = response._Failures()
@@ -90,13 +93,17 @@ def run_fault_window(run):
     v4 = json.loads((ROOT / "simulation/px4_gazebo_p4/configs/p4_validation.yaml").read_text(encoding="utf-8"))
     try:
         out = p4e.fault_window(run.path, run.summary, validation_p3, sensors, v4["outcomes"], f) or {}
-    except (ValueError, KeyError, FileNotFoundError, StopIteration) as exc:
-        out, f.items = {}, f.items + ["fault_window_error:" + type(exc).__name__]
+    except Exception as exc:  # noqa: BLE001  (recorded; never a silent pass)
+        out, f.items = {}, f.items + ["fault_window_error:" + type(exc).__name__ + ":" + str(exc)[:200]]
     out["failures"] = f.items
     return out
 
 
-def respond(run, row, rules, proof, window):
+def scenarios():
+    return json.loads((HERE.parent / "configs/p6_scenarios.yaml").read_text(encoding="utf-8"))
+
+
+def respond(run, declaration, rules, proof, window):
     c = response.Checks(codes())
     injected = {round(r["sim_s"], 6) for r in run.ledger if r.get("failure") is not None}
     for name in rules["response"]:
@@ -137,6 +144,10 @@ def respond(run, row, rules, proof, window):
                 ours = c.out.get("GROUND_REPLAY", {})
                 c.record("GROUND_REPLAY_P4", not f.items and accepted.get("reason") == ours.get("reason"),
                          accepted=accepted, items=f.items)
+        elif code == "GROUND_POLICY":
+            integration.ground_policy(run, c)
+        elif code == "RELAY":
+            integration.relay(run, c)
         elif code == "FAULT_WINDOW":
             c.record("FAULT_WINDOW", window is not None and not window["failures"], items=(window or {}).get("failures"))
         else:
@@ -162,7 +173,11 @@ def compose(p5_failures, exceptions, checks):
     return allowed, refused
 
 
-def evaluate(run_path, declaration=None, strict=True):
+def evaluate(run_path, declaration=None, strict=True, integration_checks=True):
+    """`strict=False` and `integration_checks=False` exist only for tests that evaluate accepted P5 runs as
+    stand-ins for P6 rows; a real P6 evaluation is always strict, with the integration checks."""
+    if strict and not integration_checks:
+        raise ValueError("a strict P6 evaluation always applies the integration checks")
     run = Run(run_path)
     declaration = declaration or run.declaration
     out = {"contract": CONTRACT, "run_id": run.path.name, "failures": []}
@@ -185,7 +200,10 @@ def evaluate(run_path, declaration=None, strict=True):
         return out
     window = run_fault_window(run) if run.exists("p4/fault_injection.json") else None
     proof = proof_module.prove(run, declaration, window)
-    checks = respond(run, row, rules, proof, window)
+    checks = respond(run, declaration, rules, proof, window)
+    if integration_checks:
+        integration.injectors(run, declaration, checks)  # Gate A row 6, on every run
+        integration.c11(run, declaration, checks, scenarios()["run_local_config_rule"])  # rule C11, on every run
     p5 = run.p5_evaluation
     p5_failures = list((p5 or {}).get("failures", [])) if p5 else ["p5_evaluation_missing"]
     allowed, refused = compose(p5_failures, rules["exceptions"], checks.out)

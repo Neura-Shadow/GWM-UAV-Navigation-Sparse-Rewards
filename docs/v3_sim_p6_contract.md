@@ -297,6 +297,10 @@ Plan §8 states what the sample sizes do and do not support.
    * F4.07, F4.13.
 
    Each needs its detection in the live component and the replayed supervisor/policy response.
+   F4.07 and F4.13 are injected at the `ground_controller` trigger, the ground-diagnostic controller's
+   first state transition, so the running controller detects them and fails closed. The unchanged
+   15 s ground window follows (M5 decision, approved 2026-11-07). The other ground fixtures keep
+   `ground_window`.
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
    process, pass-through causes no topology change beyond the declared relay, and active matches
    the declaration.
@@ -389,6 +393,8 @@ Any change after freeze is a new P6 candidate.
 | D4a | the PX4-managed S-2 and S-5 become characterization; Gate S uses S-2′ = F2.09 and S-5′ = F6.03 | §8.3 as now written; no ceiling exemption |
 | C11 | run-local config equality, except declared keys | §2 C11 in force for P6 evaluation |
 | M4 Gate A (2026-11-07, "Remove them") | A-5.F4.02 and A-5.F4.06 removed from Gate A | 12 fixtures, 14 live ground runs. F4.06 becomes R-O (covered offline by the stale rules and F4.11); F4.02 stays characterization in flight. Plan §14.4 |
+| M5 trigger (2026-11-07, "Change the trigger (Recommended)") | A-5.F4.07 and A-5.F4.13: `ground_window` → `ground_controller` | under `ground_window` the controller has already exited, so nothing could detect either fault. Faults, parameters and expected outcomes unchanged. Plan §15 |
+| M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 
 The options as presented:
 

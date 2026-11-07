@@ -6,6 +6,8 @@ The injector's ledger only says *where* to look; a fault the ledger reports but 
 evidence does not show is **not proved**, and the run fails (contract C8).
 """
 SOURCE_GAP_SIM_S = 0.12  # P3 source-gap limit, the P4 §9.1 pre-window trim
+CLOCK_STALL_WALL_S, TICK_S = 1.0, 0.05  # P2 clock stall (contract §3) and one 20 Hz control tick
+GRAPH_PERIOD_WALL_S = 1.0  # the accepted controller re-checks the PX4-input graph every 1.0 s wall
 POLICY_REASON = {"F3.04": "output_not_finite", "F3.05": "output_shape", "F3.06": "selection_outside_mask",
                  "F3.07": "timeout", "F3.08": "timeout", "F3.09": "timeout", "F3.10": "timeout",
                  "F3.11": "exception:RuntimeError", "F3.12": "input_not_finite", "F7.02": "exception:RuntimeError",
@@ -216,6 +218,9 @@ def _bridge_stop(run, d, p, fault_window):
     p.check(fault_window is not None, "p4_fault_window_not_evaluated")
     if fault_window is None:
         return
+    errors = [x for x in fault_window["failures"] if x.startswith("fault_window_error")]
+    p.check(not errors, "p4_fault_window_error")  # a window that could not be evaluated proves nothing
+    p.check(bool(fault_window.get("native_headers_after_injection")), "no_native_source_evidence_after_injection")
     f1 = [x for x in fault_window["failures"] if x.startswith("s6:f1_") or x == "s6:injection_record_missing"]
     p.evidence(t_inj_sim_s=fault_window.get("t_inj_sim_s"), native_headers_after=fault_window.get("native_headers_after_injection"))
     for item in f1:
@@ -287,17 +292,59 @@ def _refusal(run, d, p, _):
     p.check(not run.exists("ros-events.jsonl"), "controller_started_before_refusing")
 
 
+def _abort_event(run, prefix):
+    return next((e for e in run.events if e.get("event") == "abort" and str(e.get("reason", "")).startswith(prefix)), None)
+
+
+def _process(run, name):
+    return next((x for x in run.summary.get("processes") or [] if x["name"] == name), None)
+
+
 def _competing_publisher(run, d, p, _):
-    graph = run.optional("ros-graph.json") or {}
+    """F4.07. The accepted controller raises inside its graph check before it rewrites `ros-graph.json`, so that
+    file keeps the previous (clean) check (M5 finding). The proof is the controller's own fail-closed reason
+    naming the declared topic, inside the advertiser's lifetime from the runner's process table, and an
+    advertiser that ended cleanly having published nothing (it has no publish call, M2 test)."""
     topic = d["parameters"]["topic"]
-    foreign = [pub for entry in graph.values() if entry.get("topic") == topic for pub in entry.get("publishers", [])
-               if not pub["node"].endswith("p5_control")]
-    p.evidence(foreign_publishers=foreign, controller_failure=run.result.get("failure"))
-    p.check(bool(foreign), "no_foreign_publisher_in_the_accepted_graph_record")
-    p.check(str(run.result.get("failure", "")).startswith("competing_control_publisher"), "controller_did_not_detect")
+    failure = str(run.result.get("failure", ""))
+    abort = _abort_event(run, "competing_control_publisher")
+    advertiser = _process(run, "p6-competing-publisher")
+    finished = next((r for r in run.fault_ledger("competing_publisher") if r["kind"] == "finished"), None)
+    alive = advertiser is not None and abort is not None and (
+        advertiser["launched_monotonic_s"] <= abort["monotonic_s"] <= (advertiser.get("exit_observed_monotonic_s") or float("inf")))
+    p.evidence(controller_failure=failure, abort_monotonic_s=abort and abort["monotonic_s"],
+               advertiser=advertiser and {k: advertiser.get(k) for k in ("launched_monotonic_s", "exit_observed_monotonic_s", "exit_code")},
+               detection_after_advertise_wall_s=(abort["monotonic_s"] - advertiser["launched_monotonic_s"]) if alive else None)
+    p.check(failure == "competing_control_publisher:" + topic, "controller_did_not_detect_the_declared_topic")
+    p.check(alive, "detection_outside_the_advertiser_lifetime")
+    p.check(advertiser is not None and advertiser.get("exit_code") == 0, "advertiser_process_record")
+    p.check(finished is not None and finished.get("messages_published") == 0, "advertiser_published")
+    # "within 1.0 s wall plus graph query": from the advertisement (the advertiser's own wall record, CLOCK_MONOTONIC)
+    # to the abort, at most the 1.0 s graph-check period, one tick and the longest accepted graph-check span.
+    act = activation(run, "competing_publisher")
+    trace = [] if not run.exists("timing-trace.jsonl") else __import__("p6_run").jsonl(run.file("timing-trace.jsonl"))
+    query = max((s.get("duration_wall_s") or 0.0 for s in trace if s.get("operation") == "graph_check"), default=0.0)
+    if act is not None and abort is not None and act.get("advertised_wall_s") is not None:
+        latency = abort["monotonic_s"] - act["advertised_wall_s"]
+        p.evidence(detection_after_advertisement_wall_s=latency, longest_graph_check_wall_s=query)
+        p.check(0.0 <= latency <= GRAPH_PERIOD_WALL_S + TICK_S + query + 1e-9, "detection_later_than_1_0_s_plus_graph_query")
+    else:
+        p.check(False, "no_advertisement_time")
 
 
 def _clock_stall(run, d, p, _):
+    """F4.13: the kernel showed the clock bridge stopped and resumed (`/proc`, read by the process-signal
+    injector), and the accepted controller aborted `clock_stalled` while it was stopped, within 1.0 s wall plus
+    one 20 Hz tick of the stop request (the last clock receipt can only be earlier, so this is conservative)."""
     failure = str(run.result.get("failure", ""))
-    p.evidence(controller_failure=failure)
+    abort = _abort_event(run, "clock_stalled")
+    act = activation(run, "process_signal")
+    p.evidence(controller_failure=failure, activation=act, abort_monotonic_s=abort and abort["monotonic_s"])
     p.check(failure == "clock_stalled", "controller_did_not_report_clock_stalled")
+    p.check(act is not None and act.get("signal") == "SIGSTOP" and act.get("proved") is True, "no_proc_evidence_of_the_stop")
+    if act is None or abort is None or not act.get("proved"):
+        return
+    latency = abort["monotonic_s"] - act["request_wall_s"]
+    p.evidence(detection_wall_s=latency)
+    p.check(act["stopped_seen_wall_s"] <= abort["monotonic_s"] <= act["resumed_seen_wall_s"], "abort_not_while_stopped")
+    p.check(latency <= CLOCK_STALL_WALL_S + TICK_S + 1e-9, "clock_stall_detection_later_than_1_0_s_plus_one_tick")
