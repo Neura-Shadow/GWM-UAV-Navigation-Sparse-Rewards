@@ -71,6 +71,14 @@ for _row in ("A-5.F3.01", "A-5.F3.02", "A-5.F3.03", "A-5.F4.07", "A-5.F4.13"):
     ROWS[_row] = {"response": [], "exceptions": FAIL_CLOSED}
 # The P5 policy_fault checks describe P5's own fixture (a mismatched checkpoint copy); for the absent checkpoint
 # and the changed schema they cannot hold, and the P6 refusal proof (declared reason, no node started) replaces them.
+# F4.07/F4.13 (operator decision, 2026-11-07, "Allow that one item"): the accepted controller fails closed before its
+# connectivity check passes, so it exits 1 by design, which the unchanged P3 classifier reports as this one item (the
+# accepted P5 evaluator treats the same item as its own refusal fixture's designed exit). Exactly this item, for these
+# two rows only, is replaced by the fail-closed proof; every other cleanup item stays never excepted.
+FAIL_CLOSED_EXIT = "cleanup:ros-controller:nonzero_exit_1"
+FAIL_CLOSED_EXIT_ROWS = ("A-5.F4.07", "A-5.F4.13")
+for _row in FAIL_CLOSED_EXIT_ROWS:
+    ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "=" + FAIL_CLOSED_EXIT: "PROOF"}}
 for _row in ("A-5.F3.01", "A-5.F3.03"):
     ROWS[_row] = {"response": [], "exceptions": {**FAIL_CLOSED, "policy_fault:not_a_checkpoint_mismatch": "PROOF",
                                                  "policy_fault:mismatched_checkpoint_record": "PROOF"}}
@@ -106,6 +114,13 @@ def run_fault_window(run):
 
 def scenarios():
     return json.loads((HERE.parent / "configs/p6_scenarios.yaml").read_text(encoding="utf-8"))
+
+
+def p4_window_applies(run):
+    """The accepted P4 §9.1 window is the bridge-stop window. An adapter stop (F1.02) writes the same P4 record but
+    has its own proof, and must not be judged by the bridge's F1/F2 items (M5 finding)."""
+    injected = run.optional("p4/fault_injection.json") or {}
+    return injected.get("process") == "sensor-bridge"
 
 
 def respond(run, declaration, rules, proof, window):
@@ -165,11 +180,16 @@ def respond(run, declaration, rules, proof, window):
     return c
 
 
+def _matches(item, key):
+    """An exception key is a prefix, or with a leading '=' one exact item."""
+    return item == key[1:] if key.startswith("=") else item.startswith(key)
+
+
 def compose(p5_failures, exceptions, checks):
     """Every P5-evaluator failure is either excepted (with its replacement check passed) or a P6 failure."""
     allowed, refused = [], []
     for item in p5_failures:
-        rule = next((replacement for prefix, replacement in exceptions.items() if item.startswith(prefix)), None)
+        rule = next((replacement for key, replacement in exceptions.items() if _matches(item, key)), None)
         replacement = checks.get(rule.split(":")[0]) if rule else None
         if rule and replacement and replacement["passed"]:
             allowed.append({"item": item, "replacement": rule})
@@ -203,9 +223,7 @@ def evaluate(run_path, declaration=None, strict=True, integration_checks=True):
     if rules is None:
         out.update(status="failed", failures=["no_evaluation_rules_for_row"])
         return out
-    # The accepted P4 §9.1 window is the bridge-stop window; an adapter stop (F1.02) has its own proof (M5 finding).
-    injected = run.optional("p4/fault_injection.json") or {}
-    window = run_fault_window(run) if injected.get("process") == "sensor-bridge" else None
+    window = run_fault_window(run) if p4_window_applies(run) else None
     proof = proof_module.prove(run, declaration, window)
     checks = respond(run, declaration, rules, proof, window)
     if integration_checks:

@@ -8,6 +8,7 @@ evidence does not show is **not proved**, and the run fails (contract C8).
 SOURCE_GAP_SIM_S = 0.12  # P3 source-gap limit, the P4 §9.1 pre-window trim
 CLOCK_STALL_WALL_S, TICK_S = 1.0, 0.05  # P2 clock stall (contract §3) and one 20 Hz control tick
 GRAPH_PERIOD_WALL_S = 1.0  # the accepted controller re-checks the PX4-input graph every 1.0 s wall
+SETTLE_S = 0.2  # relay windows: margin at each end for in-flight messages and per-process /clock views
 POLICY_REASON = {"F3.04": "output_not_finite", "F3.05": "output_shape", "F3.06": "selection_outside_mask",
                  "F3.07": "timeout", "F3.08": "timeout", "F3.09": "timeout", "F3.10": "timeout",
                  "F3.11": "exception:RuntimeError", "F3.12": "input_not_finite", "F7.02": "exception:RuntimeError",
@@ -186,8 +187,11 @@ def _pose_to_perception(run, d, p, _):
     if act is None:
         return
     t = act["sim_s"]
-    end = t + d["parameters"].get("window_sim_s", float("inf"))  # a ground fixture withholds for its window only
-    inside = lambda w: t + 0.2 < (w.get("receipt_sim_s") or 0) <= end  # noqa: E731
+    # The relay withholds on the half-open window [t, t + window) of `schedule.Windows`; a message it releases at the
+    # boundary is correct. Both ends get the same settle margin, for messages in flight and for the relay's and the
+    # witness's separate /clock views (M5: one attitude message at exactly t + 5.000 s was counted as "continued").
+    end = t + d["parameters"].get("window_sim_s", float("inf"))
+    inside = lambda w: t + SETTLE_S < (w.get("receipt_sim_s") or 0) < end - SETTLE_S  # noqa: E731
     for kind in ("position", "attitude"):
         true = [w for w in run.witness("true_" + kind) if inside(w)]
         relayed = [w for w in run.witness("relayed_" + kind) if inside(w)]
@@ -195,7 +199,7 @@ def _pose_to_perception(run, d, p, _):
         p.check(bool(true), "true_%s_stopped_too" % kind)
         p.check(not relayed, "relayed_%s_continued" % kind)
     # Perception's own per-snapshot record, inside the window (start-up association misses do not count).
-    unassociated = [s for s in run.local_map if t + 0.2 < s["processing_sim_s"] <= end
+    unassociated = [s for s in run.local_map if t + SETTLE_S < s["processing_sim_s"] < end - SETTLE_S
                     and str(s.get("reason", "")).startswith("association:")]
     p.evidence(perception_unassociated_in_window=len(unassociated),
                reasons=sorted({s["reason"] for s in unassociated}))
@@ -325,6 +329,14 @@ def _process(run, name):
     return next((x for x in run.summary.get("processes") or [] if x["name"] == name), None)
 
 
+def _designed_exit(run, p):
+    """The accepted `p5_control` exits 0, or 1 when its connectivity check had not passed when it failed closed
+    (`main`: ok = connectivity passed and ...). Any other exit is not the designed fail-closed exit."""
+    code, connectivity = run.summary.get("controller_exit_code"), run.result.get("connectivity")
+    p.evidence(controller_exit_code=code, connectivity=connectivity)
+    p.check(code == 0 or (code == 1 and connectivity == "failed"), "controller_exit_not_the_designed_fail_closed_exit")
+
+
 def _competing_publisher(run, d, p, _):
     """F4.07. The accepted controller raises inside its graph check before it rewrites `ros-graph.json`, so that
     file keeps the previous (clean) check (M5 finding). The proof is the controller's own fail-closed reason
@@ -341,6 +353,7 @@ def _competing_publisher(run, d, p, _):
                advertiser=advertiser and {k: advertiser.get(k) for k in ("launched_monotonic_s", "exit_observed_monotonic_s", "exit_code")},
                detection_after_advertise_wall_s=(abort["monotonic_s"] - advertiser["launched_monotonic_s"]) if alive else None)
     p.check(failure == "competing_control_publisher:" + topic, "controller_did_not_detect_the_declared_topic")
+    _designed_exit(run, p)
     p.check(alive, "detection_outside_the_advertiser_lifetime")
     p.check(advertiser is not None and advertiser.get("exit_code") == 0, "advertiser_process_record")
     p.check(finished is not None and finished.get("messages_published") == 0, "advertiser_published")
@@ -366,6 +379,7 @@ def _clock_stall(run, d, p, _):
     act = activation(run, "process_signal")
     p.evidence(controller_failure=failure, activation=act, abort_monotonic_s=abort and abort["monotonic_s"])
     p.check(failure == "clock_stalled", "controller_did_not_report_clock_stalled")
+    _designed_exit(run, p)
     p.check(act is not None and act.get("signal") == "SIGSTOP" and act.get("proved") is True, "no_proc_evidence_of_the_stop")
     if act is None or abort is None or not act.get("proved"):
         return

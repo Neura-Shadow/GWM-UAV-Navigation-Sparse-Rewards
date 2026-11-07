@@ -47,6 +47,7 @@ DRY_RUN = "DRY"
 DRY_RUN_CONTRACT = "p6-dry-run-approval-v1"
 OWNER = P6 / "scripts/p6_namespace_owner.py"
 P3_OWNER = SIM / "scripts/p3_namespace_owner.py"
+LIVE_LOCK = "state/p6-live-run.lock"  # held by the gate sequencer for the whole of a live sequence (M5 lifecycle)
 
 
 def scenarios():
@@ -127,6 +128,9 @@ def manifest_sha(value):
 
 
 def freeze(root, output, policy_approval, development=False):
+    lock = live_lock(root)
+    if lock.exists():
+        raise SystemExit("A live P6 sequence holds %s; no candidate may be frozen until it ends" % lock)
     value = candidate(root, policy_approval, development)
     value["frozen_unix_ns"] = time.time_ns()
     value["frozen_git_head"] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
@@ -147,6 +151,37 @@ def verify_current(root, manifest_path):
         differing = sorted(k for k in set(current) | set(frozen) if current.get(k) != frozen.get(k))
         raise ValueError("Current inputs differ from the frozen P6 candidate: " + ",".join(differing))
     return frozen, manifest_sha(frozen)
+
+
+# ---- the live-run lifecycle (M5): one unchanged candidate for the whole of a live sequence ------------------
+def live_lock(root):
+    return Path(root) / LIVE_LOCK
+
+
+def acquire_live_lock(root, sha):
+    """Exclusive: a second live sequence, or a freeze, is refused while this exists."""
+    try:
+        atomic_json(live_lock(root), {"manifest_sha256": sha, "pid": os.getpid(), "started_unix_ns": time.time_ns()},
+                    exclusive=True)
+    except FileExistsError:
+        raise SystemExit("Another live P6 sequence holds %s" % live_lock(root))
+
+
+def release_live_lock(root, sha):
+    lock = live_lock(root)
+    if lock.exists() and strict_json(lock).get("manifest_sha256") == sha and strict_json(lock).get("pid") == os.getpid():
+        lock.unlink()
+
+
+def source_drift(frozen):
+    """Hash-bound P6 files that differ from the frozen candidate now (cheap; no P3-P5 recomputation)."""
+    drift = []
+    for key, current in (("p6_source_files", p6_source_files()), ("injectors", injector_identity()), ("specs", specs_identity())):
+        bound = frozen[key]
+        drift += sorted(k for k in set(bound) | set(current) if bound.get(k) != current.get(k))
+    if frozen["namespace_owner"]["sha256"] != digest(OWNER):
+        drift.append(frozen["namespace_owner"]["path"])
+    return drift
 
 
 def runner_view(frozen):

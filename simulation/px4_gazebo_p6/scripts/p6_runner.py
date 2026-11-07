@@ -103,6 +103,11 @@ def observation_end(declared, t_inj):
     return t_inj + max([OBSERVE_SIM_S] + [w + OBSERVE_MARGIN_SIM_S for w in windows])
 
 
+def live_trigger_due(rows):
+    """`ground_controller`: the ground-diagnostic controller's first state transition (its ros-events.jsonl)."""
+    return any(r.get("event") == "transition" for r in rows)
+
+
 def uses(declared, mechanism):
     return declaration_module.uses(declared, mechanism)
 
@@ -280,7 +285,7 @@ class P6Runner(p5r.P5Runner):
         events = base.Tail(self.run / "ros-events.jsonl")
         while self.controller.poll() is None:
             self.pump()
-            if self.p6_injection is None and any(r.get("event") == "transition" for r in events.read()):
+            if self.p6_injection is None and live_trigger_due(events.read()):
                 self.inject_fault()
             if time.monotonic() > deadline:
                 raise base.Abort("deadline:controller")

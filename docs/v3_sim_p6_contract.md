@@ -304,7 +304,12 @@ Plan §8 states what the sample sizes do and do not support.
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
    process, pass-through causes no topology change beyond the declared relay, and active matches
    the declaration.
-7. One PX4-input owner; no unintended vehicle commands (Policy A); graceful cleanup.
+7. One PX4-input owner; no unintended vehicle commands (Policy A); graceful cleanup. The one
+   exception is the designed fail-closed exit of F4.07 and F4.13 (M5 decision, approved 2026-11-07).
+   The accepted controller fails closed before its connectivity check passes and exits 1, which the
+   unchanged P3 classifier reports as `cleanup:ros-controller:nonzero_exit_1`. That exact item, on
+   those two rows only, is replaced by the fail-closed proof. Every other cleanup item is never
+   excepted.
 
 ### 8.2 Gate B — smoke
 
@@ -394,6 +399,7 @@ Any change after freeze is a new P6 candidate.
 | C11 | run-local config equality, except declared keys | §2 C11 in force for P6 evaluation |
 | M4 Gate A (2026-11-07, "Remove them") | A-5.F4.02 and A-5.F4.06 removed from Gate A | 12 fixtures, 14 live ground runs. F4.06 becomes R-O (covered offline by the stale rules and F4.11); F4.02 stays characterization in flight. Plan §14.4 |
 | M5 trigger (2026-11-07, "Change the trigger (Recommended)") | A-5.F4.07 and A-5.F4.13: `ground_window` → `ground_controller` | under `ground_window` the controller has already exited, so nothing could detect either fault. Faults, parameters and expected outcomes unchanged. Plan §15 |
+| M5 fail-closed exit (2026-11-07, "Allow that one item (Recommended)") | A-5.F4.07 and A-5.F4.13 may report exactly `cleanup:ros-controller:nonzero_exit_1` | replaced by the fail-closed proof (declared reason, timing, `/proc` or advertiser evidence, exit 0 or exit 1 with connectivity "failed"); every other cleanup item stays never excepted. Plan §15 |
 | M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 
 The options as presented:

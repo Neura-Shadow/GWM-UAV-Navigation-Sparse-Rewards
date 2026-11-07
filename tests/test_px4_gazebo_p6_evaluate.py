@@ -86,10 +86,22 @@ def test_an_excepted_p5_failure_needs_its_replacement_check_to_pass():
 
 
 def test_no_row_ever_excepts_safety_policy_a_ownership_or_cleanup():
+    """The single exception: the designed fail-closed exit of F4.07/F4.13, exactly one item (operator decision)."""
     never = ("safety:", "native", "competing_flight_publisher", "residual_namespace_processes", "cleanup:", "p2:final_landed")
+    designed = "=" + p6_evaluate.FAIL_CLOSED_EXIT
     for row, rules in p6_evaluate.ROWS.items():
         for prefix in rules["exceptions"]:
+            if prefix == designed:
+                assert row in ("A-5.F4.07", "A-5.F4.13"), row
+                continue
             assert not any(prefix.startswith(n) or n.startswith(prefix) for n in never if prefix), (row, prefix)
+    allowed, refused = p6_evaluate.compose(
+        ["cleanup:ros-controller:nonzero_exit_1", "cleanup:ros-controller:nonzero_exit_10", "cleanup:p6-witness:forced_kill_after_grace"],
+        p6_evaluate.ROWS["A-5.F4.07"]["exceptions"], {"PROOF": {"passed": True}})
+    assert [a["item"] for a in allowed] == ["cleanup:ros-controller:nonzero_exit_1"]
+    assert refused == ["cleanup:ros-controller:nonzero_exit_10", "cleanup:p6-witness:forced_kill_after_grace"]
+    assert p6_evaluate.compose(["cleanup:ros-controller:nonzero_exit_1"], p6_evaluate.ROWS["A-5.F1.01"]["exceptions"],
+                               {"PROOF": {"passed": True}})[1] == ["cleanup:ros-controller:nonzero_exit_1"]
 
 
 def test_every_gated_flight_row_has_rules():

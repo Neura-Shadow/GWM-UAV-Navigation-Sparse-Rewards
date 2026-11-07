@@ -36,6 +36,8 @@ from p3_provenance import atomic_json, digest, strict_json  # noqa: E402
 LIVE = ("p3_readiness", "ground_readiness", "ground_fixture", "startup_refusal")
 PYTHON = "/usr/bin/python3"
 NEVER_EXCEPTED = ("native_commands:", "cleanup:", "residual_namespace_processes", "artifact_hash_changed:")
+# The one designed fail-closed exit the evaluator allows (p6_evaluate.FAIL_CLOSED_EXIT, operator decision 2026-11-07).
+FAIL_CLOSED_EXIT = ("cleanup:ros-controller:nonzero_exit_1", ("A-5.F4.07", "A-5.F4.13"))
 
 
 def rows(gate):
@@ -110,7 +112,8 @@ def aggregate(row_id, records):
         else:
             refused = evaluation.get("p5_failures_refused") or []
             allowed = [x["item"] for x in evaluation.get("p5_failures_allowed") or []]
-            bad = [x for x in refused + allowed if x.startswith(NEVER_EXCEPTED)]
+            designed = [x for x in allowed if r["row"] in FAIL_CLOSED_EXIT[1] and x == FAIL_CLOSED_EXIT[0]]
+            bad = [x for x in refused + allowed if x.startswith(NEVER_EXCEPTED) and x not in designed]
             failures += [r["row"] + ":" + x for x in bad]
     if not live:
         failures.append("no_evaluated_live_rows")
@@ -155,6 +158,7 @@ def main(argv=None):
         if output.exists():
             raise SystemExit("This P6 gate already has a result for this manifest; results are never overwritten")
         marker, gate_flag, operator = p6_manifest.consume(root, args.gate, sha, args.authorization), args.gate, authorization["authorized_by"]
+    p6_manifest.acquire_live_lock(root, sha)  # no freeze and no second sequence while this one runs
     result = {"contract": "p6-dry-run-result-v1" if args.dry_run else "p6-gate-result-v1", "gate": args.gate,
               "scope": p6_manifest.GATES[args.gate], "manifest_sha256": sha, "development": frozen["development"],
               "baselines": frozen["baselines"], "authorization": {"path": str(args.authorization), "sha256": digest(args.authorization),
@@ -166,6 +170,12 @@ def main(argv=None):
         for row in plan:
             record = {"row": row["id"], "role": row["role"], "scope": row["scope"]}
             result["runs"].append(record)
+            drift = p6_manifest.source_drift(frozen)
+            if drift:  # a changed candidate ends the sequence: its later rows are not run, never counted as passed
+                record.update(failures=["candidate_changed_during_run:" + ",".join(drift[:8])], passed=False)
+                result["first_failure"] = result["first_failure"] or row["id"] + ":" + record["failures"][0]
+                result["candidate_changed_during_run"] = drift
+                break
             if row["scope"] in LIVE:
                 completed, run = execute_row(runtime_command(row["id"], row["role"], gate_flag, args.manifest, args.authorization))
                 record.update(run=str(run) if run else None, runtime_exit_code=completed.returncode,
@@ -197,9 +207,12 @@ def main(argv=None):
         else:
             result["accepted"] = result["first_failure"] is None and not args.dry_run
         result["all_rows_passed"] = len(result["runs"]) == len(plan) and all(r.get("passed") for r in result["runs"])
+        result["not_run"] = [r["id"] for r in plan][len(result["runs"]):]
     finally:
         result["completed_unix_ns"] = time.time_ns()
+        result["candidate_unchanged_at_end"] = not p6_manifest.source_drift(frozen)
         atomic_json(output, result, exclusive=True)
+        p6_manifest.release_live_lock(root, sha)
     label = "DRY RUN" if args.dry_run else ("ACCEPTED" if result["accepted"] else "FAILED")
     print(f"{label} P6 Gate {args.gate}: {output}", flush=True)
     return 0 if (result["accepted"] or (args.dry_run and result["all_rows_passed"])) else 1
