@@ -344,7 +344,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M1** taxonomy and scenarios — **COMPLETE 2026-11-06** (§11; the scenario list and four corrections approved by the operator) | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
-| **M4** evaluators | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
+| **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
@@ -548,3 +548,99 @@ which needs its own authorization. The P6 runner, manifest and evaluators are M4
 * **Fixed:** the shim no longer invents a selection index (F3.06).
 * **Full report:** [M3 report](v3_sim_p6_m3_offline_report.md).
 * **Next:** M4, the evaluators, which needs its own authorization.
+
+## 14. M4 record: independent evaluators (2026-11-07, authorized by the operator: "Authorize M4")
+
+Offline only. No simulator ran and no P2–P5 file changed. Everything is in
+`simulation/px4_gazebo_p6/validation/`.
+
+### 14.1 What was built
+
+| Module | Role |
+|---|---|
+| `p6_run.py` | A read-only view of a P6 run: the accepted P5 layout plus `p6/` (declaration, per-injector ledgers, witness, `p6/injection.json`). A depth-bridge stop also writes the accepted `p4/fault_injection.json` |
+| `p6_fault_evaluate.py` | The occurrence proof (C8), from evidence the injector did not write (table below) |
+| `p6_safety_evaluate.py` | One check per outcome code on the accepted controller's records: H35, A10, HT20, PH3, L45 (through the accepted P4 `abort_landing`), L45R (landed and disarmed from PX4's own state messages), R2, GOAL, RECOVERY (§6.5), STALE_IFF_AGE, NO_INVOKE_AFTER_STALE, LIMITS_UNINJECTED, UNSAFE (§6.3 a), and the Gate A ground replay of the accepted `Supervisor.stale_reason` |
+| `p6_timing_evaluate.py` | Detection latency, fault-to-safe-action latency, time degraded, recovered (reported) |
+| `p6_evaluate.py` | The orchestrator, described below |
+| `p6_coverage_report.py` | Rows, uncovered required faults, latency summaries, recoveries, unsafe-setpoint runs; descriptive only |
+
+**What the orchestrator does:**
+1. It requires the declaration to be the frozen row (strict).
+2. It composes the unchanged P5 evaluator output. Each failure must match the row's exception table,
+   and the replacement check named there must pass.
+3. It runs the accepted P4 §9.1 `fault_window` for bridge stops, the proof and the response checks.
+4. It writes `p6/p6-evaluation.json`. Characterization rows end `characterized`, never `passed`.
+
+**Never excepted** (pinned by a test): safety, Policy A, ownership, cleanup, and P2's landed-and-disarmed
+check.
+
+**Independent proof per family:**
+
+| Family | Evidence |
+|---|---|
+| Policy | Accepted policy-ledger failures equal the shim-affected invocations; the failure reason is as declared; `inference_s` ≥ the declared delay |
+| Map | Perception's own `local_map.jsonl` published in the window, but the controller never used those snapshots |
+| Health | The adapter's own health log stayed fresh, while the controller reported it missing |
+| Pose | The witness shows true state continuing and relayed state stopped; perception's own unusable reasons |
+| Bridge stop | The accepted P4 §9.1 F1 checks |
+| Depth relay | The witness, raw versus relayed |
+| Depth counters | The adapter's own rejection counters |
+| Tick delay | The accepted timing trace, and the controller failure `stale_action` |
+| Refusal | The refusal reason in the controller log, and no ROS artifacts |
+| Competing publisher | The accepted graph record |
+| Clock stall | The controller failure |
+
+### 14.2 Tests
+
+`tests/test_px4_gazebo_p6_evaluate.py` has 17 tests: Windows 11 passed and 6 skipped (retained runs);
+WSL 17 passed. The full P6 set in WSL passes 100 of 100.
+
+**On retained accepted runs:**
+* The real Gate S S6 bridge stop, evaluated as an S-1-type fault (non-strict, P4 trigger), is
+  **proved** and its response passes. Detection is ≤ 0.5 s after the trigger.
+* The clean Gate C S2 flight passes as the B-0 pass-through baseline.
+
+**Negative cases, all failing as required:**
+* S-1, B-1 or S-4 declared on the clean flight: declared but not observed;
+* a non-frozen declaration;
+* one policy failure erased from the ledger;
+* `safety:collisions` in the P5 output;
+* target motion on a held tick;
+* S-4 run in pass-through: nothing dropped;
+* witness or counter mismatches;
+* a controller-input fault on the ground.
+
+**End to end:** B-1 and S-4 rig flights, written in the P6 run layout, pass with exactly their declared
+exceptions.
+
+### 14.3 Bugs caught by the tests and fixed
+
+* **Motion attributed to the wrong tick.** The unsafe-motion check attributed the previous moving
+  tick's 0.01 m step to the first held tick. A decision event logs the target *before* its tick acts,
+  so the motion a tick causes is the next event's target. The accepted S6 flight failed the check until
+  this was fixed.
+* **A check-name mismatch** (`UNSAFE`) that would have refused C-3's outcome exception.
+
+### 14.4 Decision needed: two Gate A fixtures cannot be proved
+
+A-5.F4.02 (map delay) and A-5.F4.06 (health loss) are faults in the controller's own inputs. On the
+ground the controller logs no decisions, so no record outside the injector shows the fault. The
+evaluator therefore fails them explicitly (`no_independent_ground_evidence_for_a_controller_input_fault`)
+rather than trusting the shim.
+
+* **Already covered offline (M3):** their supervisor response (`adapter_health_missing`,
+  `snapshot_stale` timing; F4.11).
+* **Already covered in flight:** map input faults, in S-4 and C-5.
+* **Recommended:** remove A-5.F4.02 and A-5.F4.06 from Gate A, giving 12 fixtures and 14 live ground
+  runs. Keep F4.06 as R-O.
+* **Alternative:** keep them, with a replay-only proof. That conflicts with C8.
+
+### 14.5 Not yet exercised
+
+* **Real P6 runs (M5/M6).** Each row's exception table is prefix-based and narrow. The exact P5 item
+  names a real faulted run produces will be pinned in the M5 dry run.
+* **L45R** on real PX4 data, the **load-harness** proof, and the proofs for the characterization
+  flights:
+  * not yet defined: X-F2.01, X-F5.01, X-F3.10, X-F5.09, X-F4.12, X-F5.02, X-F7.03;
+  * they must be defined before each is authorized.
