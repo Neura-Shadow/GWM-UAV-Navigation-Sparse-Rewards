@@ -296,3 +296,13 @@ def test_the_clock_stall_proof_needs_the_kernel_stop_and_a_detection_while_stopp
     unproved = {"process_signal": [{"kind": "declared"}, dict(act, proved=False)]}
     assert not prove(fail_closed_run(tmp_path / "proc", d, "clock_stalled", 101.03, ledgers=unproved), d)["proved"]
     assert not prove(fail_closed_run(tmp_path / "none", d, "clock_stalled", 101.03), d)["proved"]
+
+
+# ---- ROS node QoS (M5 live findings) ----------------------------------------------------------------------
+def test_every_p6_node_takes_the_clock_best_effort_and_no_relay_copies_graph_qos_verbatim():
+    """A reliable `/clock` subscription never matches the best-effort clock bridge, and graph endpoint QoS has
+    no history or depth, so `create_publisher` refuses it (both seen in the first live A-3 run)."""
+    for name in ("depth_relay", "state_relay", "witness"):
+        text = (P6 / "injection" / (name + ".py")).read_text(encoding="utf-8")
+        assert 'create_subscription(Clock, "/clock", self.clock, clock_profile())' in text, name
+        assert "return infos[0].qos_profile\n" not in text, name

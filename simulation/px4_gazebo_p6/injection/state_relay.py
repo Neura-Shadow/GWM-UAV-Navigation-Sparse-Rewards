@@ -12,6 +12,7 @@ import time
 
 from . import declaration as declaration_module
 from .fault_ledger import FaultLedger
+from .qos import STATE_QUEUE, clock_profile, relay_profile
 from .state_faults import StateInjector
 
 SOURCE, TARGET = "/px4_71", "/gwm/p6/px4_71"
@@ -57,7 +58,7 @@ def main(argv=None):
                 qos = self.source_qos(SOURCE + suffix)
                 self.pubs[base] = self.create_publisher(cls, TARGET + suffix, qos)
                 self.create_subscription(cls, SOURCE + suffix, lambda msg, key=base: self.state(key, msg), qos)
-            self.create_subscription(Clock, "/clock", self.clock, 10)
+            self.create_subscription(Clock, "/clock", self.clock, clock_profile())
             ledger.record("armed", None, mode=mode)
 
         def source_qos(self, topic):
@@ -65,7 +66,7 @@ def main(argv=None):
             while time.monotonic() < deadline:
                 infos = self.get_publishers_info_by_topic(topic)
                 if infos:
-                    return infos[0].qos_profile
+                    return relay_profile(infos[0].qos_profile, STATE_QUEUE)
                 rclpy.spin_once(self, timeout_sec=0.1)
             raise RuntimeError("no PX4 publisher on " + topic)
 

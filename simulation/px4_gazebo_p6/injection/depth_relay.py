@@ -16,6 +16,7 @@ import time
 from . import declaration as declaration_module
 from .depth_faults import DepthInjector
 from .fault_ledger import FaultLedger
+from .qos import DEPTH_QUEUE, clock_profile, relay_profile
 
 RAW = "/gwm/p6/raw/front_depth"
 OUT = "/gwm/sensors/front_depth"
@@ -65,17 +66,17 @@ def main(argv=None):
             self.info_pub = self.create_publisher(CameraInfo, OUT + "/camera_info", qos)
             self.create_subscription(Image, RAW + "/image_raw", self.image, qos)
             self.create_subscription(CameraInfo, RAW + "/camera_info", self.info, qos)
-            self.create_subscription(Clock, "/clock", self.clock, 10)
+            self.create_subscription(Clock, "/clock", self.clock, clock_profile())
             self.create_timer(0.01, self.release)
             ledger.record("armed", None, mode=mode, qos=str(qos))
 
         def bridge_qos(self, topic):
-            """Copy the bridge's publisher QoS so delivery to the unchanged consumers stays as accepted."""
+            """The bridge's reliability and durability, so delivery to the unchanged consumers stays as accepted."""
             deadline = time.monotonic() + QOS_WAIT_WALL_S
             while time.monotonic() < deadline:
                 infos = self.get_publishers_info_by_topic(topic)
                 if infos:
-                    return infos[0].qos_profile
+                    return relay_profile(infos[0].qos_profile, DEPTH_QUEUE)
                 rclpy.spin_once(self, timeout_sec=0.1)
             raise RuntimeError("no bridge publisher on " + topic)
 

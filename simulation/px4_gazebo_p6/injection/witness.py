@@ -16,6 +16,8 @@ import time
 import zlib
 from pathlib import Path
 
+from .qos import clock_profile
+
 DEPTH = (("raw_image", "/gwm/p6/raw/front_depth/image_raw"), ("relayed_image", "/gwm/sensors/front_depth/image_raw"),
          ("raw_info", "/gwm/p6/raw/front_depth/camera_info"), ("relayed_info", "/gwm/sensors/front_depth/camera_info"))
 STATE = (("true_position", "/px4_71", "vehicle_local_position"), ("relayed_position", "/gwm/p6/px4_71", "vehicle_local_position"),
@@ -52,7 +54,7 @@ def main(argv=None):
             super().__init__("p6_witness", namespace="/gwm", parameter_overrides=[Parameter("use_sim_time", value=True)])
             self.sim = None
             self.streams = {}
-            self.create_subscription(Clock, "/clock", self.clock, 10)
+            self.create_subscription(Clock, "/clock", self.clock, clock_profile())
             if args.depth:
                 for name, topic in DEPTH:
                     cls = Image if name.endswith("image") else CameraInfo
