@@ -1140,3 +1140,65 @@ because the runner had ended the row. It is not counted.
   F2.09 need the accepted P2 wall-clock freshness to hold, so the operator should switch it to "Best
   performance" first.
 * **Authorization.** The dry run needs its own operator authorization.
+
+### 15.16 Proposed host-stability diagnostic before the next full dry run (2026-11-13)
+
+**Operator instruction (2026-11-13):** proceed without a Windows power-mode change; before another
+full 18-row dry run, propose a lightweight, separately authorized, ground-only diagnostic of simulator
+RTF, estimator-status publication intervals and controller readiness under the current host settings.
+No P2–P5 threshold may be relaxed.
+
+**What the retained evidence already shows (read-only, scratchpad `m5_host_diag.py`):**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max |
+|---|---|---|---|---|
+| 11-07 A-1 | 0.80 | 1.61 / 1.50 s | 0 | — |
+| 11-07 A-3 | 0.69 | 1.20 / 1.20 s | 0 | 4.5 |
+| 11-07 F2.09 | 0.77 | 1.22 / 1.19 s | 0 | — |
+| 11-13 A-1 | 0.65 | 1.93 / 1.79 s | 0 | — |
+| 11-13 A-3 | 0.46 (ledger) | 2.95 / 2.68 s | 22 | 6.7 |
+| 11-13 F2.09 | 0.53 | 2.07 / 1.38 s | 1 | 5.6 |
+| 11-13 F4.07 | 0.60 | 1.88 / 1.87 s | 0 | — |
+
+* **Per-process CPU was the same on both days:** Gazebo about 1.3 cores, the adapter 0.43, the witness
+  0.4–0.45, perception 0.36, the controller 0.33–0.4, each relay 0.21–0.27; about 4.3 cores in all on
+  a 24-thread i7-13700HX.
+* **So the P6 processes did not grow.** The host delivered less simulated time per wall second for the
+  same demand, and its load was higher. Gazebo's single simulation thread is the limit; nothing in P6
+  can speed it up.
+* **The flags interval in PX4 time was 1.0 s in every run.** Only the wall interval stretched.
+
+**The proposed diagnostic (needs its own authorization; no credit):**
+* **Rows:** on candidate `524f0714`, through the dry-run sequencer with `--rows`: A-1 then A-3 in one
+  sequence, then A-3 once more. Three live runs, about six minutes of simulator time.
+  * A-1 is the accepted P3 readiness run without any P6 node; A-3 is the P6 ground readiness run with
+    the relays and the witness. Their difference isolates P6 overhead from host slowness.
+* **Approval:** a separate file, `state/p6-dry-run-approval-524f07143f59-hostdiag.json`, bound to the
+  candidate, `live_runs_max: 3`, citing the operator's authorization. The runner counts runs per
+  approval file, so these never count against the later full dry run's cap.
+* **Host snapshot before each sequence (read-only):** the active power overlay, battery and AC state,
+  and the top Windows processes by CPU over a 5 s sample, saved beside the result file.
+* **Measured from the retained evidence only**, by the read-only script: RTF mean and minimum interval
+  RTF; flags wall gap max, p95 and the count over 2.0 s; time from controller start to PRESTREAM;
+  connectivity and failure; per-process CPU; 1-min load.
+* **Pre-declared stability criteria**, from the 11-07 envelope and the accepted P2 rule
+  (`state_fresh_wall_s` 2.0 s, unchanged):
+  1. every run's flags wall gap max ≤ 1.7 s (11-07 maximum over 14 rows was 1.67 s; 0.3 s margin
+     under the rule);
+  2. both A-3 runs: RTF mean ≥ 0.65, connectivity "passed", 0 P5 failures;
+  3. A-1: RTF mean ≥ 0.75.
+* **Decision rule:**
+  * all criteria hold → request a separate authorization for the complete 18-row dry run on
+    `524f0714`;
+  * otherwise → report the measured bottleneck with the mitigations below; no retry.
+* **Nothing changes:** no bound P6 file, no accepted file, no host setting. The script is a scratchpad
+  tool and binds nothing.
+
+**Mitigations to weigh if the criteria fail** (each needs the operator's choice; none relaxes a limit):
+1. **Scheduling, no code:** run with the host otherwise idle (no Docker backend, editors or vendor
+   utilities active), and add a pre-run host-CPU gate to the launch script so a sequence does not start
+   on a busy host.
+2. **Software, new candidate:** lower the scheduling priority (`nice`) of the P6 witness and relays.
+   Gazebo is the bottleneck and the host is not saturated, so the expected gain is small.
+3. **Host, needs authorization:** the power overlay, or the Hyper-V vCPU placement for WSL on the
+   performance cores. Both are host configuration and stay the operator's decision.
