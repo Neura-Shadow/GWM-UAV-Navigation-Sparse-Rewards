@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; authorized 2026-11-13; flight-row support built and tested offline, no flight run) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1323,3 +1323,60 @@ flags wall gap maximum 1.92 s, 0 gaps over the accepted 2.0 s rule.
 **M5 exit condition met:** a complete dry run passed under one unchanged development candidate. The
 dry run earns no credit; no P6 gate has run and none is accepted. M6 and the real P6 freeze each need
 their own operator authorization.
+
+## 16. M6 record: SITL fault validation (authorized by the operator 2026-11-13: "Authorize M6")
+
+**Status: in progress.** No flight has been run, no gate has run, and nothing earns credit.
+
+### 16.1 What M6 needs (contract §8)
+
+* Gates B (2 rows), S (5) and C (5), each separately authorized and bound to one non-development P6
+  manifest, in the order A → B → S → C: each needs its predecessor's accepted result for the same
+  manifest.
+* So before any flight gate: a production Policy A approval for the P6 candidate (the development
+  approval is refused for a real candidate), the real freeze, and an authorized real Gate A.
+* Every flight row is a simulated flight on the row's P4 world (S1–S4) with the vehicle armed in SITL,
+  never real hardware.
+
+### 16.2 What was built (`8740815`, offline)
+
+| File | Change |
+|---|---|
+| `scripts/p6_runner.py` | the `flight` scope: the accepted P5 flight path on the row's world (`--scenario`), under the accepted gating (`GWM_ALLOW_SITL_COMMANDS=1` and `--allow-simulated-flight`, flight rows only; a ground row refuses the flag). The runner feeds the controller's own events to the frozen trigger with the frozen P4 scenario boxes and fires its mechanisms once: relay SIGUSR1 (DR, SR), the accepted P4 bridge SIGINT (PS, position recorded), the bounded load harness at its own `load_start` trigger (LH, C-5). CS and MR fire inside the shim. The accepted flight window (PRESTREAM to COMPLETE or RECOVERY) is written before a fail-closed exit is reported, so the unchanged P5 evaluation runs and the row's rules decide (S-5′). |
+| `scripts/run_p6_gates.py` | runs Gates B, S and C; requires the accepted predecessor result for the same manifest; passes the flight gating to flight rows only; dry runs of flight content need a matching approval |
+| `scripts/p6_manifest.py` | dry-run approvals carry `gate_content`; Gate B/S/C content needs `flight` and `simulated_flight_only` true, named in the confirmation phrase; Gate A content stays ground-only |
+| `injection/load_harness.py` | records its activation and clearing in a fault ledger (`--ledger`, `--row`, `--fault`, `--sim-s`) |
+| `validation/p6_integration_evaluate.py` | the injector-process check expects `p6-load-harness` for a load row |
+
+**A bug caught by inspection before any run:** the generated P4 world declaration records boxes as
+`center_m` with a height, while the triggers read the scenario spec's 2-D `center`. The runner passes the
+frozen `p4_scenarios.json` boxes, and a test pins both shapes.
+
+Per row, what the runner fires: S-1 PS at `avoiding_near`; S-2′ SR at `avoiding_first`; C-1 DR at
+`avoiding_first`; C-4 PS at `avoiding_first` (its CS part in the shim); C-5 LH at `transit_start` (its
+MR part in the shim); B-1, S-3, S-4, S-5′, C-2, C-3 fire inside the shim only; B-0 fires nothing.
+
+### 16.3 Offline regression on `8740815` (no simulator)
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 149 passed in the full run, 0 skipped; the runner file re-run after the last edit: 46 passed (150 tests in all) |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 106 passed, 44 skipped (Linux-only; not counted as passes) |
+
+P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
+
+### 16.4 Development candidate and the next step
+
+**Development candidate `33f33c5a22c917a7feaa184a5598cdbc421cc4964a7c04b33226b99f1f160ffb`**, frozen at
+`c1b84be` from a clean P6 tree; verifies; 41 files; no dry-run approval written.
+
+**Recommended next step (needs its own authorization):** a flight-content dry run of Gate B on this
+development candidate, simulated flight only, no credit: B-0 first (every injector in pass-through, the
+first P6 flight at all), then B-1. The M5 experience says the first live use of new runner code finds
+defects; a dry run finds them without consuming a gate. The approval would name simulated flight
+explicitly (`gate_content` B).
+
+**Then, each separately authorized:** the production Policy A approval, the real freeze, Gate A, Gate B,
+Gate S, Gate C.
