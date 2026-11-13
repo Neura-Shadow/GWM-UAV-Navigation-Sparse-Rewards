@@ -19,8 +19,7 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 | `validation/p6_integration_evaluate.py` | M5: rule C11, the injector-process check (A-6), the A-3 relay figures and ground policy replay |
 | `scripts/p6_runner.py`, `p6_manifest.py`, `run_p6_gates.py`, `run_p6.sh`, `verify_p6_evidence.sh`, `p6_node.py` | M5: the runner (built on the accepted P5 runner), the candidate manifest (development candidates, dry-run approvals, live-run lock, drift check), the Gate A sequencer with its dry-run mode, the namespace launch, the evaluation wrapper |
 
-Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 in progress (plan §15): ground dry runs of
-development candidates (no credit). The authorized dry run of `ce73e574` (commit `68ccf30`) passed 16 of 18 Gate A
-rows. The `44fa1111` rerun passed 15 of 18 (plan §15.14); the F4.13 detection decision is implemented, and development
-candidate `524f0714` (commit `e5d7fb5`) awaits authorization for its dry run (plan §15.15). No P6 gate has run.
+Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 complete 2026-11-13 (plan §15): the authorized
+dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gate A rows (plan §15.19), no credit. No P6 gate
+has run; M6 and the real P6 freeze each need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

@@ -345,7 +345,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration — **IN PROGRESS** (§15; dry runs `ce73e574` 16/18 and `44fa1111` 15/18; the F4.07/F4.13 decisions implemented; candidate `524f0714` awaits its dry-run authorization, §15.15) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -656,7 +656,7 @@ rather than trusting the shim.
 
 ## 15. M5 record: ground integration and Gate A content dry runs (2026-11-07, authorized by the operator: "Authorize M5")
 
-**Status: in progress.**
+**Status: complete (exit condition met 2026-11-13, §15.19); no credit.**
 * **Done:**
   * the offline recovery;
   * a fresh development candidate (`ce73e574…`, §15.7);
@@ -665,8 +665,8 @@ rather than trusting the shim.
   * a new development candidate, `44fa1111…` (§15.12); its dry run was interrupted by a host stop, and its rerun
     passed 15 of 18 rows (§15.13–15.14);
   * the F4.13 detection decision, implemented in a new development candidate, `524f0714…` (§15.15).
-* **Not done:** that candidate's dry run, which needs its own operator authorization and the host back at full
-  speed.
+  * the `524f0714` dry run: all 18 rows passed under one unchanged candidate (§15.17–15.19).
+* **Not done:** M6 and the real P6 freeze, each with its own authorization.
 * **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
 
 Scope as authorized:
@@ -1289,3 +1289,37 @@ re-freeze.
 
 **Stopped here, as authorized.** The full 18-row dry run on `524f0714` needs its own authorization,
 with the host kept on AC power in Best-performance mode for the whole run (about 25 min).
+
+### 15.19 The `524f0714` dry run: all 18 rows passed (2026-11-13, no credit)
+
+**Authorization:** the operator, 2026-11-13, "Authorize dry run", answering: "Authorize the full
+18-row Gate A content dry run on development candidate 524f0714?" Approval
+`state/p6-dry-run-approval-524f07143f59.json`.
+
+**Verified before starting:** AC power, the Best-performance overlay, host CPU 0 %, the manifest and
+the P3/P4/P5 baselines, no simulator or P6 process, no live lock.
+
+**Run facts:** 14:19:13Z–14:41:02Z (21.5 min). The candidate was unchanged at every row and at the
+end; `not_run` is empty; the lock was released; no residual process. Result:
+`state/p6-dryrun-A-524f07143f59-20261113T141932Z.result.json`; the evidence is retained unchanged.
+
+**All 18 rows passed.** The P6 evaluation refused no P5 item on any row.
+* A-1, A-2, A-3, A-4 (87/87, 32/32, 12/12), A-6, A-7.
+* F1.01, F1.02, F1.04, F1.06, F1.07 (10 of 10 frames rejected), F1.11 (calibration invalidated,
+  relay continuous).
+* F2.09: 0 of 230 position and 0 of 460 attitude messages relayed in the window; perception
+  unassociated 46 times.
+* F3.01, F3.02, F3.03: each refused with its declared reason, no node started.
+* **F4.07 at `ground_prestream`:** detected 0.080 s after the advertisement; exit 0, connectivity
+  "passed"; the only P5 item, `p2:timing`, replaced by the proof.
+* **F4.13 at `ground_prestream`, the first pass:** `clock_epoch_mismatch:vehicle_local_position`,
+  0.157 s wall after the stop while the clock bridge was stopped; the controller's ledger showed PX4
+  0.108 s past the frozen clock against the 0.1 s tolerance; exit 0, connectivity "passed"; the only
+  P5 item, `p2:timing`, replaced by the proof.
+
+**Host during the run (read-only metrics over the 10 live rows with a controller):** RTF 0.60–0.76,
+flags wall gap maximum 1.92 s, 0 gaps over the accepted 2.0 s rule.
+
+**M5 exit condition met:** a complete dry run passed under one unchanged development candidate. The
+dry run earns no credit; no P6 gate has run and none is accepted. M6 and the real P6 freeze each need
+their own operator authorization.
