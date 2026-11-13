@@ -1011,3 +1011,77 @@ Gate A content dry run on development candidate 44fa1111?" Approval:
 * After the reboot the candidate still verifies, including P3, P4 and P5 (C1).
 * A rerun is a retry, so it needs the operator's explicit authorization, and so does clearing the
   stale lock.
+
+### 15.14 The `44fa1111` rerun (2026-11-13, no credit)
+
+**Authorization:** the operator, on 2026-11-13, "授權重跑" (authorize the rerun), answering whether to
+clear the stale live lock and rerun the full Gate A dry run on `44fa1111`.
+
+**Before the run:**
+* The lock's pid (312859, previous boot) was not running, no simulator process was present, and the
+  lock named this candidate. Only `state/p6-live-run.lock` was removed.
+* The host was on AC power, battery 79 %.
+
+**Run facts:**
+* 12:40:48Z to 13:09:11Z.
+* The candidate was unchanged at every row and at the end; `not_run` is empty; the lock was released.
+* Result: `state/p6-dryrun-A-44fa11116230-20261113T124106Z.result.json`; the evidence is retained
+  unchanged.
+
+**Passed (15):**
+* A-1, A-2, A-4, A-6, A-7.
+* F1.01, F1.02, F1.04 (141 frames), F1.06, F1.07 (10 of 10), F1.11.
+* F3.01–F3.03.
+* **F4.07, at `ground_prestream` for the first time:**
+  * detected 0.686 s after the advertisement;
+  * the controller exited 0 with connectivity "passed";
+  * the only P5 item, `p2:timing`, was replaced by the proof;
+  * no cleanup item arose.
+
+**Failed (3), on two causes.**
+
+1. **A-3 and F2.09: the host ran the simulation too slowly for an accepted P2 rule.**
+   * The rule (`timing.validate`) treats estimator status flags as stale after 2.0 s of wall time
+     without a new message (`state_fresh_wall_s`). PX4 publishes them every 1.0 s of simulated time.
+   * So whenever the simulation runs below half real time for a whole flags interval, the rule
+     fires.
+
+   | Dry run | Longest wall gap between flags |
+   |---|---|
+   | 11-07, every row | 1.67 s |
+   | 11-13, A-3 | 2.95 s (22 gaps over 2.0 s) |
+   | 11-13, F2.09 | 2.07 s (1 gap over 2.0 s) |
+   | 11-13, other rows | up to 1.88 s |
+
+   * **A-3:** the controller never held a valid estimate for 5 s (`ground_diagnostic_deadline`).
+   * **F2.09:** the controller aborted `stale_state:estimator_status_flags` during PRESTREAM, before
+     the fault was injected. Its fault proof passed; only `p2:timing` was refused.
+   * The mean real-time factor was about 0.66, against about 0.76 on 11-07.
+   * The Windows power mode on AC was "Best power efficiency" (overlay `961cc777…`). It is the likely
+     cause but not proven.
+   * No P6 code is involved, and the accepted threshold stays unchanged.
+2. **F4.13: a different detection of the same fault. A P6 specification gap caused by moving the
+   trigger.**
+   * While waiting for a valid estimate, the accepted mission catches a failed state check and only
+     restarts the stability timer. So at the old trigger the 1.0 s `clock_stalled` check was the only
+     abort path.
+   * From PRESTREAM on, a failed state check aborts at once. With `/clock` stopped, PX4's own
+     timestamps keep advancing, so `clock_epoch_mismatch:vehicle_local_position` fires as soon as one
+     runs more than `clock_offset_tolerance_s` (0.1 s) ahead of the frozen clock. Here PX4 was at
+     12.712 against a frozen 12.608.
+   * The abort came 0.269 s wall after the stop request, while the clock bridge was stopped.
+   * The runner expected only `clock_stalled`, so it ended the row with
+     `declared_detection_not_observed`, and the evaluation had no sensor window.
+
+**Open:**
+* **An operator decision:** accept `clock_epoch_mismatch:<state topic>` as F4.13's detection at
+  `ground_prestream`, besides `clock_stalled`.
+  * The proof would be otherwise unchanged:
+    * the `/proc` stop window;
+    * the abort while stopped, within 1.0 s plus one tick of the stop request;
+    * connectivity "passed", exit 0;
+    * the timing reconciliation completed.
+  * It would also require the named topic's PX4 timestamp in the controller's own ledger to be more
+    than 0.1 s past the frozen clock.
+* **The host's speed:** to be restored by the operator before the next dry run. That needs a new
+  candidate and its own authorization.
