@@ -76,8 +76,20 @@ def main(argv=None):
     parser.add_argument("--workers", type=int, required=True)
     parser.add_argument("--seconds", type=float, required=True)
     parser.add_argument("--memory-fraction", type=float, default=0.0)
+    parser.add_argument("--ledger", help="M6: the fault ledger this harness records its activation and clearing in")
+    parser.add_argument("--row")
+    parser.add_argument("--fault")
+    parser.add_argument("--sim-s", type=float, help="the trigger's simulation time, as the runner read it")
     args = parser.parse_args(argv)
-    run(args.workers, args.seconds, args.memory_fraction)
+    ledger = None
+    if args.ledger:
+        from .fault_ledger import FaultLedger
+        ledger = FaultLedger(args.ledger, args.row, args.fault, "load_harness")
+    try:
+        run(args.workers, args.seconds, args.memory_fraction, ledger=ledger, sim_s=args.sim_s)
+    finally:
+        if ledger is not None:
+            ledger.close()
     return 0
 
 

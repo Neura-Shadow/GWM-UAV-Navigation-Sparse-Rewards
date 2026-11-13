@@ -7,7 +7,10 @@ Gate A (contract §8.1), in the frozen order of `p6_scenarios.yaml`:
 * A-4 the M3 offline suite, run here and bound by hash to the manifest's sources (offline);
 * A-5 the 12 ground fault fixtures (live; the vehicle is never armed);
 * A-6 injector activation and cleanup, and A-7 ownership, Policy A and cleanup, evaluated over the runs.
-Gates B, S and C are M6 work; this version refuses them.
+Gates B, S and C (contract §8.2-8.4, M6): every row is a simulated flight on the row's world, run by the same
+runner with `--allow-simulated-flight` and GWM_ALLOW_SITL_COMMANDS=1 (the accepted P5 flight gating). A flight gate
+needs the accepted result of its predecessor gate for the same manifest (A -> B -> S -> C). A flight-content dry run
+(development candidate) needs an approval that names simulated flight explicitly.
 
 A gate needs its own operator authorization bound to a frozen, non-development P6 manifest. It is consumed
 before the first runtime starts; the first failure stops the gate and nothing is retried. A dry run
@@ -33,7 +36,8 @@ for path in (P6 / "scripts", SIM / "scripts", SIM / "validation"):
 import p6_manifest  # noqa: E402
 from p3_provenance import atomic_json, digest, strict_json  # noqa: E402
 
-LIVE = ("p3_readiness", "ground_readiness", "ground_fixture", "startup_refusal")
+LIVE = ("p3_readiness", "ground_readiness", "ground_fixture", "startup_refusal", "flight")
+FLIGHT = "flight"
 PYTHON = "/usr/bin/python3"
 NEVER_EXCEPTED = ("native_commands:", "cleanup:", "residual_namespace_processes", "artifact_hash_changed:")
 # The one designed fail-closed exit the evaluator allows (p6_evaluate.FAIL_CLOSED_EXIT, operator decision 2026-11-07).
@@ -52,13 +56,32 @@ def dry_result_path(root, gate, sha):
     return Path(root) / "state" / f"p6-dryrun-{gate}-{sha[:12]}-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}.result.json"
 
 
-def runtime_command(row, role, gate, manifest, authorization):
-    return ["bash", str(P6 / "scripts/run_p6.sh"), "--run", "--row", row, "--gate", gate, "--role", role,
-            "--manifest", str(manifest), "--authorization", str(authorization)]
+def runtime_command(row, role, gate, manifest, authorization, flight=False):
+    command = ["bash", str(P6 / "scripts/run_p6.sh"), "--run", "--row", row, "--gate", gate, "--role", role,
+               "--manifest", str(manifest), "--authorization", str(authorization)]
+    return command + (["--allow-simulated-flight"] if flight else [])
 
 
-def execute_row(command):
-    completed = subprocess.run(command, text=True, capture_output=True)
+def runtime_env(flight):
+    """The accepted P5 flight gating: the SITL command gate is set for flight rows only, never for ground rows."""
+    env = {k: v for k, v in os.environ.items() if k != "GWM_ALLOW_SITL_COMMANDS"}
+    if flight:
+        env["GWM_ALLOW_SITL_COMMANDS"] = "1"
+    return env
+
+
+def predecessor_accepted(root, gate, sha):
+    """Contract §8: each gate after A needs the accepted predecessor for the same manifest."""
+    before = p6_manifest.scenarios()["predecessor"].get(gate)
+    if before is None:
+        return None, None
+    path = result_path(root, before, sha)
+    result = strict_json(path) if path.exists() else None
+    return before, bool(result and result.get("accepted") is True and result.get("manifest_sha256") == sha)
+
+
+def execute_row(command, env=None):
+    completed = subprocess.run(command, text=True, capture_output=True, env=env)
     found = re.search(r"^P6 evidence: (.+)$", completed.stdout, re.M)
     return completed, Path(found.group(1)) if found else None
 
@@ -128,8 +151,6 @@ def main(argv=None):
     parser.add_argument("--dry-run", action="store_true", help="M5: a development candidate under a dry-run approval")
     parser.add_argument("--rows", nargs="*", help="dry run only: a subset of the gate's rows")
     args = parser.parse_args(argv)
-    if args.gate != "A":
-        raise SystemExit("This version runs Gate A content only (Gates B, S and C are M6)")
     if args.rows and not args.dry_run:
         raise SystemExit("A gate always runs every row")
     missing = [key for key in ("GWM_ALLOW_OPTIONAL_RUNTIME", "GWM_RUN_GAZEBO_PX4_TESTS", "GWM_ALLOW_PX4_LAUNCH")
@@ -143,7 +164,7 @@ def main(argv=None):
         raise SystemExit("GWM_PX4_MC_TRACE=%s must select the frozen MC trace build" % mc_trace_runtime.CONTRACT)
     plan = rows(args.gate)
     if args.dry_run:
-        approval = p6_manifest.require_dry_run_approval(args.authorization, sha, frozen)
+        approval = p6_manifest.require_dry_run_approval(args.authorization, sha, frozen, args.gate)
         if args.rows:
             unknown = sorted(set(args.rows) - {r["id"] for r in plan})
             if unknown:
@@ -157,6 +178,9 @@ def main(argv=None):
         output = result_path(root, args.gate, sha)
         if output.exists():
             raise SystemExit("This P6 gate already has a result for this manifest; results are never overwritten")
+        before, accepted = predecessor_accepted(root, args.gate, sha)
+        if before is not None and not accepted:
+            raise SystemExit("Gate %s needs the accepted Gate %s result for manifest %s" % (args.gate, before, sha))
         marker, gate_flag, operator = p6_manifest.consume(root, args.gate, sha, args.authorization), args.gate, authorization["authorized_by"]
     p6_manifest.acquire_live_lock(root, sha)  # no freeze and no second sequence while this one runs
     result = {"contract": "p6-dry-run-result-v1" if args.dry_run else "p6-gate-result-v1", "gate": args.gate,
@@ -177,7 +201,9 @@ def main(argv=None):
                 result["candidate_changed_during_run"] = drift
                 break
             if row["scope"] in LIVE:
-                completed, run = execute_row(runtime_command(row["id"], row["role"], gate_flag, args.manifest, args.authorization))
+                flight = row["scope"] == FLIGHT
+                completed, run = execute_row(runtime_command(row["id"], row["role"], gate_flag, args.manifest, args.authorization, flight),
+                                             runtime_env(flight))
                 record.update(run=str(run) if run else None, runtime_exit_code=completed.returncode,
                               runtime_stdout_tail=completed.stdout[-4000:], runtime_stderr_tail=completed.stderr[-4000:])
                 if run is None:

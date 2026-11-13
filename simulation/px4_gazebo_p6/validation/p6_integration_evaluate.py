@@ -115,6 +115,8 @@ def injectors(run, declaration, c):
         expected.add("p6-witness")
     if declaration.get("fault") == "F4.07":
         expected.add("p6-competing-publisher")
+    if "LH" in declaration["mechanisms"]:
+        expected.add("p6-load-harness")  # M6: the bounded load harness (D8), launched by the runner at its load trigger
     controller = next((p for p in processes if p["name"] == "ros-controller"), None)
     shim_used = controller is not None and "controller_shim" in [str(x) for x in controller["command"]]
     shim_expected = shim_mode(declaration) != "off"

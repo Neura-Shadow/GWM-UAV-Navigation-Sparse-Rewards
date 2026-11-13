@@ -659,3 +659,138 @@ def test_a_fail_closed_proof_refuses_an_exit_the_accepted_controller_does_not_de
         summary.update(controller_exit_code=code, controller_result=dict(summary["controller_result"], connectivity=connectivity))
         run.file("summary.json").write_text(json.dumps(summary))
         assert prove(Run(run.path), d)["proved"] is ok, (code, connectivity)
+
+
+# ---- M6: flight rows (Gates B, S and C), offline ---------------------------------------------------------------
+FLIGHT_ROWS = [r for g in ("B", "S", "C") for r in specs.strict_json(specs.SCENARIOS)["gates"][g]]
+
+
+def test_every_flight_row_maps_to_the_accepted_p5_flight_scope_and_a_p4_world():
+    r = runner()
+    worlds = {k for k in json.loads((REPO / "simulation/px4_gazebo_p4/configs/p4_scenarios.json").read_text(encoding="utf-8"))["scenarios"]}
+    for row in FLIGHT_ROWS:
+        assert row["scope"] == r.FLIGHT_SCOPE and r.P5_SCOPE[row["scope"]] == "flight", row["id"]
+        assert row["world"] in worlds, row["id"]
+
+
+def test_runner_mechanisms_and_flight_triggers_per_row():
+    """The runner fires DR, SR, PS and LH at the frozen trigger; CS and MR fire inside the shim; a pass-through row
+    fires nothing; C-5's load harness has its own trigger (`load_start`)."""
+    r = runner()
+    # B-0: its relays are present in pass-through and nothing fires
+    expected = {"B-0": (("DR", "SR"), None, None), "B-1": ((), None, None), "S-1": (("PS",), "avoiding_near", None),
+                "S-2'": (("SR",), "avoiding_first", None), "S-3": ((), None, None), "S-4": ((), None, None),
+                "S-5'": ((), None, None), "C-1": (("DR",), "avoiding_first", None), "C-2": ((), None, None),
+                "C-3": ((), None, None), "C-4": (("PS",), "avoiding_first", None), "C-5": (("LH",), None, "transit_start")}
+    for row in FLIGHT_ROWS:
+        d = declaration.build(row["id"])
+        fault, load = r.flight_triggers(d, boxes=[{"center": [3.0, 0.0]}])
+        assert (r.runner_mechanisms(d), fault and fault.name, load and load.name) == expected[row["id"]], row["id"]
+
+
+def test_flight_triggers_fire_once_on_the_controllers_own_decision_events():
+    r = runner()
+    d = declaration.build("S-1")
+    fault, _ = r.flight_triggers(d, boxes=[{"center": [3.0, 0.0]}])
+    prestream = {"event": "transition", "to": "PRESTREAM_SAFE_SETPOINTS", "evidence": {"origin_ned": [0.0, 0.0, 0.0]}}
+    far = {"event": "p4_decision", "state": "AVOIDING", "sim_s": 20.0, "vehicle_enu": [0.5, 0.0, 1.2]}
+    near = {"event": "p4_decision", "state": "AVOIDING", "sim_s": 21.0, "vehicle_enu": [2.0, 0.0, 1.2]}
+    assert fault.feed(prestream) is None and fault.feed(far) is None
+    assert fault.feed(near) == 21.0 and fault.feed(dict(near, sim_s=22.0)) == 21.0
+    _, load = r.flight_triggers(declaration.build("C-5"), boxes=[])
+    assert load.feed({"event": "p4_decision", "state": "NORMAL", "sim_s": 15.0, "vehicle_enu": [0.1, 0.0, 1.2]}) == 15.0
+
+
+def test_the_flight_window_is_the_accepted_prestream_to_complete_or_recovery():
+    r = runner()
+    ok = {"transitions": [{"to": "PRESTREAM_SAFE_SETPOINTS", "sim_s": 12.7}, {"to": "COMPLETE", "sim_s": 80.2}]}
+    recovery = {"transitions": [{"to": "PRESTREAM_SAFE_SETPOINTS", "sim_s": 12.7}, {"to": "RECOVERY", "sim_s": 40.0}]}
+    assert r.flight_window(ok) == [12.7, 80.2] and r.flight_window(recovery) == [12.7, 40.0]
+    assert r.flight_window({"transitions": [{"to": "WAIT_FOR_VALID_ESTIMATION", "sim_s": 4.4}]}) is None
+    assert r.flight_window(None) is None
+
+
+def test_flight_rows_need_the_accepted_flight_gating_and_ground_rows_refuse_it(monkeypatch):
+    """P6Runner.preconditions, before anything else: a flight row needs GWM_ALLOW_SITL_COMMANDS=1 and
+    --allow-simulated-flight (the accepted P5 gating); a ground row refuses the flight flag; gates and scopes match."""
+    from types import SimpleNamespace
+    r = runner()
+    monkeypatch.setenv("GWM_ALLOW_SITL_COMMANDS", "0")
+    for key in r.base.GATES:
+        monkeypatch.delenv(key, raising=False)
+
+    def pre(row, flag):
+        gate, spec = specs.row(row)
+        fake = SimpleNamespace(args=SimpleNamespace(allow_simulated_flight=flag, row=row), p6_scope=spec["scope"], row_gate=gate)
+        with pytest.raises((PermissionError, ValueError)) as info:
+            r.P6Runner.preconditions(fake)
+        return str(info.value)
+    assert "GWM_ALLOW_SITL_COMMANDS" in pre("B-0", False)
+    assert "GWM_ALLOW_SITL_COMMANDS" in pre("S-1", True)
+    assert "only valid for a flight row" in pre("A-3", True)
+    assert "Missing explicit gates" in pre("A-3", False)  # the ground row passes the flight checks and fails on the gates
+    monkeypatch.setenv("GWM_ALLOW_SITL_COMMANDS", "1")
+    assert "Missing explicit gates" in pre("C-5", True)
+
+
+def test_a_flight_content_dry_run_needs_an_approval_that_names_simulated_flight(tmp_path):
+    m = manifest()
+    ground = tmp_path / "a.json"
+    flight = tmp_path / "b.json"
+    ground.write_text(json.dumps(m.dry_run_template("ab" * 32, "op", "s")))
+    flight.write_text(json.dumps(m.dry_run_template("ab" * 32, "op", "s", gate_content="B")))
+    dev = {"development": True}
+    assert m.require_dry_run_approval(ground, "ab" * 32, dev)["flight"] is False
+    assert m.require_dry_run_approval(flight, "ab" * 32, dev, "B")["simulated_flight_only"] is True
+    for path, gate in ((ground, "B"), (flight, "A"), (flight, "S")):
+        with pytest.raises(PermissionError):
+            m.require_dry_run_approval(path, "ab" * 32, dev, gate)
+    forged = dict(json.loads(flight.read_text()), simulated_flight_only=False)
+    (tmp_path / "c.json").write_text(json.dumps(forged))
+    with pytest.raises(PermissionError):
+        m.require_dry_run_approval(tmp_path / "c.json", "ab" * 32, dev, "B")
+    assert json.loads(flight.read_text())["acceptance_credit"] is False and "simulated flight only" in json.loads(flight.read_text())["statement"]
+
+
+def test_the_sequencer_passes_the_flight_gating_only_to_flight_rows_and_needs_the_predecessor(tmp_path, monkeypatch):
+    pytest.importorskip("fcntl")
+    import run_p6_gates
+    monkeypatch.setenv("GWM_ALLOW_SITL_COMMANDS", "1")
+    assert "--allow-simulated-flight" in run_p6_gates.runtime_command("S-1", "r", "S", Path("m"), Path("a"), flight=True)
+    assert "--allow-simulated-flight" not in run_p6_gates.runtime_command("A-3", "r", "A", Path("m"), Path("a"), flight=False)
+    assert run_p6_gates.runtime_env(True)["GWM_ALLOW_SITL_COMMANDS"] == "1"
+    assert "GWM_ALLOW_SITL_COMMANDS" not in run_p6_gates.runtime_env(False)
+    assert "flight" in run_p6_gates.LIVE
+    (tmp_path / "state").mkdir()
+    sha = "ab" * 32
+    assert run_p6_gates.predecessor_accepted(tmp_path, "A", sha) == (None, None)
+    assert run_p6_gates.predecessor_accepted(tmp_path, "B", sha) == ("A", False)
+    run_p6_gates.result_path(tmp_path, "A", sha).write_text(json.dumps({"accepted": True, "manifest_sha256": sha}))
+    assert run_p6_gates.predecessor_accepted(tmp_path, "B", sha) == ("A", True)
+    assert run_p6_gates.predecessor_accepted(tmp_path, "S", sha) == ("B", False)
+    run_p6_gates.result_path(tmp_path, "A", sha).write_text(json.dumps({"accepted": True, "manifest_sha256": "cd" * 32}))
+    assert run_p6_gates.predecessor_accepted(tmp_path, "B", sha) == ("A", False)
+
+
+def test_the_injector_process_check_expects_the_load_harness_for_a_load_row(tmp_path):
+    d = declaration.build("C-5")
+    good = [process("ros-controller", SHIM, stop="completes_own_work")]
+    harness = process("p6-load-harness", stop="completes_own_work")
+    assert not injectors(tmp_path / "none", d, good, {"controller_shim": "active"})["passed"]
+    assert injectors(tmp_path / "lh", d, good + [harness], {"controller_shim": "active"})["passed"]
+
+
+def test_flight_triggers_take_the_frozen_p4_scenario_boxes_not_the_generated_declaration():
+    """The generated world declaration stores boxes as `center_m` with a height; the trigger's near rule reads the
+    scenario spec's 2-D `center`. With S2's real spec an AVOIDING decision 1.0 m short of the box fires avoiding_near."""
+    r = runner()  # Linux only: the runner import also puts the accepted P4 scripts on the path
+    import p4_worlds
+    scenarios = json.loads((REPO / "simulation/px4_gazebo_p4/configs/p4_scenarios.json").read_text(encoding="utf-8"))
+    boxes = r.scenario_boxes(scenarios, "S2")
+    assert boxes and all(set(b) >= {"center", "size"} and len(b["center"]) == 2 for b in boxes)
+    source = Path(p4_worlds.__file__).read_text(encoding="utf-8")  # the accepted generator records `center_m`, not `center`
+    assert '"center_m": [float(center[0]), float(center[1]), float(center_z)]' in source
+    fault, _ = r.flight_triggers(declaration.build("S-1"), boxes)
+    cx, cy = boxes[0]["center"]
+    fault.feed({"event": "transition", "to": "PRESTREAM_SAFE_SETPOINTS", "evidence": {"origin_ned": [0.0, 0.0, 0.0]}})
+    assert fault.feed({"event": "p4_decision", "state": "AVOIDING", "sim_s": 30.0, "vehicle_enu": [cx - 1.0, cy, 1.2]}) == 30.0

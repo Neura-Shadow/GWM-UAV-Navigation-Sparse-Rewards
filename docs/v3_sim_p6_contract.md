@@ -275,6 +275,9 @@ Plan §8 states what the sample sizes do and do not support.
 * Each gate after A needs the accepted predecessor for the same manifest.
 * No P2–P5 gate result grants P6 credit.
 * A Policy A approval is required per P6 candidate commit.
+* A development candidate may dry-run a gate's content under a dry-run approval bound to that candidate and
+  naming that gate's content; for Gate B, S or C content the approval must name simulated flight explicitly
+  (SITL only, never real hardware). A dry run writes no gate result and earns no credit (M5, M6).
 
 ### 8.1 Gate A — ground readiness and fault fixtures
 
