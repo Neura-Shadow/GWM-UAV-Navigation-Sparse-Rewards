@@ -46,6 +46,7 @@ R_O = {
     "F3.06": [OFF + "test_R_F3_06_selection_outside_the_mask_is_classified"],
     "F3.09": [POLICY + "[F3.09", OFF + "test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once"],
     "F4.11": [OFF + "test_R_F4_11_health_and_map_freshness_are_checked_independently"],
+    "F4.06": [STALE + "[adapter_health_missing", OFF + "test_R_F4_11_health_and_map_freshness_are_checked_independently"],
     "F5.03": [ACKS + "[F5.03"], "F5.06": [ACKS + "[F5.06"],
     "F5.05": [OFF + "test_R_F5_05_wrong_nav_state_is_offboard_armed_state_lost"],
     "F5.07": [STATE + "[F5.07"], "F5.10": [STATE + "[F5.10"],

@@ -288,17 +288,48 @@ Plan §8 states what the sample sizes do and do not support.
    * decisions on the recorded ground snapshots bit-identical to the P5 replay.
 4. **The M3 offline suite**, run in its declared scope and bound by hash: every R-O item of the
    matrix, including precedence (F8.04, F8.05) and the F7 properties.
-5. **Ground fault fixtures, 14 live runs** (F2.09 added by M1 correction 1, approved 2026-11-06):
+5. **Ground fault fixtures, 12 live runs.** F2.09 was added by M1 correction 1 (approved 2026-11-06).
+   F4.02 and F4.06 were removed by the M4 decision (approved 2026-11-07), because a controller-input
+   fault leaves no independent record on the ground (C8). The fixtures:
    * F1.01, F1.02, F1.04, F1.06, F1.07, F1.11;
    * F2.09;
    * F3.01, F3.02, F3.03;
-   * F4.02, F4.06, F4.07, F4.13.
+   * F4.07, F4.13.
 
    Each needs its detection in the live component and the replayed supervisor/policy response.
+   F4.07 and F4.13 are injected at the `ground_prestream` trigger, so the running controller detects
+   them and fails closed. The unchanged 15 s ground window follows. The other ground fixtures keep
+   `ground_window`.
+   * **The trigger point** is the ground-diagnostic controller's transition into
+     PRESTREAM_SAFE_SETPOINTS (M5 decisions, approved 2026-11-07).
+   * **By then:** its estimate has been valid for P2 `estimator_stable_sim_s`, connectivity has
+     passed, and every PX4 stream is in its ledger.
+   * **It holds that state** for `ground_prestream_sim_s` (3.0 s).
+   * **F4.13's detection** (M5 decision, approved 2026-11-13): `clock_stalled`, or
+     `clock_epoch_mismatch:<state topic>`.
+     * From PRESTREAM on, the accepted state check aborts at once. With `/clock` stopped, PX4's
+       timestamps run past the frozen clock by more than `clock_offset_tolerance_s` (0.1 s) before
+       the 1.0 s stall check.
+     * The epoch reason counts only if the controller's own ledger shows that topic's PX4
+       timestamp past the frozen clock by more than the tolerance, before the abort.
+     * The 1.0 s plus one tick bound and the `/proc` stop window are unchanged.
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
    process, pass-through causes no topology change beyond the declared relay, and active matches
    the declaration.
-7. One PX4-input owner; no unintended vehicle commands (Policy A); graceful cleanup.
+7. One PX4-input owner; no unintended vehicle commands (Policy A); graceful cleanup. The one
+   exception is the designed fail-closed exit of F4.07 and F4.13 (M5 decision, approved 2026-11-07).
+   * If the accepted controller fails closed before its connectivity check passes, it exits 1. The
+     unchanged P3 classifier reports that as `cleanup:ros-controller:nonzero_exit_1`.
+   * That exact item, on those two rows only, is replaced by the fail-closed proof.
+   * At the `ground_prestream` trigger connectivity has already passed, so the designed exit is 0
+     and the item does not arise.
+   * Every other cleanup item is never excepted.
+
+   **`p2:timing` (M5 decision, approved 2026-11-07, "Adopt both").** The accepted P2 timing check
+   reports failed whenever the controller's result carries a failure.
+   * On F4.07 and F4.13 only, exactly `p2:timing` is replaced by the fail-closed proof.
+   * The proof then also requires the timing reconciliation to have completed: a timing status
+     exists, and there is no `p2_integrity_error`.
 
 ### 8.2 Gate B — smoke
 
@@ -386,6 +417,13 @@ Any change after freeze is a new P6 candidate.
 | D1a | depth relay through a declared 2-key run-local bridge config; map and health input faults inside the controller shim; pose faults to perception through `--px4-prefix` and a state relay | plan §4.2 rows M-DR, M-MR (shim), M-SR |
 | D4a | the PX4-managed S-2 and S-5 become characterization; Gate S uses S-2′ = F2.09 and S-5′ = F6.03 | §8.3 as now written; no ceiling exemption |
 | C11 | run-local config equality, except declared keys | §2 C11 in force for P6 evaluation |
+| M4 Gate A (2026-11-07, "Remove them") | A-5.F4.02 and A-5.F4.06 removed from Gate A | 12 fixtures, 14 live ground runs. F4.06 becomes R-O (covered offline by the stale rules and F4.11); F4.02 stays characterization in flight. Plan §14.4 |
+| M5 trigger (2026-11-07, "Change the trigger (Recommended)") | A-5.F4.07 and A-5.F4.13: `ground_window` → `ground_controller` | under `ground_window` the controller has already exited, so nothing could detect either fault. Faults, parameters and expected outcomes unchanged. Plan §15 |
+| M5 fail-closed exit (2026-11-07, "Allow that one item (Recommended)") | A-5.F4.07 and A-5.F4.13 may report exactly `cleanup:ros-controller:nonzero_exit_1` | replaced by the fail-closed proof (declared reason, timing, `/proc` or advertiser evidence, exit 0 or exit 1 with connectivity "failed"); every other cleanup item stays never excepted. Plan §15 |
+| M5 trigger point (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13: `ground_controller` (first transition) → `ground_prestream` (the transition into PRESTREAM_SAFE_SETPOINTS) | at the first transition PX4 had published no attitude yet and its estimator was still starting up, so F4.13's ledger lacked attitude and its window began inside the start-up (`ce73e574` dry run). The proof also requires the injection after that transition and connectivity "passed". Plan §15.11–15.12 |
+| M5 F4.13 detection (2026-11-13, "接受並準備新候選", accept and prepare a new candidate) | A-5.F4.13 also accepts `clock_epoch_mismatch:<state topic>` | from PRESTREAM on the accepted `StateCache.validate` aborts at once, and PX4's timestamps pass the stopped clock by more than 0.1 s before the 1.0 s `clock_stalled` check (`44fa1111` rerun). The proof also requires that evidence in the controller's own ledger; the bound and the stop window are unchanged. Plan §15.14–15.15 |
+| M5 `p2:timing` (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13 may report exactly `p2:timing` | replaced by the fail-closed proof, which also requires the timing reconciliation to have completed; the accepted P2 check reports failed whenever the controller failed. Plan §15.11–15.12 |
+| M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 
 The options as presented:
 

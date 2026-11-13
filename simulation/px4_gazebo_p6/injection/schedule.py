@@ -6,13 +6,14 @@ plans are relative to the trigger's simulation time.
 """
 import math
 
-TRIGGERS = ("ground_window", "transit_start", "avoiding_first", "avoiding_near", "normal_2m")
+TRIGGERS = ("ground_window", "ground_prestream", "transit_start", "avoiding_first", "avoiding_near", "normal_2m")
+GROUND = ("ground_window", "ground_prestream")  # fired by the runner, never by a decision event
 AVOIDING_NEAR_M = 1.5
 NORMAL_DISTANCE_M = 2.0
 
 
 class Trigger:
-    """Fires once. `ground_window` is fired by the runner; the others by `feed(event)`."""
+    """Fires once. The ground triggers are fired by the runner; the others by `feed(event)`."""
 
     def __init__(self, name, boxes=()):
         if name not in TRIGGERS:
@@ -34,7 +35,7 @@ class Trigger:
             origin = (event.get("evidence") or {}).get("origin_ned")
             if origin is not None:
                 self.origin_enu = (float(origin[1]), float(origin[0]))
-        if event.get("event") != "p4_decision" or self.name == "ground_window":
+        if event.get("event") != "p4_decision" or self.name in GROUND:
             return None
         state, sim = event.get("state"), event["sim_s"]
         if self.name == "transit_start":

@@ -1,0 +1,631 @@
+{
+  "bound_files": {
+    "simulation/px4_gazebo_p6/configs/p6_faults.yaml": "9e585f26526740d3759c082fe33473425b55db2e68cc6ecc5c46d36f7ab46686",
+    "simulation/px4_gazebo_p6/configs/p6_scenarios.yaml": "99b7994f9386c8f58c74131712a36471a06fb13050993fd3992bf09aa8d9813a",
+    "simulation/px4_gazebo_p6/injection/__init__.py": "bfb270023789d973ba4ad981c28e3589e92b1c9b0f6a966e8b2baa7d808c6e0f",
+    "simulation/px4_gazebo_p6/injection/competing_publisher.py": "9ac2bc8d3c09f4f03036d30a28015e755221158e64ed334e662561873884b549",
+    "simulation/px4_gazebo_p6/injection/controller_shim.py": "13279d8961dfddbdd7e4aa92ad066ee4a2593ad5e7b64d99279c36a808b308c6",
+    "simulation/px4_gazebo_p6/injection/declaration.py": "666535af5a72dc406b76f8135be065329d4c773e3a73212e40b2bf8f7c580609",
+    "simulation/px4_gazebo_p6/injection/depth_faults.py": "58fad8942e9f646d47b268fc18c72b3dd8d74c7d17f6e2c2e2044547123c3f0e",
+    "simulation/px4_gazebo_p6/injection/depth_relay.py": "1d51ddc1a9bde7a8233a1e58d0a79aa9860cbc3ed91917482317a408c7007dcc",
+    "simulation/px4_gazebo_p6/injection/fault_ledger.py": "e82c08064f56a8bd7d48028ba7146329da3ba2ddb4222a6b35fc16e79abb2aae",
+    "simulation/px4_gazebo_p6/injection/load_harness.py": "188a9e99e4caede745ad725fcf3dca2fee2a59030ad03283ae5b7d3eb500e534",
+    "simulation/px4_gazebo_p6/injection/policy_faults.py": "fe7bfb7713e306fcee4051a79a53cd82b4e68672d0453fdee4c7ebb90be1f318",
+    "simulation/px4_gazebo_p6/injection/process_faults.py": "5209ec4a08511846a82fe23b4e8ecfca542fa1a85e54e07ff958585230f3f5ff",
+    "simulation/px4_gazebo_p6/injection/schedule.py": "83fc06ea148722e7ced641db43ed3f8560fb36e3e1313d66a55c70b62f1e9c3e",
+    "simulation/px4_gazebo_p6/injection/specs.py": "aeb85a22cc2abbea30baaa378324a51a1f417a6dafb5c9dd802c09ec1141dd5e",
+    "simulation/px4_gazebo_p6/injection/state_faults.py": "20ffeea01cff7f2524a794106318a3a1cee80d61ca3aac9562b1416bb0b0b03b",
+    "simulation/px4_gazebo_p6/injection/state_relay.py": "a3edef654e5aa7f9bd5aaf62d5f48ccd03e74511121d4080d05206895ff1064b",
+    "simulation/px4_gazebo_p6/injection/witness.py": "1f6539ba8f66cf1775c357a8a0754483637c6bd04690c872f95beb8127311097",
+    "simulation/px4_gazebo_p6/validation/p6_offline_suite.py": "d5f2925dfab06d2b52a16b86226d294d5c7cf5168458554771f35a4d30f34f70",
+    "simulation/px4_gazebo_p6/validation/p6_passthrough_check.py": "7e93c82681eae02a9d4b914cbe4b9335601541d044115e6cf4578b02227a1c22",
+    "simulation/px4_gazebo_p6/validation/recorded.py": "02be4d80b5abb4ae5528c1fc3f9fd7f897960ec4368d693533bcae551174d458",
+    "tests/test_px4_gazebo_p6_injection.py": "f7cf6a0d7755a43599eb3a6d2b85fdf3fca3724c0179cd76bee64140dce953df",
+    "tests/test_px4_gazebo_p6_offline.py": "e34ce255a5c016b9557130e7fd994e1dd55c5958e947e12781169088b88314c2",
+    "tests/test_px4_gazebo_p6_specs.py": "fcc113d7d125d0f4968a9156af31d1a6cf1fa3b7a80319874f79c8d042aa7f08"
+  },
+  "characterization": {
+    "C-4 rehearsal": {
+      "abort": "p4_supervisor_abort:policy_unavailable",
+      "policy_failures_before_stale": 3
+    },
+    "F1.05": {
+      "footprint_free_bad": 16,
+      "footprint_free_clean": 16,
+      "max_free_cells_created_vs_clean": 36,
+      "max_occupied_cells_misplaced": 71,
+      "unsafe_candidates_bad": 0,
+      "unsafe_candidates_clean": 0,
+      "window_snapshots": [
+        676,
+        736
+      ]
+    },
+    "F1.08": {
+      "free_cells_lost_to_unknown": 376,
+      "free_or_occupied_created": 0,
+      "recorded_snapshots": 300
+    },
+    "F1.09": {
+      "corrupted_columns": [
+        240,
+        400
+      ],
+      "footprint_free_bad": 16,
+      "footprint_free_clean": 16,
+      "max_free_cells_created_vs_clean": 11,
+      "pillar_first_occupied_snapshot": 706,
+      "unsafe_candidates_bad": 0,
+      "unsafe_candidates_clean": 0,
+      "window_snapshots": [
+        676,
+        736
+      ]
+    },
+    "F1.10": {
+      "free_cells_lost": 10,
+      "unknown_ray_fraction_note": "90 % NaN pixels make nearly every band column UNKNOWN"
+    },
+    "F2.02": {
+      "decisions_changed": 0,
+      "recorded_ticks": 120
+    },
+    "F2.03": {
+      "decisions_changed": 61,
+      "recorded_ticks": 120
+    },
+    "F2.04": {
+      "shift_0.5_m": {
+        "after_first_fresh_frame": {
+          "footprint_free": 12,
+          "unsafe_candidates": 0
+        },
+        "before_reobservation": {
+          "footprint_free": 16,
+          "unsafe_candidates": 0
+        }
+      },
+      "shift_1.0_m": {
+        "after_first_fresh_frame": {
+          "footprint_free": 12,
+          "unsafe_candidates": 0
+        },
+        "before_reobservation": {
+          "footprint_free": 16,
+          "unsafe_candidates": 3
+        }
+      }
+    },
+    "F2.08": {
+      "decisions_changed": 120,
+      "recorded_ticks": 120
+    },
+    "F3.06": {
+      "note": "the accepted re-check `allowed[choice]` would accept a negative index by Python wrap-around; unreachable from `policy_choice` (it returns allowed indices only), and any such value would raise KeyError outside the ranker's try, failing closed through P2 RECOVERY"
+    },
+    "F4.03": {
+      "max_occupied_cells_lost": 1,
+      "note": "each regression lasts until the next snapshot (about 0.1 s) and stays inside the 0.25 s age limit",
+      "regressions": 9,
+      "snapshots": 1328
+    },
+    "F4.08": {
+      "check_present": false,
+      "forged_all_free_snapshot_accepted": true
+    },
+    "F4.10": {
+      "restart_at_m": 3.0,
+      "traversed_cells_inside_pillar_footprint": 16,
+      "unsafe_candidates_if_mask_were_reset": 0,
+      "unsafe_candidates_with_kept_mask": 0
+    },
+    "F5.02": {
+      "confirm": "characterization flight X-F5.02",
+      "first_tick_after_stall": "passes every P2 check on pre-stop state (sim time also pre-stop)",
+      "later_ticks": "queues drain one message per subscription per wait-set pass; observation_gap fires only if consecutive ticks' samples differ by > 0.2 s sim; most likely the stall goes undetected in flight and only the post-run P2 timing evaluation sees the publication gap",
+      "px4": "no failsafe: 0.3 s < COM_OF_LOSS_T 1.0 s"
+    }
+  },
+  "contract": "p6-offline-suite-v1",
+  "counts": {
+    "failed": 0,
+    "passed": 87,
+    "skipped": 0
+  },
+  "created_unix_s": 1794010070.2791991,
+  "git_head": "60093c8bf2865945b8c76c17aac3baa123c55662",
+  "interpreter": "/usr/bin/python3",
+  "numpy": "1.26.4",
+  "passed": true,
+  "pytest_exit_code": 0,
+  "python": "3.12.3",
+  "recorded_run": "20261106T132442Z-p5-flight-S2-184a5a5e",
+  "recorded_run_summary_sha256": "1ab57114e925c41612df74b30a32162a4e9973f48ce8a56af5b986f12d37ffe2",
+  "rehearsals": {
+    "B-0": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_pass_through_shim_is_bit_identical_to_the_accepted_mission": {
+          "test_px4_gazebo_p6_injection.test_pass_through_shim_is_bit_identical_to_the_accepted_mission": "passed"
+        }
+      }
+    },
+    "B-1": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[B-1": {
+          "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[B-1-timeout]": "passed"
+        }
+      }
+    },
+    "C-1": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_rehearsal_C1_depth_bursts_stale_exactly_when_old_and_recover_to_the_goal": {
+          "test_px4_gazebo_p6_offline.test_rehearsal_C1_depth_bursts_stale_exactly_when_old_and_recover_to_the_goal": "passed"
+        }
+      }
+    },
+    "C-2": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_isolated_timeouts_hold_only_their_ticks_and_the_mission_completes": {
+          "test_px4_gazebo_p6_injection.test_isolated_timeouts_hold_only_their_ticks_and_the_mission_completes": "passed"
+        }
+      }
+    },
+    "C-3": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_adversarial_choice_stays_inside_the_mask_on_every_tick": {
+          "test_px4_gazebo_p6_injection.test_adversarial_choice_stays_inside_the_mask_on_every_tick": "passed"
+        }
+      }
+    },
+    "C-4": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_rehearsal_C4_staleness_precedes_the_policy_and_the_run_aborts_and_lands": {
+          "test_px4_gazebo_p6_offline.test_rehearsal_C4_staleness_precedes_the_policy_and_the_run_aborts_and_lands": "passed"
+        }
+      }
+    },
+    "C-5": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_rehearsal_C5_map_loss_part_hovers_and_completes": {
+          "test_px4_gazebo_p6_offline.test_rehearsal_C5_map_loss_part_hovers_and_completes": "passed"
+        }
+      }
+    },
+    "S-1": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-1": {
+          "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-1-avoiding_near-stop]": "passed"
+        }
+      }
+    },
+    "S-2'": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-2'": {
+          "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-2'-avoiding_first-unusable]": "passed"
+        }
+      }
+    },
+    "S-3": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[S-3": {
+          "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[S-3-output_not_finite]": "passed"
+        }
+      }
+    },
+    "S-4": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_map_loss_hovers_while_stale_then_recovers_and_completes": {
+          "test_px4_gazebo_p6_injection.test_map_loss_hovers_while_stale_then_recovers_and_completes": "passed"
+        }
+      }
+    },
+    "S-5'": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_tick_delay_sleeps_once_after_normal_at_two_metres": {
+          "test_px4_gazebo_p6_injection.test_tick_delay_sleeps_once_after_normal_at_two_metres": "passed"
+        }
+      }
+    }
+  },
+  "required_offline": {
+    "F1.06": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_06_stamp_faults_on_recorded_frames_give_exactly_the_injected_rejections": {
+          "test_px4_gazebo_p6_offline.test_R_F1_06_stamp_faults_on_recorded_frames_give_exactly_the_injected_rejections": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s": {
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed"
+        }
+      }
+    },
+    "F1.07": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_07_and_F1_12_layout_and_frame_id_faults_are_rejected_on_recorded_frames": {
+          "test_px4_gazebo_p6_offline.test_R_F1_07_and_F1_12_layout_and_frame_id_faults_are_rejected_on_recorded_frames": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s": {
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed"
+        }
+      }
+    },
+    "F1.08": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_08_nan_region_never_creates_free_or_occupied_space_on_recorded_frames": {
+          "test_px4_gazebo_p6_offline.test_R_F1_08_nan_region_never_creates_free_or_occupied_space_on_recorded_frames": "passed"
+        }
+      }
+    },
+    "F1.10": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_10_coverage_loss_only_removes_information_on_recorded_frames": {
+          "test_px4_gazebo_p6_offline.test_R_F1_10_coverage_loss_only_removes_information_on_recorded_frames": "passed"
+        }
+      }
+    },
+    "F1.11": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_11_calibration_change_makes_health_not_fresh_and_the_supervisor_hover": {
+          "test_px4_gazebo_p6_offline.test_R_F1_11_calibration_change_makes_health_not_fresh_and_the_supervisor_hover": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s": {
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed"
+        }
+      }
+    },
+    "F1.12": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F1_07_and_F1_12_layout_and_frame_id_faults_are_rejected_on_recorded_frames": {
+          "test_px4_gazebo_p6_offline.test_R_F1_07_and_F1_12_layout_and_frame_id_faults_are_rejected_on_recorded_frames": "passed"
+        }
+      }
+    },
+    "F2.04": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F2_04_reset_epoch_bracket_makes_frames_unusable_and_the_supervisor_hover": {
+          "test_px4_gazebo_p6_offline.test_R_F2_04_reset_epoch_bracket_makes_frames_unusable_and_the_supervisor_hover": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s": {
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed"
+        }
+      }
+    },
+    "F2.05": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.05": {
+          "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.05-params0-state_time_backwards:vehicle_local_position]": "passed"
+        }
+      }
+    },
+    "F2.06": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.06": {
+          "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.06-params1-clock_epoch_mismatch:vehicle_local_position]": "passed"
+        }
+      }
+    },
+    "F2.07": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.07": {
+          "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.07-params2-invalid_estimate]": "passed"
+        }
+      }
+    },
+    "F2.09": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F2_09_withheld_pose_makes_recorded_frames_unassociable": {
+          "test_px4_gazebo_p6_offline.test_R_F2_09_withheld_pose_makes_recorded_frames_unassociable": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s": {
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+          "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed"
+        }
+      }
+    },
+    "F3.03": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F3_03_schema_change_refuses_start_before_any_node": {
+          "test_px4_gazebo_p6_offline.test_R_F3_03_schema_change_refuses_start_before_any_node": "passed"
+        }
+      }
+    },
+    "F3.05": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.05": {
+          "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.05-<lambda>-output_shape]": "passed"
+        }
+      }
+    },
+    "F3.06": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F3_06_selection_outside_the_mask_is_classified": {
+          "test_px4_gazebo_p6_offline.test_R_F3_06_selection_outside_the_mask_is_classified": "passed"
+        }
+      }
+    },
+    "F3.09": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": {
+          "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.09": {
+          "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.09-<lambda>-timeout]": "passed"
+        }
+      }
+    },
+    "F3.11": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.11": {
+          "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.11-<lambda>-exception:RuntimeError]": "passed"
+        }
+      }
+    },
+    "F3.12": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.12": {
+          "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.12-<lambda>-input_not_finite]": "passed"
+        }
+      }
+    },
+    "F4.11": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F4_11_health_and_map_freshness_are_checked_independently": {
+          "test_px4_gazebo_p6_offline.test_R_F4_11_health_and_map_freshness_are_checked_independently": "passed"
+        }
+      }
+    },
+    "F5.03": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.03": {
+          "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.03-REQUEST_OFFBOARD-176]": "passed"
+        }
+      }
+    },
+    "F5.05": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F5_05_wrong_nav_state_is_offboard_armed_state_lost": {
+          "test_px4_gazebo_p6_offline.test_R_F5_05_wrong_nav_state_is_offboard_armed_state_lost": "passed"
+        }
+      }
+    },
+    "F5.06": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.06": {
+          "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.06-REQUEST_LAND-21]": "passed"
+        }
+      }
+    },
+    "F5.07": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.07": {
+          "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.07-params3-stale_state:vehicle_status]": "passed"
+        }
+      }
+    },
+    "F5.10": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.10": {
+          "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.10-params4-vehicle_health_invalid]": "passed"
+        }
+      }
+    },
+    "F6.03": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_injection.test_tick_delay_sleeps_once_after_normal_at_two_metres": {
+          "test_px4_gazebo_p6_injection.test_tick_delay_sleeps_once_after_normal_at_two_metres": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": {
+          "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": "passed"
+        }
+      }
+    },
+    "F7.02": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F7_02_alternating_failures_never_reach_policy_unavailable": {
+          "test_px4_gazebo_p6_offline.test_R_F7_02_alternating_failures_never_reach_policy_unavailable": "passed"
+        }
+      }
+    },
+    "F7.04": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F7_04_and_F7_06_fuzzed_supervisor_transitions_are_legal_and_abort_is_absorbing": {
+          "test_px4_gazebo_p6_offline.test_R_F7_04_and_F7_06_fuzzed_supervisor_transitions_are_legal_and_abort_is_absorbing": "passed"
+        },
+        "test_px4_gazebo_p6_offline.test_R_F7_04_every_recorded_accepted_flight_transition_is_legal": {
+          "test_px4_gazebo_p6_offline.test_R_F7_04_every_recorded_accepted_flight_transition_is_legal": "passed"
+        }
+      }
+    },
+    "F7.05": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": {
+          "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": "passed"
+        }
+      }
+    },
+    "F7.06": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F7_04_and_F7_06_fuzzed_supervisor_transitions_are_legal_and_abort_is_absorbing": {
+          "test_px4_gazebo_p6_offline.test_R_F7_04_and_F7_06_fuzzed_supervisor_transitions_are_legal_and_abort_is_absorbing": "passed"
+        }
+      }
+    },
+    "F7.07": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F7_07_target_moves_only_by_apply_action_and_never_while_held": {
+          "test_px4_gazebo_p6_offline.test_R_F7_07_target_moves_only_by_apply_action_and_never_while_held": "passed"
+        }
+      }
+    },
+    "F8.04": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F8_04_policy_failure_rule_precedes_the_transition_table": {
+          "test_px4_gazebo_p6_offline.test_R_F8_04_policy_failure_rule_precedes_the_transition_table": "passed"
+        }
+      }
+    },
+    "F8.05": {
+      "passed": true,
+      "tests": {
+        "test_px4_gazebo_p6_offline.test_R_F8_05_a_controller_started_against_an_armed_vehicle_refuses": {
+          "test_px4_gazebo_p6_offline.test_R_F8_05_a_controller_started_against_an_armed_vehicle_refuses": "passed"
+        }
+      }
+    }
+  },
+  "results": {
+    "test_px4_gazebo_p6_injection.test_accepted_code_never_refers_to_p6": "passed",
+    "test_px4_gazebo_p6_injection.test_adversarial_choice_stays_inside_the_mask_on_every_tick": "passed",
+    "test_px4_gazebo_p6_injection.test_app_side_state_faults_raise_the_intended_accepted_p2_check[F2.05-params0-state_time_backwards:vehicle_local_position]": "passed",
+    "test_px4_gazebo_p6_injection.test_app_side_state_faults_raise_the_intended_accepted_p2_check[F2.06-params1-clock_epoch_mismatch:vehicle_local_position]": "passed",
+    "test_px4_gazebo_p6_injection.test_app_side_state_faults_raise_the_intended_accepted_p2_check[F2.07-params2-invalid_estimate]": "passed",
+    "test_px4_gazebo_p6_injection.test_app_side_state_faults_raise_the_intended_accepted_p2_check[F5.10-params3-vehicle_health_invalid]": "passed",
+    "test_px4_gazebo_p6_injection.test_calibration_fault_changes_or_invalidates_the_accepted_calibration": "passed",
+    "test_px4_gazebo_p6_injection.test_declarations_are_the_frozen_rows_and_nothing_else": "passed",
+    "test_px4_gazebo_p6_injection.test_depth_bursts_drop_exactly_inside_the_declared_windows": "passed",
+    "test_px4_gazebo_p6_injection.test_depth_dimension_fault_is_rejected_by_the_accepted_decoder_as_declared": "passed",
+    "test_px4_gazebo_p6_injection.test_depth_pass_through_returns_the_very_same_frame": "passed",
+    "test_px4_gazebo_p6_injection.test_depth_stamp_faults_give_exactly_the_declared_rejection_counts_in_the_accepted_pipeline": "passed",
+    "test_px4_gazebo_p6_injection.test_depth_value_faults_are_classified_by_the_accepted_code_as_intended": "passed",
+    "test_px4_gazebo_p6_injection.test_isolated_timeouts_hold_only_their_ticks_and_the_mission_completes": "passed",
+    "test_px4_gazebo_p6_injection.test_ledger_is_exclusive_sequenced_strict_and_validated": "passed",
+    "test_px4_gazebo_p6_injection.test_load_bounds_are_the_approved_ones": "passed",
+    "test_px4_gazebo_p6_injection.test_load_workers_stop_themselves_at_their_deadline": "passed",
+    "test_px4_gazebo_p6_injection.test_map_loss_hovers_while_stale_then_recovers_and_completes": "passed",
+    "test_px4_gazebo_p6_injection.test_no_injector_publishes_to_px4_and_the_witness_and_competitor_never_publish": "passed",
+    "test_px4_gazebo_p6_injection.test_pass_through_shim_is_bit_identical_to_the_accepted_mission": "passed",
+    "test_px4_gazebo_p6_injection.test_policy_corruptions_are_refused_by_the_accepted_selection_and_the_adversary_stays_in_the_mask": "passed",
+    "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[B-1-timeout]": "passed",
+    "test_px4_gazebo_p6_injection.test_policy_fault_rows_hold_three_ticks_then_abort_policy_unavailable[S-3-output_not_finite]": "passed",
+    "test_px4_gazebo_p6_injection.test_process_stop_is_proven_from_proc_and_bounded": "passed",
+    "test_px4_gazebo_p6_injection.test_shim_serves_both_of_its_mechanisms_and_nothing_else": "passed",
+    "test_px4_gazebo_p6_injection.test_tick_delay_sleeps_once_after_normal_at_two_metres": "passed",
+    "test_px4_gazebo_p6_injection.test_triggers_fire_once_on_the_controllers_own_decision_events": "passed",
+    "test_px4_gazebo_p6_injection.test_windows_and_invocation_plans": "passed",
+    "test_px4_gazebo_p6_injection.test_withholding_ack_and_map_faults_and_their_pass_through": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F1_05_frozen_frames_project_old_content_at_new_poses_on_recorded_frames": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F1_09_inf_corruption_marks_unobserved_obstacle_cells_free_on_recorded_frames": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F2_04_map_reused_after_an_estimator_reset_misplaces_the_obstacle[0.5]": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F2_04_map_reused_after_an_estimator_reset_misplaces_the_obstacle[1.0]": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F4_03_reordered_snapshots_can_regress_the_controllers_occupancy": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F4_08_a_fabricated_usable_snapshot_is_accepted_without_any_check": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F4_10_restarted_perception_misaligns_the_kept_traversed_mask": "passed",
+    "test_px4_gazebo_p6_offline.test_C_F5_02_first_tick_after_a_stall_sees_old_state_and_old_sim_time": "passed",
+    "test_px4_gazebo_p6_offline.test_C_app_side_pose_faults_change_the_accepted_decisions[F2.02]": "passed",
+    "test_px4_gazebo_p6_offline.test_C_app_side_pose_faults_change_the_accepted_decisions[F2.03]": "passed",
+    "test_px4_gazebo_p6_offline.test_C_app_side_pose_faults_change_the_accepted_decisions[F2.08]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F1_06_stamp_faults_on_recorded_frames_give_exactly_the_injected_rejections": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F1_07_and_F1_12_layout_and_frame_id_faults_are_rejected_on_recorded_frames": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F1_08_nan_region_never_creates_free_or_occupied_space_on_recorded_frames": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F1_10_coverage_loss_only_removes_information_on_recorded_frames": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F1_11_calibration_change_makes_health_not_fresh_and_the_supervisor_hover": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F2_04_reset_epoch_bracket_makes_frames_unusable_and_the_supervisor_hover": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F2_09_withheld_pose_makes_recorded_frames_unassociable": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F3_03_schema_change_refuses_start_before_any_node": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F3_06_selection_outside_the_mask_is_classified": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F3_09_and_F6_03_overruns_trip_the_dispatch_guard_and_land_once": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F4_11_health_and_map_freshness_are_checked_independently": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F5_05_wrong_nav_state_is_offboard_armed_state_lost": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F7_02_alternating_failures_never_reach_policy_unavailable": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F7_04_and_F7_06_fuzzed_supervisor_transitions_are_legal_and_abort_is_absorbing": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F7_04_every_recorded_accepted_flight_transition_is_legal": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F7_07_target_moves_only_by_apply_action_and_never_while_held": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F8_04_policy_failure_rule_precedes_the_transition_table": "passed",
+    "test_px4_gazebo_p6_offline.test_R_F8_05_a_controller_started_against_an_armed_vehicle_refuses": "passed",
+    "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.03-REQUEST_OFFBOARD-176]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_ack_rewrites_raise_command_ack_denied_in_the_accepted_mission[F5.06-REQUEST_LAND-21]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.05-params0-state_time_backwards:vehicle_local_position]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.06-params1-clock_epoch_mismatch:vehicle_local_position]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F2.07-params2-invalid_estimate]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.07-params3-stale_state:vehicle_status]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_app_side_state_faults_hit_the_intended_p2_check[F5.10-params4-vehicle_health_invalid]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.05-<lambda>-output_shape]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.09-<lambda>-timeout]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.11-<lambda>-exception:RuntimeError]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_policy_faults_are_classified_by_the_accepted_ranker[F3.12-<lambda>-input_not_finite]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_missing-health_old]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[adapter_health_not_fresh-health_stale]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[calibration_mismatch-calibration]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[estimator_reset_since_last_usable_frame-reset]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[snapshot_stale-None]": "passed",
+    "test_px4_gazebo_p6_offline.test_R_stale_rules_hover_by_t_last_plus_0_35_with_frozen_target_then_abort_at_10_s[unusable_frames-unusable]": "passed",
+    "test_px4_gazebo_p6_offline.test_rehearsal_C1_depth_bursts_stale_exactly_when_old_and_recover_to_the_goal": "passed",
+    "test_px4_gazebo_p6_offline.test_rehearsal_C4_staleness_precedes_the_policy_and_the_run_aborts_and_lands": "passed",
+    "test_px4_gazebo_p6_offline.test_rehearsal_C5_map_loss_part_hovers_and_completes": "passed",
+    "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-1-avoiding_near-stop]": "passed",
+    "test_px4_gazebo_p6_offline.test_rehearsal_sensor_loss_rows_hover_then_abort_snapshot_stale_and_land[S-2'-avoiding_first-unusable]": "passed",
+    "test_px4_gazebo_p6_specs.test_counts_match_the_approved_gate_structure": "passed",
+    "test_px4_gazebo_p6_specs.test_every_gate_row_references_a_fault_of_its_gate_class_and_back": "passed",
+    "test_px4_gazebo_p6_specs.test_fault_fields_classes_tiers_mechanisms_and_aliases_are_valid": "passed",
+    "test_px4_gazebo_p6_specs.test_fault_ids_are_unique_complete_and_numbered_per_category": "passed",
+    "test_px4_gazebo_p6_specs.test_injected_timings_sit_where_the_accepted_limits_put_them": "passed",
+    "test_px4_gazebo_p6_specs.test_px4_managed_and_recovery_landings_are_never_gated_as_complete": "passed",
+    "test_px4_gazebo_p6_specs.test_worlds_triggers_and_baselines_are_bound": "passed"
+  },
+  "wall_s": 276.3802218437195
+}

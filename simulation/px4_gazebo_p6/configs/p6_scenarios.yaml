@@ -27,6 +27,7 @@
   },
   "triggers": {
     "ground_window": "the declared 15 s sim ground window has elapsed (P4 fault-scope pattern), vehicle never armed",
+    "ground_prestream": "the ground-diagnostic controller's transition into PRESTREAM_SAFE_SETPOINTS in its ros-events.jsonl: its estimate has been valid for the accepted P2 estimator_stable_sim_s, connectivity has passed, every PX4 stream is in its ledger, and it holds that state for the accepted ground_prestream_sim_s while running its graph and clock checks; vehicle never armed; after its fail-closed detection the unchanged 15 s ground window is held (P5 policy_fault pattern); M5 decisions",
     "transit_start": "first TRANSIT tick",
     "avoiding_first": "first TRANSIT tick with supervisor state AVOIDING",
     "avoiding_near": "first TRANSIT tick with supervisor state AVOIDING and horizontal vehicle-to-nearest-box-centre distance <= 1.5 m",
@@ -50,10 +51,8 @@
       {"id": "A-5.F3.01", "role": "fixture-checkpoint-missing", "scope": "startup_refusal", "fault": "F3.01", "parameters": {"model_path": "absent"}, "expected": ["REF", "reason checkpoint_missing"]},
       {"id": "A-5.F3.02", "role": "fixture-checkpoint-mismatch", "scope": "startup_refusal", "fault": "F3.02", "parameters": {"model": "mismatched copy (P5 pattern)"}, "expected": ["REF", "reason checkpoint_sha256_mismatch"]},
       {"id": "A-5.F3.03", "role": "fixture-schema-mismatch", "scope": "startup_refusal", "fault": "F3.03", "parameters": {"schema": "run-local copy with one changed description byte"}, "expected": ["REF", "reason p5_model_schema_differs_from_frozen_hash"]},
-      {"id": "A-5.F4.02", "role": "fixture-map-delay", "scope": "ground_fixture", "fault": "F4.02", "trigger": "ground_window", "parameters": {"delay_s": 0.30, "window_sim_s": 5.0}, "expected": ["replayed HOVER (snapshot_stale)"]},
-      {"id": "A-5.F4.06", "role": "fixture-health-loss", "scope": "ground_fixture", "fault": "F4.06", "trigger": "ground_window", "parameters": {"window_sim_s": 5.0}, "expected": ["replayed adapter_health_missing HOVER within 2.0 + 0.10 s sim"]},
-      {"id": "A-5.F4.07", "role": "fixture-competing-publisher", "scope": "ground_fixture", "fault": "F4.07", "trigger": "ground_window", "parameters": {"topic": "/px4_71/fmu/in/trajectory_setpoint", "advertise_s": 5.0, "messages_published": 0}, "expected": ["competing_control_publisher within 1.0 s wall plus graph query", "ground diagnostic fails closed (declared scope)", "0 foreign setpoints in the ULog"]},
-      {"id": "A-5.F4.13", "role": "fixture-clock-stall", "scope": "ground_fixture", "fault": "F4.13", "trigger": "ground_window", "parameters": {"process": "clock-bridge", "signal": "SIGSTOP", "resume_after_wall_s": 2.0}, "expected": ["clock_stalled within 1.0 s wall plus one tick", "ground diagnostic fails closed (declared scope)", "clock bridge resumes and exits gracefully at cleanup"]},
+      {"id": "A-5.F4.07", "role": "fixture-competing-publisher", "scope": "ground_fixture", "fault": "F4.07", "trigger": "ground_prestream", "parameters": {"topic": "/px4_71/fmu/in/trajectory_setpoint", "advertise_s": 5.0, "messages_published": 0}, "expected": ["competing_control_publisher within 1.0 s wall plus graph query", "ground diagnostic fails closed (declared scope)", "0 foreign setpoints in the ULog"]},
+      {"id": "A-5.F4.13", "role": "fixture-clock-stall", "scope": "ground_fixture", "fault": "F4.13", "trigger": "ground_prestream", "parameters": {"process": "clock-bridge", "signal": "SIGSTOP", "resume_after_wall_s": 2.0}, "expected": ["clock_stalled, or clock_epoch_mismatch:<state topic> (from PRESTREAM on the accepted state check fails closed first), within 1.0 s wall plus one tick while the clock bridge is stopped", "ground diagnostic fails closed (declared scope)", "clock bridge resumes and exits gracefully at cleanup"]},
       {"id": "A-6", "role": "injector-activation-cleanup", "scope": "evaluation", "expected": ["off: no injector process", "pass-through: no topology change beyond the declared relay", "active: matches the declaration"]},
       {"id": "A-7", "role": "ownership-policy-cleanup", "scope": "evaluation", "expected": ["one PX4-input owner", "Policy A content only", "graceful cleanup"]}
     ],
@@ -77,7 +76,7 @@
     ]
   },
   "predecessor": {"B": "A", "S": "B", "C": "S"},
-  "counts": {"gate_a_live_ground_runs": 16, "gate_a_fault_fixtures": 14, "flights": 12, "offline_required_items": 31},
+  "counts": {"gate_a_live_ground_runs": 14, "gate_a_fault_fixtures": 12, "flights": 12, "offline_required_items": 32},
   "characterization": {
     "authorization": "each live run separately authorized; never gated; every safety check evaluated and reported",
     "flights": [
@@ -98,5 +97,13 @@
     "3: 31 required offline items (F3.03 had been missed)",
     "4: C11 allows the accepted runners' own run-local changes"
   ],
-  "approved": {"by": "operator", "date": "2026-11-06", "statement": "Approve as recommended"}
+  "approved": {"by": "operator", "date": "2026-11-06", "statement": "Approve as recommended"},
+  "m4_decision_approved": {"date": "2026-11-07", "statement": "Remove them",
+    "change": "A-5.F4.02 and A-5.F4.06 removed from Gate A: a fault in the controller's own map or health input leaves no record outside the injector on the ground (no decisions are logged), so it cannot be proved independently (contract C8). Their supervisor response is proven offline (M3); map input faults are flown in S-4 and C-5. F4.06 becomes R-O; F4.02 stays characterization in flight."},
+  "m5_decision_approved": {"date": "2026-11-07", "statement": "Change the trigger (Recommended)",
+    "change": "A-5.F4.07 and A-5.F4.13 trigger ground_window -> ground_controller: under ground_window the ground-diagnostic controller has already exited, so nothing could detect either fault (M5 finding). The rows' faults, parameters and expected outcomes are unchanged."},
+  "m5_prestream_decision_approved": {"date": "2026-11-07", "statement": "Adopt both",
+    "change": "A-5.F4.07 and A-5.F4.13 trigger ground_controller (first transition) -> ground_prestream: at the first transition PX4 had not yet published vehicle_attitude and its estimator was still starting up, so the F4.13 controller exited with no attitude in its ledger and the ground window after its exit began inside the estimator start-up (ce73e574 dry run, plan 15.11). The rows' faults, parameters and expected outcomes are unchanged."},
+  "m5_f413_detection_approved": {"date": "2026-11-13", "statement": "接受並準備新候選 (accept and prepare a new candidate)",
+    "change": "A-5.F4.13 at ground_prestream also accepts clock_epoch_mismatch:<state topic> as its detection: from PRESTREAM on the accepted StateCache.validate aborts at once, and with /clock stopped PX4 timestamps run past the frozen clock by more than clock_offset_tolerance_s before the 1.0 s clock_stalled check (44fa1111 rerun, plan 15.14). The proof additionally requires that topic's PX4 timestamp in the controller's own ledger to exceed the frozen clock by more than the tolerance; parameters and the 1.0 s + 1 tick bound are unchanged."}
 }

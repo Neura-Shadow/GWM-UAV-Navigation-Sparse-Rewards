@@ -343,9 +343,9 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M0** baseline and contract audit — **COMPLETE 2026-11-06** ([audit](v3_sim_p6_m0_audit.md)) | §1 re-verified; remap support of the adapter and perception; how the P4 "stale clock" and "calibration mismatch" fixtures were covered; PX4 v1.17 offboard-loss, data-link-loss and failsafe-delay semantics from the pinned source and the accepted ULogs (no flight); run-local config checks in the P3/P4/P5 evaluators | written audit; decisions D1–D10 answered; D1a, D4a and C11 raised and approved |
 | **M1** taxonomy and scenarios — **COMPLETE 2026-11-06** (§11; the scenario list and four corrections approved by the operator) | freeze `p6_faults.yaml` and `p6_scenarios.yaml` from the matrix; precedence and expected outcomes fixed before any runtime | the operator approves the scenario list |
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
-| **M3** offline validation | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
-| **M4** evaluators | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
+| **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
+| **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -530,3 +530,796 @@ report `passed: true`.
 The ROS node wrappers (`depth_relay`, `state_relay`, `witness`, `competing_publisher`) are only
 import-tested; they have never run against ROS. Their first live use is M5 (ground integration),
 which needs its own authorization. The P6 runner, manifest and evaluators are M4/M5 work.
+
+## 13. M3 record: offline fault validation (2026-11-07, authorized by the operator: "Authorize M3")
+
+* **Run:** the suite runner `validation/p6_offline_suite.py`, at commit `60093c8`, under the
+  controller interpreter.
+* **Result:** 87 tests passed, 0 failed, 0 skipped; **31 of 31 required offline items; 12 of 12
+  flight-row rehearsals**. The result is bound to every P6 source, spec and test hash:
+  `docs/evidence/v3_sim_p6_m3_offline_suite_60093c8.json` (SHA-256 `988da4341fff18cd…`).
+* **Inputs:** read-only, from one retained accepted flight. The offline perception replay reproduced
+  every recorded grid bit for bit before any corruption was measured.
+* **Settled:** F5.02, from the rclpy executor order. The first tick after a stall sees pre-stop state
+  and pre-stop sim time, so a short stall most likely goes undetected in flight.
+* **Measured:** the characterized gaps, with risk statements. The most serious is F2.04: after a 1.0 m
+  XY reset, 3 collision-valid candidates enter the real obstacle until the next fresh frame re-marks it;
+  0.5 m gives none.
+* **Fixed:** the shim no longer invents a selection index (F3.06).
+* **Full report:** [M3 report](v3_sim_p6_m3_offline_report.md).
+* **Next:** M4, the evaluators, which needs its own authorization.
+
+## 14. M4 record: independent evaluators (2026-11-07, authorized by the operator: "Authorize M4")
+
+Offline only. No simulator ran and no P2–P5 file changed. Everything is in
+`simulation/px4_gazebo_p6/validation/`.
+
+### 14.1 What was built
+
+| Module | Role |
+|---|---|
+| `p6_run.py` | A read-only view of a P6 run: the accepted P5 layout plus `p6/` (declaration, per-injector ledgers, witness, `p6/injection.json`). A depth-bridge stop also writes the accepted `p4/fault_injection.json` |
+| `p6_fault_evaluate.py` | The occurrence proof (C8), from evidence the injector did not write (table below) |
+| `p6_safety_evaluate.py` | One check per outcome code on the accepted controller's records: H35, A10, HT20, PH3, L45 (through the accepted P4 `abort_landing`), L45R (landed and disarmed from PX4's own state messages), R2, GOAL, RECOVERY (§6.5), STALE_IFF_AGE, NO_INVOKE_AFTER_STALE, LIMITS_UNINJECTED, UNSAFE (§6.3 a), and the Gate A ground replay of the accepted `Supervisor.stale_reason` |
+| `p6_timing_evaluate.py` | Detection latency, fault-to-safe-action latency, time degraded, recovered (reported) |
+| `p6_evaluate.py` | The orchestrator, described below |
+| `p6_coverage_report.py` | Rows, uncovered required faults, latency summaries, recoveries, unsafe-setpoint runs; descriptive only |
+
+**What the orchestrator does:**
+1. It requires the declaration to be the frozen row (strict).
+2. It composes the unchanged P5 evaluator output. Each failure must match the row's exception table,
+   and the replacement check named there must pass.
+3. It runs the accepted P4 §9.1 `fault_window` for bridge stops, the proof and the response checks.
+4. It writes `p6/p6-evaluation.json`. Characterization rows end `characterized`, never `passed`.
+
+**Never excepted** (pinned by a test): safety, Policy A, ownership, cleanup, and P2's landed-and-disarmed
+check.
+
+**Independent proof per family:**
+
+| Family | Evidence |
+|---|---|
+| Policy | Accepted policy-ledger failures equal the shim-affected invocations; the failure reason is as declared; `inference_s` ≥ the declared delay |
+| Map | Perception's own `local_map.jsonl` published in the window, but the controller never used those snapshots |
+| Health | The adapter's own health log stayed fresh, while the controller reported it missing |
+| Pose | The witness shows true state continuing and relayed state stopped; perception's own unusable reasons |
+| Bridge stop | The accepted P4 §9.1 F1 checks |
+| Depth relay | The witness, raw versus relayed |
+| Depth counters | The adapter's own rejection counters |
+| Tick delay | The accepted timing trace, and the controller failure `stale_action` |
+| Refusal | The refusal reason in the controller log, and no ROS artifacts |
+| Competing publisher | The accepted graph record |
+| Clock stall | The controller failure |
+
+### 14.2 Tests
+
+`tests/test_px4_gazebo_p6_evaluate.py` has 17 tests: Windows 11 passed and 6 skipped (retained runs);
+WSL 17 passed. The full P6 set in WSL passes 100 of 100.
+
+**On retained accepted runs:**
+* The real Gate S S6 bridge stop, evaluated as an S-1-type fault (non-strict, P4 trigger), is
+  **proved** and its response passes. Detection is ≤ 0.5 s after the trigger.
+* The clean Gate C S2 flight passes as the B-0 pass-through baseline.
+
+**Negative cases, all failing as required:**
+* S-1, B-1 or S-4 declared on the clean flight: declared but not observed;
+* a non-frozen declaration;
+* one policy failure erased from the ledger;
+* `safety:collisions` in the P5 output;
+* target motion on a held tick;
+* S-4 run in pass-through: nothing dropped;
+* witness or counter mismatches;
+* a controller-input fault on the ground.
+
+**End to end:** B-1 and S-4 rig flights, written in the P6 run layout, pass with exactly their declared
+exceptions.
+
+### 14.3 Bugs caught by the tests and fixed
+
+* **Motion attributed to the wrong tick.** The unsafe-motion check attributed the previous moving
+  tick's 0.01 m step to the first held tick. A decision event logs the target *before* its tick acts,
+  so the motion a tick causes is the next event's target. The accepted S6 flight failed the check until
+  this was fixed.
+* **A check-name mismatch** (`UNSAFE`) that would have refused C-3's outcome exception.
+
+### 14.4 Decision: two Gate A fixtures removed (operator: "Remove them", 2026-11-07)
+
+A-5.F4.02 (map delay) and A-5.F4.06 (health loss) are faults in the controller's own inputs. On the
+ground the controller logs no decisions, so no record outside the injector shows the fault. The
+evaluator therefore fails them explicitly (`no_independent_ground_evidence_for_a_controller_input_fault`)
+rather than trusting the shim.
+
+* **Already covered offline (M3):** their supervisor response (`adapter_health_missing`,
+  `snapshot_stale` timing; F4.11).
+* **Already covered in flight:** map input faults, in S-4 and C-5.
+* **Recommended:** remove A-5.F4.02 and A-5.F4.06 from Gate A, giving 12 fixtures and 14 live ground
+  runs. Keep F4.06 as R-O.
+* **Alternative:** keep them, with a replay-only proof. That conflicts with C8.
+* **Applied:**
+  * `p6_scenarios.yaml`: the rows are gone; counts are 12 fixtures, 14 live ground runs, 32 offline items.
+  * `p6_faults.yaml`: F4.02 is now C with tier S; F4.06 is now R-O.
+  * Contract §8.1 and the §10 record.
+  * The evaluator's ground rules.
+  * The offline-suite coverage map: F4.06 is covered by the `adapter_health_missing` stale rule and F4.11.
+  * The tests.
+
+  The evaluator still refuses any controller-input fault on the ground.
+
+### 14.5 Not yet exercised
+
+* **Real P6 runs (M5/M6).** Each row's exception table is prefix-based and narrow. The exact P5 item
+  names a real faulted run produces will be pinned in the M5 dry run (progress in §15.5).
+* **L45R** on real PX4 data, the **load-harness** proof, and the proofs for the characterization
+  flights:
+  * not yet defined: X-F2.01, X-F5.01, X-F3.10, X-F5.09, X-F4.12, X-F5.02, X-F7.03;
+  * they must be defined before each is authorized.
+
+## 15. M5 record: ground integration and Gate A content dry runs (2026-11-07, authorized by the operator: "Authorize M5")
+
+**Status: complete (exit condition met 2026-11-13, §15.19); no credit.**
+* **Done:**
+  * the offline recovery;
+  * a fresh development candidate (`ce73e574…`, §15.7);
+  * its authorized confirming dry run: 16 of 18 rows passed (§15.11);
+  * the two F4.07/F4.13 decisions, adopted and implemented offline;
+  * a new development candidate, `44fa1111…` (§15.12); its dry run was interrupted by a host stop, and its rerun
+    passed 15 of 18 rows (§15.13–15.14);
+  * the F4.13 detection decision, implemented in a new development candidate, `524f0714…` (§15.15).
+  * the `524f0714` dry run: all 18 rows passed under one unchanged candidate (§15.17–15.19).
+* **Not done:** M6 and the real P6 freeze, each with its own authorization.
+* **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
+
+Scope as authorized:
+* the P6 runner and manifest;
+* a ground dry run of Gate A content on development candidates, with no credit.
+
+No run set `GWM_ALLOW_SITL_COMMANDS`, and the vehicle was never armed.
+
+### 15.1 What was built
+
+| File | Role |
+|---|---|
+| `scripts/p6_runner.py` | `P6Runner(P5Runner)` for the Gate A ground rows: relays, witness, controller shim, process signals, competing publisher, start-up refusals |
+| `scripts/p6_manifest.py` | the P6 candidate: P3/P4/P5 re-verified (C1), P6 sources and tests, injectors, specs, owner copy, per-candidate Policy A; development candidates, dry-run approvals, the live-run lock and the drift check |
+| `scripts/run_p6_gates.py` | the Gate A sequencer; `--dry-run` for development candidates (every row recorded, no gate result, no credit) |
+| `scripts/run_p6.sh`, `p6_namespace_owner.py`, `p3_runner.py`, `p6_node.py` | namespace launch with the byte-identical owner copy; injector entry point |
+| `scripts/verify_p6_evidence.sh` | the unchanged P5 evaluation, then the P6 evaluation |
+| `validation/p6_integration_evaluate.py` | C11, INJECTORS (A-6), RELAY and GROUND_POLICY (A-3) |
+| `injection/qos.py` | relay and `/clock` QoS (§15.4) |
+
+P6 has no build package: its nodes run from the manifest-bound tree under `/usr/bin/python3`.
+
+### 15.2 Operator decisions (2026-11-07)
+
+1. **Policy A for M5 development candidates only.** Answer: "Approve for M5 (Recommended)".
+   * Recorded in `state/p6-policy-A-approval-m5-development.json`.
+   * The manifest refuses it for a real candidate, and a real candidate refuses it.
+2. **F4.07 and F4.13 use the `ground_controller` trigger.** Answer: "Change the trigger (Recommended)".
+   * Under `ground_window` the controller had already exited, so nothing could detect either fault.
+3. **The designed fail-closed exit of F4.07 and F4.13.** Answer: "Allow that one item (Recommended)".
+   * Exactly `cleanup:ros-controller:nonzero_exit_1`, on those two rows only, is replaced by the
+     fail-closed proof.
+   * Every other cleanup item stays never excepted (§15.5).
+4. **F4.07 and F4.13 inject at the `ground_prestream` trigger** (the controller's transition into
+   PRESTREAM_SAFE_SETPOINTS). Answer: "Adopt both" (§15.11, open decision 1).
+5. **Exactly `p2:timing` on F4.07 and F4.13** is replaced by the fail-closed proof, which also requires
+   the timing reconciliation to have completed. Answer: "Adopt both" (§15.11, open decision 2).
+
+### 15.3 Live dry runs (no credit; evidence retained unchanged)
+
+| Candidate | Commit | Rows | Outcome |
+|---|---|---|---|
+| `f6048036` | `7fe1917` | A-3 | **failed**: the relays could not create publishers, and `/clock` never matched (§15.4, items 1–2) |
+| `08e79d05` | `04c1a95` | A-3 | **passed** |
+| `ef5ce69e` | `9ce6443` | all 18 Gate A rows | **failed**: 6 passed, 12 failed or not run (below) |
+| `ce73e574` | `68ccf30` | all 18 Gate A rows | **failed**: 16 passed; F4.07 and F4.13 failed on P5 items (§15.11) |
+
+A-3 on `08e79d05`:
+* the P5 evaluation had 0 failures, so every §3 limit held with three relays, the witness and the
+  shim in the loop;
+* relayed images arrived after a median of 3.5 ms, p95 9.6 ms, max 23 ms;
+* CPU: depth relay 27 %, state relay 22 %, witness 44 %;
+* the ground policy replay was bit-exact on 150 snapshots.
+
+Rows of the `ef5ce69e` run:
+* **Passed:** A-1, A-2, A-3, A-4 (87/87, 32/32, 12/12), F1.01, F1.06.
+* **Failed on defects in M5 code:** F1.02, F1.04, F1.07, F1.11, F2.09; see §15.4.
+* **Not run:** F3.01, F3.02, F3.03, F4.07, F4.13. Fixes were committed to bound files while the
+  sequence ran, so the runner's manifest check refused each row before launching anything
+  (`injectors,p6_source_files` differed). They are neither failures nor passes of their fixtures.
+* **Failed through F1.11 only:** A-6 and A-7, whose aggregates include the crashed relay.
+
+### 15.4 Root causes and fixes
+
+Each fix has a regression test in `tests/test_px4_gazebo_p6_runner.py` or the injection tests.
+
+1. **Relay QoS (`f6048036`).** Graph endpoint QoS has no history or depth, so `create_publisher`
+   refused it.
+   * **Fix:** the relays copy only reliability and durability, with keep-last depth (8, the bridge's
+     queue).
+2. **`/clock` (`f6048036`).** The P6 nodes subscribed to `/clock` as reliable, but the bridge
+   publishes it best-effort, so no relay could ever activate.
+   * **Fix:** every P6 node now takes `/clock` best-effort.
+3. **F1.02, evaluator.** The P4 §9.1 window is the bridge-stop window. It was applied to the adapter
+   stop as well.
+   * **Fix:** `p4_window_applies` limits it to `sensor-bridge`.
+   * **Re-evaluated on the retained evidence:** passes. The only P5 item allowed is
+     `fault_injection_outside_s6`, covered by the adapter-stop proof (own exit, no health after
+     exit, 166 native headers after the stop).
+4. **F1.04, evaluator.** The delay proof had no upper bound, so it also judged frames after the 5 s
+   window, which are correctly undelayed.
+   * **Boundaries on the retained evidence:**
+     * the relay activated at 31.092;
+     * delayed frames run from 31.092 to 36.076, with lags of 0.300–0.304 s;
+     * the first undelayed frame is at 36.108, past the window end of 36.092.
+   * **Fix:** the proof now judges frames from the trigger to the window end minus the delay.
+   * **Re-evaluated:** passes on 141 frames.
+5. **F1.07, injector.** The 10-frame budget was counted from the `affected` list, which the relay
+   drains into its ledger after each frame, so 161 frames were cut.
+   * **Fix:** a separate counter.
+   * **Offline in the relay's own pattern:** exactly 10 frames are cut, then every received object is
+     relayed untouched.
+   * **Still to prove live:** the old evidence correctly still fails.
+6. **F1.11, injector.** Images went through the image transform, which had no F1.11 case, and the
+   relay exited.
+   * **Fix:** images pass untouched; only `camera_info` changes, from the trigger on.
+   * **Still to prove live:** relay continuity, witness and cleanup.
+7. **F2.09, evaluator boundary.**
+   * **The fault reached its consumer:** in the window 0 position and 1 attitude message were
+     relayed, against 240 and 481 true ones; perception was unassociated 46 times; the replayed
+     supervisor hovered at 31.360 (`snapshot_stale`, within 0.35 s).
+   * **The single "continued" attitude message** arrived at 36.080, exactly the trigger (31.080) plus
+     5.000 s. The relay's last withheld message was at 36.068.
+   * **The relay withholds on the half-open window [t, t+5)** of `schedule.Windows`, so releasing that
+     message was correct. The proof's window was closed at the end.
+   * **Fix:** both ends get the same 0.2 s settle margin, for messages in flight and for the relay's
+     and the witness's separate `/clock` views. The expectation is unchanged: relayed state silent
+     while true state continues.
+   * **Re-evaluated:** passes.
+
+### 15.5 F3.01–F3.03, F4.07 and F4.13: expected identities from the accepted code
+
+| Row | Accepted controller refusal or failure | P5 evaluator items (unchanged `policy_fault`) | Allowed by |
+|---|---|---|---|
+| F3.01 | `PolicyError: checkpoint_missing` (`FrozenPolicy.load`, unreadable file) | `policy_fault:not_a_checkpoint_mismatch`, `:mismatched_checkpoint_record`, `:refusal_reason` | PROOF (refusal text, no node started) |
+| F3.02 | `PolicyError: checkpoint_sha256_mismatch` (as in accepted P5 Gate A) | none | — |
+| F3.03 | `ValueError: p5_model_schema_differs_from_frozen_hash` (`verified_policy`, before any load) | `policy_fault:not_a_checkpoint_mismatch`, `:refusal_reason` | PROOF |
+| F4.07 | `competing_control_publisher:/px4_71/fmu/in/trajectory_setpoint` (`inspect_graph`; the topic is unversioned, per `topic-contract.json`) | `cleanup:ros-controller:nonzero_exit_1` (certain) | PROOF (decision 3) |
+| F4.13 | `clock_stalled` (P2 mission stall check) | `cleanup:ros-controller:nonzero_exit_1` (certain) | PROOF (decision 3) |
+
+How the items were derived:
+* **F3 rows:** with the unchanged P5 check, in a test on the records the runner writes.
+* **The two cleanup items:** from the accepted `main` (exit 1 unless connectivity passed). Both
+  faults fire during WAIT_FOR_VALID_ESTIMATION, before connectivity passes.
+
+Pinned from live evidence on `ce73e574` (§15.11):
+* `p2:timing` on both rows;
+* on F4.13 only, four more items, caused by the trigger point rather than by the fault.
+
+The fail-closed proofs require:
+* the declared reason;
+* the advertiser's lifetime, or the `/proc` stop window;
+* detection within 1.0 s plus one tick (plus the graph query for F4.07);
+* the designed exit: 0, or 1 with connectivity "failed".
+
+### 15.6 Live-run lifecycle (no manifest drift)
+
+* **The live lock.** The sequencer holds `state/p6-live-run.lock` for the whole of a live sequence.
+  While it exists, a freeze and a second sequence are refused.
+* **The drift check.** Before every row the sequencer re-checks every hash-bound P6 file. A changed
+  candidate ends the sequence; the remaining rows are recorded under `not_run`, never as passed.
+* **During a live run:** no bound file changes, no commits, no CPU-heavy tests. If a change is needed,
+  the run ends first, its evidence is kept, and a new candidate follows.
+
+### 15.7 Offline regression on `68ccf30` (no simulator)
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests (specs, injection, offline, evaluate, runner) | 135 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 99 passed, 36 skipped (Linux-only: `fcntl`, ROS, retained WSL runs) |
+
+The Windows skips are not counted as passes.
+
+P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
+
+**New development candidate:** `ce73e57458fa7f1a743a58f64c8f612b96712829fd83d237a9fe4809daf145e1`
+* frozen at `68ccf30` from a clean P6 tree;
+* binds 41 files (16 injector modules), faults `172b8219…`, scenarios `699d29f1…`, and the
+  development Policy A approval;
+* Gate A: 18 rows, 14 of them live.
+
+### 15.8 Authorization status
+
+* Each earlier dry-run approval is bound to its own manifest SHA-256.
+* **`ce73e574`.**
+  * Authorized by the operator on 2026-11-07, "Authorize dry run", answering: "Authorize the full
+    Gate A content dry run on development candidate ce73e574?"
+  * Approval: `state/p6-dry-run-approval-ce73e57458fa.json`.
+  * It ran once (§15.11).
+* **`44fa1111` (§15.12):** no approval has been written. Its dry run needs a new operator
+  authorization.
+* **M5 exits** only when a complete dry run passes under one unchanged candidate.
+
+### 15.9 PX4-managed characterization on the ground
+
+None is possible without arming. M0 settled the D4 values from source and ULogs. The PX4-managed
+outcomes stay separately authorized characterization flights.
+
+### 15.10 Remaining
+
+* The authorized dry run of all 18 rows on `44fa1111`.
+  * F4.07 and F4.13 run at `ground_prestream` for the first time.
+  * Any further P5 items they produce must be pinned from that evidence.
+* M6 and the real P6 freeze, each with its own authorization.
+
+### 15.11 The `ce73e574` dry run (2026-11-07, no credit)
+
+**Run facts:**
+* Started 10:50:40Z and took 25 min.
+* No simulator processes were running before or after it.
+* The live lock was held for the whole sequence and then released.
+* The candidate was unchanged at every row and at the end; `not_run` is empty.
+* Result: `state/p6-dryrun-A-ce73e57458fa-20261107T105106Z.result.json`; the evidence is retained
+  unchanged.
+
+**Passed (16):**
+* A-1 and A-2.
+* A-3.
+* A-4: 87/87, 32/32, 12/12.
+* F1.01.
+* F1.02:
+  * own exit, 0 health records after the exit, 169 native headers after the stop;
+  * the P5 items it is allowed are covered by that proof.
+* F1.04: 141 delayed frames, minimum lag 0.296 s.
+* F1.06.
+* **F1.07, live for the first time:** the adapter rejected exactly the 10 declared frames.
+* **F1.11, live for the first time:** the adapter invalidated the calibration with
+  `calibration_rejected_after_lock:focal_length_inconsistent_with_pinned_fov`, and the relay
+  continued.
+* F2.09:
+  * 0 of 230 position and 0 of 460 attitude messages were relayed in the window;
+  * perception was unassociated 46 times.
+* **F3.01–F3.03, live for the first time:**
+  * each refused with exactly the reason in §15.5, and no node started;
+  * the P5 items were exactly those predicted.
+* A-6 and A-7.
+
+**F4.07 and F4.13 (failed).** Both fail-closed proofs passed:
+
+| Row | Declared detection | Detected after |
+|---|---|---|
+| F4.07 | `competing_control_publisher:/px4_71/fmu/in/trajectory_setpoint` | 0.14 s from the advertisement, 1.04 s from the advertiser's launch |
+| F4.13 | `clock_stalled` | 1.016 s wall from the stop |
+
+* The controller exited 1 with connectivity "failed".
+* Decision 3 replaced the `cleanup:ros-controller:nonzero_exit_1` item.
+* The P5 items no exception covers are below.
+
+1. **`p2:timing`, both rows. Certain, from the accepted P2 code.**
+   * The P2 timing check (`timing_evidence.trace_metrics`) reports failed whenever the
+     controller's result carries a failure, and a fail-closed row always carries one.
+   * Every reconciliation check passed: the trace was complete with no overflow, and the counts and
+     ordering matched. The evaluator raised no `p2_integrity_error`.
+   * No current exception covers the item.
+2. **`p2:bag_received_ledger_count:vehicle_attitude`, F4.13. Caused by the trigger point.**
+   * PX4 first publishes `vehicle_attitude` at about 5.5 s PX4 time; on this candidate's runs it was
+     5.46–5.56 s.
+   * F4.13 stalls `/clock` at the controller's first transition (4.37 s). The controller's ledger
+     ends at about 4.85 s PX4 time, before PX4's first attitude message.
+   * F4.07's controller exited later and holds 393 attitude messages.
+3. **`depth:state_association_incomplete`, `depth:reset_bracket_not_single_reset` and
+   `depth:reset_bracket_bound`, F4.13. A P6 runner defect: the window placement.**
+   * `live_trigger` holds the unchanged ground window from the controller's exit. For F4.13 that was
+     6.172 s, inside PX4's estimator start-up.
+   * On every run of this candidate the estimate is invalid until about 6.6 s, and start-up
+     reset-epoch brackets occur at 5.2–6.7 s.
+   * So 3 `estimate_invalid` observations (6.172–6.372) and one start-up reset bracket (6.472) fell
+     in the window. The ledger of a controller that has already exited cannot corroborate that reset.
+   * F4.07's window began at 9.604 and was clean: 150 of 150 observations matched. The accepted
+     ground rows begin their window at about 16 s.
+
+**Open decisions:**
+1. **The trigger point.** Recommended: inject at the controller's transition into
+   PRESTREAM_SAFE_SETPOINTS.
+   * At that transition the estimate has been valid for 5 s (P2 `estimator_stable_sim_s`) and every
+     PX4 stream is in the ledger. The window after the exit starts after the estimator start-up,
+     so items 2 and 3 cannot arise.
+   * The ground diagnostic then holds PRESTREAM for 3.0 s sim, which covers about 1.1 s of
+     detection.
+   * The accepted `main` exits 0 after connectivity passes (ground `p4_outcome` is `not_run`), so
+     the designed exit becomes 0. That is already accepted by the fail-closed proof, and decision 3
+     is no longer exercised.
+   * The alternative: keep the first transition, hold the window until after the estimator start-up,
+     and add a proof-backed exception for item 2.
+2. **`p2:timing` on F4.07 and F4.13.** Recommended: allow exactly this item on these two rows,
+   replaced by the fail-closed proof. The replacement would also require:
+   * the P2 timing reconciliation completed (no `p2_integrity_error`);
+   * its `controller_failure` is the declared detection.
+
+   Without this exception no fail-closed row can pass under the accepted P2 rule.
+
+Both decisions were adopted on 2026-11-07 ("Adopt both"); see §15.12.
+
+### 15.12 The two decisions implemented, and candidate `44fa1111` (2026-11-07)
+
+**Code (`f74b71f`):**
+* **The trigger.** `injection/schedule.py` and `configs/p6_scenarios.yaml` replace
+  `ground_controller` with `ground_prestream` (record `m5_prestream_decision_approved`).
+  `p6_runner.live_trigger_due` fires only on the controller's transition into
+  PRESTREAM_SAFE_SETPOINTS.
+* **The fail-closed proofs** (`validation/p6_fault_evaluate.py`) now also require:
+  * the runner's injection request at or after that transition, and connectivity "passed";
+  * the P2 timing reconciliation completed: a timing status in the P5 evaluation and no
+    `p2_integrity_error`.
+* **The evaluator** (`validation/p6_evaluate.py`): on A-5.F4.07 and A-5.F4.13 only, exactly
+  `=p2:timing` is replaced by PROOF.
+* **What did not change:** the rows' faults, parameters and expected outcomes, and every accepted
+  P2–P5 source, threshold and model.
+
+**Read from the accepted sources** (regression tests):
+* connectivity passes on the estimator-stability rule just before PRESTREAM;
+* the ground diagnostic then holds PRESTREAM for `ground_prestream_sim_s` (3.0 s);
+* `main` exits 0 once connectivity has passed (ground `p4_outcome` is `not_run`), so the designed exit
+  is 0;
+* `trace_metrics` reports failed exactly when the controller's result carries a failure.
+
+**Offline regression on `f74b71f`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 139 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 103 passed, 36 skipped (Linux-only; not counted as passes) |
+
+**Development candidate:** `44fa111162307b240af152105f266896b96ff5e30c460e08c42c36d3dfb2d5a0`
+* frozen at `f74b71f` from a clean P6 tree; it verifies;
+* P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` re-verified;
+* binds 41 files (16 injector modules), faults `172b8219…`, scenarios `a451bb21…`, and the
+  development Policy A approval;
+* Gate A: 18 rows, 14 of them live;
+* no dry-run approval has been written.
+
+**Expected on its dry run:**
+* F4.07 and F4.13 detect at PRESTREAM and exit 0, so no cleanup item arises.
+* `p2:timing` is replaced by the proof.
+* Any other item is a P6 failure, to be diagnosed from evidence and not excepted.
+
+### 15.13 The `44fa1111` dry run was interrupted by a host stop (2026-11-07)
+
+**Authorization:** the operator, on 2026-11-07, "Authorize dry run", answering: "Authorize the full
+Gate A content dry run on development candidate 44fa1111?" Approval:
+`state/p6-dry-run-approval-44fa11116230.json`.
+
+**What happened:**
+* The sequence started at 12:55:55Z with no other simulator processes running.
+* At about 12:57:40Z, during the start-up of its first live row, A-1, the Windows host stopped
+  without a clean shutdown.
+  * Event Kernel-Power 41 was logged, with bugcheck 0.
+  * There was no dump, no sleep and no power-button press.
+  * The host rebooted on 2026-11-13.
+* WSL lost its unflushed writes:
+  * the A-1 run, `20261107T125708Z-p6dry-A-1-b72222af`, has zero-length files and status
+    `incomplete`;
+  * there is no result file;
+  * `state/p6-live-run.lock` is left by the dead sequence (pid 312859, previous boot).
+* The cause cannot be settled from the logs. The same launch had run 14 times without fault on
+  `ce73e574`.
+
+**Status:**
+* No row has a result, so this is neither a pass nor a failure of any row.
+* The interrupted run is retained unchanged. Under the approval's cap it counts as 1 of 40 live runs.
+* After the reboot the candidate still verifies, including P3, P4 and P5 (C1).
+* A rerun is a retry, so it needs the operator's explicit authorization, and so does clearing the
+  stale lock.
+
+### 15.14 The `44fa1111` rerun (2026-11-13, no credit)
+
+**Authorization:** the operator, on 2026-11-13, "授權重跑" (authorize the rerun), answering whether to
+clear the stale live lock and rerun the full Gate A dry run on `44fa1111`.
+
+**Before the run:**
+* The lock's pid (312859, previous boot) was not running, no simulator process was present, and the
+  lock named this candidate. Only `state/p6-live-run.lock` was removed.
+* The host was on AC power, battery 79 %.
+
+**Run facts:**
+* 12:40:48Z to 13:09:11Z.
+* The candidate was unchanged at every row and at the end; `not_run` is empty; the lock was released.
+* Result: `state/p6-dryrun-A-44fa11116230-20261113T124106Z.result.json`; the evidence is retained
+  unchanged.
+
+**Passed (15):**
+* A-1, A-2, A-4, A-6, A-7.
+* F1.01, F1.02, F1.04 (141 frames), F1.06, F1.07 (10 of 10), F1.11.
+* F3.01–F3.03.
+* **F4.07, at `ground_prestream` for the first time:**
+  * detected 0.686 s after the advertisement;
+  * the controller exited 0 with connectivity "passed";
+  * the only P5 item, `p2:timing`, was replaced by the proof;
+  * no cleanup item arose.
+
+**Failed (3), on two causes.**
+
+1. **A-3 and F2.09: the host ran the simulation too slowly for an accepted P2 rule.**
+   * The rule (`timing.validate`) treats estimator status flags as stale after 2.0 s of wall time
+     without a new message (`state_fresh_wall_s`). PX4 publishes them every 1.0 s of simulated time.
+   * So whenever the simulation runs below half real time for a whole flags interval, the rule
+     fires.
+
+   | Dry run | Longest wall gap between flags |
+   |---|---|
+   | 11-07, every row | 1.67 s |
+   | 11-13, A-3 | 2.95 s (22 gaps over 2.0 s) |
+   | 11-13, F2.09 | 2.07 s (1 gap over 2.0 s) |
+   | 11-13, other rows | up to 1.88 s |
+
+   * **A-3:** the controller never held a valid estimate for 5 s (`ground_diagnostic_deadline`).
+   * **F2.09:** the controller aborted `stale_state:estimator_status_flags` during PRESTREAM, before
+     the fault was injected. Its fault proof passed; only `p2:timing` was refused.
+   * The mean real-time factor was about 0.66, against about 0.76 on 11-07.
+   * The Windows power mode on AC was "Best power efficiency" (overlay `961cc777…`). It is the likely
+     cause but not proven.
+   * No P6 code is involved, and the accepted threshold stays unchanged.
+2. **F4.13: a different detection of the same fault. A P6 specification gap caused by moving the
+   trigger.**
+   * While waiting for a valid estimate, the accepted mission catches a failed state check and only
+     restarts the stability timer. So at the old trigger the 1.0 s `clock_stalled` check was the only
+     abort path.
+   * From PRESTREAM on, a failed state check aborts at once. With `/clock` stopped, PX4's own
+     timestamps keep advancing, so `clock_epoch_mismatch:vehicle_local_position` fires as soon as one
+     runs more than `clock_offset_tolerance_s` (0.1 s) ahead of the frozen clock. Here PX4 was at
+     12.712 against a frozen 12.608.
+   * The abort came 0.269 s wall after the stop request, while the clock bridge was stopped.
+   * The runner expected only `clock_stalled`, so it ended the row with
+     `declared_detection_not_observed`, and the evaluation had no sensor window.
+
+**Open:**
+* **An operator decision:** accept `clock_epoch_mismatch:<state topic>` as F4.13's detection at
+  `ground_prestream`, besides `clock_stalled`.
+  * The proof would be otherwise unchanged:
+    * the `/proc` stop window;
+    * the abort while stopped, within 1.0 s plus one tick of the stop request;
+    * connectivity "passed", exit 0;
+    * the timing reconciliation completed.
+  * It would also require the named topic's PX4 timestamp in the controller's own ledger to be more
+    than 0.1 s past the frozen clock.
+* **The host's speed:** to be restored by the operator before the next dry run. That needs a new
+  candidate and its own authorization.
+
+### 15.15 The F4.13 detection implemented, and candidate `524f0714` (2026-11-13)
+
+**Decision:** adopted by the operator on 2026-11-13, "接受並準備新候選" (accept and prepare a new
+candidate). Recorded as `m5_f413_detection_approved`.
+
+**Code (`e5d7fb5`):**
+* **The runner.** `LIVE_DETECTION["F4.13"]` is now `("clock_stalled", "clock_epoch_mismatch:")`.
+* **The proof** (`p6_fault_evaluate._clock_stall`) accepts `clock_stalled` or
+  `clock_epoch_mismatch:<accepted state topic>`.
+  * The epoch reason counts only if the controller's own ledger has a sample of that topic,
+    received before the abort, whose PX4 timestamp is past the frozen clock (the abort's simulated
+    time) by more than the run-local `clock_offset_tolerance_s`.
+  * Unchanged: the `/proc` stop window, the 1.0 s plus one tick bound, connectivity "passed",
+    exit 0, and the timing reconciliation.
+* **The specifications.** In `p6_faults.yaml` and `p6_scenarios.yaml`, F4.13's detection and expected
+  text now name both reasons. Its parameters are unchanged.
+
+**Read from the accepted sources** (regression tests):
+* before PRESTREAM, a failed state check only restarts the stability timer;
+* the epoch check comes before the staleness check;
+* the tolerance is 0.1 s and the stall limit 1.0 s;
+* `STATE_TOPICS` matches.
+
+**Replayed in memory on the retained `44fa1111` F4.13 evidence:**
+* PX4 was 0.104 s past the frozen clock, against a tolerance of 0.1;
+* the detection came 0.269 s after the stop, while stopped;
+* exit 0, connectivity "passed".
+
+The only remaining item is the timing reconciliation. That run's P5 evaluation never reached it,
+because the runner had ended the row. It is not counted.
+
+**Offline regression on `e5d7fb5`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 141 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 105 passed, 36 skipped (Linux-only; not counted as passes) |
+
+**Development candidate:** `524f07143f592a5ab7a31f2ad298a31ab879183a4126726ca02c056e47202405`
+* frozen at `e5d7fb5` from a clean P6 tree; it verifies;
+* P3, P4 and P5 re-verified;
+* binds 41 files, faults `97fc5eef…`, scenarios `626fd44f…`, and the development Policy A approval;
+* no dry-run approval has been written.
+
+**Before its dry run:**
+* **Host speed.** The Windows power mode on AC was still "Best power efficiency" at freezing. A-3 and
+  F2.09 need the accepted P2 wall-clock freshness to hold, so the operator should switch it to "Best
+  performance" first.
+* **Authorization.** The dry run needs its own operator authorization.
+
+### 15.16 Proposed host-stability diagnostic before the next full dry run (2026-11-13)
+
+**Operator instruction (2026-11-13):** proceed without a Windows power-mode change; before another
+full 18-row dry run, propose a lightweight, separately authorized, ground-only diagnostic of simulator
+RTF, estimator-status publication intervals and controller readiness under the current host settings.
+No P2–P5 threshold may be relaxed.
+
+**What the retained evidence already shows (read-only, scratchpad `m5_host_diag.py`):**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max |
+|---|---|---|---|---|
+| 11-07 A-1 | 0.80 | 1.61 / 1.50 s | 0 | — |
+| 11-07 A-3 | 0.69 | 1.20 / 1.20 s | 0 | 4.5 |
+| 11-07 F2.09 | 0.77 | 1.22 / 1.19 s | 0 | — |
+| 11-13 A-1 | 0.65 | 1.93 / 1.79 s | 0 | — |
+| 11-13 A-3 | 0.46 (ledger) | 2.95 / 2.68 s | 22 | 6.7 |
+| 11-13 F2.09 | 0.53 | 2.07 / 1.38 s | 1 | 5.6 |
+| 11-13 F4.07 | 0.60 | 1.88 / 1.87 s | 0 | — |
+
+* **Per-process CPU was the same on both days:** Gazebo about 1.3 cores, the adapter 0.43, the witness
+  0.4–0.45, perception 0.36, the controller 0.33–0.4, each relay 0.21–0.27; about 4.3 cores in all on
+  a 24-thread i7-13700HX.
+* **So the P6 processes did not grow.** The host delivered less simulated time per wall second for the
+  same demand, and its load was higher. Gazebo's single simulation thread is the limit; nothing in P6
+  can speed it up.
+* **The flags interval in PX4 time was 1.0 s in every run.** Only the wall interval stretched.
+
+**The proposed diagnostic (needs its own authorization; no credit):**
+* **Rows:** on candidate `524f0714`, through the dry-run sequencer with `--rows`: A-1 then A-3 in one
+  sequence, then A-3 once more. Three live runs, about six minutes of simulator time.
+  * A-1 is the accepted P3 readiness run without any P6 node; A-3 is the P6 ground readiness run with
+    the relays and the witness. Their difference isolates P6 overhead from host slowness.
+* **Approval:** a separate file, `state/p6-dry-run-approval-524f07143f59-hostdiag.json`, bound to the
+  candidate, `live_runs_max: 3`, citing the operator's authorization. The runner counts runs per
+  approval file, so these never count against the later full dry run's cap.
+* **Host snapshot before each sequence (read-only):** the active power overlay, battery and AC state,
+  and the top Windows processes by CPU over a 5 s sample, saved beside the result file.
+* **Measured from the retained evidence only**, by the read-only script: RTF mean and minimum interval
+  RTF; flags wall gap max, p95 and the count over 2.0 s; time from controller start to PRESTREAM;
+  connectivity and failure; per-process CPU; 1-min load.
+* **Pre-declared stability criteria**, from the 11-07 envelope and the accepted P2 rule
+  (`state_fresh_wall_s` 2.0 s, unchanged):
+  1. every run's flags wall gap max ≤ 1.7 s (11-07 maximum over 14 rows was 1.67 s; 0.3 s margin
+     under the rule);
+  2. both A-3 runs: RTF mean ≥ 0.65, connectivity "passed", 0 P5 failures;
+  3. A-1: RTF mean ≥ 0.75.
+* **Decision rule:**
+  * all criteria hold → request a separate authorization for the complete 18-row dry run on
+    `524f0714`;
+  * otherwise → report the measured bottleneck with the mitigations below; no retry.
+* **Nothing changes:** no bound P6 file, no accepted file, no host setting. The script is a scratchpad
+  tool and binds nothing.
+
+**Mitigations to weigh if the criteria fail** (each needs the operator's choice; none relaxes a limit):
+1. **Scheduling, no code:** run with the host otherwise idle (no Docker backend, editors or vendor
+   utilities active), and add a pre-run host-CPU gate to the launch script so a sequence does not start
+   on a busy host.
+2. **Software, new candidate:** lower the scheduling priority (`nice`) of the P6 witness and relays.
+   Gazebo is the bottleneck and the host is not saturated, so the expected gain is small.
+3. **Host, needs authorization:** the power overlay, or the Hyper-V vCPU placement for WSL on the
+   performance cores. Both are host configuration and stay the operator's decision.
+
+### 15.17 Host-stability diagnostic: result (2026-11-13, no credit)
+
+**Authorization:** the operator, 2026-11-13, "Authorize diagnostic". Approval
+`state/p6-dry-run-approval-524f07143f59-hostdiag.json` (cap 3, bound to `524f0714`).
+
+**Host before the sequence (read-only snapshot):** power overlay "Best power efficiency", AC with
+battery 79 %, Windows CPU 7 %, no heavy host process (the top one used 1.45 CPU-seconds in 5 s).
+
+**Sequence 1 (13:53:56Z–13:58:00Z), rows A-1 then A-3; result
+`state/p6-dryrun-A-524f07143f59-20261113T135417Z.result.json`:**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max | Outcome |
+|---|---|---|---|---|---|
+| A-1 (no P6 node) | 0.58 | 2.31 / 1.85 s | 1 | 2.7 | passed (readiness only; the P3 evaluation has no wall-freshness rule) |
+| A-3 (relays, witness) | 0.50 | 2.16 / 2.06 s | 10 | 6.8 | failed: `stale_state:estimator_status_flags` after 51.8 s to PRESTREAM; `p2:timing` |
+
+Per-process CPU was again unchanged: Gazebo 1.17–1.22 cores, adapter 0.4, witness 0.35, perception
+0.37, controller 0.3, relays 0.2–0.24.
+
+**Against the pre-declared criteria (§15.16):** all three fail.
+1. Flags wall gap max ≤ 1.7 s: A-1 2.31 s, A-3 2.16 s.
+2. A-3 RTF ≥ 0.65 and 0 P5 failures: 0.50, and the run failed.
+3. A-1 RTF ≥ 0.75: 0.58 (0.80 on 11-07).
+
+**The third run (A-3 again) was not executed.** The decision was already settled, and it would only
+have added simulator time. Two of the three authorized runs were used.
+
+**The measured bottleneck:**
+* The accepted P3 stack alone (A-1), with no P6 process, already runs at 0.58 real time and breached
+  the accepted P2 wall-freshness rule (2.0 s) once. On 11-07 the same row ran at 0.80 with a 1.61 s
+  maximum.
+* CPU demand per process is identical across days, and the host was idle before the run. So the host
+  delivers fewer Gazebo simulation-thread cycles per second than on 11-07: a frequency or core-placement
+  cap, consistent with the "Best power efficiency" overlay that has been active since the reboot.
+* P6 adds load (A-3 load 6.8 against 2.7) and lengthens the gaps further, but is not the cause: the
+  rule fails without it.
+
+**Consequence:** under the current host settings a full 18-row dry run would fail A-3 and every
+fixture whose controller must reach PRESTREAM. No request for the full dry run is made.
+
+**Mitigations (the operator's choice):**
+1. **Host (needs authorization, not done):** set the AC power overlay to "Best performance" (or
+   restore the 11-07 setting), or pin WSL's vCPUs to the performance cores. This is the only measure
+   that addresses the measured cause.
+2. **Scheduling, no code:** run only on an idle host, with a pre-run host-CPU gate in the launch script.
+   The host was already idle today, so this alone will not suffice.
+3. **Software, new candidate:** `nice` for the witness and relays. It reduces the A-3 load but cannot
+   raise Gazebo's single-thread throughput; A-1 fails without any P6 process.
+
+The accepted P2 freshness timeout and every P3–P5 threshold stay unchanged.
+
+### 15.18 Host-stability diagnostic repeated after the power-mode change (2026-11-13, no credit)
+
+**Host change (the operator's, not recorded in any manifest):** the Windows AC power overlay was set
+to "Best performance" (`ded574b5…`); the on-battery overlay stays "Best power efficiency".
+
+**Authorization:** the operator, 2026-11-13: one new capped ground-only sequence on `524f0714`, A-1
+then A-3 once each (cap 2), under §15.16; stop and report; no full dry run, no retry. Approval
+`state/p6-dry-run-approval-524f07143f59-hostdiag2.json`.
+
+**Verified before starting:** AC power (battery 79 %), the Best-performance overlay, host CPU 2 %, the
+manifest and the P3/P4/P5 baselines (C1), no simulator or P6 process, no live lock.
+
+**Sequence (14:13:36Z–14:16:15Z); result
+`state/p6-dryrun-A-524f07143f59-20261113T141353Z.result.json`:**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max | Outcome |
+|---|---|---|---|---|---|
+| A-1 | 0.80 | 1.23 / 1.21 s | 0 | 1.9 | passed |
+| A-3 | 0.69 | 1.59 / 1.45 s | 0 | 2.7 | passed, 0 P5 failures, 11.2 s to PRESTREAM |
+
+Per-process CPU unchanged (Gazebo 1.15–1.19 cores, witness 0.41, adapter 0.4, perception 0.37,
+controller 0.35, relays 0.2–0.24). Both runs now match the 11-07 figures (A-1 0.80, A-3 0.69).
+
+**Against the pre-declared criteria (§15.16):** all hold.
+1. Flags wall gap max ≤ 1.7 s: 1.23 s and 1.59 s.
+2. A-3 RTF ≥ 0.65 and 0 P5 failures: 0.69, passed.
+3. A-1 RTF ≥ 0.75: 0.80.
+
+**Conclusion:** the measured bottleneck of §15.17 was the power overlay. With it changed, the host
+again meets the accepted P2 wall-freshness rule with margin, and P6's own load has not changed.
+The candidate was unchanged throughout and the lock was released. No threshold or source changed; no
+re-freeze.
+
+**Stopped here, as authorized.** The full 18-row dry run on `524f0714` needs its own authorization,
+with the host kept on AC power in Best-performance mode for the whole run (about 25 min).
+
+### 15.19 The `524f0714` dry run: all 18 rows passed (2026-11-13, no credit)
+
+**Authorization:** the operator, 2026-11-13, "Authorize dry run", answering: "Authorize the full
+18-row Gate A content dry run on development candidate 524f0714?" Approval
+`state/p6-dry-run-approval-524f07143f59.json`.
+
+**Verified before starting:** AC power, the Best-performance overlay, host CPU 0 %, the manifest and
+the P3/P4/P5 baselines, no simulator or P6 process, no live lock.
+
+**Run facts:** 14:19:13Z–14:41:02Z (21.5 min). The candidate was unchanged at every row and at the
+end; `not_run` is empty; the lock was released; no residual process. Result:
+`state/p6-dryrun-A-524f07143f59-20261113T141932Z.result.json`; the evidence is retained unchanged.
+
+**All 18 rows passed.** The P6 evaluation refused no P5 item on any row.
+* A-1, A-2, A-3, A-4 (87/87, 32/32, 12/12), A-6, A-7.
+* F1.01, F1.02, F1.04, F1.06, F1.07 (10 of 10 frames rejected), F1.11 (calibration invalidated,
+  relay continuous).
+* F2.09: 0 of 230 position and 0 of 460 attitude messages relayed in the window; perception
+  unassociated 46 times.
+* F3.01, F3.02, F3.03: each refused with its declared reason, no node started.
+* **F4.07 at `ground_prestream`:** detected 0.080 s after the advertisement; exit 0, connectivity
+  "passed"; the only P5 item, `p2:timing`, replaced by the proof.
+* **F4.13 at `ground_prestream`, the first pass:** `clock_epoch_mismatch:vehicle_local_position`,
+  0.157 s wall after the stop while the clock bridge was stopped; the controller's ledger showed PX4
+  0.108 s past the frozen clock against the 0.1 s tolerance; exit 0, connectivity "passed"; the only
+  P5 item, `p2:timing`, replaced by the proof.
+
+**Host during the run (read-only metrics over the 10 live rows with a controller):** RTF 0.60–0.76,
+flags wall gap maximum 1.92 s, 0 gaps over the accepted 2.0 s rule.
+
+**M5 exit condition met:** a complete dry run passed under one unchanged development candidate. The
+dry run earns no credit; no P6 gate has run and none is accepted. M6 and the real P6 freeze each need
+their own operator authorization.
