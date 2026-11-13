@@ -66,7 +66,9 @@ ACCEPTED_DEPTH, RAW_DEPTH = "/gwm/sensors/front_depth", "/gwm/p6/raw/front_depth
 STATE_PREFIX = "/gwm/p6/px4_71"
 REFUSALS = {"F3.01": "checkpoint_missing", "F3.02": "checkpoint_sha256_mismatch",
             "F3.03": "p5_model_schema_differs_from_frozen_hash"}
-LIVE_DETECTION = {"F4.07": "competing_control_publisher", "F4.13": "clock_stalled"}
+# F4.13 (M5 decision, 2026-11-13): from PRESTREAM on the accepted state check aborts at once, so a stopped /clock is
+# reported as clock_epoch_mismatch:<state topic> before the 1.0 s clock_stalled check; the proof decides which is valid.
+LIVE_DETECTION = {"F4.07": ("competing_control_publisher",), "F4.13": ("clock_stalled", "clock_epoch_mismatch:")}
 LIVE_TRIGGER = "ground_prestream"  # only if the frozen specification declares it (see live_trigger)
 PRESTREAM = "PRESTREAM_SAFE_SETPOINTS"
 OBSERVE_SIM_S = 5.0  # after the injection: the accepted P4 ground-fault observation, or the declared window + margin

@@ -10,6 +10,10 @@ CLOCK_STALL_WALL_S, TICK_S = 1.0, 0.05  # P2 clock stall (contract §3) and one 
 GRAPH_PERIOD_WALL_S = 1.0  # the accepted controller re-checks the PX4-input graph every 1.0 s wall
 SETTLE_S = 0.2  # relay windows: margin at each end for in-flight messages and per-process /clock views
 PRESTREAM = "PRESTREAM_SAFE_SETPOINTS"  # the live ground trigger state (M5 decision, `ground_prestream`)
+# The accepted P2 `timing.STATE_TOPICS` (a test reads the accepted source) and F4.13's declared detections.
+STATE_TOPICS = ("vehicle_local_position", "vehicle_status", "vehicle_attitude",
+                "vehicle_land_detected", "estimator_status_flags", "failsafe_flags")
+CLOCK_DETECTIONS = ("clock_stalled",) + tuple("clock_epoch_mismatch:" + t for t in STATE_TOPICS)
 POLICY_REASON = {"F3.04": "output_not_finite", "F3.05": "output_shape", "F3.06": "selection_outside_mask",
                  "F3.07": "timeout", "F3.08": "timeout", "F3.09": "timeout", "F3.10": "timeout",
                  "F3.11": "exception:RuntimeError", "F3.12": "input_not_finite", "F7.02": "exception:RuntimeError",
@@ -398,15 +402,34 @@ def _competing_publisher(run, d, p, _):
         p.check(False, "no_advertisement_time")
 
 
+def _epoch_ahead(run, abort, topic):
+    """The accepted `StateCache.validate` raises `clock_epoch_mismatch:<topic>` when sim - timestamp is below
+    -clock_offset_tolerance_s. The controller's own ledger must show a `topic` sample received before the abort whose
+    PX4 timestamp is past the frozen clock (the abort's sim time) by more than the run-local tolerance (C11 keeps the
+    run-local p2_control.yaml equal to the accepted one)."""
+    tolerance = (run.optional("p2_control.yaml") or {}).get("clock_offset_tolerance_s")
+    rows = [e for e in run.received(topic) if e.get("monotonic_s") is not None and e["monotonic_s"] <= abort["monotonic_s"]]
+    ahead = max((int(e["fields"]["timestamp"]) / 1e6 - abort["sim_s"] for e in rows), default=None)
+    return tolerance, ahead
+
+
 def _clock_stall(run, d, p, _):
     """F4.13: the kernel showed the clock bridge stopped and resumed (`/proc`, read by the process-signal
-    injector), and the accepted controller aborted `clock_stalled` while it was stopped, within 1.0 s wall plus
-    one 20 Hz tick of the stop request (the last clock receipt can only be earlier, so this is conservative)."""
+    injector), and the accepted controller failed closed while it was stopped, within 1.0 s wall plus one 20 Hz tick
+    of the stop request (the last clock receipt can only be earlier, so this is conservative). Its reason is
+    `clock_stalled`, or (M5 decision, 2026-11-13) `clock_epoch_mismatch:<state topic>`: from PRESTREAM on the accepted
+    state check aborts at once, and PX4's timestamps run past the stopped clock first; that reason is valid only when
+    the controller's own ledger shows the topic's PX4 timestamp past the frozen clock by more than the tolerance."""
     failure = str(run.result.get("failure", ""))
-    abort = _abort_event(run, "clock_stalled")
+    declared = failure in CLOCK_DETECTIONS
+    abort = next((e for e in run.events if e.get("event") == "abort" and e.get("reason") == failure), None) if declared else None
     act = activation(run, "process_signal")
     p.evidence(controller_failure=failure, activation=act, abort_monotonic_s=abort and abort["monotonic_s"])
-    p.check(failure == "clock_stalled", "controller_did_not_report_clock_stalled")
+    p.check(declared, "controller_did_not_report_a_declared_clock_detection")
+    if declared and failure != "clock_stalled":
+        tolerance, ahead = _epoch_ahead(run, abort, failure.split(":", 1)[1]) if abort else (None, None)
+        p.evidence(clock_offset_tolerance_s=tolerance, px4_ahead_of_frozen_clock_s=ahead)
+        p.check(tolerance is not None and ahead is not None and ahead > tolerance, "epoch_mismatch_not_in_the_controllers_ledger")
     _designed_exit(run, p)
     _after_prestream(run, p)
     _designed_timing(run, p)

@@ -305,6 +305,14 @@ Plan §8 states what the sample sizes do and do not support.
    * **By then:** its estimate has been valid for P2 `estimator_stable_sim_s`, connectivity has
      passed, and every PX4 stream is in its ledger.
    * **It holds that state** for `ground_prestream_sim_s` (3.0 s).
+   * **F4.13's detection** (M5 decision, approved 2026-11-13): `clock_stalled`, or
+     `clock_epoch_mismatch:<state topic>`.
+     * From PRESTREAM on, the accepted state check aborts at once. With `/clock` stopped, PX4's
+       timestamps run past the frozen clock by more than `clock_offset_tolerance_s` (0.1 s) before
+       the 1.0 s stall check.
+     * The epoch reason counts only if the controller's own ledger shows that topic's PX4
+       timestamp past the frozen clock by more than the tolerance, before the abort.
+     * The 1.0 s plus one tick bound and the `/proc` stop window are unchanged.
 6. **Injector activation and cleanup proven** for every mechanism used later: off leaves no
    process, pass-through causes no topology change beyond the declared relay, and active matches
    the declaration.
@@ -413,6 +421,7 @@ Any change after freeze is a new P6 candidate.
 | M5 trigger (2026-11-07, "Change the trigger (Recommended)") | A-5.F4.07 and A-5.F4.13: `ground_window` → `ground_controller` | under `ground_window` the controller has already exited, so nothing could detect either fault. Faults, parameters and expected outcomes unchanged. Plan §15 |
 | M5 fail-closed exit (2026-11-07, "Allow that one item (Recommended)") | A-5.F4.07 and A-5.F4.13 may report exactly `cleanup:ros-controller:nonzero_exit_1` | replaced by the fail-closed proof (declared reason, timing, `/proc` or advertiser evidence, exit 0 or exit 1 with connectivity "failed"); every other cleanup item stays never excepted. Plan §15 |
 | M5 trigger point (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13: `ground_controller` (first transition) → `ground_prestream` (the transition into PRESTREAM_SAFE_SETPOINTS) | at the first transition PX4 had published no attitude yet and its estimator was still starting up, so F4.13's ledger lacked attitude and its window began inside the start-up (`ce73e574` dry run). The proof also requires the injection after that transition and connectivity "passed". Plan §15.11–15.12 |
+| M5 F4.13 detection (2026-11-13, "接受並準備新候選", accept and prepare a new candidate) | A-5.F4.13 also accepts `clock_epoch_mismatch:<state topic>` | from PRESTREAM on the accepted `StateCache.validate` aborts at once, and PX4's timestamps pass the stopped clock by more than 0.1 s before the 1.0 s `clock_stalled` check (`44fa1111` rerun). The proof also requires that evidence in the controller's own ledger; the bound and the stop window are unchanged. Plan §15.14–15.15 |
 | M5 `p2:timing` (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13 may report exactly `p2:timing` | replaced by the fail-closed proof, which also requires the timing reconciliation to have completed; the accepted P2 check reports failed whenever the controller failed. Plan §15.11–15.12 |
 | M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 

@@ -250,7 +250,7 @@ def test_a6_and_a7_aggregate_every_evaluated_live_row():
 
 # ---- live fail-closed proofs (F4.07, F4.13) ---------------------------------------------------------------
 def fail_closed_run(tmp, decl, failure, abort_wall, processes=(), ledgers=None, trace=(), requested=None, entered=None,
-                    p5=None, code=0, connectivity="passed"):
+                    p5=None, code=0, connectivity="passed", received=()):
     """A live ground fixture as the `ground_prestream` trigger produces it: the controller entered PRESTREAM (its own
     transition event), the runner requested the injection after it, the controller aborted and (connectivity having
     passed) exited 0; the unchanged P5 evaluation reports `p2:timing` with a completed timing reconciliation."""
@@ -260,7 +260,7 @@ def fail_closed_run(tmp, decl, failure, abort_wall, processes=(), ledgers=None, 
     (tmp / "p6/fault-declaration.json").write_text(json.dumps(decl))
     (tmp / "p6/injection.json").write_text(json.dumps({"row": decl["row"], "request_monotonic_s": requested}))
     events = [{"event": "transition", "from": "WAIT_FOR_VALID_ESTIMATION", "to": "PRESTREAM_SAFE_SETPOINTS", "sim_s": 8.0,
-               "monotonic_s": entered}, {"event": "abort", "reason": failure, "sim_s": 9.0, "monotonic_s": abort_wall}]
+               "monotonic_s": entered}, *received, {"event": "abort", "reason": failure, "sim_s": 9.0, "monotonic_s": abort_wall}]
     (tmp / "ros-events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events if e["monotonic_s"] is not None))
     (tmp / "timing-trace.jsonl").write_text("".join(json.dumps(s) + "\n" for s in trace))
     (tmp / "summary.json").write_text(json.dumps({"processes": list(processes), "controller_exit_code": code,
@@ -532,7 +532,55 @@ def test_the_live_detections_are_the_accepted_controllers_own_reasons():
     mission = (REPO / "simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control/mission.py").read_text(encoding="utf-8")
     assert 'raise ValueError("competing_control_publisher:" + topic)' in node
     assert 'raise ValueError("clock_stalled")' in mission
-    assert r.LIVE_DETECTION == {"F4.07": "competing_control_publisher", "F4.13": "clock_stalled"}
+    assert r.LIVE_DETECTION == {"F4.07": ("competing_control_publisher",), "F4.13": ("clock_stalled", "clock_epoch_mismatch:")}
+
+
+def test_from_prestream_a_stopped_clock_is_reported_as_an_epoch_mismatch_by_the_accepted_state_check():
+    """M5 decision (2026-11-13), read from the accepted sources: before PRESTREAM a failed state check only restarts
+    the stability timer, so `clock_stalled` (1.0 s wall) is the only abort; from PRESTREAM on `validate` aborts at once,
+    and its epoch check (PX4 timestamp past the clock by more than the tolerance) comes before staleness."""
+    import p6_fault_evaluate
+    src = REPO / "simulation/px4_gazebo/ros2_ws/src/gwm_px4_control/gwm_px4_control"
+    mission = (src / "mission.py").read_text(encoding="utf-8")
+    timing = (src / "timing.py").read_text(encoding="utf-8")
+    config = json.loads((REPO / "simulation/px4_gazebo/configs/p2_control.yaml").read_text(encoding="utf-8"))
+    assert "except ValueError:\n                self.stable_since = None\n                return actions" in mission
+    epoch = timing.index('raise ValueError("clock_epoch_mismatch:" + name)')
+    assert 'if age < -c["clock_offset_tolerance_s"]:' in timing and epoch < timing.index('raise ValueError("stale_state:" + name)')
+    assert config["clock_offset_tolerance_s"] == 0.1 and config["clock_stall_wall_s"] == 1.0
+    import ast
+    accepted = timing.split("STATE_TOPICS = ", 1)[1].split(")", 1)[0] + ")"
+    assert tuple(ast.literal_eval(accepted)) == p6_fault_evaluate.STATE_TOPICS
+
+
+def test_the_clock_stall_proof_accepts_an_epoch_mismatch_only_with_the_controllers_own_evidence(tmp_path):
+    from p6_fault_evaluate import prove
+    d = declaration.build("A-5.F4.13")
+    act = {"kind": "activated", "signal": "SIGSTOP", "proved": True, "request_wall_s": 100.0, "stopped_seen_wall_s": 100.01,
+           "resumed_seen_wall_s": 102.02}
+    ledger = {"process_signal": [{"kind": "declared"}, act]}
+
+    def sample(topic, px4_s, wall):
+        return {"event": "received", "topic_key": topic, "monotonic_s": wall, "fields": {"timestamp": int(round(px4_s * 1e6))}}
+
+    def run(name, failure, received, config=True):
+        r = fail_closed_run(tmp_path / name, d, failure, 100.27, ledgers=ledger, requested=100.0, received=received)
+        if config:
+            shutil.copyfile(REPO / "simulation/px4_gazebo/configs/p2_control.yaml", r.file("p2_control.yaml"))
+        return prove(Run(r.path), d)
+    reason = "clock_epoch_mismatch:vehicle_local_position"
+    ok = run("ok", reason, [sample("vehicle_local_position", 9.050, 100.10), sample("vehicle_local_position", 9.104, 100.26)])
+    assert ok["proved"] and abs(ok["evidence"]["px4_ahead_of_frozen_clock_s"] - 0.104) < 1e-9  # the 44fa1111 rerun: 0.104
+    within = run("within", reason, [sample("vehicle_local_position", 9.050, 100.26)])
+    assert "proof:epoch_mismatch_not_in_the_controllers_ledger" in within["failures"]
+    after = run("after", reason, [sample("vehicle_local_position", 9.2, 100.30)])  # received after the abort: no evidence
+    assert "proof:epoch_mismatch_not_in_the_controllers_ledger" in after["failures"]
+    other = run("other", reason, [sample("vehicle_attitude", 9.2, 100.2)])
+    assert "proof:epoch_mismatch_not_in_the_controllers_ledger" in other["failures"]
+    assert not run("noconf", reason, [sample("vehicle_local_position", 9.2, 100.2)], config=False)["proved"]
+    undeclared = run("cmd", "clock_epoch_mismatch:vehicle_command", [sample("vehicle_command", 9.2, 100.2)])
+    assert "proof:controller_did_not_report_a_declared_clock_detection" in undeclared["failures"]
+    assert "proof:controller_did_not_report_a_declared_clock_detection" in run("stale", "stale_state:failsafe_flags", [])["failures"]
 
 
 @pytest.mark.parametrize("row, expected", [
