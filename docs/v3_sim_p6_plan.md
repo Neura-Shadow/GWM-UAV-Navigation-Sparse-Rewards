@@ -1202,3 +1202,54 @@ No P2–P5 threshold may be relaxed.
    Gazebo is the bottleneck and the host is not saturated, so the expected gain is small.
 3. **Host, needs authorization:** the power overlay, or the Hyper-V vCPU placement for WSL on the
    performance cores. Both are host configuration and stay the operator's decision.
+
+### 15.17 Host-stability diagnostic: result (2026-11-13, no credit)
+
+**Authorization:** the operator, 2026-11-13, "Authorize diagnostic". Approval
+`state/p6-dry-run-approval-524f07143f59-hostdiag.json` (cap 3, bound to `524f0714`).
+
+**Host before the sequence (read-only snapshot):** power overlay "Best power efficiency", AC with
+battery 79 %, Windows CPU 7 %, no heavy host process (the top one used 1.45 CPU-seconds in 5 s).
+
+**Sequence 1 (13:53:56Z–13:58:00Z), rows A-1 then A-3; result
+`state/p6-dryrun-A-524f07143f59-20261113T135417Z.result.json`:**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max | Outcome |
+|---|---|---|---|---|---|
+| A-1 (no P6 node) | 0.58 | 2.31 / 1.85 s | 1 | 2.7 | passed (readiness only; the P3 evaluation has no wall-freshness rule) |
+| A-3 (relays, witness) | 0.50 | 2.16 / 2.06 s | 10 | 6.8 | failed: `stale_state:estimator_status_flags` after 51.8 s to PRESTREAM; `p2:timing` |
+
+Per-process CPU was again unchanged: Gazebo 1.17–1.22 cores, adapter 0.4, witness 0.35, perception
+0.37, controller 0.3, relays 0.2–0.24.
+
+**Against the pre-declared criteria (§15.16):** all three fail.
+1. Flags wall gap max ≤ 1.7 s: A-1 2.31 s, A-3 2.16 s.
+2. A-3 RTF ≥ 0.65 and 0 P5 failures: 0.50, and the run failed.
+3. A-1 RTF ≥ 0.75: 0.58 (0.80 on 11-07).
+
+**The third run (A-3 again) was not executed.** The decision was already settled, and it would only
+have added simulator time. Two of the three authorized runs were used.
+
+**The measured bottleneck:**
+* The accepted P3 stack alone (A-1), with no P6 process, already runs at 0.58 real time and breached
+  the accepted P2 wall-freshness rule (2.0 s) once. On 11-07 the same row ran at 0.80 with a 1.61 s
+  maximum.
+* CPU demand per process is identical across days, and the host was idle before the run. So the host
+  delivers fewer Gazebo simulation-thread cycles per second than on 11-07: a frequency or core-placement
+  cap, consistent with the "Best power efficiency" overlay that has been active since the reboot.
+* P6 adds load (A-3 load 6.8 against 2.7) and lengthens the gaps further, but is not the cause: the
+  rule fails without it.
+
+**Consequence:** under the current host settings a full 18-row dry run would fail A-3 and every
+fixture whose controller must reach PRESTREAM. No request for the full dry run is made.
+
+**Mitigations (the operator's choice):**
+1. **Host (needs authorization, not done):** set the AC power overlay to "Best performance" (or
+   restore the 11-07 setting), or pin WSL's vCPUs to the performance cores. This is the only measure
+   that addresses the measured cause.
+2. **Scheduling, no code:** run only on an idle host, with a pre-run host-CPU gate in the launch script.
+   The host was already idle today, so this alone will not suffice.
+3. **Software, new candidate:** `nice` for the witness and relays. It reduces the A-3 load but cannot
+   raise Gazebo's single-thread throughput; A-1 fails without any P6 process.
+
+The accepted P2 freshness timeout and every P3–P5 threshold stay unchanged.
