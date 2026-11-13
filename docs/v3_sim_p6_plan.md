@@ -1085,3 +1085,55 @@ clear the stale live lock and rerun the full Gate A dry run on `44fa1111`.
     than 0.1 s past the frozen clock.
 * **The host's speed:** to be restored by the operator before the next dry run. That needs a new
   candidate and its own authorization.
+
+### 15.15 The F4.13 detection implemented, and candidate `524f0714` (2026-11-13)
+
+**Decision:** adopted by the operator on 2026-11-13, "接受並準備新候選" (accept and prepare a new
+candidate). Recorded as `m5_f413_detection_approved`.
+
+**Code (`e5d7fb5`):**
+* **The runner.** `LIVE_DETECTION["F4.13"]` is now `("clock_stalled", "clock_epoch_mismatch:")`.
+* **The proof** (`p6_fault_evaluate._clock_stall`) accepts `clock_stalled` or
+  `clock_epoch_mismatch:<accepted state topic>`.
+  * The epoch reason counts only if the controller's own ledger has a sample of that topic,
+    received before the abort, whose PX4 timestamp is past the frozen clock (the abort's simulated
+    time) by more than the run-local `clock_offset_tolerance_s`.
+  * Unchanged: the `/proc` stop window, the 1.0 s plus one tick bound, connectivity "passed",
+    exit 0, and the timing reconciliation.
+* **The specifications.** In `p6_faults.yaml` and `p6_scenarios.yaml`, F4.13's detection and expected
+  text now name both reasons. Its parameters are unchanged.
+
+**Read from the accepted sources** (regression tests):
+* before PRESTREAM, a failed state check only restarts the stability timer;
+* the epoch check comes before the staleness check;
+* the tolerance is 0.1 s and the stall limit 1.0 s;
+* `STATE_TOPICS` matches.
+
+**Replayed in memory on the retained `44fa1111` F4.13 evidence:**
+* PX4 was 0.104 s past the frozen clock, against a tolerance of 0.1;
+* the detection came 0.269 s after the stop, while stopped;
+* exit 0, connectivity "passed".
+
+The only remaining item is the timing reconciliation. That run's P5 evaluation never reached it,
+because the runner had ended the row. It is not counted.
+
+**Offline regression on `e5d7fb5`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 141 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 105 passed, 36 skipped (Linux-only; not counted as passes) |
+
+**Development candidate:** `524f07143f592a5ab7a31f2ad298a31ab879183a4126726ca02c056e47202405`
+* frozen at `e5d7fb5` from a clean P6 tree; it verifies;
+* P3, P4 and P5 re-verified;
+* binds 41 files, faults `97fc5eef…`, scenarios `626fd44f…`, and the development Policy A approval;
+* no dry-run approval has been written.
+
+**Before its dry run:**
+* **Host speed.** The Windows power mode on AC was still "Best power efficiency" at freezing. A-3 and
+  F2.09 need the accepted P2 wall-clock freshness to hold, so the operator should switch it to "Best
+  performance" first.
+* **Authorization.** The dry run needs its own operator authorization.
