@@ -1253,3 +1253,39 @@ fixture whose controller must reach PRESTREAM. No request for the full dry run i
    raise Gazebo's single-thread throughput; A-1 fails without any P6 process.
 
 The accepted P2 freshness timeout and every P3–P5 threshold stay unchanged.
+
+### 15.18 Host-stability diagnostic repeated after the power-mode change (2026-11-13, no credit)
+
+**Host change (the operator's, not recorded in any manifest):** the Windows AC power overlay was set
+to "Best performance" (`ded574b5…`); the on-battery overlay stays "Best power efficiency".
+
+**Authorization:** the operator, 2026-11-13: one new capped ground-only sequence on `524f0714`, A-1
+then A-3 once each (cap 2), under §15.16; stop and report; no full dry run, no retry. Approval
+`state/p6-dry-run-approval-524f07143f59-hostdiag2.json`.
+
+**Verified before starting:** AC power (battery 79 %), the Best-performance overlay, host CPU 2 %, the
+manifest and the P3/P4/P5 baselines (C1), no simulator or P6 process, no live lock.
+
+**Sequence (14:13:36Z–14:16:15Z); result
+`state/p6-dryrun-A-524f07143f59-20261113T141353Z.result.json`:**
+
+| Run | RTF mean | Flags wall gap max / p95 | Gaps > 2.0 s | 1-min load max | Outcome |
+|---|---|---|---|---|---|
+| A-1 | 0.80 | 1.23 / 1.21 s | 0 | 1.9 | passed |
+| A-3 | 0.69 | 1.59 / 1.45 s | 0 | 2.7 | passed, 0 P5 failures, 11.2 s to PRESTREAM |
+
+Per-process CPU unchanged (Gazebo 1.15–1.19 cores, witness 0.41, adapter 0.4, perception 0.37,
+controller 0.35, relays 0.2–0.24). Both runs now match the 11-07 figures (A-1 0.80, A-3 0.69).
+
+**Against the pre-declared criteria (§15.16):** all hold.
+1. Flags wall gap max ≤ 1.7 s: 1.23 s and 1.59 s.
+2. A-3 RTF ≥ 0.65 and 0 P5 failures: 0.69, passed.
+3. A-1 RTF ≥ 0.75: 0.80.
+
+**Conclusion:** the measured bottleneck of §15.17 was the power overlay. With it changed, the host
+again meets the accepted P2 wall-freshness rule with margin, and P6's own load has not changed.
+The candidate was unchanged throughout and the lock was released. No threshold or source changed; no
+re-freeze.
+
+**Stopped here, as authorized.** The full 18-row dry run on `524f0714` needs its own authorization,
+with the host kept on AC power in Best-performance mode for the whole run (about 25 min).
