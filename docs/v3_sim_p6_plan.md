@@ -983,3 +983,31 @@ Both decisions were adopted on 2026-11-07 ("Adopt both"); see §15.12.
 * F4.07 and F4.13 detect at PRESTREAM and exit 0, so no cleanup item arises.
 * `p2:timing` is replaced by the proof.
 * Any other item is a P6 failure, to be diagnosed from evidence and not excepted.
+
+### 15.13 The `44fa1111` dry run was interrupted by a host stop (2026-11-07)
+
+**Authorization:** the operator, on 2026-11-07, "Authorize dry run", answering: "Authorize the full
+Gate A content dry run on development candidate 44fa1111?" Approval:
+`state/p6-dry-run-approval-44fa11116230.json`.
+
+**What happened:**
+* The sequence started at 12:55:55Z with no other simulator processes running.
+* At about 12:57:40Z, during the start-up of its first live row, A-1, the Windows host stopped
+  without a clean shutdown.
+  * Event Kernel-Power 41 was logged, with bugcheck 0.
+  * There was no dump, no sleep and no power-button press.
+  * The host rebooted on 2026-11-13.
+* WSL lost its unflushed writes:
+  * the A-1 run, `20261107T125708Z-p6dry-A-1-b72222af`, has zero-length files and status
+    `incomplete`;
+  * there is no result file;
+  * `state/p6-live-run.lock` is left by the dead sequence (pid 312859, previous boot).
+* The cause cannot be settled from the logs. The same launch had run 14 times without fault on
+  `ce73e574`.
+
+**Status:**
+* No row has a result, so this is neither a pass nor a failure of any row.
+* The interrupted run is retained unchanged. Under the approval's cap it counts as 1 of 40 live runs.
+* After the reboot the candidate still verifies, including P3, P4 and P5 (C1).
+* A rerun is a retry, so it needs the operator's explicit authorization, and so does clearing the
+  stale lock.
