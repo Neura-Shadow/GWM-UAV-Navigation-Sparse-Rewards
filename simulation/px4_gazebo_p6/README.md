@@ -21,6 +21,6 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 
 Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 in progress (plan §15): ground dry runs of
 development candidates (no credit). The authorized dry run of `ce73e574` (commit `68ccf30`) passed 16 of 18 Gate A
-rows. The two F4.07/F4.13 decisions are implemented (plan §15.12), and development candidate `44fa1111` (commit
-`f74b71f`) awaits authorization for its dry run. No P6 gate has run.
+rows. The `44fa1111` rerun passed 15 of 18 (plan §15.14); the F4.13 detection decision is implemented, and development
+candidate `524f0714` (commit `e5d7fb5`) awaits authorization for its dry run (plan §15.15). No P6 gate has run.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

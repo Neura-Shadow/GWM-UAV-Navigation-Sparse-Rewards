@@ -345,7 +345,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M2** injection infrastructure — **COMPLETE 2026-11-06** (§12) | M-DR, M-MR, M-CS, M-PS, M-LH, the witness and the fault ledger, each with off/pass-through/active modes; unit tests | pass-through bit identity on recorded inputs |
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
-| **M5** ground and integration — **IN PROGRESS** (§15; the `ce73e574` dry run passed 16 of 18 rows; both F4.07/F4.13 decisions implemented; candidate `44fa1111` awaits its dry-run authorization, §15.12) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
+| **M5** ground and integration — **IN PROGRESS** (§15; dry runs `ce73e574` 16/18 and `44fa1111` 15/18; the F4.07/F4.13 decisions implemented; candidate `524f0714` awaits its dry-run authorization, §15.15) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
@@ -662,8 +662,11 @@ rather than trusting the shim.
   * a fresh development candidate (`ce73e574…`, §15.7);
   * its authorized confirming dry run: 16 of 18 rows passed (§15.11);
   * the two F4.07/F4.13 decisions, adopted and implemented offline;
-  * a new development candidate, `44fa1111…` (§15.12).
-* **Not done:** that candidate's dry run, which needs its own operator authorization.
+  * a new development candidate, `44fa1111…` (§15.12); its dry run was interrupted by a host stop, and its rerun
+    passed 15 of 18 rows (§15.13–15.14);
+  * the F4.13 detection decision, implemented in a new development candidate, `524f0714…` (§15.15).
+* **Not done:** that candidate's dry run, which needs its own operator authorization and the host back at full
+  speed.
 * **No credit:** a dry run earns none. No P6 gate has run, and none is accepted.
 
 Scope as authorized:
