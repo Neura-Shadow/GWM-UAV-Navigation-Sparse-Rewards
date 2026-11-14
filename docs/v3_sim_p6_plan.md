@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; Gate C dry run 1 of 5 on `23d513ee`: three P6 defects, a C-3 host-timing abort and a Gazebo shutdown hang; decision open, §16.8) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; Gate C dry run 1 of 5 on `23d513ee`; the fixes and the C-3 rule implemented; candidate `75289deb` awaits a Gate C content rerun authorization, §16.9) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1571,3 +1571,40 @@ ticks, LIMITS_UNINJECTED, GOAL; completed.
   and rerun C-3, which passes only if no host spike crosses the budget during a long adversarial flight.
 * Then a new development candidate and a rerun of the full Gate C content on it, which also shows whether the C-4
   Gazebo hang recurs.
+
+### 16.9 The Gate C fixes implemented, and candidate `75289deb` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt both"), as proposed in §16.8.
+
+**Code (`e3c8b69`):**
+* `scripts/p6_node.py`: `load_harness` is a dispatchable module (C-5). A test requires every module the runner
+  launches through `self.node` to be one the node accepts, and runs the harness's `--help` through the node.
+* `validation/p6_fault_evaluate.py`: the F1.03 drop proof judges frames inside the accepted sensor window, and fails
+  without one (C-1). The M4 synthetic test now carries a sensor window.
+* `validation/p6_evaluate.py`: C-4 runs LIMITS_UNINJECTED (its timing exceptions' check). C-3 runs
+  FAIL_CLOSED_LANDING, whose exceptions are exactly the P2 fail-closed landing's runtime status, `p2:timing` and the
+  four RECOVERY-landing items.
+* `validation/p6_safety_evaluate.py`: `fail_closed_landing`, recorded only when the run ends in P2 RECOVERY with a
+  failure: L45R for the reported failure plus the RECOVERY_LANDING proof.
+* A new invariant test: every exception's replacement check is one its row actually records (the defect class of
+  C-4).
+
+**Replayed on the retained Gate C evidence** (stored evaluations unchanged): C-1 passes; C-3 passes, reporting
+`stale_action`; C-4 fails on `cleanup:gazebo:forced_kill_after_grace` alone; C-5 still fails (its harness never ran).
+
+**Offline regression on `e3c8b69`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 158 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 112 passed, 46 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `75289deb16c90af2f2d11d791706f14209be0af20e41e246b638945005244ef4`**, frozen at `e3c8b69`
+from a clean P6 tree; verifies; P3/P4/P5 re-verified; 41 files; no dry-run approval written.
+
+**Next (needs its own authorization):** a rerun of the full Gate C content on `75289deb` in simulated flight (C-1 to
+C-5), no credit. It is the first in-flight use of the load harness (C-5) and shows whether the C-4 Gazebo shutdown
+hang recurs. Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to
+be shown (S-5′ has not re-run live since its rule changed).

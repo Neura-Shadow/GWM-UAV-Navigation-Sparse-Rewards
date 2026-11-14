@@ -24,6 +24,7 @@ dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gat
 progress (plan §16): the runner and sequencer carry the Gate B, S and C flight rows; the Gate B content dry run (B-0, B-1)
 passed in simulated flight on development candidate `33f33c5a` (plan §16.5), and the Gate S content dry run passed 4 of 5
 (S-5′'s four P2-RECOVERY-landing items are now replaced by the RECOVERY_LANDING proof, plan §16.6–16.7), no credit.
-The Gate C content dry run on development candidate `23d513ee` passed 1 of 5 (three P6 defects found; plan §16.8). No P6 gate has run; the real P6
+The Gate C content dry run on development candidate `23d513ee` passed 1 of 5; its three P6 defects are fixed and the C-3
+outcome rule adopted (plan §16.8–16.9). Development candidate `75289deb` (commit `e3c8b69`) awaits a Gate C content rerun. No P6 gate has run; the real P6
 freeze and every gate need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.
