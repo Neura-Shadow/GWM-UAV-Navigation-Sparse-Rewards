@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 P6 = Path(__file__).resolve().parents[1]
-MODULES = ("depth_relay", "state_relay", "witness", "competing_publisher", "controller_shim")
+MODULES = ("depth_relay", "state_relay", "witness", "competing_publisher", "controller_shim", "load_harness")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1] not in MODULES:

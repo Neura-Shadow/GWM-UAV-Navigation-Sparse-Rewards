@@ -269,17 +269,24 @@ def _relay_pairs(run, d):
 
 
 def _depth_drop(run, d, p, _):
+    """F1.03: every raw frame inside a declared burst window is withheld, every other one relayed. Frames are judged
+    inside the accepted sensor window only, as the accepted delivery checks judge them: before it the relay's
+    subscription may not have matched yet (M6 finding, 23d513ee C-1: 3 frames at 5.0 s, 80 s before the trigger)."""
     act = activation(run, "depth_relay")
     p.check(act is not None, "no_activation")
-    if act is None:
+    sensor_window = run.summary.get("sensor_window_sim_s")
+    p.check(bool(sensor_window), "no_sensor_window")
+    if act is None or not sensor_window:
         return
     from injection.schedule import Windows
+    begin, end = sensor_window
     windows = Windows(d["parameters"]["burst_start_offsets_sim_s"], d["parameters"]["burst_durations_sim_s"])
-    raw = run.witness("raw_image")
+    raw = [w for w in run.witness("raw_image") if w["receipt_sim_s"] is not None and begin <= w["receipt_sim_s"] <= end]
     relayed = {w["stamp_ns"] for w in run.witness("relayed_image")}
-    inside = [w for w in raw if windows.active((w["receipt_sim_s"] or 0) - act["sim_s"])]
-    outside = [w for w in raw if not windows.active((w["receipt_sim_s"] or 0) - act["sim_s"])]
-    p.evidence(raw_inside=len(inside), relayed_inside=sum(w["stamp_ns"] in relayed for w in inside),
+    inside = [w for w in raw if windows.active(w["receipt_sim_s"] - act["sim_s"])]
+    outside = [w for w in raw if not windows.active(w["receipt_sim_s"] - act["sim_s"])]
+    p.evidence(sensor_window_sim_s=sensor_window, raw_inside=len(inside),
+               relayed_inside=sum(w["stamp_ns"] in relayed for w in inside), raw_outside=len(outside),
                raw_outside_missing=sum(w["stamp_ns"] not in relayed for w in outside))
     p.check(bool(inside) and not any(w["stamp_ns"] in relayed for w in inside), "frames_in_window_not_dropped")
     p.check(all(w["stamp_ns"] in relayed for w in outside), "frames_outside_window_dropped")

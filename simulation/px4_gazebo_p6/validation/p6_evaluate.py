@@ -57,8 +57,15 @@ ROWS = {
     "C-1": {"response": ["STALE_IFF_AGE", "RECOVERY", "GOAL", "UNSAFE"],
             "exceptions": {"depth:": "PROOF", "performance:": "STALE_IFF_AGE", "outcome:detour_sequence": "RECOVERY"}},
     "C-2": {"response": ["LIMITS_UNINJECTED", "GOAL", "UNSAFE"], "exceptions": {**POLICY_EXCEPTIONS, **TIMING_EXCEPTIONS}},
-    "C-3": {"response": ["UNSAFE"], "exceptions": {"policy:ledger:argmax_differs": "PROOF", "outcome:": "UNSAFE"}},
-    "C-4": {"response": ["NO_INVOKE_AFTER_STALE", "L45", "UNSAFE"],
+    # C-3 (M6 decision, operator 2026-11-14, "Adopt both"): S0 is required and the outcome reported. When the accepted P2
+    # controller fails closed during the adversarial flight and lands through RECOVERY, that landing is the reported
+    # outcome: its runtime status, P2 timing and the four RECOVERY-landing items are replaced by FAIL_CLOSED_LANDING
+    # (L45R for the reported P2 failure plus the RECOVERY_LANDING proof), which is recorded only for such a landing.
+    "C-3": {"response": ["UNSAFE", "FAIL_CLOSED_LANDING"],
+            "exceptions": {"policy:ledger:argmax_differs": "PROOF", "outcome:": "UNSAFE",
+                           "runtime_status:Abort:controller_failed:": "FAIL_CLOSED_LANDING", "=p2:timing": "FAIL_CLOSED_LANDING",
+                           **{"=" + item: "FAIL_CLOSED_LANDING" for item in response.RECOVERY_LANDING_ITEMS}}},
+    "C-4": {"response": ["NO_INVOKE_AFTER_STALE", "L45", "UNSAFE", "LIMITS_UNINJECTED"],  # M6: its timing exceptions' check
             "exceptions": {**DEPTH_WINDOW, **POLICY_EXCEPTIONS, **TIMING_EXCEPTIONS, "outcome:": "L45"}},
     "C-5": {"response": ["H35", "STALE_IFF_AGE", "L45", "UNSAFE"],
             "exceptions": {"performance:": "STALE_IFF_AGE", "outcome:": "L45"}},
@@ -168,6 +175,8 @@ def respond(run, declaration, rules, proof, window):
             response.unsafe_setpoints(run, c)
         elif code == "RECOVERY_LANDING":
             response.recovery_landing(run, c)
+        elif code == "FAIL_CLOSED_LANDING":
+            response.fail_closed_landing(run, c)
         elif code == "GROUND_REPLAY":
             config = json.loads(run.file("p4_avoidance.yaml").read_text(encoding="utf-8"))
             response.ground_replay(run, c, arg.split(","), config)

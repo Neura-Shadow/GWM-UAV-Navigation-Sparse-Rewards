@@ -794,3 +794,48 @@ def test_flight_triggers_take_the_frozen_p4_scenario_boxes_not_the_generated_dec
     cx, cy = boxes[0]["center"]
     fault.feed({"event": "transition", "to": "PRESTREAM_SAFE_SETPOINTS", "evidence": {"origin_ned": [0.0, 0.0, 0.0]}})
     assert fault.feed({"event": "p4_decision", "state": "AVOIDING", "sim_s": 30.0, "vehicle_enu": [cx - 1.0, cy, 1.2]}) == 30.0
+
+
+# ---- M6 Gate C fixes (plan §16.8-16.9) ------------------------------------------------------------------------
+def test_every_module_the_runner_launches_is_one_the_node_dispatches():
+    """23d513ee C-5: the runner launched `load_harness` through p6_node.py, which did not list it, so the harness
+    printed its usage and exited 1 and no load was applied. Every `self.node("<module>"` must be dispatchable."""
+    import importlib.util
+    import re
+    import subprocess
+    spec = importlib.util.spec_from_file_location("p6_node_entry", P6 / "scripts/p6_node.py")
+    node = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(node)
+    launched = set(re.findall(r'self\.node\("([a-z_]+)"', (P6 / "scripts/p6_runner.py").read_text(encoding="utf-8")))
+    assert launched and launched <= set(node.MODULES), sorted(launched - set(node.MODULES))
+    for module in node.MODULES:
+        assert (P6 / "injection" / (module + ".py")).exists(), module
+    done = subprocess.run([sys.executable, "-s", "-B", str(P6 / "scripts/p6_node.py"), "load_harness", "--help"],
+                          capture_output=True, text=True, timeout=60)
+    assert done.returncode == 0 and "--workers" in done.stdout, done.stdout + done.stderr
+
+
+def test_the_depth_burst_proof_judges_the_sensor_window_not_the_relay_start_up(tmp_path):
+    """23d513ee C-1: 3 frames at 5.0 s, before the relay's subscription matched and 80 s before the trigger, were not
+    relayed; the accepted delivery checks judge the sensor window only, and so does the proof now."""
+    from p6_fault_evaluate import prove
+    d = declaration.build("C-1")
+    t = 84.0
+    p = d["parameters"]
+    bursts = [(t + o, t + o + du) for o, du in zip(p["burst_start_offsets_sim_s"], p["burst_durations_sim_s"])]
+    raw = [{"stamp_ns": k, "receipt_sim_s": round(5.0 + 0.032 * k, 3)} for k in range(3000)]
+
+    def in_burst(s):
+        return any(a <= s < b for a, b in bursts)
+    relayed = [w for w in raw if w["receipt_sim_s"] > 5.1 and not in_burst(w["receipt_sim_s"])]
+    files = {"p6/fault-ledger-depth_relay.jsonl": [{"kind": "activated", "sim_s": t}], "p6/witness/raw_image.jsonl": raw,
+             "p6/witness/relayed_image.jsonl": relayed, "summary.json": {"sensor_window_sim_s": [14.0, 95.0]}}
+    ok = prove(ground_run(tmp_path / "ok", d, files), d)
+    assert ok["proved"] and ok["evidence"]["raw_outside_missing"] == 0 and ok["evidence"]["raw_inside"] > 0, ok
+    lost = dict(files, **{"p6/witness/relayed_image.jsonl": [w for w in relayed if abs(w["receipt_sim_s"] - 50.0) > 0.02]})
+    assert "proof:frames_outside_window_dropped" in prove(ground_run(tmp_path / "lost", d, lost), d)["failures"]
+    leak = relayed + [w for w in raw if 88.1 <= w["receipt_sim_s"] < 88.2]
+    leaked = dict(files, **{"p6/witness/relayed_image.jsonl": leak})
+    assert "proof:frames_in_window_not_dropped" in prove(ground_run(tmp_path / "leak", d, leaked), d)["failures"]
+    no_window = dict(files, **{"summary.json": {}})
+    assert "proof:no_sensor_window" in prove(ground_run(tmp_path / "nowin", d, no_window), d)["failures"]

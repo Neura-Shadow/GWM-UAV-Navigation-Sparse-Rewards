@@ -95,11 +95,11 @@ def test_no_row_ever_excepts_safety_policy_a_ownership_or_cleanup():
     for row, rules in p6_evaluate.ROWS.items():
         for prefix in rules["exceptions"]:
             if prefix == designed:
-                assert row in ("A-5.F4.07", "A-5.F4.13", "S-5'"), row
-                assert row != "S-5'" or rules["exceptions"][prefix] == "RECOVERY_LANDING"
+                assert row in ("A-5.F4.07", "A-5.F4.13", "S-5'", "C-3"), row
+                assert rules["exceptions"][prefix] in ("PROOF", "RECOVERY_LANDING", "FAIL_CLOSED_LANDING")
                 continue
-            if row == "S-5'" and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.RECOVERY_LANDING_ITEMS:
-                assert rules["exceptions"][prefix] == "RECOVERY_LANDING"
+            if row in ("S-5'", "C-3") and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.RECOVERY_LANDING_ITEMS:
+                assert rules["exceptions"][prefix] == {"S-5'": "RECOVERY_LANDING", "C-3": "FAIL_CLOSED_LANDING"}[row]
                 continue
             assert not any(prefix.startswith(n) or n.startswith(prefix) for n in never if prefix), (row, prefix)
     allowed, refused = p6_evaluate.compose(
@@ -286,11 +286,12 @@ def test_depth_burst_proof_needs_drops_inside_and_only_inside_the_windows(tmp_pa
     raw = frames(5.0, 25.0)
     w = Windows(d["parameters"]["burst_start_offsets_sim_s"], d["parameters"]["burst_durations_sim_s"])
     relayed = [f for f in raw if not w.active(f["receipt_sim_s"] - 10.0)]
+    window = {"sensor_window_sim_s": [5.0, 25.0]}  # M6: the proof judges the accepted sensor window (plan §16.9)
     run = synthetic_run(tmp_path / "ok", d, "depth_relay", files={"p6/witness/raw_image.jsonl": raw,
-                                                                    "p6/witness/relayed_image.jsonl": relayed})
+                                                                    "p6/witness/relayed_image.jsonl": relayed, "summary.json": window})
     assert prove(run, d)["proved"]
     run = synthetic_run(tmp_path / "none", d, "depth_relay", files={"p6/witness/raw_image.jsonl": raw,
-                                                                      "p6/witness/relayed_image.jsonl": raw})
+                                                                      "p6/witness/relayed_image.jsonl": raw, "summary.json": window})
     assert not prove(run, d)["proved"]  # the ledger says activated, the witness shows nothing dropped
 
 
@@ -402,3 +403,68 @@ def test_the_retained_s5_dry_run_passes_under_the_adopted_rule():
     assert out["status"] == "passed", out["failures"]
     assert sorted(a["item"] for a in out["p5_failures_allowed"] if a["replacement"] == "RECOVERY_LANDING") == sorted(p6_evaluate.response.RECOVERY_LANDING_ITEMS)
     assert out["p5_failures_refused"] == []
+
+
+# ---- M6 Gate C fixes (plan §16.8-16.9) ------------------------------------------------------------------------
+ALWAYS_RECORDED = {"PROOF", "C11", "INJECTORS"}
+
+
+def test_every_exception_names_a_check_its_row_records():
+    """23d513ee C-4: its timing exceptions named LIMITS_UNINJECTED, which its response list never ran, so they could
+    never apply. Every replacement check must be recorded for its row: a response code, an always-recorded check, or
+    FAULT_WINDOW_F1F2 on a bridge-stop row (recorded whenever the accepted P4 window applies)."""
+    from injection import declaration
+    for row, rules in p6_evaluate.ROWS.items():
+        recorded = {code.split(":")[0] for code in rules["response"]} | ALWAYS_RECORDED
+        if "GROUND_REPLAY" in recorded:
+            recorded.add("GROUND_REPLAY_P4")
+        try:
+            d = declaration.build(row)
+        except Exception:  # noqa: BLE001  (a rule key that is not a frozen row)
+            d = None
+        if d is not None and d["parameters"].get("process") == "sensor-bridge":
+            recorded.add("FAULT_WINDOW_F1F2")
+        needed = {value.split(":")[0] for value in rules["exceptions"].values()}
+        assert needed <= recorded, (row, sorted(needed - recorded))
+
+
+def test_c3_reports_a_p2_fail_closed_landing_and_allows_its_items_only_with_the_check(tmp_path):
+    run = recovery_landing_run(tmp_path / "landing")
+    c = Checks({"L45R": {"ulog_landed_and_disarmed_within_wall_s_of_land": 45.0}})
+    p6_evaluate.response.fail_closed_landing(run, c)
+    assert "FAIL_CLOSED_LANDING" in c.out and c.out["FAIL_CLOSED_LANDING"]["p2_failure"] == "stale_action"
+    completed = tmp_path / "completed"
+    completed.mkdir()
+    (completed / "summary.json").write_text(json.dumps({"controller_exit_code": 0,
+                                                        "controller_result": {"final_state": "COMPLETE", "failure": None}}))
+    c2 = Checks({})
+    p6_evaluate.response.fail_closed_landing(Run(completed), c2)
+    assert "FAIL_CLOSED_LANDING" not in c2.out and not c2.failures  # nothing recorded, so nothing can be excepted
+    rules = p6_evaluate.ROWS["C-3"]["exceptions"]
+    items = ["runtime_status:Abort:controller_failed:stale_action", "p2:timing"] + list(p6_evaluate.response.RECOVERY_LANDING_ITEMS)
+    other = ["runtime_status:Abort:deadline:controller", "cleanup:gazebo:forced_kill_after_grace"]
+    allowed, refused = p6_evaluate.compose(items + other, rules, {"FAIL_CLOSED_LANDING": {"passed": True}})
+    assert [a["item"] for a in allowed] == items and refused == other
+    assert p6_evaluate.compose(items, rules, {})[1] == items
+
+
+def _retained(prefix):
+    import glob
+    runs = glob.glob(str(Path.home() / "uav_autonomy/runs" / prefix))
+    if not runs or not (Path(runs[0]) / "p5-evaluation.json").exists():
+        pytest.skip("retained evidence not present: " + prefix)
+    return Path(runs[0])
+
+
+def test_the_retained_gate_c_runs_under_the_fixes():
+    """The 2026-11-14 Gate C dry run on 23d513ee, stored evaluations unchanged: C-1 and C-3 now pass; C-4 fails on the
+    Gazebo shutdown hang alone (a cleanup item is never excepted); C-5's load harness never ran, so it still fails."""
+    c1 = p6_evaluate.evaluate(_retained("20261114T083341Z-p6dry-C-1-*"))
+    assert c1["status"] == "passed", c1["failures"]
+    c3 = p6_evaluate.evaluate(_retained("20261114T084020Z-p6dry-C-3-*"))
+    assert c3["status"] == "passed", c3["failures"]
+    assert c3["response"]["FAIL_CLOSED_LANDING"]["p2_failure"] == "stale_action"
+    c4 = p6_evaluate.evaluate(_retained("20261114T084352Z-p6dry-C-4-*"))
+    assert c4["failures"] == ["p5:cleanup:gazebo:forced_kill_after_grace"], c4["failures"]
+    c5 = p6_evaluate.evaluate(_retained("20261114T084636Z-p6dry-C-5-*"))
+    assert "response:INJECTORS" in c5["failures"]

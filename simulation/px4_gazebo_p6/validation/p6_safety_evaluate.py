@@ -205,6 +205,22 @@ def recovery_landing(run, c):
              land_wall_s=land_wall, landed_wall_s=landed_wall, cs_in_air_false_wall_s=in_air_false_wall)
 
 
+def fail_closed_landing(run, c):
+    """C-3 (M6 decision, operator 2026-11-14, "Adopt both"; contract §8.4: S0 required, outcome reported). When the
+    accepted P2 controller fails closed and lands through RECOVERY, that landing is the reported outcome: L45R for the
+    reported P2 failure (one LAND, landed and disarmed within the limit) and the RECOVERY_LANDING proof. For any other
+    ending nothing is recorded, so no exception keyed to this check can apply."""
+    result = run.result
+    if result.get("final_state") != "RECOVERY" or not result.get("failure"):
+        return
+    sub = Checks(c.codes)
+    l45r(run, sub, result["failure"])
+    recovery_landing(run, sub)
+    ok = sub.out["L45R"]["passed"] and sub.out["RECOVERY_LANDING"]["passed"]
+    c.record("FAIL_CLOSED_LANDING", ok, p2_failure=result["failure"], l45r=sub.out["L45R"],
+             recovery_landing=sub.out["RECOVERY_LANDING"])
+
+
 def goal(run, c):
     result = run.result
     c.record("GOAL", result.get("p4_outcome") == "completed" and result.get("final_state") == "COMPLETE",
