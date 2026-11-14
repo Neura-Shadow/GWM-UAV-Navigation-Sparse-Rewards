@@ -1691,3 +1691,77 @@ shutdown hang of §16.8 did not recur (1 in 17 flight runs so far).
   * Otherwise, C-5 at 24 workers fails whenever the recorder overflows.
 * Then a new development candidate. Before the real freeze, one unchanged candidate must still pass Gate B, S and C
   content.
+
+### 16.11 The C-5 load decision implemented, and candidate `06d08d98` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt as recommended"), as proposed in §16.10. It is recorded as
+`m6_c5_load_decision_approved` in the scenarios config and in contract §8.4 and §10.
+
+**Code (`4c76455`). No accepted P2–P5 source changes, and no threshold changes:**
+* **`injection/load_harness.py`: the harness stops cleanly.**
+  * A SIGINT or SIGTERM stop ends the workers, records `cleared` with `stopped_early` naming the signal, and exits 0.
+  * The workers ignore SIGINT, so a stop sent to the whole group reaches them only through the harness.
+  * Ledger lines are written whole.
+* **`configs/p6_scenarios.yaml`: C-5's load starts at the map-loss trigger.** `load_start` changed from `transit_start` to
+  `avoiding_first`. The workers (24), window (60 s) and drop window (1.0 s) are unchanged. The expected outcome now
+  includes the §5.3 P2 abort landed through RECOVERY.
+* **`validation/p6_safety_evaluate.py`: three new checks.**
+  * **`LOAD` implements §5.3.** The window comes from the harness's own ledger, on the shared monotonic clock. The
+    declared responses are:
+    * a P2 failure must be `stale_action`, inside the window, in a callback over the accepted 0.050 s budget;
+    * every inference above 0.020 s must hold;
+    * every stale onset must hover and hold, a `snapshot_stale` onset within H35.
+    
+    The P5 inference statistics must hold outside the window.
+  * **`LOAD_RECORDER` handles the recorder overflow.** It requires:
+    * every lost frame inside the window, with its written neighbours inside it too;
+    * the recorder drained and fsynced with no error, and its counts agree;
+    * 0 missed processing periods;
+    * the accepted P5 depth-stream evaluation failed on its two recorder items alone;
+    * the adapter's designed exit 3.
+  * **`LANDING` passes on the path the run took:** L45, or FAIL_CLOSED_LANDING. The RECOVERY_LANDING proof now takes
+    the items another passing proof of the same row explains.
+* **`validation/p6_evaluate.py`: C-5's rules.**
+  * Response: H35, STALE_IFF_AGE, LOAD, LOAD_RECORDER, FAIL_CLOSED_LANDING, LANDING, UNSAFE.
+  * Exceptions are exact items only. The inference statistics need LOAD, the dispatch abort and its landing items need
+    FAIL_CLOSED_LANDING, and the three recorder items need LOAD_RECORDER.
+
+**Tests:**
+* The harness, run through `p6_node.py` in its own group, stopped by a SIGINT to the group and by a SIGTERM to the
+  harness: exit 0, `cleared` recorded, and no worker survives.
+* LOAD: a positive case and each negative (wrong P2 failure, abort outside the window, no measured overrun, a load not
+  as declared, an unheld slow inference, a p99 breach outside the window, a late or moving stale onset, no
+  activation).
+* LOAD_RECORDER: a positive case and each negative, and nothing is recorded without an overflow.
+* C-5's composition, and both landing paths.
+* The C-5 runner trigger, which now fires on the map loss's own decision.
+
+**Replayed on the retained `75289deb` C-5 run** (non-strict, because its declaration predates the decision):
+* LOAD passes, matching the 53.8 ms overrun to the P2 abort.
+* LOAD_RECORDER passes, with all 31 lost frames inside the window.
+* The fail-closed landing's L45R passes. Its RECOVERY_LANDING proof finds exactly one unexplained item, the old
+  harness's `terminated_by_SIGINT`.
+* The run still fails, as it should: no H35, and the harness item.
+
+**Offline regression on `4c76455`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 165 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 116 passed, 49 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+WSL's git, which has no `autocrlf`, lists some accepted P5 files as modified. That is line endings only: the diff
+ignoring CRs is empty, Windows git shows them clean, the last commit touching P5 is `40a109b`, and the P5 manifest
+verifies.
+
+**Development candidate `06d08d9862a0be662f01faf3c3639657b6b4f0c24aa89888bbe5bba2e5aa996b`**, frozen at `4c76455`
+from a clean P6 tree. It verifies, and P3/P4/P5 re-verify. It binds 41 files, faults `97fc5eef…` and scenarios
+`4e06ab00…`. No dry-run approval has been written.
+
+**Next (needs its own authorization):**
+* A Gate C content rerun on `06d08d98` in simulated flight, no credit. It is the first run of the load from the map
+  loss, and of the new LOAD, LOAD_RECORDER and LANDING checks on live evidence.
+* Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown.
+  S-5′ has not re-run live since its rule changed.
