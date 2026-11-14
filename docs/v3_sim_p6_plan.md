@@ -1608,3 +1608,86 @@ from a clean P6 tree; verifies; P3/P4/P5 re-verified; 41 files; no dry-run appro
 C-5), no credit. It is the first in-flight use of the load harness (C-5) and shows whether the C-4 Gazebo shutdown
 hang recurs. Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to
 be shown (S-5′ has not re-run live since its rule changed).
+
+### 16.10 Gate C content rerun in simulated flight on `75289deb` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-75289deb16c9-gateC-flight.json` (Gate C content, simulated flight only, cap 5: one run per
+row, no retry). Verified before launch: AC power, Best-performance overlay `ded574b5`, the manifest, no simulator or
+P6 process, no lock.
+
+**Run:** 10:52:15Z–11:08:27Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-75289deb16c9-20261114T105229Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.995–1.000 over each flight. Gazebo exited in 0.44–0.52 s on every row: the C-4
+shutdown hang of §16.8 did not recur (1 in 17 flight runs so far).
+
+**Passed (4); the §16.9 C-1 and C-4 fixes hold in flight:**
+* **C-1**, F1.03 depth bursts: proved on the sensor window (64 frames inside the bursts, none relayed; all 3533
+  outside relayed); recovery (2 returns), GOAL; completed.
+* **C-2**, F3.07: 5 timeout records, HOLD on exactly the injected ticks, LIMITS_UNINJECTED (832 ticks, p99 0.83 ms),
+  GOAL; completed.
+* **C-3**, F3.13: the worst allowed slot on all 2999 invocations from the trigger; UNSAFE passed (0 moves outside the
+  mask); COMPLETE through a supervisor abort. There was no host spike this time, so FAIL_CLOSED_LANDING was not
+  exercised.
+* **C-4**, F8.01: detection 0.048 s, NO_INVOKE_AFTER_STALE, L45, FAULT_WINDOW_F1F2, 3 timeout records,
+  LIMITS_UNINJECTED (145 ticks, p99 0.56 ms).
+
+**Failed (1): C-5, F8.03 map loss 1.0 s plus 24 CPU workers.** The load harness ran in flight for the first time (the
+§16.9 C-5 fix holds): 24 workers started at `transit_start` (74.508 s sim), recorded in the harness ledger.
+1. **The load caused a dispatch breach, and the P2 controller aborted, which is §5.3's declared response.**
+   * Under the load, the control callback rose from a 1.13 ms median (3.9 ms max) to 20.4 ms (53.8 ms max). The
+     mission tick rose from 0.32 ms to 17.1 ms (43.5 ms max).
+   * At 76.568 s, 2.06 s after the load started, one callback took 53.8 ms against the accepted 50 ms dispatch budget.
+     The accepted P2 controller failed closed (`stale_action`) and landed through RECOVERY.
+   * S0 held: UNSAFE passed, with 0 moves.
+2. **The map loss never fired.** Its trigger (`avoiding_first`) came 4.3 s after TRANSIT in the §16.8 run, and here
+   the abort came first. The shim never activated (0 invocations), so `proof:no_activation`, H35 (`no_stale_decision`)
+   and L45 (an abort landed through COMPLETE) failed.
+3. **P6 defect: the load harness does not stop gracefully.**
+   * The runner stopped it with SIGINT when the stack ended. It died on an unhandled `KeyboardInterrupt` (exit by
+     signal), so INJECTORS failed and `cleanup:p6-load-harness:terminated_by_SIGINT` was refused.
+   * This is not specific to the abort. Its 60 s window outlives a nominal C-5 too: in the §16.8 run COMPLETE came
+     55 s after `transit_start`.
+   * The plan's M-LH row (§4.2) already allows the workers to be "killed in cleanup".
+4. **P6 defect: §5.3 is not implemented (the C-4 defect class).**
+   * The contract gives C-5 "§5.3" and the scenario expects "LOAD", but the rule table runs no LOAD check.
+   * §5.3 accepts a P4 perception or P5 inference breach inside a declared load window only when its declared response
+     follows, with 0 unsafe commands. The declared responses are:
+     * stale snapshot → H35;
+     * inference above 0.020 s → HOLD;
+     * dispatch above 0.050 s → P2 abort.
+5. **A load-induced loss outside §5.3: the accepted P3 raw depth recorder overflowed.**
+   * Its 32-slot queue dropped 31 of 2539 frames from the evidence recording. All 31 were inside the load window
+     (78.97–82.48 s, during the RECOVERY landing).
+   * The adapter reported `raw_recorder_overflow` and exited 3, giving `cleanup:sensor-adapter:nonzero_exit_3`,
+     `depth:adapter_result_not_passed` and `depth:raw_recorder_incomplete`.
+   * Perception itself met every period: 0 missed periods, a 0.076 s maximum observation age, and complete delivery to
+     the adapter.
+   * §5.3 covers P4 perception and P5 inference limits, not P3 evidence recording.
+6. **Other items:**
+   * `policy:inference_p99`: 5.9 ms against the accepted 5 ms. All 47 invocations were inside the load window; the
+     maximum was 5.9 ms against 10 ms, and none came near the 0.020 s HOLD threshold.
+   * The P2 fail-closed landing's items: the runtime status, `p2:timing` and the four RECOVERY-landing items of §16.6.
+
+**Open decision (recommendation first):**
+* **Fix the two P6 defects.** No accepted code and no threshold change.
+  * The harness stops its workers on SIGINT or SIGTERM, records `cleared` with `stopped_early`, and exits 0.
+  * C-5 runs a LOAD check implementing §5.3: every breach in the window must be matched by its declared response. The
+    P5 inference-statistics items are allowed only with that check.
+* **How C-5 handles 24 workers on this host, where the P2 abort comes about 2 s into the load:**
+  * **Recommended: start the load at the map-loss trigger,** keeping 24 workers and 60 s.
+    * The map loss then happens under load from its first moment. In §16.8 the stale decision came 0.144 s after the
+      trigger; here the first breach came 2.06 s after the load started.
+    * After H35, accept either recovery or A10, or the §5.3 P2 abort checked by FAIL_CLOSED_LANDING.
+    * Residual risk: a dispatch breach before the first stale decision fails H35.
+  * *Alternative:* keep `transit_start` and accept the §5.3 abort before the map loss as a reported outcome. Map loss
+    under load would then likely never be shown on this host.
+  * *Alternative:* 8 workers, F6.01's lower level. Probably no breach and no recorder overflow, so no new exception is
+    needed, but the load is weaker and the frozen F8.03 row text changes.
+* **The recorder overflow at 24 workers is outside §5.3 and needs its own decision.**
+  * Recommended, narrowing an accepted P3 evidence check inside the declared load window only: replace the three
+    adapter items with a proof. The proof requires every lost frame inside the load window, the adapter meeting every
+    processing period, and the recorder drained and fsynced with no error. The loss is reported.
+  * Otherwise, C-5 at 24 workers fails whenever the recorder overflows.
+* Then a new development candidate. Before the real freeze, one unchanged candidate must still pass Gate B, S and C
+  content.
