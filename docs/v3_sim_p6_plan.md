@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5, S-5′ fails on four RECOVERY-landing items of the accepted evaluators, decision open, §16.6) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; candidate `23d513ee` awaits a Gate C content dry-run authorization, §16.7) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1477,3 +1477,39 @@ The alternative is to leave S-5′ failing under the accepted evaluators, which 
 
 **Also to note:** S-1's allowed items include `depth:health_not_fresh_in_window` and `performance:compute_max`
 under FAULT_WINDOW, as the accepted P4 §9.1 window intends. No threshold, baseline or source changed.
+
+### 16.7 The S-5′ decision implemented, and candidate `23d513ee` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt"), as proposed in §16.6.
+
+**Code (`c274cba`):**
+* `validation/p6_safety_evaluate.py`: the `RECOVERY_LANDING` check, with `RECOVERY_LANDING_ITEMS` naming the
+  four items. It requires the designed exit (exit 1, `p4_outcome` `failed`, connectivity passed, final state
+  RECOVERY, one LAND); the accepted absence-monitor ledger covering the window within its gap limit with every
+  other absence check passed and no RGB metadata; the controller's own reference record without a rejection,
+  the replay item present, and `cs_in_air` first false after the LAND command and after `landed`; and no other
+  item of the cleanup, absence, P2-integrity or MC-causal families.
+* `validation/p6_evaluate.py`: S-5′'s response adds `RECOVERY_LANDING`; its exceptions add exactly the four
+  items, each replaced by that check. No other row changes.
+* Tests: the proof accepts the S-5′ shape and refuses each missing piece (nine negatives); the exception is
+  exact and S-5′-only; the retained S-5′ dry run of §16.6 now evaluates as passed with exactly those four
+  items allowed and nothing refused (its stored evaluations are unchanged).
+
+**Offline regression on `c274cba`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 153 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 108 passed, 45 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `23d513ee40290b41327ce705584b4e5cf6948d69612f6b2737182fd2d294eb27`**, frozen at
+`c274cba` from a clean P6 tree; verifies; P3/P4/P5 re-verified; 41 files; no dry-run approval written.
+
+**Next (needs its own authorization):** a Gate C content dry run on `23d513ee` in simulated flight (C-1 to
+C-5 in frozen order), no credit. It exercises the depth relay's burst faults in flight (C-1), isolated
+inference timeouts (C-2), the adversarial policy (C-3), the compound bridge stop plus inference delay (C-4),
+and the compound map loss plus the 24-worker load harness, the first in-flight use of LH (C-5). S-5′ itself
+has not re-run on the new candidate; its pass is on the retained evidence only, and a complete Gate S dry
+run on one unchanged candidate remains to be shown.
