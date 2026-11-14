@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; candidate `23d513ee` awaits a Gate C content dry-run authorization, §16.7) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; Gate C dry run 1 of 5 on `23d513ee`: three P6 defects, a C-3 host-timing abort and a Gazebo shutdown hang; decision open, §16.8) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1513,3 +1513,61 @@ inference timeouts (C-2), the adversarial policy (C-3), the compound bridge stop
 and the compound map loss plus the 24-worker load harness, the first in-flight use of LH (C-5). S-5′ itself
 has not re-run on the new candidate; its pass is on the retained evidence only, and a complete Gate S dry
 run on one unchanged candidate remains to be shown.
+
+### 16.8 Gate C content dry run in simulated flight on `23d513ee` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C". Approval
+`state/p6-dry-run-approval-23d513ee4029-gateC-flight.json` (Gate C content, simulated flight only, cap 6). Verified
+before launch: AC power, Best-performance overlay, host CPU 1 %, the manifest and baselines, no simulator or P6
+process, no lock.
+
+**Run:** 08:33:10Z–08:49:32Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-23d513ee4029-20261114T083325Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.996–0.998 on every row.
+
+**Passed (1):** C-2, F3.07 five isolated 25 ms timeouts (shim): 5 timeout ledger records, HOLD on exactly the injected
+ticks, LIMITS_UNINJECTED, GOAL; completed.
+
+**Failed (4), on three P6 defects, one host-timing abort and one Gazebo shutdown hang:**
+
+1. **C-1, F1.03 depth bursts (DR at `avoiding_first`, 84.15 s): a P6 evaluator defect.** The relay dropped exactly
+   the frames inside the three burst windows (63 frames, none relayed). The proof failed on 3 "outside" frames that
+   were the first frames of the run (5.02–5.08 s sim), received by the witness before the relay's subscription had
+   matched, about 80 s before the fault was armed. The proof judged every frame from boot; the accepted delivery
+   checks judge the sensor window only. **Fix:** judge frames inside the accepted sensor window. Re-evaluated in
+   memory on the retained evidence: proved (63 dropped inside, all 3546 outside relayed); the run passes, with the
+   four `depth:` items allowed by the proof as the row defines.
+2. **C-3, F3.13 adversarial policy (shim): a host-timing abort after 70 s.** The shim chose the worst allowed slot
+   on all 1420 invocations from the trigger; the shield held (UNSAFE passed, 0 outside the mask) and the vehicle
+   never reached the goal. At 145.5 s one control callback took 51.8 ms against the accepted 50 ms dispatch budget,
+   and the accepted P2 controller failed closed (`stale_action`) and landed through RECOVERY. Median mission ticks
+   were 5–6 ms throughout, as on B-0, C-2 and S-4 (which had spikes up to 37 ms); C-3's 70 s of TRANSIT gave more
+   exposure. The evidence does not attribute the spike to the fault. The row's rules (S0, outcome reported) have no
+   check for a P2 fail-closed landing, so its items (`runtime_status`, `p2:timing` and the four RECOVERY-landing
+   items of §16.6) were refused.
+3. **C-4, F8.01 bridge stop plus 25 ms inference delay: a rule-table defect and a Gazebo shutdown hang.**
+   * The M4 rule table gives C-4 the timing exceptions (`policy:inference_p99`, `policy:inference_max`, replaced by
+     LIMITS_UNINJECTED) but not the LIMITS_UNINJECTED check itself, so they can never apply. **Fix:** add
+     LIMITS_UNINJECTED to C-4's response, as on B-1 and C-2. Re-evaluated in memory: it passes (145 uninjected
+     ticks, p99 0.85 ms).
+   * At cleanup Gazebo did not exit within its 15 s grace after SIGINT and was killed
+     (`cleanup:gazebo:forced_kill_after_grace`, never excepted). In the other 11 flight runs it exited in
+     0.44–0.64 s, with the same shutdown order (S-1 also stopped the bridge). No Gazebo-side log records the
+     cause. It needs a rerun to show whether it recurs.
+   * Its own checks passed: FAULT_WINDOW_F1F2, NO_INVOKE_AFTER_STALE, L45, 3 timeout records, detection 0.052 s.
+4. **C-5, F8.03 map loss plus 24 load workers: a P6 runner defect.** The runner launched the load harness at
+   `transit_start` (74.67 s) through `p6_node.py`, whose module list does not include `load_harness`; it printed its
+   usage and exited 1 at once. No load was applied, so C-5 did not test LH; INJECTORS failed and
+   `cleanup:p6-load-harness:nonzero_exit_1` was refused. The MR part passed (H35, STALE_IFF_AGE, L45, recovery).
+   **Fix:** add `load_harness` to the node's modules, with a test that every module the runner launches is one the
+   node accepts.
+
+**Open decision (recommendation first):**
+* **Fix the three P6 defects** (C-1 proof scope, C-4 LIMITS_UNINJECTED, C-5 node module). No accepted code and no
+  threshold changes.
+* **C-3 outcome:** the contract requires S0 and reports the outcome. Recommended: accept a P2 fail-closed RECOVERY
+  landing as a reported C-3 outcome, checked by L45R (one LAND, landed and disarmed within 45 s), the
+  RECOVERY_LANDING proof of §16.6 and S0, with the P2 failure reason reported. The alternative is to keep the rule
+  and rerun C-3, which passes only if no host spike crosses the budget during a long adversarial flight.
+* Then a new development candidate and a rerun of the full Gate C content on it, which also shows whether the C-4
+  Gazebo hang recurs.
