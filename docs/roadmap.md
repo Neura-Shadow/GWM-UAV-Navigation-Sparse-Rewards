@@ -290,7 +290,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   model `ee006a80`, no fallback, no online learning; PX4 SITL only, no hardware). Seven flights,
   0 collisions, 0 policy failures. [Contract](v3_sim_p5_contract.md), [plan](v3_sim_p5_plan.md).
   The earlier candidate `db4c4779` failed Gate C and remains on record.
-- [ ] P6 Failure validation — **planning underway; contract approved; M0 audit, M1 specifications, M2 injectors, M3 offline validation and M4 evaluators complete; M5 ground integration complete 2026-11-13 (development dry run of `524f0714` passed all 18 Gate A rows, no credit); M6 SITL fault validation in progress (flight-row support built offline; no flight, no gate run yet)**
+- [ ] P6 Failure validation — **planning underway; contract approved; M0 audit, M1 specifications, M2 injectors, M3 offline validation and M4 evaluators complete; M5 ground integration complete 2026-11-13 (development dry run of `524f0714` passed all 18 Gate A rows, no credit); M6 SITL fault validation in progress (Gate B content dry run passed in simulated flight on a development candidate, no credit; no gate run yet)**
   (2026-11-07; offline work only: no simulator run, nothing accepted): [plan](v3_sim_p6_plan.md),
   [contract](v3_sim_p6_contract.md), [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
   [fault matrix](v3_sim_p6_fault_matrix.md),

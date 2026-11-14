@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; authorized 2026-11-13; flight-row support built and tested offline, no flight run) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B content dry run passed in simulated flight on `33f33c5a`, no credit; Gate S content dry run next, §16.5) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1380,3 +1380,36 @@ explicitly (`gate_content` B).
 
 **Then, each separately authorized:** the production Policy A approval, the real freeze, Gate A, Gate B,
 Gate S, Gate C.
+
+### 16.5 Gate B content dry run in simulated flight on `33f33c5a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize flight dry run", answering: "Authorize a Gate B content
+dry run (B-0, then B-1) in simulated flight on development candidate 33f33c5a?" Approval
+`state/p6-dry-run-approval-33f33c5a22c9-gateB-flight.json` (Gate B content, `flight` and
+`simulated_flight_only` true, cap 4).
+
+**Verified before each launch:** the manifest and the P3/P4/P5 baselines; no simulator or P6 process; no live lock;
+the host on AC in Best-performance mode. The first attempt found the AC overlay reverted to "Best power
+efficiency" and stopped before launching anything; the operator switched it back and the runs followed.
+
+**The first P6 flights.** Both rows passed, each as one run (SITL, S2 world, no credit):
+
+| Row | Fault | Result | Window (sim s) | RTF | P5 items (all allowed by a passed check) |
+|---|---|---|---|---|---|
+| B-0 | none, every injector pass-through | COMPLETE, `completed`; 0 P5 failures; C11, GOAL, INJECTORS, PROOF, UNSAFE passed | 12.66–128.98 | 0.998 | none |
+| B-1 | F3.08, three 25 ms inference ticks in AVOIDING (shim) | COMPLETE, `supervisor_abort`; PH3, L45, LIMITS_UNINJECTED, UNSAFE, C11, INJECTORS, PROOF passed | 12.64–88.54 | 0.998 | `outcome:not_completed`, `outcome:goal_distance`, `outcome:detour_sequence` (L45), `policy:failure_ticks`, `policy:participation`, `policy:inference_p99`, `policy:inference_max` (PH3) |
+
+B-1 detail: the shim fired at 81.74 s sim on the first AVOIDING decision; 3 timeout records in the accepted
+policy ledger; detection 0.048 s (one tick) after the trigger; the abort followed within 0.10 s; the
+vehicle landed through the accepted sequence. No P5 item was refused on either row. The candidate was
+unchanged throughout; the lock was released; no residual process.
+
+**What this shows:** the flight path of the runner (world selection, flight gating, the shim in flight, the
+relays and witness in pass-through through a complete flight, the flight window, the evaluation and
+composition for flight rows) works on the first live use. The runner-fired mechanisms in flight (relay
+SIGUSR1 at an in-flight trigger, the bridge SIGINT, the load harness) have not yet been exercised; they
+belong to the Gate S and C rows.
+
+**Next (needs its own authorization):** a Gate S content dry run on this candidate (S-1, S-2′, S-3, S-4,
+S-5′, in the frozen order), simulated flight only, no credit. It exercises PS at `avoiding_near` (S-1), SR at
+`avoiding_first` (S-2′), the shim faults F3.04, F4.01 and F6.03, and the fail-closed L45R path (S-5′).
