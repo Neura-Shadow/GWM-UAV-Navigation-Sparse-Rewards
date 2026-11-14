@@ -22,6 +22,7 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 complete 2026-11-13 (plan §15): the authorized
 dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gate A rows (plan §15.19), no credit. M6 in
 progress (plan §16): the runner and sequencer carry the Gate B, S and C flight rows; the Gate B content dry run (B-0, B-1)
-passed in simulated flight on development candidate `33f33c5a` (plan §16.5), no credit. No P6 gate has run; the real P6
+passed in simulated flight on development candidate `33f33c5a` (plan §16.5), and the Gate S content dry run passed 4 of 5
+(S-5′ fails on four items the accepted evaluators raise for any P2 RECOVERY landing; decision open, plan §16.6), no credit. No P6 gate has run; the real P6
 freeze and every gate need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

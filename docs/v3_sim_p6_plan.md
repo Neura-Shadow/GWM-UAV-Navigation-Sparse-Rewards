@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B content dry run passed in simulated flight on `33f33c5a`, no credit; Gate S content dry run next, §16.5) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5, S-5′ fails on four RECOVERY-landing items of the accepted evaluators, decision open, §16.6) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1413,3 +1413,67 @@ belong to the Gate S and C rows.
 **Next (needs its own authorization):** a Gate S content dry run on this candidate (S-1, S-2′, S-3, S-4,
 S-5′, in the frozen order), simulated flight only, no credit. It exercises PS at `avoiding_near` (S-1), SR at
 `avoiding_first` (S-2′), the shim faults F3.04, F4.01 and F6.03, and the fail-closed L45R path (S-5′).
+
+### 16.6 Gate S content dry run in simulated flight on `33f33c5a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate S dry run". Approval
+`state/p6-dry-run-approval-33f33c5a22c9-gateS-flight.json` (Gate S content, simulated flight only, cap 6).
+Verified before launch: AC power, Best-performance overlay, host CPU 1 %, the manifest and baselines, no
+simulator or P6 process, no lock.
+
+**Run:** 03:36:10Z–03:49:46Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-S-33f33c5a22c9-20261114T033624Z.result.json`. The candidate was unchanged throughout; the
+lock was released; no residual process. RTF 0.996–0.998 on every row.
+
+**Passed (4): the runner-fired in-flight mechanisms work.**
+
+| Row | Fault, mechanism, trigger | What happened | P5 items (all allowed by a passed check) |
+|---|---|---|---|
+| S-1 | F1.01 bridge SIGINT (PS) at `avoiding_near`, fired 89.93 s | FAULT_WINDOW and F1–F4 passed; detection 0.224 s; L45 via `supervisor_abort`; 312 native headers after the stop | 8, under FAULT_WINDOW |
+| S-2′ | F2.09 state relay (SR) at `avoiding_first`, fired 81.25 s | 0 of 1329 position and 0 of 2658 attitude messages relayed; perception unassociated 257 times; H35, A10, L45; detection 0.272 s | 3, under L45 |
+| S-3 | F3.04 NaN scores (shim) at `avoiding_first`, 81.88 s | 3 `output_not_finite` ledger records; PH3, L45; detection 0.052 s | 5, under PH3/L45 |
+| S-4 | F4.01 map loss 1.0 s (shim) at `avoiding_first`, 81.5 s | 10 snapshots published in the window, 0 used; H35, RECOVERY, GOAL; recovered; `completed` | 1, under RECOVERY |
+
+**Failed (1): S-5′, on four P5 items. Its own checks passed:** PROOF (one mission tick delayed 60 ms),
+R2 (`stale_action` abort with a valid Offboard sample, detection 0.048 s), L45R (exactly one LAND at 85.764 s,
+landed 90.42 s, disarmed by 92.42 s), UNSAFE, C11, INJECTORS. Allowed as predicted: `runtime_status:…`,
+`p2:timing`, `outcome:not_completed`, `outcome:goal_distance`. Refused:
+
+1. **`cleanup:ros-controller:nonzero_exit_1`.** The accepted `main` exits 1 whenever `p4_outcome` is
+   `failed`, and the accepted P4 `outcome()` returns `failed` for any run ending in P2 RECOVERY. So every
+   L45R row exits 1 by design. The same finding as A-5.F4.07/F4.13 (§15.2, decision 3), for a different
+   reason.
+2. **`rgb_absence:snapshot_missing:window_end`.** The accepted P3 runner's snapshot thread takes the
+   `window_end` RGB-absence snapshot on the COMPLETE transition only (`TRIGGERS`). A RECOVERY landing never
+   reaches COMPLETE, so the snapshot does not exist. The continuous absence monitor did cover the whole
+   window and beyond (148 rows, max gap 0.50 s, zero IMX214 subscribers, control subscriber present), and
+   every other absence check passed.
+3. **`p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost`.** The accepted offline
+   replay (`reference_evidence.classify`) feeds every received sample to the reference manager with the
+   current phase, including RECOVERY, which is not in the manager's landing exemption
+   (REQUEST_LAND … COMPLETE). When the vehicle landed at 90.42 s, `cs_in_air` went false at 90.57 s and the
+   replayed manager rejected `final_alignment_lost`. The live controller never rejected (`rejected_count`
+   0, no `reference_rejected` event): its RECOVERY tick returns before the reference check. The replay's
+   `historical` branch already relabels RECOVERY as TAKEOFF for exactly this reason, but the P4/P5
+   evaluators call it with `historical=False`.
+4. **`mc_causal_yaw:p2_integrity_missing`.** A consequence of 3: the P2 report was never produced.
+
+**Why these never appeared before:** no accepted P2–P5 flight row ends in P2 RECOVERY; the accepted
+abort rows land through the nominal sequence (`supervisor_abort`, COMPLETE). S-5′ is the first L45R flight
+evaluated by this stack. The four items are consequences of the RECOVERY landing in accepted code, not of
+the fault or of P6.
+
+**Open decision (recommendation first).** On S-5′ only, replace exactly these four items by proofs, with
+the accepted evaluators and thresholds unchanged:
+* item 1 by L45R plus a designed-exit proof: exit 1, `p4_outcome` `failed`, connectivity passed, final state
+  RECOVERY, exactly one LAND;
+* item 2 by a proof from the accepted monitor ledger: coverage from before the window start to after the
+  window end, max gap within the accepted limit, zero IMX214 subscribers and the control subscriber present
+  on every row (the data the P5 evaluator already reports), plus every other absence check passed;
+* items 3 and 4 by a proof that the controller's own reference record shows no rejection, the replay's
+  rejection reason is `final_alignment_lost`, and `cs_in_air` first went false after the LAND command and
+  after `landed` was reported (the landing itself).
+The alternative is to leave S-5′ failing under the accepted evaluators, which no change in P6 can satisfy.
+
+**Also to note:** S-1's allowed items include `depth:health_not_fresh_in_window` and `performance:compute_max`
+under FAULT_WINDOW, as the accepted P4 §9.1 window intends. No threshold, baseline or source changed.
