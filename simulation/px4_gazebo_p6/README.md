@@ -28,6 +28,6 @@ The Gate C content dry run on development candidate `23d513ee` passed 1 of 5; it
 outcome rule adopted (plan §16.8–16.9). The rerun on development candidate `75289deb` (commit `e3c8b69`) passed 4 of 5;
 C-5's 24-worker load made the P2 controller abort before the map loss (plan §16.10). The adopted C-5 load decision is
 implemented (load at the map-loss trigger, the §5.3 LOAD check, the recorder proof, a clean harness stop), and
-development candidate `06d08d98` (commit `4c76455`) awaits a Gate C content rerun (plan §16.11). No P6 gate has run; the real P6
+development candidate `0db5c60a` (code `4c76455`, frozen at `d25831d`) awaits a Gate C content rerun (plan §16.11). No P6 gate has run; the real P6
 freeze and every gate need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

@@ -1692,7 +1692,7 @@ shutdown hang of §16.8 did not recur (1 in 17 flight runs so far).
 * Then a new development candidate. Before the real freeze, one unchanged candidate must still pass Gate B, S and C
   content.
 
-### 16.11 The C-5 load decision implemented, and candidate `06d08d98` (2026-11-14)
+### 16.11 The C-5 load decision implemented, and candidate `0db5c60a` (2026-11-14)
 
 **Decision:** adopted by the operator on 2026-11-14 ("Adopt as recommended"), as proposed in §16.10. It is recorded as
 `m6_c5_load_decision_approved` in the scenarios config and in contract §8.4 and §10.
@@ -1756,12 +1756,19 @@ WSL's git, which has no `autocrlf`, lists some accepted P5 files as modified. Th
 ignoring CRs is empty, Windows git shows them clean, the last commit touching P5 is `40a109b`, and the P5 manifest
 verifies.
 
-**Development candidate `06d08d9862a0be662f01faf3c3639657b6b4f0c24aa89888bbe5bba2e5aa996b`**, frozen at `4c76455`
-from a clean P6 tree. It verifies, and P3/P4/P5 re-verify. It binds 41 files, faults `97fc5eef…` and scenarios
-`4e06ab00…`. No dry-run approval has been written.
+**Development candidate `0db5c60a20b3c458f8b65a8d508b57a5b99c0b6c477d7ca7c25cfcefc975bcdc`**
+(`state/p6-dev-candidate-d25831d.json`), frozen at `d25831d` from a clean P6 tree. Its P6 sources are those of
+`4c76455`; only the plan record changed in between. It verifies from any directory, and P3/P4/P5 re-verify. It binds
+41 files, faults `97fc5eef…` and scenarios `4e06ab00…`. No dry-run approval has been written.
+
+**Superseded freeze `06d08d98`** (`state/p6-dev-candidate-4c76455.json`, same sources and specs):
+* It was frozen with a relative Policy A approval path, so it verifies only from `~/uav_autonomy`. The launchers verify
+  from other directories.
+* Earlier candidates record the absolute path, and so does `0db5c60a`.
+* `06d08d98` was never approved or run, and the file is kept.
 
 **Next (needs its own authorization):**
-* A Gate C content rerun on `06d08d98` in simulated flight, no credit. It is the first run of the load from the map
+* A Gate C content rerun on `0db5c60a` in simulated flight, no credit. It is the first run of the load from the map
   loss, and of the new LOAD, LOAD_RECORDER and LANDING checks on live evidence.
 * Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown.
   S-5′ has not re-run live since its rule changed.
