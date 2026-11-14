@@ -5,6 +5,9 @@ records (decisions, policy ledger, events, transactions) with the numbers frozen
 supervisor and ledger records are written by accepted code, never by an injector.
 """
 import math
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[3]  # the repository (the accepted P3 validation config)
 
 ACCEPTED = 0
 
@@ -144,6 +147,62 @@ def r2(run, c, expected_failure):
     result = run.result
     c.record("R2", result.get("final_state") == "RECOVERY" and result.get("failure") == expected_failure,
              failure=result.get("failure"))
+
+
+RECOVERY_LANDING_ITEMS = ("cleanup:ros-controller:nonzero_exit_1", "rgb_absence:snapshot_missing:window_end",
+                          "p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost",
+                          "mc_causal_yaw:p2_integrity_missing")
+
+
+def recovery_landing(run, c):
+    """M6 decision (operator, 2026-11-14, "Adopt"): the four P5 items every P2 RECOVERY landing produces in accepted code,
+    on S-5' only, each replaced by evidence the accepted code did not write for that purpose (plan §16.6):
+    1. the designed exit: `main` exits 1 because P4 `outcome()` is `failed` for a RECOVERY end; connectivity had
+       passed, the final state is RECOVERY and exactly one LAND was sent;
+    2. the `window_end` RGB-absence snapshot is taken on COMPLETE only; the continuous absence monitor (the accepted
+       ledger the P5 evaluator reports) covers the whole window with zero IMX214 subscribers, within its gap limit,
+       and every other absence check passed;
+    3. the accepted offline replay feeds RECOVERY-phase samples to the reference manager, which rejects
+       `final_alignment_lost` once `cs_in_air` is false after touchdown; the live controller's own record shows no
+       rejection, and `cs_in_air` first went false after the LAND command and after `landed`;
+    4. the missing P2 report is the consequence of 3 and nothing else."""
+    import json as _json
+    result, summary = run.result, run.summary
+    p5 = run.p5_evaluation or {}
+    items = list(p5.get("failures") or [])
+    lands = [t for t in result.get("transactions", []) if t["command"] == 21]
+    exit_ok = (summary.get("controller_exit_code") == 1 and result.get("p4_outcome") == "failed"
+               and result.get("connectivity") == "passed" and result.get("final_state") == "RECOVERY" and len(lands) == 1)
+    absence = p5.get("rgb_absence") or {}
+    monitor = absence.get("monitor") or {}
+    window = absence.get("window_monotonic_s") or [None, None]
+    coverage = monitor.get("coverage_monotonic_s") or [None, None]
+    settings = _json.loads((ROOT / "simulation/px4_gazebo/configs/p3_validation.yaml").read_text(encoding="utf-8"))["rgb_absence_monitor"]
+    absence_ok = (absence.get("failures") == ["snapshot_missing:window_end"] and None not in window and None not in coverage
+                  and coverage[0] <= window[0] and coverage[1] >= window[1]
+                  and (monitor.get("max_sample_gap_wall_s") or float("inf")) <= settings["max_sample_gap_wall_s"]
+                  and absence.get("rgb_metadata_rows") == 0)
+    reference = result.get("reference") or {}
+    rejected_events = [e for e in run.events if e.get("event") == "reference_rejected"]
+    land_wall = lands[0]["sent_monotonic_s"] if lands else None
+    landed_wall = next((e["monotonic_s"] for e in run.events if e.get("event") == "received" and e.get("topic_key") == "vehicle_land_detected"
+                        and e["fields"].get("landed") is True and land_wall is not None and e["monotonic_s"] >= land_wall), None)
+    in_air_false_wall = next((e["monotonic_s"] for e in run.events if e.get("event") == "received"
+                              and e.get("topic_key") == "estimator_status_flags" and e["fields"].get("cs_in_air") is False
+                              and land_wall is not None and e["monotonic_s"] >= land_wall), None)
+    replay_item = "p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost"
+    reference_ok = (reference.get("rejected_count") == 0 and reference.get("rejection") is None and not rejected_events
+                    and replay_item in items and landed_wall is not None and in_air_false_wall is not None
+                    and in_air_false_wall >= landed_wall)
+    other = [x for x in items if x.startswith(("p2_integrity_error", "mc_causal", "rgb_absence:", "cleanup:"))
+             and x not in RECOVERY_LANDING_ITEMS]
+    ok = exit_ok and absence_ok and reference_ok and not other
+    c.record("RECOVERY_LANDING", ok, exit_designed=exit_ok, absence_monitor_covers_window=absence_ok,
+             reference_rejected_only_in_replay_after_touchdown=reference_ok, other_items=other,
+             controller_exit_code=summary.get("controller_exit_code"), p4_outcome=result.get("p4_outcome"),
+             land_commands=len(lands), monitor_coverage_monotonic_s=coverage, window_monotonic_s=window,
+             monitor_max_gap_wall_s=monitor.get("max_sample_gap_wall_s"), controller_rejected_count=reference.get("rejected_count"),
+             land_wall_s=land_wall, landed_wall_s=landed_wall, cs_in_air_false_wall_s=in_air_false_wall)
 
 
 def goal(run, c):

@@ -351,6 +351,17 @@ Plan §8 states what the sample sizes do and do not support.
 | S-4 | S3 | F4.01 local-map loss 1.0 s in `AVOIDING` | H35; recovery only with §6.5; goal reached; S0 |
 | S-5′ | S1 | F6.03 one 60 ms mission-tick stall in NORMAL | P2 dispatch-budget abort with a valid Offboard sample, then exactly one LAND, then L45R; S0 |
 
+**S-5′ and the P2 RECOVERY landing (M6 decision, approved 2026-11-14, "Adopt").** No accepted P2–P5 flight
+row ends in P2 RECOVERY, and the accepted code produces four P5 items for any run that does: the designed
+exit 1 (`outcome()` is `failed` for a RECOVERY end), the `window_end` RGB-absence snapshot that is taken on
+COMPLETE only, the offline reference replay's `final_alignment_lost` rejection after touchdown (the live
+controller never rejects), and the P2 report that rejection suppresses. On S-5′ only, exactly these four
+items are replaced by the `RECOVERY_LANDING` proof: exit 1 with `p4_outcome` `failed`, connectivity passed and
+one LAND; the accepted absence-monitor ledger covering the whole window with zero IMX214 subscribers within
+its gap limit and every other absence check passed; the controller's own reference record without a
+rejection, with `cs_in_air` first false after the LAND command and after `landed`. The accepted evaluators and
+thresholds are unchanged.
+
 **D4a, approved by the operator 2026-11-06.** M0 found that PX4 lands through Return, but breaches
 the 3.0 m ceiling and can pass within 0.20 m over obstacle tops. The original rows are therefore
 moved out of Gate S:
@@ -425,6 +436,7 @@ Any change after freeze is a new P6 candidate.
 | M5 fail-closed exit (2026-11-07, "Allow that one item (Recommended)") | A-5.F4.07 and A-5.F4.13 may report exactly `cleanup:ros-controller:nonzero_exit_1` | replaced by the fail-closed proof (declared reason, timing, `/proc` or advertiser evidence, exit 0 or exit 1 with connectivity "failed"); every other cleanup item stays never excepted. Plan §15 |
 | M5 trigger point (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13: `ground_controller` (first transition) → `ground_prestream` (the transition into PRESTREAM_SAFE_SETPOINTS) | at the first transition PX4 had published no attitude yet and its estimator was still starting up, so F4.13's ledger lacked attitude and its window began inside the start-up (`ce73e574` dry run). The proof also requires the injection after that transition and connectivity "passed". Plan §15.11–15.12 |
 | M5 F4.13 detection (2026-11-13, "接受並準備新候選", accept and prepare a new candidate) | A-5.F4.13 also accepts `clock_epoch_mismatch:<state topic>` | from PRESTREAM on the accepted `StateCache.validate` aborts at once, and PX4's timestamps pass the stopped clock by more than 0.1 s before the 1.0 s `clock_stalled` check (`44fa1111` rerun). The proof also requires that evidence in the controller's own ledger; the bound and the stop window are unchanged. Plan §15.14–15.15 |
+| M6 S-5′ RECOVERY landing (2026-11-14, "Adopt") | S-5′ may report exactly `cleanup:ros-controller:nonzero_exit_1`, `rgb_absence:snapshot_missing:window_end`, `p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost` and `mc_causal_yaw:p2_integrity_missing` | replaced by the `RECOVERY_LANDING` proof (§8.3); the four items are what accepted code produces for any P2 RECOVERY landing (`33f33c5a` Gate S dry run). Plan §16.6–16.7 |
 | M5 `p2:timing` (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13 may report exactly `p2:timing` | replaced by the fail-closed proof, which also requires the timing reconciliation to have completed; the accepted P2 check reports failed whenever the controller failed. Plan §15.11–15.12 |
 | M5 Policy A (2026-11-07, "Approve for M5 (Recommended)") | Policy A for M5 development candidates only | ground dry runs with no credit; the real P6 candidate needs a fresh approval, and the manifest refuses the development approval for it |
 

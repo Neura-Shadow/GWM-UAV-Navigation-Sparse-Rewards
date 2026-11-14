@@ -27,6 +27,8 @@ for path in (REPO / "simulation/px4_gazebo_p6", REPO / "simulation/px4_gazebo_p6
     sys.path.insert(0, str(path))
 import p6_coverage_report  # noqa: E402
 import p6_evaluate  # noqa: E402
+from p6_run import Run  # noqa: E402
+from p6_safety_evaluate import Checks  # noqa: E402
 from injection import declaration, fault_ledger  # noqa: E402
 
 RUNS = Path(os.environ.get("GWM_RUNS", Path.home() / "uav_autonomy/runs"))
@@ -86,13 +88,18 @@ def test_an_excepted_p5_failure_needs_its_replacement_check_to_pass():
 
 
 def test_no_row_ever_excepts_safety_policy_a_ownership_or_cleanup():
-    """The single exception: the designed fail-closed exit of F4.07/F4.13, exactly one item (operator decision)."""
+    """The exceptions: the designed fail-closed exit of F4.07/F4.13 (M5 decision) and the four RECOVERY-landing items of
+    S-5' (M6 decision), each an exact item replaced by its proof; nothing else touches these families."""
     never = ("safety:", "native", "competing_flight_publisher", "residual_namespace_processes", "cleanup:", "p2:final_landed")
     designed = "=" + p6_evaluate.FAIL_CLOSED_EXIT
     for row, rules in p6_evaluate.ROWS.items():
         for prefix in rules["exceptions"]:
             if prefix == designed:
-                assert row in ("A-5.F4.07", "A-5.F4.13"), row
+                assert row in ("A-5.F4.07", "A-5.F4.13", "S-5'"), row
+                assert row != "S-5'" or rules["exceptions"][prefix] == "RECOVERY_LANDING"
+                continue
+            if row == "S-5'" and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.RECOVERY_LANDING_ITEMS:
+                assert rules["exceptions"][prefix] == "RECOVERY_LANDING"
                 continue
             assert not any(prefix.startswith(n) or n.startswith(prefix) for n in never if prefix), (row, prefix)
     allowed, refused = p6_evaluate.compose(
@@ -326,3 +333,72 @@ def test_controller_input_faults_cannot_be_proved_on_the_ground(tmp_path):
     from injection import specs
     rows = [r["id"] for r in specs.strict_json(specs.SCENARIOS)["gates"]["A"]]
     assert "A-5.F4.02" not in rows and "A-5.F4.06" not in rows
+
+
+# ---- M6 decision: the S-5' RECOVERY-landing items (operator, 2026-11-14, "Adopt") ----------------------------
+def recovery_landing_run(tmp, p5_failures=None, exit_code=1, outcome="failed", rejected_count=0, in_air_false_at=140.6,
+                         landed_at=140.4, coverage=(100.0, 141.0), gap=0.5, absence_failures=("snapshot_missing:window_end",)):
+    tmp.mkdir(parents=True, exist_ok=True)
+    (tmp / "p6").mkdir(exist_ok=True)
+    land_wall = 135.0
+    items = list(p6_evaluate.response.RECOVERY_LANDING_ITEMS) if p5_failures is None else list(p5_failures)
+    result = {"final_state": "RECOVERY", "failure": "stale_action", "p4_outcome": outcome, "connectivity": "passed",
+              "transactions": [{"command": 21, "sent_monotonic_s": land_wall}],
+              "reference": {"rejected_count": rejected_count, "rejection": None}}
+    (tmp / "summary.json").write_text(json.dumps({"controller_exit_code": exit_code, "controller_result": result}))
+    events = [{"event": "received", "topic_key": "vehicle_land_detected", "monotonic_s": landed_at, "fields": {"landed": True}},
+              {"event": "received", "topic_key": "estimator_status_flags", "monotonic_s": in_air_false_at, "fields": {"cs_in_air": False}}]
+    (tmp / "ros-events.jsonl").write_text("".join(json.dumps(e) + chr(10) for e in events))
+    (tmp / "p5-evaluation.json").write_text(json.dumps({"failures": items, "rgb_absence": {
+        "failures": list(absence_failures), "window_monotonic_s": [101.0, 140.9], "rgb_metadata_rows": 0,
+        "monitor": {"coverage_monotonic_s": list(coverage), "max_sample_gap_wall_s": gap}}}))
+    return Run(tmp)
+
+
+def recovery_landing(run):
+    c = Checks({})
+    p6_evaluate.response.recovery_landing(run, c)
+    return c.out["RECOVERY_LANDING"]
+
+
+def test_the_recovery_landing_proof_accepts_the_s5_shape_and_refuses_each_missing_piece(tmp_path):
+    ok = recovery_landing(recovery_landing_run(tmp_path / "ok"))
+    assert ok["passed"], ok
+    bad = {
+        "exit0": dict(exit_code=0), "outcome": dict(outcome="supervisor_abort"), "rejected": dict(rejected_count=1),
+        "in_air_before_landing": dict(in_air_false_at=140.3), "coverage_short": dict(coverage=(100.0, 140.5)),
+        "gap": dict(gap=1.5), "other_absence": dict(absence_failures=("snapshot_missing:window_end", "unexpected_subscriber")),
+        "other_item": dict(p5_failures=list(p6_evaluate.response.RECOVERY_LANDING_ITEMS) + ["cleanup:p6-witness:forced_kill_after_grace"]),
+        "no_replay_item": dict(p5_failures=[x for x in p6_evaluate.response.RECOVERY_LANDING_ITEMS if "final_alignment" not in x]),
+    }
+    for name, kw in bad.items():
+        assert not recovery_landing(recovery_landing_run(tmp_path / name, **kw))["passed"], name
+
+
+def test_s5_allows_exactly_the_four_recovery_landing_items_and_only_with_the_proof():
+    rules = p6_evaluate.ROWS["S-5'"]["exceptions"]
+    items = list(p6_evaluate.response.RECOVERY_LANDING_ITEMS)
+    extra = ["cleanup:ros-controller:nonzero_exit_10", "rgb_absence:unexpected_subscriber", "p2_integrity_error:ValueError:other"]
+    allowed, refused = p6_evaluate.compose(items + extra, rules, {"RECOVERY_LANDING": {"passed": True}})
+    assert [a["item"] for a in allowed] == items and refused == extra
+    assert p6_evaluate.compose(items, rules, {"RECOVERY_LANDING": {"passed": False}})[1] == items
+    for row in ("S-1", "B-1", "C-4"):
+        assert p6_evaluate.compose(items, p6_evaluate.ROWS[row]["exceptions"],
+                                   {"RECOVERY_LANDING": {"passed": True}, "PROOF": {"passed": True}})[1] == items, row
+    # A-5.F4.13 allows only its own designed exit item (M5 decision), never the three RECOVERY-landing items
+    refused = p6_evaluate.compose(items, p6_evaluate.ROWS["A-5.F4.13"]["exceptions"],
+                                  {"RECOVERY_LANDING": {"passed": True}, "PROOF": {"passed": True}})[1]
+    assert refused == [x for x in items if x != p6_evaluate.FAIL_CLOSED_EXIT]
+
+
+def test_the_retained_s5_dry_run_passes_under_the_adopted_rule():
+    """The 2026-11-14 S-5' dry run on development candidate 33f33c5a (retained WSL evidence): with the stored P5
+    evaluation unchanged, the P6 evaluation now passes with exactly the four items allowed by RECOVERY_LANDING."""
+    import glob
+    runs = glob.glob(str(Path.home() / "uav_autonomy/runs/20261114T034747Z-p6dry-S-5p-*"))
+    if not runs or not (Path(runs[0]) / "p5-evaluation.json").exists():
+        pytest.skip("retained S-5' evidence not present")
+    out = p6_evaluate.evaluate(Path(runs[0]))
+    assert out["status"] == "passed", out["failures"]
+    assert sorted(a["item"] for a in out["p5_failures_allowed"] if a["replacement"] == "RECOVERY_LANDING") == sorted(p6_evaluate.response.RECOVERY_LANDING_ITEMS)
+    assert out["p5_failures_refused"] == []

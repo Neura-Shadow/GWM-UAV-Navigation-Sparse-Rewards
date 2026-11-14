@@ -46,8 +46,14 @@ ROWS = {
              "exceptions": {"outcome:": "A10", "performance:": "H35"}},
     "S-3": {"response": ["PH3", "L45", "UNSAFE"], "exceptions": {**POLICY_EXCEPTIONS, "outcome:": "L45"}},
     "S-4": {"response": ["H35", "RECOVERY", "GOAL", "UNSAFE"], "exceptions": {"outcome:detour_sequence": "RECOVERY"}},
-    "S-5'": {"response": ["R2:stale_action", "L45R:stale_action", "UNSAFE"],
-             "exceptions": {"runtime_status:": "R2", "p2:timing": "PROOF", "outcome:": "L45R"}},
+    "S-5'": {"response": ["R2:stale_action", "L45R:stale_action", "UNSAFE", "RECOVERY_LANDING"],
+             "exceptions": {"runtime_status:": "R2", "p2:timing": "PROOF", "outcome:": "L45R",
+                            # M6 decision (operator, 2026-11-14, "Adopt"): the four items every P2 RECOVERY landing
+                            # produces in accepted code, exactly these, on this row only, replaced by the
+                            # RECOVERY_LANDING proof (plan §16.6): the designed exit 1, the COMPLETE-only
+                            # window_end absence snapshot, the replay's post-touchdown reference rejection and its
+                            # missing P2 report.
+                            **{"=" + item: "RECOVERY_LANDING" for item in response.RECOVERY_LANDING_ITEMS}}},
     "C-1": {"response": ["STALE_IFF_AGE", "RECOVERY", "GOAL", "UNSAFE"],
             "exceptions": {"depth:": "PROOF", "performance:": "STALE_IFF_AGE", "outcome:detour_sequence": "RECOVERY"}},
     "C-2": {"response": ["LIMITS_UNINJECTED", "GOAL", "UNSAFE"], "exceptions": {**POLICY_EXCEPTIONS, **TIMING_EXCEPTIONS}},
@@ -160,6 +166,8 @@ def respond(run, declaration, rules, proof, window):
             response.limits_uninjected(run, c, p5_limits(), injected)
         elif code == "UNSAFE":
             response.unsafe_setpoints(run, c)
+        elif code == "RECOVERY_LANDING":
+            response.recovery_landing(run, c)
         elif code == "GROUND_REPLAY":
             config = json.loads(run.file("p4_avoidance.yaml").read_text(encoding="utf-8"))
             response.ground_replay(run, c, arg.split(","), config)
