@@ -88,18 +88,23 @@ def test_an_excepted_p5_failure_needs_its_replacement_check_to_pass():
 
 
 def test_no_row_ever_excepts_safety_policy_a_ownership_or_cleanup():
-    """The exceptions: the designed fail-closed exit of F4.07/F4.13 (M5 decision) and the four RECOVERY-landing items of
-    S-5' (M6 decision), each an exact item replaced by its proof; nothing else touches these families."""
+    """The exceptions: the designed fail-closed exit of F4.07/F4.13 (M5 decision), the four RECOVERY-landing items of
+    S-5', C-3 and C-5 (M6 decisions) and C-5's recorder-overflow items (M6 decision, plan §16.11), each an exact item
+    replaced by its proof; nothing else touches these families."""
     never = ("safety:", "native", "competing_flight_publisher", "residual_namespace_processes", "cleanup:", "p2:final_landed")
     designed = "=" + p6_evaluate.FAIL_CLOSED_EXIT
+    landing = {"S-5'": "RECOVERY_LANDING", "C-3": "FAIL_CLOSED_LANDING", "C-5": "FAIL_CLOSED_LANDING"}
     for row, rules in p6_evaluate.ROWS.items():
         for prefix in rules["exceptions"]:
             if prefix == designed:
-                assert row in ("A-5.F4.07", "A-5.F4.13", "S-5'", "C-3"), row
+                assert row in ("A-5.F4.07", "A-5.F4.13", "S-5'", "C-3", "C-5"), row
                 assert rules["exceptions"][prefix] in ("PROOF", "RECOVERY_LANDING", "FAIL_CLOSED_LANDING")
                 continue
-            if row in ("S-5'", "C-3") and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.RECOVERY_LANDING_ITEMS:
-                assert rules["exceptions"][prefix] == {"S-5'": "RECOVERY_LANDING", "C-3": "FAIL_CLOSED_LANDING"}[row]
+            if row in landing and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.RECOVERY_LANDING_ITEMS:
+                assert rules["exceptions"][prefix] == landing[row]
+                continue
+            if row == "C-5" and prefix.startswith("=") and prefix[1:] in p6_evaluate.response.LOAD_RECORDER_ITEMS:
+                assert rules["exceptions"][prefix] == "LOAD_RECORDER"
                 continue
             assert not any(prefix.startswith(n) or n.startswith(prefix) for n in never if prefix), (row, prefix)
     allowed, refused = p6_evaluate.compose(
@@ -458,7 +463,8 @@ def _retained(prefix):
 
 def test_the_retained_gate_c_runs_under_the_fixes():
     """The 2026-11-14 Gate C dry run on 23d513ee, stored evaluations unchanged: C-1 and C-3 now pass; C-4 fails on the
-    Gazebo shutdown hang alone (a cleanup item is never excepted); C-5's load harness never ran, so it still fails."""
+    Gazebo shutdown hang alone (a cleanup item is never excepted); C-5's load harness never ran, so it still fails
+    (and since the C-5 load decision its declaration is no longer the frozen row, so strict evaluation refuses it)."""
     c1 = p6_evaluate.evaluate(_retained("20261114T083341Z-p6dry-C-1-*"))
     assert c1["status"] == "passed", c1["failures"]
     c3 = p6_evaluate.evaluate(_retained("20261114T084020Z-p6dry-C-3-*"))
@@ -466,5 +472,202 @@ def test_the_retained_gate_c_runs_under_the_fixes():
     assert c3["response"]["FAIL_CLOSED_LANDING"]["p2_failure"] == "stale_action"
     c4 = p6_evaluate.evaluate(_retained("20261114T084352Z-p6dry-C-4-*"))
     assert c4["failures"] == ["p5:cleanup:gazebo:forced_kill_after_grace"], c4["failures"]
-    c5 = p6_evaluate.evaluate(_retained("20261114T084636Z-p6dry-C-5-*"))
+    c5_path = _retained("20261114T084636Z-p6dry-C-5-*")
+    assert p6_evaluate.evaluate(c5_path)["failures"][0].startswith("declaration_not_frozen_row:")
+    c5 = p6_evaluate.evaluate(c5_path, strict=False)
     assert "response:INJECTORS" in c5["failures"]
+
+
+# ---- M6 C-5 load decision (operator 2026-11-14, "Adopt as recommended", plan §16.10-16.11) ------------------------
+C5_CODES = {"H35": {"hover_after_last_usable_sim_s": 0.35, "stale_target_motion_m": 0.01, "stale_target_yaw_deg": 0.5},
+            "L45R": {"ulog_landed_and_disarmed_within_wall_s_of_land": 45.0}}
+LIMITS = {"inference_p99_s": 0.005, "inference_max_s": 0.010, "failure_wall_s": 0.020}
+
+
+def load_run(tmp, failure="stale_action", abort_wall=1003.02, abort_callback_s=0.0538, cleared=True, ticks=None,
+             decisions=None, workers=24):
+    """A C-5-shaped run: the load starts at wall 1000.0 (sim 80.0) for 60 s; control callbacks at 20 Hz on one clock."""
+    (tmp / "p6").mkdir(parents=True, exist_ok=True)
+    d = declaration.build("C-5")
+    (tmp / "p6/fault-declaration.json").write_text(json.dumps(d))
+    harness = [{"kind": "activated", "sim_s": 80.0, "wall_s": 1000.0, "workers": workers, "seconds": 60.0, "start_wall_s": 1000.0}]
+    if cleared:
+        harness.append({"kind": "cleared", "sim_s": 80.0, "end_wall_s": 1014.0, "stopped_early": "SIGINT", "workers": workers,
+                        "seconds": 60.0, "start_wall_s": 1000.0})
+    (tmp / "p6/fault-ledger-load_harness.jsonl").write_text("".join(json.dumps(r) + chr(10) for r in harness))
+    trace = []
+    for k in range(400):  # wall 995.0 .. 1015.0, sim = wall - 920
+        start = 995.0 + 0.05 * k
+        duration = 0.004
+        if failure is not None and start <= abort_wall <= start + 0.05:
+            duration = abort_callback_s
+            start = abort_wall - duration + 0.0001
+        trace.append({"operation": "control_callback", "start_wall_s": start, "end_wall_s": start + duration,
+                      "duration_wall_s": duration, "sim_s": round(start - 920.0, 3)})
+    (tmp / "timing-trace.jsonl").write_text("".join(json.dumps(r) + chr(10) for r in trace))
+    events = [] if failure is None else [{"event": "abort", "reason": failure, "sim_s": round(abort_wall - 920.0, 3),
+                                          "monotonic_s": abort_wall}]
+    events += decisions or []
+    (tmp / "ros-events.jsonl").write_text("".join(json.dumps(e) + chr(10) for e in events))
+    ledger = ticks if ticks is not None else [{"tick": k, "sim_s": 76.0 + 0.05 * k, "invoked": True, "inference_s": 0.0009,
+                                               "failure": None, "action": "TRANSLATE"} for k in range(150)]
+    (tmp / "p5").mkdir(exist_ok=True)
+    (tmp / "p5/policy-ledger.jsonl").write_text("".join(json.dumps(r) + chr(10) for r in ledger))
+    result = {"final_state": "RECOVERY" if failure else "COMPLETE", "failure": failure}
+    (tmp / "summary.json").write_text(json.dumps({"controller_result": result}))
+    return Run(tmp)
+
+
+def load_check(run):
+    c = Checks(C5_CODES)
+    p6_evaluate.response.load(run, c, LIMITS, 0.05)
+    return c.out["LOAD"]
+
+
+def test_the_load_check_matches_each_breach_to_its_declared_response(tmp_path):
+    """Contract §5.3: dispatch above the budget -> P2 abort; inference above the failure limit -> HOLD; stale snapshot
+    -> H35; the P5 inference statistics hold outside the window."""
+    ok = load_check(load_run(tmp_path / "ok"))
+    assert ok["passed"], ok
+    assert ok["window"]["wall_s"] == [1000.0, 1014.0] and ok["window"]["sim_s"][0] == pytest.approx(80.0)
+    assert ok["dispatch"]["abort_callback_s"] == pytest.approx(0.0538)
+    assert load_check(load_run(tmp_path / "held", failure=None))["passed"]  # limits held: nothing to match
+    assert load_check(load_run(tmp_path / "uncleared", cleared=False))["window"]["wall_s"] == [1000.0, 1060.0]
+    bad = {
+        "not_dispatch": (dict(failure="stale_state"), "p2_failure_not_a_dispatch_response:stale_state"),
+        "before_load": (dict(abort_wall=999.0), "p2_abort_outside_load_window"),
+        "no_overrun": (dict(abort_callback_s=0.049), "p2_abort_without_measured_overrun"),
+        "workers": (dict(workers=8), "load_not_as_declared"),
+    }
+    for name, (kw, problem) in bad.items():
+        out = load_check(load_run(tmp_path / name, **kw))
+        assert not out["passed"] and problem in out["problems"], (name, out)
+    slow = [{"tick": 1, "sim_s": 81.0, "invoked": True, "inference_s": 0.021, "failure": None, "action": "TRANSLATE"}]
+    assert load_check(load_run(tmp_path / "slow", ticks=slow))["inference"]["without_hold"] == [1]
+    held = [dict(slow[0], failure="timeout", action="HOLD")]
+    assert load_check(load_run(tmp_path / "slow_held", ticks=held))["passed"]
+    outside = [{"tick": 1, "sim_s": 70.0, "invoked": True, "inference_s": 0.006, "failure": None, "action": "TRANSLATE"}]
+    assert not load_check(load_run(tmp_path / "outside", ticks=outside))["passed"]  # the p99 limit holds outside
+    assert load_check(load_run(tmp_path / "inside", ticks=[dict(outside[0], sim_s=81.0)]))["passed"]  # §5.3 inside
+
+    def decision(sim, stale=None, acq=None, state="AVOIDING", action="TRANSLATE"):
+        return {"event": "p4_decision", "sim_s": sim, "stale": stale, "snapshot_acquisition_sim_s": acq, "state": state,
+                "action": action, "target_enu": [0.0, 0.0, 1.2]}
+    timely = [decision(81.0, acq=80.95), decision(81.3, "snapshot_stale", 80.95, "HOVER", "HOLD")]
+    assert load_check(load_run(tmp_path / "h35", decisions=timely))["stale"] == {"onsets": 1, "without_h35": []}
+    late = [decision(81.0, acq=80.95), decision(81.4, "snapshot_stale", 80.95, "HOVER", "HOLD")]
+    assert load_check(load_run(tmp_path / "late", decisions=late))["stale"]["without_h35"] == [81.4]
+    moving = [decision(81.0, acq=80.95), decision(81.3, "snapshot_stale", 80.95, "AVOIDING", "TRANSLATE")]
+    assert not load_check(load_run(tmp_path / "moving", decisions=moving))["passed"]
+    no_load = tmp_path / "no_load"
+    load_run(no_load)
+    (no_load / "p6/fault-ledger-load_harness.jsonl").write_text("")
+    assert load_check(Run(no_load)) == {"passed": False, "error": "no_load_activation"}
+
+
+def recorder_run(tmp, missing=(5, 6, 9), lost_wall=None, missed_periods=0, depth_failures=None, error=None, exit_code=3):
+    """A recorder overflow: 12 receipts at wall 1001.0 + 0.1 k, the load window [1000.0, 1014.0]."""
+    load_run(tmp)
+    (tmp / "sensors").mkdir(exist_ok=True)
+    walls = {k: 1001.0 + 0.1 * k for k in range(1, 13)}
+    walls.update(lost_wall or {})
+    index = [{"receipt_id": k, "receipt_wall_s": walls[k]} for k in range(1, 13) if k not in missing]
+    (tmp / "sensors/depth-index.jsonl").write_text("".join(json.dumps(r) + chr(10) for r in index))
+    recorder = {"accepted": len(index), "written": len(index), "overflow": len(missing), "drained": True, "fsynced": True,
+                "error": error, "complete": False}
+    (tmp / "sensors/depth-recorder-closed.json").write_text(json.dumps(recorder))
+    (tmp / "sensors/adapter-result.json").write_text(json.dumps({
+        "status": "failed", "error": "raw_recorder_overflow", "recorder": recorder,
+        "accounting": {"received": 12, "missed_periods": missed_periods, "rejected": {}}}))
+    summary = json.loads((tmp / "summary.json").read_text())
+    summary["processes"] = [{"name": "sensor-adapter", "exit_code": exit_code, "stop_method": "SIGINT", "reaped": True,
+                             "forced": False, "graceful_codes": [0], "stop_requested_monotonic_s": 1013.0,
+                             "exit_observed_monotonic_s": 1013.2, "grace_s": 15.0, "remaining_group_members": []}]
+    (tmp / "summary.json").write_text(json.dumps(summary))
+    (tmp / "p5-evaluation.json").write_text(json.dumps({"depth_stream": {"failures": depth_failures or [
+        "adapter_result_not_passed", "raw_recorder_incomplete"]}}))
+    return Run(tmp)
+
+
+def test_the_load_recorder_proof_accepts_an_overflow_inside_the_window_only(tmp_path):
+    ok = p6_evaluate.response.load_recorder(recorder_run(tmp_path / "ok"))
+    assert ok["passed"] and ok["missing_receipts"] == 3, ok
+    bad = {"outside": dict(lost_wall={4: 999.0, 5: 999.1, 6: 999.2}, missing=(5,)),
+           "missed_period": dict(missed_periods=1),
+           "other_depth": dict(depth_failures=["adapter_result_not_passed", "raw_recorder_incomplete", "observation_age"]),
+           "recorder_error": dict(error="write_failed"), "exit": dict(exit_code=1)}
+    for name, kw in bad.items():
+        assert not p6_evaluate.response.load_recorder(recorder_run(tmp_path / name, **kw))["passed"], name
+    clean = tmp_path / "clean"
+    recorder_run(clean)
+    (clean / "sensors/adapter-result.json").write_text(json.dumps({"status": "passed", "error": None}))
+    c = Checks({})
+    p6_evaluate.response.load_recorder_check(Run(clean), c)
+    assert "LOAD_RECORDER" not in c.out  # no overflow: nothing recorded, so its exceptions apply to nothing
+
+
+def test_c5_allows_its_load_items_only_with_their_checks():
+    rules = p6_evaluate.ROWS["C-5"]
+    assert rules["response"].index("H35") == 0 and "LANDING" in rules["response"] and "LOAD" in rules["response"]
+    landing = (["runtime_status:Abort:controller_failed:stale_action", "p2:timing"]
+               + list(p6_evaluate.response.RECOVERY_LANDING_ITEMS))
+    recorder = list(p6_evaluate.response.LOAD_RECORDER_ITEMS)
+    stats = ["policy:inference_p99", "policy:inference_max"]
+    other = ["runtime_status:Abort:controller_failed:stale_state", "cleanup:p6-load-harness:terminated_by_SIGINT",
+             "depth:observation_age", "policy:failure_ticks"]
+    passed = {code: {"passed": True} for code in ("FAIL_CLOSED_LANDING", "LOAD_RECORDER", "LOAD", "LANDING", "STALE_IFF_AGE")}
+    allowed, refused = p6_evaluate.compose(landing + recorder + stats + other, rules["exceptions"], passed)
+    assert [a["item"] for a in allowed] == landing + recorder + stats and refused == other
+    for code in ("FAIL_CLOSED_LANDING", "LOAD_RECORDER", "LOAD"):
+        without = {k: v for k, v in passed.items() if k != code}
+        assert p6_evaluate.compose(landing + recorder + stats, rules["exceptions"], without)[1], code
+
+
+def landed_and_disarmed(tmp, **kw):
+    recovery_landing_run(tmp, **kw)
+    with (tmp / "ros-events.jsonl").open("a") as stream:
+        stream.write(json.dumps({"event": "received", "topic_key": "vehicle_status", "monotonic_s": 140.5,
+                                 "fields": {"arming_state": 1}}) + chr(10))
+    return Run(tmp)
+
+
+def test_the_landing_check_takes_the_path_the_run_took(tmp_path):
+    c = Checks(C5_CODES)
+    p6_evaluate.response.landing(landed_and_disarmed(tmp_path / "fail_closed"), c)
+    assert c.out["LANDING"]["path"] == "FAIL_CLOSED_LANDING" and c.out["LANDING"]["passed"], c.out
+    items = list(p6_evaluate.response.RECOVERY_LANDING_ITEMS) + list(p6_evaluate.response.LOAD_RECORDER_ITEMS)
+    c2 = Checks(C5_CODES)
+    p6_evaluate.response.landing(landed_and_disarmed(tmp_path / "extra", p5_failures=items), c2)
+    assert not c2.out["LANDING"]["passed"]  # the recorder items are unexplained unless LOAD_RECORDER passed
+    c3 = Checks(C5_CODES)
+    p6_evaluate.response.landing(landed_and_disarmed(tmp_path / "explained", p5_failures=items), c3,
+                                 p6_evaluate.response.LOAD_RECORDER_ITEMS)
+    assert c3.out["LANDING"]["passed"], c3.out
+    completed = tmp_path / "completed"
+    completed.mkdir()
+    (completed / "summary.json").write_text(json.dumps({"controller_result": {"final_state": "COMPLETE", "failure": None,
+                                                                              "p4_outcome": "completed"}}))
+    c4 = Checks(C5_CODES)
+    p6_evaluate.response.landing(Run(completed), c4)
+    assert c4.out["LANDING"]["path"] == "L45" and c4.out["LANDING"]["passed"]
+
+
+def test_the_retained_75289deb_c5_run_under_the_load_decision():
+    """The 2026-11-14 C-5 rerun on 75289deb (load from transit_start, before the decision; evaluated non-strictly since
+    its declaration is no longer the frozen row): LOAD matches the 53.8 ms overrun to the P2 abort; LOAD_RECORDER proves
+    all 31 lost frames inside the window; the fail-closed landing's L45R passes, and its RECOVERY_LANDING proof finds
+    exactly one unexplained item, the old harness's death on cleanup's SIGINT (fixed since). It still fails, as it
+    should: the map loss never fired (no H35), and that harness item is never excepted."""
+    out = p6_evaluate.evaluate(_retained("20261114T110631Z-p6dry-C-5-*"), strict=False)
+    response = out["response"]
+    assert response["LOAD"]["passed"], response["LOAD"]
+    assert response["LOAD"]["dispatch"]["abort_callback_s"] > 0.05 and response["LOAD"]["dispatch"]["p2_failure"] == "stale_action"
+    assert response["LOAD_RECORDER"]["passed"] and response["LOAD_RECORDER"]["missing_receipts"] == 31, response["LOAD_RECORDER"]
+    landing = response["FAIL_CLOSED_LANDING"]
+    assert landing["l45r"]["passed"], landing
+    assert landing["recovery_landing"]["other_items"] == ["cleanup:p6-load-harness:terminated_by_SIGINT"], landing
+    allowed = {a["item"]: a["replacement"] for a in out["p5_failures_allowed"]}
+    assert all(allowed.get(item) == "LOAD_RECORDER" for item in p6_evaluate.response.LOAD_RECORDER_ITEMS), allowed
+    assert allowed.get("policy:inference_p99") == "LOAD"
+    assert {"proof:no_activation", "response:H35", "response:INJECTORS",
+            "p5:cleanup:p6-load-harness:terminated_by_SIGINT"} <= set(out["failures"]), out["failures"]

@@ -154,7 +154,7 @@ RECOVERY_LANDING_ITEMS = ("cleanup:ros-controller:nonzero_exit_1", "rgb_absence:
                           "mc_causal_yaw:p2_integrity_missing")
 
 
-def recovery_landing(run, c):
+def recovery_landing(run, c, explained=()):
     """M6 decision (operator, 2026-11-14, "Adopt"): the four P5 items every P2 RECOVERY landing produces in accepted code,
     on S-5' only, each replaced by evidence the accepted code did not write for that purpose (plan §16.6):
     1. the designed exit: `main` exits 1 because P4 `outcome()` is `failed` for a RECOVERY end; connectivity had
@@ -165,7 +165,9 @@ def recovery_landing(run, c):
     3. the accepted offline replay feeds RECOVERY-phase samples to the reference manager, which rejects
        `final_alignment_lost` once `cs_in_air` is false after touchdown; the live controller's own record shows no
        rejection, and `cs_in_air` first went false after the LAND command and after `landed`;
-    4. the missing P2 report is the consequence of 3 and nothing else."""
+    4. the missing P2 report is the consequence of 3 and nothing else.
+    `explained`: exact items another passing proof of the same row explains (C-5: LOAD_RECORDER), which therefore do
+    not count as unexplained here; every other cleanup, integrity and absence item still fails this proof."""
     import json as _json
     result, summary = run.result, run.summary
     p5 = run.p5_evaluation or {}
@@ -195,7 +197,7 @@ def recovery_landing(run, c):
                     and replay_item in items and landed_wall is not None and in_air_false_wall is not None
                     and in_air_false_wall >= landed_wall)
     other = [x for x in items if x.startswith(("p2_integrity_error", "mc_causal", "rgb_absence:", "cleanup:"))
-             and x not in RECOVERY_LANDING_ITEMS]
+             and x not in RECOVERY_LANDING_ITEMS and x not in explained]
     ok = exit_ok and absence_ok and reference_ok and not other
     c.record("RECOVERY_LANDING", ok, exit_designed=exit_ok, absence_monitor_covers_window=absence_ok,
              reference_rejected_only_in_replay_after_touchdown=reference_ok, other_items=other,
@@ -205,20 +207,199 @@ def recovery_landing(run, c):
              land_wall_s=land_wall, landed_wall_s=landed_wall, cs_in_air_false_wall_s=in_air_false_wall)
 
 
-def fail_closed_landing(run, c):
+def fail_closed_landing(run, c, explained=()):
     """C-3 (M6 decision, operator 2026-11-14, "Adopt both"; contract §8.4: S0 required, outcome reported). When the
     accepted P2 controller fails closed and lands through RECOVERY, that landing is the reported outcome: L45R for the
     reported P2 failure (one LAND, landed and disarmed within the limit) and the RECOVERY_LANDING proof. For any other
-    ending nothing is recorded, so no exception keyed to this check can apply."""
+    ending nothing is recorded, so no exception keyed to this check can apply. (C-5 uses it for the §5.3 dispatch
+    abort, which LOAD matches to its breach.)"""
     result = run.result
     if result.get("final_state") != "RECOVERY" or not result.get("failure"):
         return
     sub = Checks(c.codes)
     l45r(run, sub, result["failure"])
-    recovery_landing(run, sub)
+    recovery_landing(run, sub, explained)
     ok = sub.out["L45R"]["passed"] and sub.out["RECOVERY_LANDING"]["passed"]
     c.record("FAIL_CLOSED_LANDING", ok, p2_failure=result["failure"], l45r=sub.out["L45R"],
              recovery_landing=sub.out["RECOVERY_LANDING"])
+
+
+def landing(run, c, explained=()):
+    """C-5 (M6 decision, operator 2026-11-14, "Adopt as recommended", plan §16.11): after H35 the row lands either
+    through COMPLETE (recovery and the goal, or a supervisor abort: L45), or, when the accepted P2 controller fails
+    closed (contract §5.3: dispatch above the budget -> P2 abort, matched to its breach by LOAD), through RECOVERY
+    (FAIL_CLOSED_LANDING). Always recorded; it passes only on the path the run actually took."""
+    result = run.result
+    sub = Checks(c.codes)
+    if result.get("final_state") == "RECOVERY" and result.get("failure"):
+        fail_closed_landing(run, sub, explained)
+        path = "FAIL_CLOSED_LANDING"
+    else:
+        l45(run, sub)
+        path = "L45"
+    c.record("LANDING", sub.out[path]["passed"], path=path, detail=sub.out[path])
+
+
+# ---- C-5 load window (contract §5.3, D8; M6 decision 2026-11-14, plan §16.11) --------------------------------------
+def _control_callbacks(run):
+    import p6_run
+    rows = [r for r in p6_run.jsonl(run.file("timing-trace.jsonl")) if r.get("operation") == "control_callback"]
+    return sorted(rows, key=lambda r: r["start_wall_s"])
+
+
+def load_window(run, callbacks=None):
+    """The load window from the harness's own ledger, in the monotonic wall clock every P2-P6 record shares: its
+    activation to its clearing, never past the declared window; with the simulation times of the first and last
+    controller callbacks inside it (the window ends with the run when the load outlives the stack)."""
+    records = run.fault_ledger("load_harness")
+    activated = next((r for r in records if r["kind"] == "activated"), None)
+    if activated is None or activated.get("start_wall_s") is None:
+        return None
+    cleared = next((r for r in records if r["kind"] == "cleared"), None)
+    begin = activated["start_wall_s"]
+    end = begin + activated["seconds"]
+    if cleared is not None and cleared.get("end_wall_s") is not None:
+        end = min(end, cleared["end_wall_s"])
+    callbacks = _control_callbacks(run) if callbacks is None else callbacks
+    inside = [r for r in callbacks if begin <= r["start_wall_s"] <= end]
+    return {"wall_s": [begin, end], "sim_s": [inside[0]["sim_s"], inside[-1]["sim_s"]] if inside else None,
+            "trigger_sim_s": activated.get("sim_s"), "workers": activated.get("workers"), "seconds": activated.get("seconds"),
+            "cleared": cleared is not None, "stopped_early": (cleared or {}).get("stopped_early"), "callbacks": inside}
+
+
+def load(run, c, limits, dispatch_budget_s):
+    """§5.3: inside the declared load window a P4 perception or P5 inference breach is acceptable only if its declared
+    response follows, with 0 unsafe commands (UNSAFE, a separate check):
+    * dispatch above the P2 budget -> P2 abort. The accepted DispatchGuard measures from callback entry before every
+      publication and once more after the last; a breach raises `stale_action` in that callback, so a P2 failure must be
+      `stale_action`, inside the window, in a callback whose measured duration exceeds the budget. Callbacks over the
+      budget without an abort passed the guard's last check (their excess is after it) and are reported;
+    * inference above the P5 failure limit -> HOLD on that tick (the accepted timeout failure);
+    * stale snapshot -> H35: every stale onset in the window hovers and holds, a `snapshot_stale` onset within the H35
+      limit of the last usable snapshot.
+    The P5 inference statistics (p99, max) must still hold on every invoked tick outside the window."""
+    window = load_window(run)
+    if window is None:
+        return c.record("LOAD", False, error="no_load_activation")
+    declared = (run.declaration or {}).get("parameters") or {}
+    problems = []
+    if (window["workers"], window["seconds"]) != (declared.get("load_workers"), declared.get("load_window_s")):
+        problems.append("load_not_as_declared")
+    begin, end = window["wall_s"]
+    inside, sim = window.pop("callbacks"), window["sim_s"]
+    durations = [r["duration_wall_s"] for r in inside]
+    over = [r for r in inside if r["duration_wall_s"] > dispatch_budget_s]
+    result = run.result
+    failure = result.get("failure")
+    abort = None if failure is None else next(
+        (e for e in run.events if e.get("event") == "abort" and e.get("reason") == failure), None)  # the P2 abort event
+    dispatch = {"budget_s": dispatch_budget_s, "callbacks": len(inside), "max_s": max(durations, default=None),
+                "over_budget": len(over), "p2_failure": failure}
+    if failure is not None:
+        if failure != "stale_action":
+            problems.append("p2_failure_not_a_dispatch_response:" + str(failure))
+        elif abort is None or not begin <= abort["monotonic_s"] <= end:
+            problems.append("p2_abort_outside_load_window")
+        else:
+            callback = next((r for r in inside if r["start_wall_s"] <= abort["monotonic_s"] <= r["end_wall_s"]), None)
+            dispatch.update(abort_sim_s=abort["sim_s"], abort_callback_s=callback and callback["duration_wall_s"])
+            if callback is None or callback["duration_wall_s"] <= dispatch_budget_s:
+                problems.append("p2_abort_without_measured_overrun")
+    dispatch["over_budget_without_abort_sim_s"] = [r["sim_s"] for r in over if abort is None or not
+                                                   r["start_wall_s"] <= abort["monotonic_s"] <= r["end_wall_s"]][:10]
+
+    def in_window(sim_s):
+        return sim is not None and sim[0] <= sim_s <= sim[1]
+    invoked = [r for r in run.ledger if r.get("invoked")]
+    slow = [r for r in invoked if in_window(r["sim_s"]) and r["inference_s"] > limits["failure_wall_s"]]
+    unanswered = [r["tick"] for r in slow if not (r.get("failure") == "timeout" and r.get("action") == "HOLD")]
+    outside = sorted(r["inference_s"] for r in invoked if not in_window(r["sim_s"]))
+    p99 = outside[min(len(outside) - 1, int(0.99 * len(outside)))] if outside else None
+    outside_ok = not outside or (p99 <= limits["inference_p99_s"] and outside[-1] <= limits["inference_max_s"])
+    inference = {"in_window": len([r for r in invoked if in_window(r["sim_s"])]), "above_failure_limit": len(slow),
+                 "without_hold": unanswered[:10], "outside_ticks": len(outside), "outside_p99_s": p99,
+                 "outside_max_s": outside[-1] if outside else None}
+
+    limit = c.codes["H35"]["hover_after_last_usable_sim_s"]
+    ordered = sorted(run.decisions, key=lambda e: e["sim_s"])
+    late, onsets, last_usable, previous = [], 0, None, None
+    for e in ordered:
+        if e.get("stale") and not (previous and previous.get("stale")) and in_window(e["sim_s"]):
+            onsets += 1
+            ok = e.get("state") == "HOVER" and e.get("action") == "HOLD"
+            if e["stale"] == "snapshot_stale":
+                ok = ok and last_usable is not None and e["sim_s"] <= last_usable + limit + 1e-9
+            if not ok:
+                late.append(e["sim_s"])
+        if e.get("snapshot_acquisition_sim_s") is not None:
+            last_usable = max(last_usable if last_usable is not None else e["snapshot_acquisition_sim_s"],
+                              e["snapshot_acquisition_sim_s"])
+        previous = e
+    stale = {"onsets": onsets, "without_h35": late[:10]}
+    ok = not problems and not unanswered and outside_ok and not late
+    c.record("LOAD", ok, problems=problems, window=window, dispatch=dispatch, inference=inference, stale=stale)
+
+
+LOAD_RECORDER_ITEMS = ("cleanup:sensor-adapter:nonzero_exit_3", "depth:adapter_result_not_passed",
+                       "depth:raw_recorder_incomplete")
+DEPTH_RECORDER_FAILURES = ["adapter_result_not_passed", "raw_recorder_incomplete"]
+
+
+def load_recorder(run):
+    """The accepted P3 raw depth recorder's bounded queue can overflow under the declared load (75289deb C-5: 31 of 2539
+    frames, all inside the window). Perception is unaffected; only frames go missing from the evidence recording.
+    Returns None when the recorder did not overflow, else the proof (M6 decision 2026-11-14, plan §16.11):
+    * the adapter's only error is `raw_recorder_overflow`; the recorder drained and fsynced with no error; its close
+      marker equals the result; accepted == written == indexed; the missing receipts are exactly the overflow count;
+    * every missing receipt lies inside the load window (its written neighbours do; a trailing one, the adapter's stop);
+    * the adapter met every processing period and rejected nothing, and the accepted P5 depth-stream evaluation failed
+      only on the two recorder items (delivery, rate, ages and health all passed on the same evidence);
+    * the adapter's exit is the designed one for that result (3), not forced and reaped."""
+    import bisect
+    import p6_run
+    from p3_process_exit import classify
+    adapter = run.optional("sensors/adapter-result.json") or {}
+    if adapter.get("error") != "raw_recorder_overflow":
+        return None
+    recorder = adapter.get("recorder") or {}
+    closed = run.optional("sensors/depth-recorder-closed.json")
+    index = p6_run.jsonl(run.file("sensors/depth-index.jsonl"))
+    accounting = adapter.get("accounting") or {}
+    written = {r["receipt_id"]: r for r in index}
+    ids = sorted(written)
+    received = accounting.get("received") or 0
+    missing = [i for i in range(1, received + 1) if i not in written]
+    window = load_window(run)
+    process = next((p for p in run.summary.get("processes") or [] if p.get("name") == "sensor-adapter"), {})
+    stop = process.get("stop_requested_monotonic_s")
+    outside = []
+    for i in missing:
+        k = bisect.bisect_left(ids, i)
+        before = written[ids[k - 1]]["receipt_wall_s"] if k > 0 else None
+        after = written[ids[k]]["receipt_wall_s"] if k < len(ids) else stop
+        if window is None or before is None or after is None or not (
+                window["wall_s"][0] <= before and after <= window["wall_s"][1]):
+            outside.append(i)
+    recorder_ok = (adapter.get("status") == "failed" and recorder.get("error") is None and recorder.get("drained") is True
+                   and recorder.get("fsynced") is True and closed == recorder and (recorder.get("overflow") or 0) > 0
+                   and recorder.get("accepted") == recorder.get("written") == len(index)
+                   and len(missing) == recorder.get("overflow"))
+    depth = ((run.p5_evaluation or {}).get("depth_stream") or {}).get("failures")
+    processing_ok = (accounting.get("missed_periods") == 0 and not accounting.get("rejected")
+                     and depth == DEPTH_RECORDER_FAILURES)
+    exit_ok = process.get("exit_code") == 3 and classify(process) == ("failed", "nonzero_exit_3")
+    ok = recorder_ok and processing_ok and exit_ok and not outside
+    return {"passed": ok, "overflow": recorder.get("overflow"), "missing_receipts": len(missing),
+            "missing_outside_window": outside[:10], "recorder_ok": recorder_ok, "processing_ok": processing_ok,
+            "exit_ok": exit_ok, "p5_depth_failures": depth, "missed_periods": accounting.get("missed_periods"),
+            "window_wall_s": window and window["wall_s"]}
+
+
+def load_recorder_check(run, c):
+    """Recorded only when the recorder overflowed, so its exceptions can apply to nothing else."""
+    proof = load_recorder(run)
+    if proof is not None:
+        c.record("LOAD_RECORDER", proof.pop("passed"), **proof)
 
 
 def goal(run, c):

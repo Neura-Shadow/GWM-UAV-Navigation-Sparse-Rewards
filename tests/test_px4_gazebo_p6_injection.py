@@ -476,3 +476,41 @@ def test_load_bounds_are_the_approved_ones():
 def test_load_workers_stop_themselves_at_their_deadline():
     record = load_harness.run(1, 0.3)
     assert record["exit_codes"] == [0] and 0.25 <= record["end_wall_s"] - record["start_wall_s"] < 3.0
+    assert record["stopped_early"] is None
+
+
+@pytest.mark.skipif(not POSIX, reason="fork start method, process groups and /proc/meminfo")
+@pytest.mark.parametrize("whole_group,sig", [(True, "SIGINT"), (False, "SIGTERM")])
+def test_a_stop_request_ends_the_load_and_the_harness_exits_cleanly(tmp_path, whole_group, sig):
+    """75289deb C-5 (plan §16.10): the 60 s window outlived the stack; cleanup's SIGINT killed the harness on an
+    unhandled KeyboardInterrupt (exit by signal), which the accepted classifier refuses. It is launched as the runner
+    launches it (through p6_node.py, its own process group) and stopped as cleanup stops it."""
+    import os
+    import signal as signals
+    import time
+    ledger = tmp_path / "fault-ledger-load_harness.jsonl"
+    child = subprocess.Popen([sys.executable, "-s", "-B", str(P6 / "scripts/p6_node.py"), "load_harness", "--workers", "2",
+                              "--seconds", "30", "--ledger", str(ledger), "--row", "C-5", "--fault", "F8.03", "--sim-s", "84.2"],
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
+    try:
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline and '"activated"' not in (ledger.read_text() if ledger.exists() else ""):
+            time.sleep(0.05)
+        records = [json.loads(line) for line in ledger.read_text().splitlines()]
+        assert [r["kind"] for r in records] == ["activated"] and len(records[0]["pids"]) == 2
+        if whole_group:
+            os.killpg(child.pid, getattr(signals, sig))
+        else:
+            child.send_signal(getattr(signals, sig))
+        out, err = child.communicate(timeout=10)
+    finally:
+        if child.poll() is None:
+            os.killpg(child.pid, signals.SIGKILL)
+    assert child.returncode == 0 and "Traceback" not in err, err
+    records = [json.loads(line) for line in ledger.read_text().splitlines()]
+    assert [r["kind"] for r in records] == ["activated", "cleared"]
+    cleared = records[1]
+    assert cleared["stopped_early"] == sig and cleared["sim_s"] == 84.2 and len(cleared["exit_codes"]) == 2
+    assert cleared["end_wall_s"] - cleared["start_wall_s"] < 10
+    for pid in records[0]["pids"]:  # no worker outlives the harness
+        assert not Path("/proc/%d" % pid).exists() or "zombie" in Path("/proc/%d/status" % pid).read_text().lower()

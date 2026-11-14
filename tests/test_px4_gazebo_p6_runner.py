@@ -16,7 +16,7 @@ for path in (P6, P6 / "validation", P6 / "scripts", REPO / "simulation/px4_gazeb
              REPO / "simulation/px4_gazebo_p5/ros2_ws/src/gwm_policy_control"):
     sys.path.insert(0, str(path))
 import p6_integration_evaluate as integration  # noqa: E402
-from injection import declaration, specs  # noqa: E402
+from injection import declaration, schedule, specs  # noqa: E402
 from p6_run import Run  # noqa: E402
 from p6_safety_evaluate import Checks  # noqa: E402
 
@@ -675,13 +675,14 @@ def test_every_flight_row_maps_to_the_accepted_p5_flight_scope_and_a_p4_world():
 
 def test_runner_mechanisms_and_flight_triggers_per_row():
     """The runner fires DR, SR, PS and LH at the frozen trigger; CS and MR fire inside the shim; a pass-through row
-    fires nothing; C-5's load harness has its own trigger (`load_start`)."""
+    fires nothing; C-5's load harness has its own trigger (`load_start`), since the M6 decision of 2026-11-14 the
+    map-loss trigger itself (plan §16.11)."""
     r = runner()
     # B-0: its relays are present in pass-through and nothing fires
     expected = {"B-0": (("DR", "SR"), None, None), "B-1": ((), None, None), "S-1": (("PS",), "avoiding_near", None),
                 "S-2'": (("SR",), "avoiding_first", None), "S-3": ((), None, None), "S-4": ((), None, None),
                 "S-5'": ((), None, None), "C-1": (("DR",), "avoiding_first", None), "C-2": ((), None, None),
-                "C-3": ((), None, None), "C-4": (("PS",), "avoiding_first", None), "C-5": (("LH",), None, "transit_start")}
+                "C-3": ((), None, None), "C-4": (("PS",), "avoiding_first", None), "C-5": (("LH",), None, "avoiding_first")}
     for row in FLIGHT_ROWS:
         d = declaration.build(row["id"])
         fault, load = r.flight_triggers(d, boxes=[{"center": [3.0, 0.0]}])
@@ -697,8 +698,13 @@ def test_flight_triggers_fire_once_on_the_controllers_own_decision_events():
     near = {"event": "p4_decision", "state": "AVOIDING", "sim_s": 21.0, "vehicle_enu": [2.0, 0.0, 1.2]}
     assert fault.feed(prestream) is None and fault.feed(far) is None
     assert fault.feed(near) == 21.0 and fault.feed(dict(near, sim_s=22.0)) == 21.0
-    _, load = r.flight_triggers(declaration.build("C-5"), boxes=[])
-    assert load.feed({"event": "p4_decision", "state": "NORMAL", "sim_s": 15.0, "vehicle_enu": [0.1, 0.0, 1.2]}) == 15.0
+    d = declaration.build("C-5")
+    _, load = r.flight_triggers(d, boxes=[])
+    shim = schedule.Trigger(d["trigger"], boxes=[])  # the map loss, as the controller shim evaluates it
+    transit = {"event": "p4_decision", "state": "NORMAL", "sim_s": 15.0, "vehicle_enu": [0.1, 0.0, 1.2]}
+    avoiding = {"event": "p4_decision", "state": "AVOIDING", "sim_s": 19.3, "vehicle_enu": [2.4, 0.0, 1.2]}
+    assert load.feed(transit) is None and shim.feed(transit) is None  # 75289deb: no longer at transit_start
+    assert load.feed(avoiding) == shim.feed(avoiding) == 19.3  # the load starts on the map loss's own decision
 
 
 def test_the_flight_window_is_the_accepted_prestream_to_complete_or_recovery():
