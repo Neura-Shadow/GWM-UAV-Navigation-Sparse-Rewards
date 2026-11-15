@@ -290,11 +290,15 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   model `ee006a80`, no fallback, no online learning; PX4 SITL only, no hardware). Seven flights,
   0 collisions, 0 policy failures. [Contract](v3_sim_p5_contract.md), [plan](v3_sim_p5_plan.md).
   The earlier candidate `db4c4779` failed Gate C and remains on record.
-- [ ] P6 Failure validation — **planning underway; contract approved; M0 audit, M1 specifications, M2 injectors, M3 offline validation and M4 evaluators complete; M5 ground integration complete 2026-11-13 (development dry run of `524f0714` passed all 18 Gate A rows, no credit); M6 SITL fault validation in progress (Gate B, S and C content dry runs in simulated flight on development candidates, no credit; Gate C rerun passed 4 of 5; C-5 load decision implemented; rerun on `0db5c60a` passed 4 of 5; recorder extension implemented; rerun on `6b1d952d` passed 3 of 5 (a DDS-agent shutdown crash, a map-drop proof boundary); proof fix implemented; Gate A, B, S and C content all passed on development candidate `57b9af72` (18/18, 2/2, 5/5, 5/5, no credit); production Policy A approval recorded; real candidate `22292775` frozen; real Gate A next; no gate run yet)**
-  (2026-11-07; offline work only: no simulator run, nothing accepted): [plan](v3_sim_p6_plan.md),
-  [contract](v3_sim_p6_contract.md), [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
-  [fault matrix](v3_sim_p6_fault_matrix.md),
-  [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md).
+- [x] P6 Failure validation — **P6 COMPLETE — Gates A, B, S and C ACCEPTED** (contract
+  `p6-acceptance-v1`, with the operator decisions of M5–M6; manifest `22292775`, the accepted P5 stack `2becfbbb`
+  unchanged; PX4 SITL only, no hardware). 26 evaluated rows (Gate A 18/18, B 2/2, S 5/5, C 5/5), 12 flights:
+  0 collisions, minimum truth clearance 0.370 m, 0 unsafe commands, every flight landed and disarmed; every
+  required fault class covered. Existence demonstrations only, no rates. [Final acceptance](v3_sim_p6_final_acceptance.md),
+  [contract](v3_sim_p6_contract.md), [plan](v3_sim_p6_plan.md), [fault matrix](v3_sim_p6_fault_matrix.md),
+  [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
+  [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The development dry runs (no credit) remain
+  on record. P7 is the next phase.
 - [ ] P7 Batch evaluation
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.

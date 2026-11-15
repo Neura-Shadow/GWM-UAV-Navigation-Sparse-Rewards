@@ -1,0 +1,1238 @@
+{
+  "arm_a_fault_labels": {
+    "flights": 1,
+    "hover_intervals": 0,
+    "sim_hours": 0.03787444444444445,
+    "stale_ticks": 0
+  },
+  "arms": {
+    "A": {
+      "collisions": 0,
+      "detection_sim_s_median": null,
+      "flights": 1,
+      "flights_without_an_obstacle": [],
+      "goal_reached": 1,
+      "landed_after_supervisor_abort": 0,
+      "landed_through_p2_recovery": 0,
+      "min_truth_clearance_m": 0.45262951135026586,
+      "other_terminal": [],
+      "over_dispatch_budget": 0,
+      "recoveries": 0,
+      "relapses_within_2s": 0,
+      "rows": [
+        "B-0"
+      ],
+      "safety_validations_passed": 1,
+      "unsafe_commands": 0
+    },
+    "B": {
+      "collisions": 0,
+      "detection_sim_s_median": 0.19999999999998863,
+      "flights": 9,
+      "flights_without_an_obstacle": [
+        "S-5'"
+      ],
+      "goal_reached": 3,
+      "landed_after_supervisor_abort": 5,
+      "landed_through_p2_recovery": 1,
+      "min_truth_clearance_m": 0.37045790610068374,
+      "other_terminal": [],
+      "over_dispatch_budget": 1,
+      "recoveries": 3,
+      "relapses_within_2s": 0,
+      "rows": [
+        "B-1",
+        "S-1",
+        "S-2'",
+        "S-3",
+        "S-4",
+        "S-5'",
+        "C-1",
+        "C-2",
+        "C-3"
+      ],
+      "safety_validations_passed": 9,
+      "unsafe_commands": 0
+    },
+    "C": {
+      "collisions": 0,
+      "detection_sim_s_median": 0.10199999999999676,
+      "flights": 2,
+      "flights_without_an_obstacle": [],
+      "goal_reached": 0,
+      "landed_after_supervisor_abort": 1,
+      "landed_through_p2_recovery": 1,
+      "min_truth_clearance_m": 1.981066649107402,
+      "other_terminal": [],
+      "over_dispatch_budget": 1,
+      "recoveries": 1,
+      "relapses_within_2s": 0,
+      "rows": [
+        "C-4",
+        "C-5"
+      ],
+      "safety_validations_passed": 2,
+      "unsafe_commands": 0
+    }
+  },
+  "contract": "p6-m7-arms-v1",
+  "coverage": {
+    "aliases": [
+      "F3.14",
+      "F5.11",
+      "F6.02",
+      "F6.04",
+      "F6.06",
+      "F6.07",
+      "F6.10",
+      "F7.08",
+      "F8.02"
+    ],
+    "by_class": {
+      "C": {
+        "covered": 0,
+        "faults": 35,
+        "items": {
+          "F1.02": "reported",
+          "F1.04": "reported",
+          "F1.05": "reported",
+          "F1.08": "reported",
+          "F1.09": "reported",
+          "F1.10": "reported",
+          "F2.01": "reported",
+          "F2.02": "reported",
+          "F2.03": "reported",
+          "F2.04": "reported",
+          "F2.07": "reported",
+          "F2.08": "reported",
+          "F3.09": "reported",
+          "F3.10": "reported",
+          "F4.02": "reported",
+          "F4.03": "reported",
+          "F4.04": "reported",
+          "F4.05": "reported",
+          "F4.07": "reported",
+          "F4.08": "reported",
+          "F4.09": "reported",
+          "F4.10": "reported",
+          "F4.12": "reported",
+          "F5.01": "reported",
+          "F5.02": "reported",
+          "F5.03": "reported",
+          "F5.04": "reported",
+          "F5.09": "reported",
+          "F6.01": "reported",
+          "F6.05": "reported",
+          "F6.08": "reported",
+          "F6.09": "reported",
+          "F7.02": "reported",
+          "F7.03": "reported",
+          "F8.06": "reported"
+        }
+      },
+      "D": {
+        "covered": 0,
+        "faults": 3,
+        "items": {
+          "F2.10": "D",
+          "F5.08": "D",
+          "F5.12": "D"
+        }
+      },
+      "R-A": {
+        "covered": 12,
+        "faults": 12,
+        "items": {
+          "F1.01": [
+            "A-5.F1.01"
+          ],
+          "F1.02": [
+            "A-5.F1.02"
+          ],
+          "F1.04": [
+            "A-5.F1.04"
+          ],
+          "F1.06": [
+            "A-5.F1.06"
+          ],
+          "F1.07": [
+            "A-5.F1.07"
+          ],
+          "F1.11": [
+            "A-5.F1.11"
+          ],
+          "F2.09": [
+            "A-5.F2.09"
+          ],
+          "F3.01": [
+            "A-5.F3.01"
+          ],
+          "F3.02": [
+            "A-5.F3.02"
+          ],
+          "F3.03": [
+            "A-5.F3.03"
+          ],
+          "F4.07": [
+            "A-5.F4.07"
+          ],
+          "F4.13": [
+            "A-5.F4.13"
+          ]
+        }
+      },
+      "R-B": {
+        "covered": 1,
+        "faults": 1,
+        "items": {
+          "F3.08": [
+            "B-1"
+          ]
+        }
+      },
+      "R-C": {
+        "covered": 7,
+        "faults": 7,
+        "items": {
+          "F1.03": [
+            "C-1"
+          ],
+          "F3.07": [
+            "C-2"
+          ],
+          "F3.13": [
+            "C-3"
+          ],
+          "F6.01": [
+            "C-5 via F8.03"
+          ],
+          "F7.09": [
+            "C-1 via F1.03"
+          ],
+          "F8.01": [
+            "C-4"
+          ],
+          "F8.03": [
+            "C-5"
+          ]
+        }
+      },
+      "R-O": {
+        "covered": 32,
+        "faults": 32,
+        "items": {
+          "F1.06": "A-4 offline suite",
+          "F1.07": "A-4 offline suite",
+          "F1.08": "A-4 offline suite",
+          "F1.10": "A-4 offline suite",
+          "F1.11": "A-4 offline suite",
+          "F1.12": "A-4 offline suite",
+          "F2.04": "A-4 offline suite",
+          "F2.05": "A-4 offline suite",
+          "F2.06": "A-4 offline suite",
+          "F2.07": "A-4 offline suite",
+          "F2.09": "A-4 offline suite",
+          "F3.03": "A-4 offline suite",
+          "F3.05": "A-4 offline suite",
+          "F3.06": "A-4 offline suite",
+          "F3.09": "A-4 offline suite",
+          "F3.11": "A-4 offline suite",
+          "F3.12": "A-4 offline suite",
+          "F4.06": "A-4 offline suite",
+          "F4.11": "A-4 offline suite",
+          "F5.03": "A-4 offline suite",
+          "F5.05": "A-4 offline suite",
+          "F5.06": "A-4 offline suite",
+          "F5.07": "A-4 offline suite",
+          "F5.10": "A-4 offline suite",
+          "F6.03": "A-4 offline suite",
+          "F7.02": "A-4 offline suite",
+          "F7.04": "A-4 offline suite",
+          "F7.05": "A-4 offline suite",
+          "F7.06": "A-4 offline suite",
+          "F7.07": "A-4 offline suite",
+          "F8.04": "A-4 offline suite",
+          "F8.05": "A-4 offline suite"
+        }
+      },
+      "R-S": {
+        "covered": 6,
+        "faults": 6,
+        "items": {
+          "F1.01": [
+            "S-1"
+          ],
+          "F2.09": [
+            "S-2'"
+          ],
+          "F3.04": [
+            "S-3"
+          ],
+          "F4.01": [
+            "S-4"
+          ],
+          "F6.03": [
+            "S-5'"
+          ],
+          "F7.09": [
+            "S-4 via F4.01"
+          ]
+        }
+      },
+      "cov": {
+        "covered": 0,
+        "faults": 2,
+        "items": {
+          "F3.02": "cov",
+          "F7.01": "cov"
+        }
+      }
+    },
+    "required_uncovered": [],
+    "tiers": {
+      "G": 19,
+      "O": 57,
+      "S": 34
+    }
+  },
+  "flights": [
+    {
+      "arm": "A",
+      "availability": {
+        "decision_ticks": 859,
+        "held_ticks": 0,
+        "not_held_fraction": 1.0
+      },
+      "deadlines": {
+        "control_callbacks": 2471,
+        "max_callback_wall_s": 0.020774457007064484,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "024a6568a1a9b0528f660c05f63bbe1de529f54f710c0ecdb76cbc807b824844",
+      "fault": null,
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.599999999999994
+        },
+        "trigger_to_land_sim_s": null
+      },
+      "latency": {
+        "degraded_sim_s": null,
+        "detection_sim_s": null,
+        "fault_to_safe_action_sim_s": null,
+        "recovered": null,
+        "trigger_sim_s": null
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "completed",
+        "final_goal_distance_m": 0.015338652069893741,
+        "goal_reached": true,
+        "label": "goal_reached_with_detour",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": 42.85199999999999
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 835,
+        "uninjected_inference_max_s": 0.0029015489999437705,
+        "uninjected_inference_p99_s": 0.0014029810117790475
+      },
+      "row": "B-0",
+      "rtf": 0.9971376408275892,
+      "run": "20261115T090859Z-p6-B-0-c6cb047e",
+      "safety_validation": "passed",
+      "sim_s": 136.348,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 0.45262951135026586,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.2437709649577439
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 142,
+        "held_ticks": 3,
+        "not_held_fraction": 0.9788732394366197
+      },
+      "deadlines": {
+        "control_callbacks": 1655,
+        "max_callback_wall_s": 0.03947975400660653,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "e8209b6fb35b98c93f7449d1360d3f775da2d6b39e98fe4ab75d385771647b30",
+      "fault": "F3.08",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.680000000000007
+        },
+        "trigger_to_land_sim_s": 0.14799999999999613
+      },
+      "latency": {
+        "degraded_sim_s": 0.09999999999999432,
+        "detection_sim_s": 0.04800000000000182,
+        "fault_to_safe_action_sim_s": 0.04800000000000182,
+        "recovered": false,
+        "trigger_sim_s": 81.84
+      },
+      "mission": {
+        "abort_reason": "policy_unavailable",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 6.704395927298823,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [
+          "timeout"
+        ],
+        "failure_ticks": 3,
+        "invoked": 142,
+        "uninjected_inference_max_s": 0.0041918299975804985,
+        "uninjected_inference_p99_s": 0.0011585690081119537
+      },
+      "row": "B-1",
+      "rtf": 0.9934558808018485,
+      "run": "20261115T091223Z-p6-B-1-b942e065",
+      "safety_validation": "passed",
+      "sim_s": 94.292,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 2.0946689525638273,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.22960623276695474
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 510,
+        "held_ticks": 202,
+        "not_held_fraction": 0.603921568627451
+      },
+      "deadlines": {
+        "control_callbacks": 2033,
+        "max_callback_wall_s": 0.010451541995280422,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "652857747ffc6635105ba7dc8e029b818e423b3b4fc8b8003ea8407f68c47f7d",
+      "fault": "F1.01",
+      "hover": {
+        "intervals": 1,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 10.044
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.548000000000002
+        },
+        "trigger_to_land_sim_s": 10.328000000000003
+      },
+      "latency": {
+        "degraded_sim_s": 10.043999999999997,
+        "detection_sim_s": 0.284000000000006,
+        "fault_to_safe_action_sim_s": 0.284000000000006,
+        "recovered": false,
+        "trigger_sim_s": 89.8
+      },
+      "mission": {
+        "abort_reason": "stale_inputs:snapshot_stale",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 5.114696433537045,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 308,
+        "uninjected_inference_max_s": 0.0008537219982827082,
+        "uninjected_inference_p99_s": 0.0007671110070077702
+      },
+      "row": "S-1",
+      "rtf": 0.9982154235124634,
+      "run": "20261115T101236Z-p6-S-1-fbfa0da3",
+      "safety_validation": "passed",
+      "sim_s": 112.168,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 0.6344147295854143,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.2280530201871282
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 351,
+        "held_ticks": 202,
+        "not_held_fraction": 0.4245014245014245
+      },
+      "deadlines": {
+        "control_callbacks": 1877,
+        "max_callback_wall_s": 0.01175355599843897,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "ed9c2520b9679224e335197586c5bf7d9b9f565e6af8978da8d2751a7a89b6f5",
+      "fault": "F2.09",
+      "hover": {
+        "intervals": 1,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 10.048
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.652000000000001
+        },
+        "trigger_to_land_sim_s": 10.295999999999992
+      },
+      "latency": {
+        "degraded_sim_s": 10.048000000000002,
+        "detection_sim_s": 0.24799999999999045,
+        "fault_to_safe_action_sim_s": 0.24799999999999045,
+        "recovered": false,
+        "trigger_sim_s": 81.992
+      },
+      "mission": {
+        "abort_reason": "stale_inputs:snapshot_stale",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 6.588555797126016,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 149,
+        "uninjected_inference_max_s": 0.0009972780098905787,
+        "uninjected_inference_p99_s": 0.0009580210025887936
+      },
+      "row": "S-2'",
+      "rtf": 0.9980353560059791,
+      "run": "20261115T101515Z-p6-S-2p-1deb786d",
+      "safety_validation": "passed",
+      "sim_s": 105.884,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 1.9264574390359257,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.2297631375296255
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 141,
+        "held_ticks": 3,
+        "not_held_fraction": 0.9787234042553191
+      },
+      "deadlines": {
+        "control_callbacks": 1660,
+        "max_callback_wall_s": 0.013711570005398244,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "fa355d3dc791d8f509a5f6c94dfbfa9e3e935e3d9a2dff48158e2b8679f5bca5",
+      "fault": "F3.04",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.599999999999994
+        },
+        "trigger_to_land_sim_s": 0.15200000000000102
+      },
+      "latency": {
+        "degraded_sim_s": 0.10000000000000853,
+        "detection_sim_s": 0.0519999999999925,
+        "fault_to_safe_action_sim_s": 0.0519999999999925,
+        "recovered": false,
+        "trigger_sim_s": 81.34
+      },
+      "mission": {
+        "abort_reason": "policy_unavailable",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 6.687111002771555,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [
+          "output_not_finite"
+        ],
+        "failure_ticks": 3,
+        "invoked": 141,
+        "uninjected_inference_max_s": 0.0009435410029254854,
+        "uninjected_inference_p99_s": 0.0009034810063894838
+      },
+      "row": "S-3",
+      "rtf": 0.9960016494523002,
+      "run": "20261115T101746Z-p6-S-3-905a75fa",
+      "safety_validation": "passed",
+      "sim_s": 93.848,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 2.0779664073958184,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.24597196488865247
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 881,
+        "held_ticks": 18,
+        "not_held_fraction": 0.9795686719636776
+      },
+      "deadlines": {
+        "control_callbacks": 2504,
+        "max_callback_wall_s": 0.013172177001251839,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "e9624987cc3ac530fa1916843ffa890cdb54c3f7b56c37dff3c0eca24a5d753f",
+      "fault": "F4.01",
+      "hover": {
+        "intervals": 1,
+        "recoveries": 1,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0.9
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.536000000000016
+        },
+        "trigger_to_land_sim_s": 42.35199999999999
+      },
+      "latency": {
+        "degraded_sim_s": 0.9000000000000057,
+        "detection_sim_s": 0.1519999999999868,
+        "fault_to_safe_action_sim_s": 0.1519999999999868,
+        "recovered": true,
+        "trigger_sim_s": 81.436
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "completed",
+        "final_goal_distance_m": 0.0655585270706004,
+        "goal_reached": true,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": 44.048
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 838,
+        "uninjected_inference_max_s": 0.0020382770017022267,
+        "uninjected_inference_p99_s": 0.0007359419978456572
+      },
+      "row": "S-4",
+      "rtf": 0.9973438063075547,
+      "run": "20261115T102004Z-p6-S-4-758b6a5e",
+      "safety_validation": "passed",
+      "sim_s": 136.208,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 1.064163037763681,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.24351458671564616
+      },
+      "unsafe_commands": 0,
+      "world": "S3"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 225,
+        "held_ticks": 0,
+        "not_held_fraction": 1.0
+      },
+      "deadlines": {
+        "control_callbacks": 1743,
+        "max_callback_wall_s": 0.06551812600810081,
+        "over_dispatch_budget": 1
+      },
+      "evaluation_sha256": "f9ec3641d9b55bd97333164c6a4a3ff527d43a2a1591cc620b1a6e22e1060dfa",
+      "fault": "F6.03",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "wall",
+          "s": 4.581276861004881
+        },
+        "trigger_to_land_sim_s": 0.04800000000000182
+      },
+      "latency": {
+        "degraded_sim_s": null,
+        "detection_sim_s": 0.04800000000000182,
+        "fault_to_safe_action_sim_s": 0.04800000000000182,
+        "recovered": false,
+        "trigger_sim_s": 85.692
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "failed",
+        "final_goal_distance_m": 5.824068016452207,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": "stale_action",
+        "p2_final_state": "RECOVERY",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 225,
+        "uninjected_inference_max_s": 0.0007063359953463078,
+        "uninjected_inference_p99_s": 0.000553786987438798
+      },
+      "row": "S-5'",
+      "rtf": 0.9979714161282955,
+      "run": "20261115T102312Z-p6-S-5p-d8f52054",
+      "safety_validation": "passed",
+      "sim_s": 90.37599999999999,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": null,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.23065908824203413
+      },
+      "unsafe_commands": 0,
+      "world": "S1"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 899,
+        "held_ticks": 35,
+        "not_held_fraction": 0.9610678531701891
+      },
+      "deadlines": {
+        "control_callbacks": 2522,
+        "max_callback_wall_s": 0.010333227997762151,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "2aeec62464e96542b0531d73a0db98a9605673212ff8567150845911300201db",
+      "fault": "F1.03",
+      "hover": {
+        "intervals": 2,
+        "recoveries": 2,
+        "relapses_within_2s": 0,
+        "time_sim_s": 1.748
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.652000000000001
+        },
+        "trigger_to_land_sim_s": 43.3
+      },
+      "latency": {
+        "degraded_sim_s": 0.3999999999999915,
+        "detection_sim_s": 4.2520000000000095,
+        "fault_to_safe_action_sim_s": 4.2520000000000095,
+        "recovered": true,
+        "trigger_sim_s": 81.184
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "completed",
+        "final_goal_distance_m": 0.04374238458307868,
+        "goal_reached": true,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": 44.95200000000001
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 838,
+        "uninjected_inference_max_s": 0.0009720219968585297,
+        "uninjected_inference_p99_s": 0.0007043609948595986
+      },
+      "row": "C-1",
+      "rtf": 0.9986449670734698,
+      "run": "20261115T120404Z-p6-C-1-a9b38f97",
+      "safety_validation": "passed",
+      "sim_s": 137.116,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 1.0120273803792077,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.24547155185960617
+      },
+      "unsafe_commands": 0,
+      "world": "S3"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 864,
+        "held_ticks": 5,
+        "not_held_fraction": 0.9942129629629629
+      },
+      "deadlines": {
+        "control_callbacks": 2485,
+        "max_callback_wall_s": 0.03116570701240562,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "c9f0113a6df5ba472bf41d12e79e59cb31278bf2c107ea6fef10509396365677",
+      "fault": "F3.07",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.696000000000012
+        },
+        "trigger_to_land_sim_s": 48.2
+      },
+      "latency": {
+        "degraded_sim_s": 0.05200000000000671,
+        "detection_sim_s": 5.0,
+        "fault_to_safe_action_sim_s": 5.0,
+        "recovered": true,
+        "trigger_sim_s": 74.576
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "completed",
+        "final_goal_distance_m": 0.012426264568280675,
+        "goal_reached": true,
+        "label": "goal_reached_with_detour",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": 43.19999999999999
+      },
+      "policy": {
+        "failure_reasons": [
+          "timeout"
+        ],
+        "failure_ticks": 5,
+        "invoked": 838,
+        "uninjected_inference_max_s": 0.0020068869926035404,
+        "uninjected_inference_p99_s": 0.0007460920023731887
+      },
+      "row": "C-2",
+      "rtf": 0.998702751754402,
+      "run": "20261115T120713Z-p6-C-2-ad2766a1",
+      "safety_validation": "passed",
+      "sim_s": 135.216,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 0.37045790610068374,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.2537417793532301
+      },
+      "unsafe_commands": 0,
+      "world": "S4"
+    },
+    {
+      "arm": "B",
+      "availability": {
+        "decision_ticks": 3001,
+        "held_ticks": 1,
+        "not_held_fraction": 0.9996667777407531
+      },
+      "deadlines": {
+        "control_callbacks": 4524,
+        "max_callback_wall_s": 0.030529030002071522,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "0f6d60e740858c871e653e34753c402505a7eaf4757b1e3800543cc4c658e11b",
+      "fault": "F3.13",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.700000000000017
+        },
+        "trigger_to_land_sim_s": 149.964
+      },
+      "latency": {
+        "degraded_sim_s": null,
+        "detection_sim_s": null,
+        "fault_to_safe_action_sim_s": 149.964,
+        "recovered": false,
+        "trigger_sim_s": 74.708
+      },
+      "mission": {
+        "abort_reason": "transit_deadline",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 8.020201315948537,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 3000,
+        "uninjected_inference_max_s": 0.003052685991860926,
+        "uninjected_inference_p99_s": 0.0007769010117044672
+      },
+      "row": "C-3",
+      "rtf": 0.9991569853634258,
+      "run": "20261115T121018Z-p6-C-3-bea8cdfa",
+      "safety_validation": "passed",
+      "sim_s": 237.068,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 3.3517508212986717,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.05329190115632811
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "C",
+      "availability": {
+        "decision_ticks": 145,
+        "held_ticks": 3,
+        "not_held_fraction": 0.9793103448275862
+      },
+      "deadlines": {
+        "control_callbacks": 1668,
+        "max_callback_wall_s": 0.03140274799079634,
+        "over_dispatch_budget": 0
+      },
+      "evaluation_sha256": "12f6f6736be9b46415a6443aac98344b92354a08f7a6803754bf5227143f1bef",
+      "fault": "F8.01",
+      "hover": {
+        "intervals": 0,
+        "recoveries": 0,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "sim",
+          "s": 6.64800000000001
+        },
+        "trigger_to_land_sim_s": 0.1519999999999868
+      },
+      "latency": {
+        "degraded_sim_s": 0.09999999999999432,
+        "detection_sim_s": 0.0519999999999925,
+        "fault_to_safe_action_sim_s": 0.0519999999999925,
+        "recovered": false,
+        "trigger_sim_s": 81.796
+      },
+      "mission": {
+        "abort_reason": "policy_unavailable",
+        "controller_outcome": "supervisor_abort",
+        "final_goal_distance_m": 6.670480792910071,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": null,
+        "p2_final_state": "COMPLETE",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [
+          "timeout"
+        ],
+        "failure_ticks": 3,
+        "invoked": 145,
+        "uninjected_inference_max_s": 0.0006232339947018772,
+        "uninjected_inference_p99_s": 0.0006073529948480427
+      },
+      "row": "C-4",
+      "rtf": 0.9980523741879471,
+      "run": "20261115T121524Z-p6-C-4-8623a241",
+      "safety_validation": "passed",
+      "sim_s": 94.208,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 2.0511984875919507,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.23105465302178924
+      },
+      "unsafe_commands": 0,
+      "world": "S2"
+    },
+    {
+      "arm": "C",
+      "availability": {
+        "decision_ticks": 118,
+        "held_ticks": 22,
+        "not_held_fraction": 0.8135593220338984
+      },
+      "deadlines": {
+        "control_callbacks": 1708,
+        "max_callback_wall_s": 0.055437078000977635,
+        "over_dispatch_budget": 1
+      },
+      "evaluation_sha256": "029c69ca24518b839ca5ce74c039f040cf5f38a28ddfdd4f5fae487eaf80bb62",
+      "fault": "F8.03",
+      "hover": {
+        "intervals": 1,
+        "recoveries": 1,
+        "relapses_within_2s": 0,
+        "time_sim_s": 0.88
+      },
+      "land": {
+        "land_commands": 1,
+        "land_to_landed_and_disarmed": {
+          "clock": "wall",
+          "s": 8.040608734008856
+        },
+        "trigger_to_land_sim_s": 1.0679999999999978
+      },
+      "latency": {
+        "degraded_sim_s": 0.8799999999999955,
+        "detection_sim_s": 0.15200000000000102,
+        "fault_to_safe_action_sim_s": 0.15200000000000102,
+        "recovered": true,
+        "trigger_sim_s": 79.084
+      },
+      "mission": {
+        "abort_reason": null,
+        "controller_outcome": "failed",
+        "final_goal_distance_m": 7.090105862891213,
+        "goal_reached": false,
+        "label": "failed",
+        "p2_failure": "stale_action",
+        "p2_final_state": "RECOVERY",
+        "time_to_goal_sim_s": null
+      },
+      "policy": {
+        "failure_reasons": [],
+        "failure_ticks": 0,
+        "invoked": 96,
+        "uninjected_inference_max_s": 0.003005236998433247,
+        "uninjected_inference_p99_s": 0.003005236998433247
+      },
+      "row": "C-5",
+      "rtf": 0.9759473550564507,
+      "run": "20261115T121745Z-p6-C-5-14840ae1",
+      "safety_validation": "passed",
+      "sim_s": 89.344,
+      "truth": {
+        "collisions": 0,
+        "min_truth_clearance_m": 1.981066649107402,
+        "setpoints_inside_inflated_obstacles": 0,
+        "tracking_max_m": 0.25054447022611187
+      },
+      "unsafe_commands": 0,
+      "world": "S4"
+    }
+  ],
+  "gates": {
+    "A": {
+      "result": "p6-gate-A-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json",
+      "rows": [
+        "A-1",
+        "A-2",
+        "A-3",
+        "A-4",
+        "A-5.F1.01",
+        "A-5.F1.02",
+        "A-5.F1.04",
+        "A-5.F1.06",
+        "A-5.F1.07",
+        "A-5.F1.11",
+        "A-5.F2.09",
+        "A-5.F3.01",
+        "A-5.F3.02",
+        "A-5.F3.03",
+        "A-5.F4.07",
+        "A-5.F4.13",
+        "A-6",
+        "A-7"
+      ],
+      "sha256": "358ecf5d46f541c536a32d9747f5aab6651abd4f9d8c500b9ad79cadb051ec21"
+    },
+    "B": {
+      "result": "p6-gate-B-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json",
+      "rows": [
+        "B-0",
+        "B-1"
+      ],
+      "sha256": "7bf387d15359d6a8c02af0ae59e9fcae32c6ae00cc5fd21a77ef938e461b2a48"
+    },
+    "C": {
+      "result": "p6-gate-C-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json",
+      "rows": [
+        "C-1",
+        "C-2",
+        "C-3",
+        "C-4",
+        "C-5"
+      ],
+      "sha256": "1aef837990f047e47ab653c81739f4f5ec7dff21d2bc302bbd571e61a030d4b3"
+    },
+    "S": {
+      "result": "p6-gate-S-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json",
+      "rows": [
+        "S-1",
+        "S-2'",
+        "S-3",
+        "S-4",
+        "S-5'"
+      ],
+      "sha256": "169b5d342579af588095faa94fade2192d89aee333369dad147a4d228b2f24e8"
+    }
+  },
+  "manifest_sha256": "222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41",
+  "note": "descriptive, paired by world, one flight per row: existence demonstrations, no rates or significance (plan \u00a78)",
+  "offline_suite": {
+    "characterization_items": [
+      "C-4 rehearsal",
+      "F1.05",
+      "F1.08",
+      "F1.09",
+      "F1.10",
+      "F2.02",
+      "F2.03",
+      "F2.04",
+      "F2.08",
+      "F3.06",
+      "F4.03",
+      "F4.08",
+      "F4.10",
+      "F5.02"
+    ],
+    "counts": {
+      "failed": 0,
+      "passed": 89,
+      "skipped": 0
+    },
+    "git_head": "0cff876bfdffa760c2d521aa8d9868428b155fe3",
+    "passed": true
+  },
+  "p5_reference_by_world": {
+    "S1": {
+      "file": "v3_sim_p5_2becfbbb_gate_s_s1_vs_p4.json",
+      "outcome": "goal_reached",
+      "rtf": 0.9986005086031421,
+      "run": "20261106T130613Z-p5-flight-S1-ab86576e",
+      "safety": {
+        "abort_reason": null,
+        "collisions": 0,
+        "min_truth_clearance_m": null,
+        "tracking_max_m": 0.24645447569700404
+      },
+      "time_to_goal_sim_s": 41.336
+    },
+    "S2": {
+      "file": "v3_sim_p5_2becfbbb_gate_b_s2_vs_p4.json",
+      "outcome": "goal_reached_with_detour",
+      "rtf": 0.9983355449243169,
+      "run": "20261106T130044Z-p5-flight-S2-679dd050",
+      "safety": {
+        "abort_reason": null,
+        "collisions": 0,
+        "min_truth_clearance_m": 0.420083641679011,
+        "tracking_max_m": 0.24104594092047665
+      },
+      "time_to_goal_sim_s": 42.92
+    },
+    "S3": {
+      "file": "v3_sim_p5_2becfbbb_gate_c_s3_vs_p4.json",
+      "outcome": "goal_reached_with_detour",
+      "rtf": 0.9982603950139242,
+      "run": "20261106T132750Z-p5-flight-S3-a8cf4c3b",
+      "safety": {
+        "abort_reason": null,
+        "collisions": 0,
+        "min_truth_clearance_m": 1.0317873076928559,
+        "tracking_max_m": 0.23682731545017993
+      },
+      "time_to_goal_sim_s": 43.379999999999995
+    },
+    "S4": {
+      "file": "v3_sim_p5_2becfbbb_gate_c_s4_vs_p4.json",
+      "outcome": "goal_reached_with_detour",
+      "rtf": 0.998313585059762,
+      "run": "20261106T133057Z-p5-flight-S4-ad589abe",
+      "safety": {
+        "abort_reason": null,
+        "collisions": 0,
+        "min_truth_clearance_m": 0.41897945286484595,
+        "tracking_max_m": 0.24530208622163507
+      },
+      "time_to_goal_sim_s": 42.828
+    }
+  },
+  "unsafe_outcome_upper_bound_95": 0.22092219194555585
+}

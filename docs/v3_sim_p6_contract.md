@@ -1,5 +1,8 @@
 # v3-SIM P6 contract `p6-acceptance-v1` — fault injection and safety validation
 
+**P6 COMPLETE (2026-11-15).** Manifest `22292775` has Gates A, B, S and C accepted. The results, identities, coverage
+and limitations are in the [final acceptance report](v3_sim_p6_final_acceptance.md).
+
 **Status: APPROVED by the operator on 2026-11-06 ("Approve contract").** The approval covers the
 whole contract, including:
 
