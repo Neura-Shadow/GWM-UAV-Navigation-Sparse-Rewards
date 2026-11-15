@@ -225,21 +225,33 @@ def consume(root, gate, sha, authorization_path):
 
 # ---- dry runs (development candidates, plan §7 M5) ----------------------------------------------------------
 def dry_run_template(sha, operator, statement, gate_content="A", live_runs_max=40):
+    """Gate A content: ground only, the vehicle is never armed. Gate B, S or C content (M6): simulated flight only,
+    the vehicle is armed in SITL; still no gate result and no credit, and the approval must say so explicitly."""
+    flight = gate_content in FLIGHT_GATES
+    where = ("simulated flight only (SITL, the vehicle is armed in simulation, never real hardware)" if flight
+             else "ground only, the vehicle is never armed")
     return {"contract": DRY_RUN_CONTRACT, "manifest_sha256": sha, "gate_content": gate_content, "authorized": True,
             "authorized_by": operator, "operator_statement": statement, "acceptance_credit": False,
-            "flight": False, "vehicle_armed": False, "live_runs_max": live_runs_max,
-            "statement": f"Dry run of P6 Gate {gate_content} content on development candidate {sha}: ground only, "
-                         "the vehicle is never armed, no gate result, no acceptance credit."}
+            "flight": flight, "simulated_flight_only": flight, "vehicle_armed": flight, "live_runs_max": live_runs_max,
+            "statement": f"Dry run of P6 Gate {gate_content} content on development candidate {sha}: {where}, "
+                         "no gate result, no acceptance credit."}
 
 
-def require_dry_run_approval(path, sha, frozen):
+def require_dry_run_approval(path, sha, frozen, gate_content="A"):
     value = strict_json(path)
     if value.get("contract") != DRY_RUN_CONTRACT or value.get("manifest_sha256") != sha:
         raise PermissionError("Dry-run approval does not bind this development candidate")
     if value.get("authorized") is not True or not value.get("authorized_by"):
         raise PermissionError("Dry-run approval is not an explicit operator approval")
-    if value.get("acceptance_credit") is not False or value.get("flight") is not False:
-        raise PermissionError("A dry run never flies and never earns credit")
+    if value.get("acceptance_credit") is not False:
+        raise PermissionError("A dry run never earns credit")
+    if value.get("gate_content") != gate_content:
+        raise PermissionError("Dry-run approval is for Gate %s content, not Gate %s" % (value.get("gate_content"), gate_content))
+    if gate_content in FLIGHT_GATES:
+        if value.get("flight") is not True or value.get("simulated_flight_only") is not True:
+            raise PermissionError("A flight-content dry run needs an approval that names simulated flight explicitly")
+    elif value.get("flight") is not False:
+        raise PermissionError("A Gate A content dry run never flies")
     if frozen.get("development") is not True:
         raise PermissionError("Dry runs use a development candidate only")
     return value
@@ -268,6 +280,8 @@ def main(argv=None):
     d.add_argument("--statement", required=True, help="the operator's chat statement that authorizes the dry run")
     d.add_argument("--confirm", required=True, help='Exactly: "dry run P6 Gate A content on <manifest-sha>"')
     d.add_argument("--live-runs-max", type=int, default=40)
+    d.add_argument("--gate-content", choices=sorted(GATES), default="A",
+                   help="A: ground only. B, S or C (M6): simulated flight only, named explicitly in the approval")
     d.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     root = Path(os.environ.get("GWM_SIM_ROOT", str(Path.home() / "uav_autonomy")))
@@ -291,10 +305,13 @@ def main(argv=None):
         frozen, sha = verify_current(root, args.manifest)
         if not frozen["development"]:
             raise SystemExit("Dry runs use a development candidate only")
-        if args.confirm != f"dry run P6 Gate A content on {sha}":
-            raise SystemExit("Confirmation phrase must be exactly: dry run P6 Gate A content on %s" % sha)
-        atomic_json(args.output, dry_run_template(sha, args.operator, args.statement, live_runs_max=args.live_runs_max),
-                    exclusive=True)
+        phrase = f"dry run P6 Gate {args.gate_content} content on {sha}"
+        if args.gate_content in FLIGHT_GATES:
+            phrase += " in simulated flight"
+        if args.confirm != phrase:
+            raise SystemExit("Confirmation phrase must be exactly: " + phrase)
+        atomic_json(args.output, dry_run_template(sha, args.operator, args.statement, gate_content=args.gate_content,
+                                                  live_runs_max=args.live_runs_max), exclusive=True)
         print(args.output)
     return 0
 

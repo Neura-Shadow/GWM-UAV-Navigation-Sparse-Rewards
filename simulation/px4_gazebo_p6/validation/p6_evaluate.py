@@ -46,16 +46,41 @@ ROWS = {
              "exceptions": {"outcome:": "A10", "performance:": "H35"}},
     "S-3": {"response": ["PH3", "L45", "UNSAFE"], "exceptions": {**POLICY_EXCEPTIONS, "outcome:": "L45"}},
     "S-4": {"response": ["H35", "RECOVERY", "GOAL", "UNSAFE"], "exceptions": {"outcome:detour_sequence": "RECOVERY"}},
-    "S-5'": {"response": ["R2:stale_action", "L45R:stale_action", "UNSAFE"],
-             "exceptions": {"runtime_status:": "R2", "p2:timing": "PROOF", "outcome:": "L45R"}},
+    "S-5'": {"response": ["R2:stale_action", "L45R:stale_action", "UNSAFE", "RECOVERY_LANDING"],
+             "exceptions": {"runtime_status:": "R2", "p2:timing": "PROOF", "outcome:": "L45R",
+                            # M6 decision (operator, 2026-11-14, "Adopt"): the four items every P2 RECOVERY landing
+                            # produces in accepted code, exactly these, on this row only, replaced by the
+                            # RECOVERY_LANDING proof (plan §16.6): the designed exit 1, the COMPLETE-only
+                            # window_end absence snapshot, the replay's post-touchdown reference rejection and its
+                            # missing P2 report.
+                            **{"=" + item: "RECOVERY_LANDING" for item in response.RECOVERY_LANDING_ITEMS}}},
     "C-1": {"response": ["STALE_IFF_AGE", "RECOVERY", "GOAL", "UNSAFE"],
             "exceptions": {"depth:": "PROOF", "performance:": "STALE_IFF_AGE", "outcome:detour_sequence": "RECOVERY"}},
     "C-2": {"response": ["LIMITS_UNINJECTED", "GOAL", "UNSAFE"], "exceptions": {**POLICY_EXCEPTIONS, **TIMING_EXCEPTIONS}},
-    "C-3": {"response": ["UNSAFE"], "exceptions": {"policy:ledger:argmax_differs": "PROOF", "outcome:": "UNSAFE"}},
-    "C-4": {"response": ["NO_INVOKE_AFTER_STALE", "L45", "UNSAFE"],
+    # C-3 (M6 decision, operator 2026-11-14, "Adopt both"): S0 is required and the outcome reported. When the accepted P2
+    # controller fails closed during the adversarial flight and lands through RECOVERY, that landing is the reported
+    # outcome: its runtime status, P2 timing and the four RECOVERY-landing items are replaced by FAIL_CLOSED_LANDING
+    # (L45R for the reported P2 failure plus the RECOVERY_LANDING proof), which is recorded only for such a landing.
+    "C-3": {"response": ["UNSAFE", "FAIL_CLOSED_LANDING"],
+            "exceptions": {"policy:ledger:argmax_differs": "PROOF", "outcome:": "UNSAFE",
+                           "runtime_status:Abort:controller_failed:": "FAIL_CLOSED_LANDING", "=p2:timing": "FAIL_CLOSED_LANDING",
+                           **{"=" + item: "FAIL_CLOSED_LANDING" for item in response.RECOVERY_LANDING_ITEMS}}},
+    "C-4": {"response": ["NO_INVOKE_AFTER_STALE", "L45", "UNSAFE", "LIMITS_UNINJECTED"],  # M6: its timing exceptions' check
             "exceptions": {**DEPTH_WINDOW, **POLICY_EXCEPTIONS, **TIMING_EXCEPTIONS, "outcome:": "L45"}},
-    "C-5": {"response": ["H35", "STALE_IFF_AGE", "L45", "UNSAFE"],
-            "exceptions": {"performance:": "STALE_IFF_AGE", "outcome:": "L45"}},
+    # C-5 (M6 decision, operator 2026-11-14, "Adopt as recommended", plan §16.10-16.11): the load starts with the map
+    # loss. After H35 the row lands through COMPLETE (L45) or, on the contract §5.3 dispatch response, through RECOVERY
+    # (FAIL_CLOSED_LANDING); LANDING passes on the path taken. LOAD implements §5.3 and alone allows the P5 inference
+    # statistics. LOAD_RECORDER replaces exactly the accepted P3 raw-recorder overflow's three items, when every lost
+    # frame is inside the load window and perception kept every period; and (extension, operator 2026-11-14, "Adopt
+    # the extension", plan §16.12-16.13) the two P3 delivery items an overflow inside the sensor window produces, when
+    # each frame they count as undelivered is matched to an overflowed receipt.
+    "C-5": {"response": ["H35", "STALE_IFF_AGE", "LOAD", "LOAD_RECORDER", "FAIL_CLOSED_LANDING", "LANDING", "UNSAFE"],
+            "exceptions": {"performance:": "STALE_IFF_AGE", "outcome:": "LANDING",
+                           "=policy:inference_p99": "LOAD", "=policy:inference_max": "LOAD",
+                           "=runtime_status:Abort:controller_failed:stale_action": "FAIL_CLOSED_LANDING",
+                           "=p2:timing": "FAIL_CLOSED_LANDING",
+                           **{"=" + item: "FAIL_CLOSED_LANDING" for item in response.RECOVERY_LANDING_ITEMS},
+                           **{"=" + item: "LOAD_RECORDER" for item in response.LOAD_RECORDER_ITEMS}}},
 }
 # Gate A ground fixtures: the accepted stale rule replayed on the recorded ground inputs, or a proven refusal.
 GROUND_EXCEPTIONS = {"depth:": "GROUND_REPLAY", "performance:": "GROUND_REPLAY", "fault_injection_outside_s6": "PROOF"}
@@ -100,6 +125,21 @@ def codes():
 
 def p5_limits():
     return json.loads((ROOT / "simulation/px4_gazebo_p5/configs/p5_validation.yaml").read_text(encoding="utf-8"))["policy"]
+
+
+def dispatch_budget():
+    """The accepted P2 dispatch budget (the run-local copy equals it, rule C11)."""
+    return json.loads((ROOT / "simulation/px4_gazebo/configs/p2_timing.yaml").read_text(encoding="utf-8"))["dispatch_budget_wall_s"]
+
+
+def explained(run, rules):
+    """Exact items another passing proof of the same row explains, so the RECOVERY_LANDING proof does not count them as
+    unexplained (C-5: the recorder overflow inside the load window, LOAD_RECORDER)."""
+    if "LOAD_RECORDER" in rules["response"]:
+        proof = response.load_recorder(run)
+        if proof is not None and proof["passed"]:
+            return response.LOAD_RECORDER_ITEMS
+    return ()
 
 
 def run_fault_window(run):
@@ -160,6 +200,16 @@ def respond(run, declaration, rules, proof, window):
             response.limits_uninjected(run, c, p5_limits(), injected)
         elif code == "UNSAFE":
             response.unsafe_setpoints(run, c)
+        elif code == "RECOVERY_LANDING":
+            response.recovery_landing(run, c)
+        elif code == "FAIL_CLOSED_LANDING":
+            response.fail_closed_landing(run, c, explained(run, rules))
+        elif code == "LANDING":
+            response.landing(run, c, explained(run, rules))
+        elif code == "LOAD":
+            response.load(run, c, p5_limits(), dispatch_budget())
+        elif code == "LOAD_RECORDER":
+            response.load_recorder_check(run, c)
         elif code == "GROUND_REPLAY":
             config = json.loads(run.file("p4_avoidance.yaml").read_text(encoding="utf-8"))
             response.ground_replay(run, c, arg.split(","), config)

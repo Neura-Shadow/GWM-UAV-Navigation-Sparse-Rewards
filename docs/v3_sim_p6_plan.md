@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; Gate C dry run 1 of 5 on `23d513ee`; the fixes and the C-3 rule implemented; candidate `75289deb` awaits a Gate C content rerun authorization, §16.9) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -1323,3 +1323,609 @@ flags wall gap maximum 1.92 s, 0 gaps over the accepted 2.0 s rule.
 **M5 exit condition met:** a complete dry run passed under one unchanged development candidate. The
 dry run earns no credit; no P6 gate has run and none is accepted. M6 and the real P6 freeze each need
 their own operator authorization.
+
+## 16. M6 record: SITL fault validation (authorized by the operator 2026-11-13: "Authorize M6")
+
+**Status: in progress.** No flight has been run, no gate has run, and nothing earns credit.
+
+### 16.1 What M6 needs (contract §8)
+
+* Gates B (2 rows), S (5) and C (5), each separately authorized and bound to one non-development P6
+  manifest, in the order A → B → S → C: each needs its predecessor's accepted result for the same
+  manifest.
+* So before any flight gate: a production Policy A approval for the P6 candidate (the development
+  approval is refused for a real candidate), the real freeze, and an authorized real Gate A.
+* Every flight row is a simulated flight on the row's P4 world (S1–S4) with the vehicle armed in SITL,
+  never real hardware.
+
+### 16.2 What was built (`8740815`, offline)
+
+| File | Change |
+|---|---|
+| `scripts/p6_runner.py` | the `flight` scope: the accepted P5 flight path on the row's world (`--scenario`), under the accepted gating (`GWM_ALLOW_SITL_COMMANDS=1` and `--allow-simulated-flight`, flight rows only; a ground row refuses the flag). The runner feeds the controller's own events to the frozen trigger with the frozen P4 scenario boxes and fires its mechanisms once: relay SIGUSR1 (DR, SR), the accepted P4 bridge SIGINT (PS, position recorded), the bounded load harness at its own `load_start` trigger (LH, C-5). CS and MR fire inside the shim. The accepted flight window (PRESTREAM to COMPLETE or RECOVERY) is written before a fail-closed exit is reported, so the unchanged P5 evaluation runs and the row's rules decide (S-5′). |
+| `scripts/run_p6_gates.py` | runs Gates B, S and C; requires the accepted predecessor result for the same manifest; passes the flight gating to flight rows only; dry runs of flight content need a matching approval |
+| `scripts/p6_manifest.py` | dry-run approvals carry `gate_content`; Gate B/S/C content needs `flight` and `simulated_flight_only` true, named in the confirmation phrase; Gate A content stays ground-only |
+| `injection/load_harness.py` | records its activation and clearing in a fault ledger (`--ledger`, `--row`, `--fault`, `--sim-s`) |
+| `validation/p6_integration_evaluate.py` | the injector-process check expects `p6-load-harness` for a load row |
+
+**A bug caught by inspection before any run:** the generated P4 world declaration records boxes as
+`center_m` with a height, while the triggers read the scenario spec's 2-D `center`. The runner passes the
+frozen `p4_scenarios.json` boxes, and a test pins both shapes.
+
+Per row, what the runner fires: S-1 PS at `avoiding_near`; S-2′ SR at `avoiding_first`; C-1 DR at
+`avoiding_first`; C-4 PS at `avoiding_first` (its CS part in the shim); C-5 LH at `transit_start` (its
+MR part in the shim); B-1, S-3, S-4, S-5′, C-2, C-3 fire inside the shim only; B-0 fires nothing.
+
+### 16.3 Offline regression on `8740815` (no simulator)
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 149 passed in the full run, 0 skipped; the runner file re-run after the last edit: 46 passed (150 tests in all) |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 106 passed, 44 skipped (Linux-only; not counted as passes) |
+
+P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…` verify.
+
+### 16.4 Development candidate and the next step
+
+**Development candidate `33f33c5a22c917a7feaa184a5598cdbc421cc4964a7c04b33226b99f1f160ffb`**, frozen at
+`c1b84be` from a clean P6 tree; verifies; 41 files; no dry-run approval written.
+
+**Recommended next step (needs its own authorization):** a flight-content dry run of Gate B on this
+development candidate, simulated flight only, no credit: B-0 first (every injector in pass-through, the
+first P6 flight at all), then B-1. The M5 experience says the first live use of new runner code finds
+defects; a dry run finds them without consuming a gate. The approval would name simulated flight
+explicitly (`gate_content` B).
+
+**Then, each separately authorized:** the production Policy A approval, the real freeze, Gate A, Gate B,
+Gate S, Gate C.
+
+### 16.5 Gate B content dry run in simulated flight on `33f33c5a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize flight dry run", answering: "Authorize a Gate B content
+dry run (B-0, then B-1) in simulated flight on development candidate 33f33c5a?" Approval
+`state/p6-dry-run-approval-33f33c5a22c9-gateB-flight.json` (Gate B content, `flight` and
+`simulated_flight_only` true, cap 4).
+
+**Verified before each launch:** the manifest and the P3/P4/P5 baselines; no simulator or P6 process; no live lock;
+the host on AC in Best-performance mode. The first attempt found the AC overlay reverted to "Best power
+efficiency" and stopped before launching anything; the operator switched it back and the runs followed.
+
+**The first P6 flights.** Both rows passed, each as one run (SITL, S2 world, no credit):
+
+| Row | Fault | Result | Window (sim s) | RTF | P5 items (all allowed by a passed check) |
+|---|---|---|---|---|---|
+| B-0 | none, every injector pass-through | COMPLETE, `completed`; 0 P5 failures; C11, GOAL, INJECTORS, PROOF, UNSAFE passed | 12.66–128.98 | 0.998 | none |
+| B-1 | F3.08, three 25 ms inference ticks in AVOIDING (shim) | COMPLETE, `supervisor_abort`; PH3, L45, LIMITS_UNINJECTED, UNSAFE, C11, INJECTORS, PROOF passed | 12.64–88.54 | 0.998 | `outcome:not_completed`, `outcome:goal_distance`, `outcome:detour_sequence` (L45), `policy:failure_ticks`, `policy:participation`, `policy:inference_p99`, `policy:inference_max` (PH3) |
+
+B-1 detail: the shim fired at 81.74 s sim on the first AVOIDING decision; 3 timeout records in the accepted
+policy ledger; detection 0.048 s (one tick) after the trigger; the abort followed within 0.10 s; the
+vehicle landed through the accepted sequence. No P5 item was refused on either row. The candidate was
+unchanged throughout; the lock was released; no residual process.
+
+**What this shows:** the flight path of the runner (world selection, flight gating, the shim in flight, the
+relays and witness in pass-through through a complete flight, the flight window, the evaluation and
+composition for flight rows) works on the first live use. The runner-fired mechanisms in flight (relay
+SIGUSR1 at an in-flight trigger, the bridge SIGINT, the load harness) have not yet been exercised; they
+belong to the Gate S and C rows.
+
+**Next (needs its own authorization):** a Gate S content dry run on this candidate (S-1, S-2′, S-3, S-4,
+S-5′, in the frozen order), simulated flight only, no credit. It exercises PS at `avoiding_near` (S-1), SR at
+`avoiding_first` (S-2′), the shim faults F3.04, F4.01 and F6.03, and the fail-closed L45R path (S-5′).
+
+### 16.6 Gate S content dry run in simulated flight on `33f33c5a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate S dry run". Approval
+`state/p6-dry-run-approval-33f33c5a22c9-gateS-flight.json` (Gate S content, simulated flight only, cap 6).
+Verified before launch: AC power, Best-performance overlay, host CPU 1 %, the manifest and baselines, no
+simulator or P6 process, no lock.
+
+**Run:** 03:36:10Z–03:49:46Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-S-33f33c5a22c9-20261114T033624Z.result.json`. The candidate was unchanged throughout; the
+lock was released; no residual process. RTF 0.996–0.998 on every row.
+
+**Passed (4): the runner-fired in-flight mechanisms work.**
+
+| Row | Fault, mechanism, trigger | What happened | P5 items (all allowed by a passed check) |
+|---|---|---|---|
+| S-1 | F1.01 bridge SIGINT (PS) at `avoiding_near`, fired 89.93 s | FAULT_WINDOW and F1–F4 passed; detection 0.224 s; L45 via `supervisor_abort`; 312 native headers after the stop | 8, under FAULT_WINDOW |
+| S-2′ | F2.09 state relay (SR) at `avoiding_first`, fired 81.25 s | 0 of 1329 position and 0 of 2658 attitude messages relayed; perception unassociated 257 times; H35, A10, L45; detection 0.272 s | 3, under L45 |
+| S-3 | F3.04 NaN scores (shim) at `avoiding_first`, 81.88 s | 3 `output_not_finite` ledger records; PH3, L45; detection 0.052 s | 5, under PH3/L45 |
+| S-4 | F4.01 map loss 1.0 s (shim) at `avoiding_first`, 81.5 s | 10 snapshots published in the window, 0 used; H35, RECOVERY, GOAL; recovered; `completed` | 1, under RECOVERY |
+
+**Failed (1): S-5′, on four P5 items. Its own checks passed:** PROOF (one mission tick delayed 60 ms),
+R2 (`stale_action` abort with a valid Offboard sample, detection 0.048 s), L45R (exactly one LAND at 85.764 s,
+landed 90.42 s, disarmed by 92.42 s), UNSAFE, C11, INJECTORS. Allowed as predicted: `runtime_status:…`,
+`p2:timing`, `outcome:not_completed`, `outcome:goal_distance`. Refused:
+
+1. **`cleanup:ros-controller:nonzero_exit_1`.** The accepted `main` exits 1 whenever `p4_outcome` is
+   `failed`, and the accepted P4 `outcome()` returns `failed` for any run ending in P2 RECOVERY. So every
+   L45R row exits 1 by design. The same finding as A-5.F4.07/F4.13 (§15.2, decision 3), for a different
+   reason.
+2. **`rgb_absence:snapshot_missing:window_end`.** The accepted P3 runner's snapshot thread takes the
+   `window_end` RGB-absence snapshot on the COMPLETE transition only (`TRIGGERS`). A RECOVERY landing never
+   reaches COMPLETE, so the snapshot does not exist. The continuous absence monitor did cover the whole
+   window and beyond (148 rows, max gap 0.50 s, zero IMX214 subscribers, control subscriber present), and
+   every other absence check passed.
+3. **`p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost`.** The accepted offline
+   replay (`reference_evidence.classify`) feeds every received sample to the reference manager with the
+   current phase, including RECOVERY, which is not in the manager's landing exemption
+   (REQUEST_LAND … COMPLETE). When the vehicle landed at 90.42 s, `cs_in_air` went false at 90.57 s and the
+   replayed manager rejected `final_alignment_lost`. The live controller never rejected (`rejected_count`
+   0, no `reference_rejected` event): its RECOVERY tick returns before the reference check. The replay's
+   `historical` branch already relabels RECOVERY as TAKEOFF for exactly this reason, but the P4/P5
+   evaluators call it with `historical=False`.
+4. **`mc_causal_yaw:p2_integrity_missing`.** A consequence of 3: the P2 report was never produced.
+
+**Why these never appeared before:** no accepted P2–P5 flight row ends in P2 RECOVERY; the accepted
+abort rows land through the nominal sequence (`supervisor_abort`, COMPLETE). S-5′ is the first L45R flight
+evaluated by this stack. The four items are consequences of the RECOVERY landing in accepted code, not of
+the fault or of P6.
+
+**Open decision (recommendation first).** On S-5′ only, replace exactly these four items by proofs, with
+the accepted evaluators and thresholds unchanged:
+* item 1 by L45R plus a designed-exit proof: exit 1, `p4_outcome` `failed`, connectivity passed, final state
+  RECOVERY, exactly one LAND;
+* item 2 by a proof from the accepted monitor ledger: coverage from before the window start to after the
+  window end, max gap within the accepted limit, zero IMX214 subscribers and the control subscriber present
+  on every row (the data the P5 evaluator already reports), plus every other absence check passed;
+* items 3 and 4 by a proof that the controller's own reference record shows no rejection, the replay's
+  rejection reason is `final_alignment_lost`, and `cs_in_air` first went false after the LAND command and
+  after `landed` was reported (the landing itself).
+The alternative is to leave S-5′ failing under the accepted evaluators, which no change in P6 can satisfy.
+
+**Also to note:** S-1's allowed items include `depth:health_not_fresh_in_window` and `performance:compute_max`
+under FAULT_WINDOW, as the accepted P4 §9.1 window intends. No threshold, baseline or source changed.
+
+### 16.7 The S-5′ decision implemented, and candidate `23d513ee` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt"), as proposed in §16.6.
+
+**Code (`c274cba`):**
+* `validation/p6_safety_evaluate.py`: the `RECOVERY_LANDING` check, with `RECOVERY_LANDING_ITEMS` naming the
+  four items. It requires the designed exit (exit 1, `p4_outcome` `failed`, connectivity passed, final state
+  RECOVERY, one LAND); the accepted absence-monitor ledger covering the window within its gap limit with every
+  other absence check passed and no RGB metadata; the controller's own reference record without a rejection,
+  the replay item present, and `cs_in_air` first false after the LAND command and after `landed`; and no other
+  item of the cleanup, absence, P2-integrity or MC-causal families.
+* `validation/p6_evaluate.py`: S-5′'s response adds `RECOVERY_LANDING`; its exceptions add exactly the four
+  items, each replaced by that check. No other row changes.
+* Tests: the proof accepts the S-5′ shape and refuses each missing piece (nine negatives); the exception is
+  exact and S-5′-only; the retained S-5′ dry run of §16.6 now evaluates as passed with exactly those four
+  items allowed and nothing refused (its stored evaluations are unchanged).
+
+**Offline regression on `c274cba`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 153 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 108 passed, 45 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `23d513ee40290b41327ce705584b4e5cf6948d69612f6b2737182fd2d294eb27`**, frozen at
+`c274cba` from a clean P6 tree; verifies; P3/P4/P5 re-verified; 41 files; no dry-run approval written.
+
+**Next (needs its own authorization):** a Gate C content dry run on `23d513ee` in simulated flight (C-1 to
+C-5 in frozen order), no credit. It exercises the depth relay's burst faults in flight (C-1), isolated
+inference timeouts (C-2), the adversarial policy (C-3), the compound bridge stop plus inference delay (C-4),
+and the compound map loss plus the 24-worker load harness, the first in-flight use of LH (C-5). S-5′ itself
+has not re-run on the new candidate; its pass is on the retained evidence only, and a complete Gate S dry
+run on one unchanged candidate remains to be shown.
+
+### 16.8 Gate C content dry run in simulated flight on `23d513ee` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C". Approval
+`state/p6-dry-run-approval-23d513ee4029-gateC-flight.json` (Gate C content, simulated flight only, cap 6). Verified
+before launch: AC power, Best-performance overlay, host CPU 1 %, the manifest and baselines, no simulator or P6
+process, no lock.
+
+**Run:** 08:33:10Z–08:49:32Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-23d513ee4029-20261114T083325Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.996–0.998 on every row.
+
+**Passed (1):** C-2, F3.07 five isolated 25 ms timeouts (shim): 5 timeout ledger records, HOLD on exactly the injected
+ticks, LIMITS_UNINJECTED, GOAL; completed.
+
+**Failed (4), on three P6 defects, one host-timing abort and one Gazebo shutdown hang:**
+
+1. **C-1, F1.03 depth bursts (DR at `avoiding_first`, 84.15 s): a P6 evaluator defect.** The relay dropped exactly
+   the frames inside the three burst windows (63 frames, none relayed). The proof failed on 3 "outside" frames that
+   were the first frames of the run (5.02–5.08 s sim), received by the witness before the relay's subscription had
+   matched, about 80 s before the fault was armed. The proof judged every frame from boot; the accepted delivery
+   checks judge the sensor window only. **Fix:** judge frames inside the accepted sensor window. Re-evaluated in
+   memory on the retained evidence: proved (63 dropped inside, all 3546 outside relayed); the run passes, with the
+   four `depth:` items allowed by the proof as the row defines.
+2. **C-3, F3.13 adversarial policy (shim): a host-timing abort after 70 s.** The shim chose the worst allowed slot
+   on all 1420 invocations from the trigger; the shield held (UNSAFE passed, 0 outside the mask) and the vehicle
+   never reached the goal. At 145.5 s one control callback took 51.8 ms against the accepted 50 ms dispatch budget,
+   and the accepted P2 controller failed closed (`stale_action`) and landed through RECOVERY. Median mission ticks
+   were 5–6 ms throughout, as on B-0, C-2 and S-4 (which had spikes up to 37 ms); C-3's 70 s of TRANSIT gave more
+   exposure. The evidence does not attribute the spike to the fault. The row's rules (S0, outcome reported) have no
+   check for a P2 fail-closed landing, so its items (`runtime_status`, `p2:timing` and the four RECOVERY-landing
+   items of §16.6) were refused.
+3. **C-4, F8.01 bridge stop plus 25 ms inference delay: a rule-table defect and a Gazebo shutdown hang.**
+   * The M4 rule table gives C-4 the timing exceptions (`policy:inference_p99`, `policy:inference_max`, replaced by
+     LIMITS_UNINJECTED) but not the LIMITS_UNINJECTED check itself, so they can never apply. **Fix:** add
+     LIMITS_UNINJECTED to C-4's response, as on B-1 and C-2. Re-evaluated in memory: it passes (145 uninjected
+     ticks, p99 0.85 ms).
+   * At cleanup Gazebo did not exit within its 15 s grace after SIGINT and was killed
+     (`cleanup:gazebo:forced_kill_after_grace`, never excepted). In the other 11 flight runs it exited in
+     0.44–0.64 s, with the same shutdown order (S-1 also stopped the bridge). No Gazebo-side log records the
+     cause. It needs a rerun to show whether it recurs.
+   * Its own checks passed: FAULT_WINDOW_F1F2, NO_INVOKE_AFTER_STALE, L45, 3 timeout records, detection 0.052 s.
+4. **C-5, F8.03 map loss plus 24 load workers: a P6 runner defect.** The runner launched the load harness at
+   `transit_start` (74.67 s) through `p6_node.py`, whose module list does not include `load_harness`; it printed its
+   usage and exited 1 at once. No load was applied, so C-5 did not test LH; INJECTORS failed and
+   `cleanup:p6-load-harness:nonzero_exit_1` was refused. The MR part passed (H35, STALE_IFF_AGE, L45, recovery).
+   **Fix:** add `load_harness` to the node's modules, with a test that every module the runner launches is one the
+   node accepts.
+
+**Open decision (recommendation first):**
+* **Fix the three P6 defects** (C-1 proof scope, C-4 LIMITS_UNINJECTED, C-5 node module). No accepted code and no
+  threshold changes.
+* **C-3 outcome:** the contract requires S0 and reports the outcome. Recommended: accept a P2 fail-closed RECOVERY
+  landing as a reported C-3 outcome, checked by L45R (one LAND, landed and disarmed within 45 s), the
+  RECOVERY_LANDING proof of §16.6 and S0, with the P2 failure reason reported. The alternative is to keep the rule
+  and rerun C-3, which passes only if no host spike crosses the budget during a long adversarial flight.
+* Then a new development candidate and a rerun of the full Gate C content on it, which also shows whether the C-4
+  Gazebo hang recurs.
+
+### 16.9 The Gate C fixes implemented, and candidate `75289deb` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt both"), as proposed in §16.8.
+
+**Code (`e3c8b69`):**
+* `scripts/p6_node.py`: `load_harness` is a dispatchable module (C-5). A test requires every module the runner
+  launches through `self.node` to be one the node accepts, and runs the harness's `--help` through the node.
+* `validation/p6_fault_evaluate.py`: the F1.03 drop proof judges frames inside the accepted sensor window, and fails
+  without one (C-1). The M4 synthetic test now carries a sensor window.
+* `validation/p6_evaluate.py`: C-4 runs LIMITS_UNINJECTED (its timing exceptions' check). C-3 runs
+  FAIL_CLOSED_LANDING, whose exceptions are exactly the P2 fail-closed landing's runtime status, `p2:timing` and the
+  four RECOVERY-landing items.
+* `validation/p6_safety_evaluate.py`: `fail_closed_landing`, recorded only when the run ends in P2 RECOVERY with a
+  failure: L45R for the reported failure plus the RECOVERY_LANDING proof.
+* A new invariant test: every exception's replacement check is one its row actually records (the defect class of
+  C-4).
+
+**Replayed on the retained Gate C evidence** (stored evaluations unchanged): C-1 passes; C-3 passes, reporting
+`stale_action`; C-4 fails on `cleanup:gazebo:forced_kill_after_grace` alone; C-5 still fails (its harness never ran).
+
+**Offline regression on `e3c8b69`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 158 passed, 0 skipped |
+| WSL | M3 offline suite runner | 87/87, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS sourced, 5 passed |
+| Windows | P6 tests | 112 passed, 46 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `75289deb16c90af2f2d11d791706f14209be0af20e41e246b638945005244ef4`**, frozen at `e3c8b69`
+from a clean P6 tree; verifies; P3/P4/P5 re-verified; 41 files; no dry-run approval written.
+
+**Next (needs its own authorization):** a rerun of the full Gate C content on `75289deb` in simulated flight (C-1 to
+C-5), no credit. It is the first in-flight use of the load harness (C-5) and shows whether the C-4 Gazebo shutdown
+hang recurs. Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to
+be shown (S-5′ has not re-run live since its rule changed).
+
+### 16.10 Gate C content rerun in simulated flight on `75289deb` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-75289deb16c9-gateC-flight.json` (Gate C content, simulated flight only, cap 5: one run per
+row, no retry). Verified before launch: AC power, Best-performance overlay `ded574b5`, the manifest, no simulator or
+P6 process, no lock.
+
+**Run:** 10:52:15Z–11:08:27Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-75289deb16c9-20261114T105229Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.995–1.000 over each flight. Gazebo exited in 0.44–0.52 s on every row: the C-4
+shutdown hang of §16.8 did not recur (1 in 17 flight runs so far).
+
+**Passed (4); the §16.9 C-1 and C-4 fixes hold in flight:**
+* **C-1**, F1.03 depth bursts: proved on the sensor window (64 frames inside the bursts, none relayed; all 3533
+  outside relayed); recovery (2 returns), GOAL; completed.
+* **C-2**, F3.07: 5 timeout records, HOLD on exactly the injected ticks, LIMITS_UNINJECTED (832 ticks, p99 0.83 ms),
+  GOAL; completed.
+* **C-3**, F3.13: the worst allowed slot on all 2999 invocations from the trigger; UNSAFE passed (0 moves outside the
+  mask); COMPLETE through a supervisor abort. There was no host spike this time, so FAIL_CLOSED_LANDING was not
+  exercised.
+* **C-4**, F8.01: detection 0.048 s, NO_INVOKE_AFTER_STALE, L45, FAULT_WINDOW_F1F2, 3 timeout records,
+  LIMITS_UNINJECTED (145 ticks, p99 0.56 ms).
+
+**Failed (1): C-5, F8.03 map loss 1.0 s plus 24 CPU workers.** The load harness ran in flight for the first time (the
+§16.9 C-5 fix holds): 24 workers started at `transit_start` (74.508 s sim), recorded in the harness ledger.
+1. **The load caused a dispatch breach, and the P2 controller aborted, which is §5.3's declared response.**
+   * Under the load, the control callback rose from a 1.13 ms median (3.9 ms max) to 20.4 ms (53.8 ms max). The
+     mission tick rose from 0.32 ms to 17.1 ms (43.5 ms max).
+   * At 76.568 s, 2.06 s after the load started, one callback took 53.8 ms against the accepted 50 ms dispatch budget.
+     The accepted P2 controller failed closed (`stale_action`) and landed through RECOVERY.
+   * S0 held: UNSAFE passed, with 0 moves.
+2. **The map loss never fired.** Its trigger (`avoiding_first`) came 4.3 s after TRANSIT in the §16.8 run, and here
+   the abort came first. The shim never activated (0 invocations), so `proof:no_activation`, H35 (`no_stale_decision`)
+   and L45 (an abort landed through COMPLETE) failed.
+3. **P6 defect: the load harness does not stop gracefully.**
+   * The runner stopped it with SIGINT when the stack ended. It died on an unhandled `KeyboardInterrupt` (exit by
+     signal), so INJECTORS failed and `cleanup:p6-load-harness:terminated_by_SIGINT` was refused.
+   * This is not specific to the abort. Its 60 s window outlives a nominal C-5 too: in the §16.8 run COMPLETE came
+     55 s after `transit_start`.
+   * The plan's M-LH row (§4.2) already allows the workers to be "killed in cleanup".
+4. **P6 defect: §5.3 is not implemented (the C-4 defect class).**
+   * The contract gives C-5 "§5.3" and the scenario expects "LOAD", but the rule table runs no LOAD check.
+   * §5.3 accepts a P4 perception or P5 inference breach inside a declared load window only when its declared response
+     follows, with 0 unsafe commands. The declared responses are:
+     * stale snapshot → H35;
+     * inference above 0.020 s → HOLD;
+     * dispatch above 0.050 s → P2 abort.
+5. **A load-induced loss outside §5.3: the accepted P3 raw depth recorder overflowed.**
+   * Its 32-slot queue dropped 31 of 2539 frames from the evidence recording. All 31 were inside the load window
+     (78.97–82.48 s, during the RECOVERY landing).
+   * The adapter reported `raw_recorder_overflow` and exited 3, giving `cleanup:sensor-adapter:nonzero_exit_3`,
+     `depth:adapter_result_not_passed` and `depth:raw_recorder_incomplete`.
+   * Perception itself met every period: 0 missed periods, a 0.076 s maximum observation age, and complete delivery to
+     the adapter.
+   * §5.3 covers P4 perception and P5 inference limits, not P3 evidence recording.
+6. **Other items:**
+   * `policy:inference_p99`: 5.9 ms against the accepted 5 ms. All 47 invocations were inside the load window; the
+     maximum was 5.9 ms against 10 ms, and none came near the 0.020 s HOLD threshold.
+   * The P2 fail-closed landing's items: the runtime status, `p2:timing` and the four RECOVERY-landing items of §16.6.
+
+**Open decision (recommendation first):**
+* **Fix the two P6 defects.** No accepted code and no threshold change.
+  * The harness stops its workers on SIGINT or SIGTERM, records `cleared` with `stopped_early`, and exits 0.
+  * C-5 runs a LOAD check implementing §5.3: every breach in the window must be matched by its declared response. The
+    P5 inference-statistics items are allowed only with that check.
+* **How C-5 handles 24 workers on this host, where the P2 abort comes about 2 s into the load:**
+  * **Recommended: start the load at the map-loss trigger,** keeping 24 workers and 60 s.
+    * The map loss then happens under load from its first moment. In §16.8 the stale decision came 0.144 s after the
+      trigger; here the first breach came 2.06 s after the load started.
+    * After H35, accept either recovery or A10, or the §5.3 P2 abort checked by FAIL_CLOSED_LANDING.
+    * Residual risk: a dispatch breach before the first stale decision fails H35.
+  * *Alternative:* keep `transit_start` and accept the §5.3 abort before the map loss as a reported outcome. Map loss
+    under load would then likely never be shown on this host.
+  * *Alternative:* 8 workers, F6.01's lower level. Probably no breach and no recorder overflow, so no new exception is
+    needed, but the load is weaker and the frozen F8.03 row text changes.
+* **The recorder overflow at 24 workers is outside §5.3 and needs its own decision.**
+  * Recommended, narrowing an accepted P3 evidence check inside the declared load window only: replace the three
+    adapter items with a proof. The proof requires every lost frame inside the load window, the adapter meeting every
+    processing period, and the recorder drained and fsynced with no error. The loss is reported.
+  * Otherwise, C-5 at 24 workers fails whenever the recorder overflows.
+* Then a new development candidate. Before the real freeze, one unchanged candidate must still pass Gate B, S and C
+  content.
+
+### 16.11 The C-5 load decision implemented, and candidate `0db5c60a` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt as recommended"), as proposed in §16.10. It is recorded as
+`m6_c5_load_decision_approved` in the scenarios config and in contract §8.4 and §10.
+
+**Code (`4c76455`). No accepted P2–P5 source changes, and no threshold changes:**
+* **`injection/load_harness.py`: the harness stops cleanly.**
+  * A SIGINT or SIGTERM stop ends the workers, records `cleared` with `stopped_early` naming the signal, and exits 0.
+  * The workers ignore SIGINT, so a stop sent to the whole group reaches them only through the harness.
+  * Ledger lines are written whole.
+* **`configs/p6_scenarios.yaml`: C-5's load starts at the map-loss trigger.** `load_start` changed from `transit_start` to
+  `avoiding_first`. The workers (24), window (60 s) and drop window (1.0 s) are unchanged. The expected outcome now
+  includes the §5.3 P2 abort landed through RECOVERY.
+* **`validation/p6_safety_evaluate.py`: three new checks.**
+  * **`LOAD` implements §5.3.** The window comes from the harness's own ledger, on the shared monotonic clock. The
+    declared responses are:
+    * a P2 failure must be `stale_action`, inside the window, in a callback over the accepted 0.050 s budget;
+    * every inference above 0.020 s must hold;
+    * every stale onset must hover and hold, a `snapshot_stale` onset within H35.
+    
+    The P5 inference statistics must hold outside the window.
+  * **`LOAD_RECORDER` handles the recorder overflow.** It requires:
+    * every lost frame inside the window, with its written neighbours inside it too;
+    * the recorder drained and fsynced with no error, and its counts agree;
+    * 0 missed processing periods;
+    * the accepted P5 depth-stream evaluation failed on its two recorder items alone;
+    * the adapter's designed exit 3.
+  * **`LANDING` passes on the path the run took:** L45, or FAIL_CLOSED_LANDING. The RECOVERY_LANDING proof now takes
+    the items another passing proof of the same row explains.
+* **`validation/p6_evaluate.py`: C-5's rules.**
+  * Response: H35, STALE_IFF_AGE, LOAD, LOAD_RECORDER, FAIL_CLOSED_LANDING, LANDING, UNSAFE.
+  * Exceptions are exact items only. The inference statistics need LOAD, the dispatch abort and its landing items need
+    FAIL_CLOSED_LANDING, and the three recorder items need LOAD_RECORDER.
+
+**Tests:**
+* The harness, run through `p6_node.py` in its own group, stopped by a SIGINT to the group and by a SIGTERM to the
+  harness: exit 0, `cleared` recorded, and no worker survives.
+* LOAD: a positive case and each negative (wrong P2 failure, abort outside the window, no measured overrun, a load not
+  as declared, an unheld slow inference, a p99 breach outside the window, a late or moving stale onset, no
+  activation).
+* LOAD_RECORDER: a positive case and each negative, and nothing is recorded without an overflow.
+* C-5's composition, and both landing paths.
+* The C-5 runner trigger, which now fires on the map loss's own decision.
+
+**Replayed on the retained `75289deb` C-5 run** (non-strict, because its declaration predates the decision):
+* LOAD passes, matching the 53.8 ms overrun to the P2 abort.
+* LOAD_RECORDER passes, with all 31 lost frames inside the window.
+* The fail-closed landing's L45R passes. Its RECOVERY_LANDING proof finds exactly one unexplained item, the old
+  harness's `terminated_by_SIGINT`.
+* The run still fails, as it should: no H35, and the harness item.
+
+**Offline regression on `4c76455`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 165 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 116 passed, 49 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+WSL's git, which has no `autocrlf`, lists some accepted P5 files as modified. That is line endings only: the diff
+ignoring CRs is empty, Windows git shows them clean, the last commit touching P5 is `40a109b`, and the P5 manifest
+verifies.
+
+**Development candidate `0db5c60a20b3c458f8b65a8d508b57a5b99c0b6c477d7ca7c25cfcefc975bcdc`**
+(`state/p6-dev-candidate-d25831d.json`), frozen at `d25831d` from a clean P6 tree. Its P6 sources are those of
+`4c76455`; only the plan record changed in between. It verifies from any directory, and P3/P4/P5 re-verify. It binds
+41 files, faults `97fc5eef…` and scenarios `4e06ab00…`. No dry-run approval has been written.
+
+**Superseded freeze `06d08d98`** (`state/p6-dev-candidate-4c76455.json`, same sources and specs):
+* It was frozen with a relative Policy A approval path, so it verifies only from `~/uav_autonomy`. The launchers verify
+  from other directories.
+* Earlier candidates record the absolute path, and so does `0db5c60a`.
+* `06d08d98` was never approved or run, and the file is kept.
+
+**Next (needs its own authorization):**
+* A Gate C content rerun on `0db5c60a` in simulated flight, no credit. It is the first run of the load from the map
+  loss, and of the new LOAD, LOAD_RECORDER and LANDING checks on live evidence.
+* Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown.
+  S-5′ has not re-run live since its rule changed.
+
+### 16.12 Gate C content rerun in simulated flight on `0db5c60a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-0db5c60a20b3-gateC-flight.json` (Gate C content, simulated flight only, cap 5: one run per
+row, no retry; all 5 used). Verified before launch: AC power, Best-performance overlay `ded574b5`, host CPU 5 %, the
+manifest, no simulator or P6 process, no lock.
+
+**Run:** 12:23:05Z–12:39:42Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-0db5c60a20b3-20261114T122319Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.987–1.000 over each flight; Gazebo exited in 0.42–0.56 s on every row.
+
+**Passed (4):** C-1, C-2, C-3 (COMPLETE through a supervisor abort) and C-4, as in §16.10.
+
+**Failed (1): C-5, F8.03, on a gap in the adopted LOAD_RECORDER proof.** The §16.11 changes otherwise worked live:
+* **The map loss ran under load.** It fired at `avoiding_first` (78.46 s), and the load started on the same decision.
+  H35 passed (first stale 0.148 s after the trigger), the vehicle recovered, and STALE_IFF_AGE and UNSAFE passed.
+* **The harness stopped cleanly.** Cleanup's SIGINT ended the workers, the harness recorded `cleared` with
+  `stopped_early` SIGINT, and INJECTORS passed.
+* **LOAD passed.** At 85.66 s, 7.2 s into the load, one callback took 52.2 ms against the 50 ms budget. The accepted
+  P2 controller aborted (`stale_action`) and landed through RECOVERY, and LOAD matched that abort to the overrun.
+  `policy:inference_p99` was allowed by LOAD (every in-window inference was under 20 ms; outside the window p99 was
+  0.69 ms).
+* **L45R passed:** one LAND, landed and disarmed in 18.95 s.
+* **What failed: LOAD_RECORDER.**
+  * The accepted P3 raw recorder overflowed again, losing 43 frames, all inside the load window (82.95–87.34 s). The
+    recorder drained and fsynced with no error, the exit was the designed 3, and there were 0 missed periods.
+  * This time the overflow began before the sensor window ended at RECOVERY (85.66 s). In the `75289deb` run it came
+    after the window.
+  * The accepted P3 stream evaluator judges delivery by the recorder's own index, so 32 native frames the adapter had
+    received count as undelivered. That added `depth:source_to_ros_delivery_loss` (recorded fraction 0.9856) and
+    `depth:ros_receipts_not_in_native_ledger`.
+  * The adopted proof requires exactly the two recorder items, so it failed. FAIL_CLOSED_LANDING and LANDING then
+    failed too, because the adapter's exit 3 was left unexplained.
+* **Cause.** All 32 undelivered native frames lie in the 26 gaps between written receipts. Each gap holds exactly as many
+  native frames as overflowed receipt ids (one gap straddles the window end at 85.66 s). No written receipt lacks a
+  native frame. The adapter received every frame (receipt ids are assigned on receipt); only the recorder failed to
+  write them.
+* **In memory, with no file changed:** extending LOAD_RECORDER to also explain those two delivery items, only under
+  this one-to-one match, makes the run pass with every item allowed by its own check.
+
+**A plain retry on `0db5c60a` would probably fail the same way.** The recorder overflowed in both 24-worker flights (31
+and 43 frames), and whether the two delivery items appear depends only on whether the overflow starts before the P2
+abort ends the sensor window.
+
+**Open decision (recommendation first):**
+* **Recommended: extend LOAD_RECORDER** to replace `depth:source_to_ros_delivery_loss` and
+  `depth:ros_receipts_not_in_native_ledger` too, under all of the following:
+  * every native frame counted as undelivered lies in a gap between written receipts;
+  * each gap holds no more native frames than overflowed receipt ids;
+  * every overflowed receipt is inside the load window;
+  * no written receipt lacks a native frame;
+  * every other depth check passed.
+  
+  This narrows two more accepted P3 delivery checks, inside the declared load window only, to frames the adapter
+  received but could not record. Then a new development candidate and a C-5 rerun.
+* *Alternative:* 8 workers (§16.10).
+* *Alternative:* keep the rule. C-5 at 24 workers then fails whenever the overflow starts inside the sensor window.
+
+### 16.13 The recorder extension implemented, and candidate `6b1d952d` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt the extension"), as proposed in §16.12. It is recorded in
+contract §8.4 and §10.
+
+**Code (`32b5a6e`), evaluator only. No accepted P2–P5 source, spec or threshold changes:**
+* **`validation/p6_safety_evaluate.py`: the extended proof.** `LOAD_RECORDER_ITEMS` gains
+  `depth:source_to_ros_delivery_loss` and `depth:ros_receipts_not_in_native_ledger`. `load_recorder` accepts the P5
+  depth failures being either the two recorder items, or those plus the two delivery items with the new
+  `_undelivered_matched` check passing. That check:
+  * recomputes the accepted delivery computation with the accepted `p3_stream_eval.source_ledger` and
+    `evaluate_source` on the sensor window;
+  * requires every frame counted as undelivered to lie in a gap between written receipts, with at least as many
+    overflowed receipt ids in that gap (each frame matched to its own unrecorded receipt);
+  * requires no written receipt in the window without a native frame.
+* **`validation/p6_evaluate.py`:** the C-5 rule comment. Its exceptions follow `LOAD_RECORDER_ITEMS`, on C-5 only.
+
+**Tests:**
+* The matching. Negative cases: a real loss (a native frame with no overflowed receipt in its gap), two undelivered
+  frames for one overflowed receipt, a written receipt without a native frame, a frame after the last written receipt,
+  and any further depth failure.
+* The two items are allowed on C-5 only, and only with LOAD_RECORDER.
+* **The retained `0db5c60a` C-5 run now passes strict evaluation:** 43 receipts overflowed, all 32 undelivered frames
+  were matched, and it landed through FAIL_CLOSED_LANDING after H35. Its stored evaluation is unchanged.
+* The `75289deb` replay still holds. Its overflow came after the sensor window, so the delivery items never arose.
+
+**Offline regression on `32b5a6e`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 167 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 117 passed, 50 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `6b1d952d1266f1a2b87ac70e3fbe4b252cc7a40bd9574dd29e711a312a258433`**
+(`state/p6-dev-candidate-32b5a6e.json`), frozen at `32b5a6e` from a clean P6 tree:
+* It records the absolute Policy A approval path and verifies from `/tmp` and from home.
+* P3/P4/P5 re-verify.
+* It binds 41 files, faults `97fc5eef…` and scenarios `4e06ab00…`.
+* No dry-run approval has been written.
+
+**Next (needs its own authorization):** a Gate C content rerun on `6b1d952d` in simulated flight, no credit. Before
+the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown. S-5′ has not
+re-run live since its rule changed.
+
+### 16.14 Gate C content rerun in simulated flight on `6b1d952d` (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-6b1d952d1266-gateC-flight.json` (Gate C content, simulated flight only, cap 5, all used).
+Verified before launch: AC power, Best-performance overlay `ded574b5`, host CPU 1 %, the manifest, no simulator or P6
+process, no lock.
+
+**Run:** 03:07:28Z–03:23:40Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-6b1d952d1266-20261115T030743Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.993–1.000; Gazebo exited in 0.48–0.59 s on every row.
+
+**Passed (3):** C-1, C-3 (COMPLETE through a supervisor abort) and C-4.
+
+**Failed (2), neither on the stack's response to its fault:**
+1. **C-2, F3.07: a shutdown crash of the accepted P3 DDS agent.**
+   * The flight completed: 5 timeout holds, the goal reached, COMPLETE.
+   * At cleanup, PX4 shut down. The `MicroXRCEAgent` got SIGINT 0.02 s later, logged `server stopped`, then died of
+     SIGSEGV during its own teardown 1.65 s after the request. The item is `cleanup:dds-agent:terminated_by_SIGSEGV`,
+     and cleanup items are never excepted.
+   * It is the first such crash in 137 SIGINT-stopped agent runs since P3 (2026-10-25); the other 135 exited 0 and one
+     has no exit code.
+   * This is accepted P3 code, not changed by P6, and nothing in the evidence ties it to the fault. No change is
+     proposed: it stays a never-excepted item. A formal Gate C with no retries carries this small risk.
+2. **C-5, F8.03: a P6 proof-boundary defect. Every response check passed.**
+   * **The responses all passed:**
+     * H35: the first stale decision came 0.200 s after the trigger. The vehicle then recovered.
+     * LOAD: the 57.4 ms dispatch abort 2.3 s into the load was matched.
+     * LOAD_RECORDER: 16 lost frames, all after the sensor window.
+     * The fail-closed landing (L45R, landed and disarmed in 13.1 s) and LANDING.
+     * INJECTORS: the harness stopped cleanly. STALE_IFF_AGE and UNSAFE also passed.
+   * **What failed:** the map-drop proof (`_map_drop`). It fails if any snapshot that perception *processed* inside
+     (trigger, trigger + 1.0 s) is *ever* used. The shim drops by the controller's *receipt* time in
+     [trigger, trigger + 1.0 s).
+   * **What happened at the window's end:** the last in-window snapshot (processed 80.152 s, published at wall
+     72845.866) had not reached the controller by its decision at 80.200 (wall 72845.874), because the load was
+     slowing the executor. The shim received it after the window closed at 80.196 and correctly passed it; it was
+     first used at 80.232.
+   * **The shim's own ledger** shows 9 drops, received 79.248–80.100.
+   * **Independent proof:** all 22 of the controller's own decisions inside the window used the snapshot acquired
+     before the trigger (79.136), holding stale.
+   * The map loss therefore happened exactly as declared. The proof assumed delivery always beats the window's end,
+     and under load it did not.
+
+**Open decision (recommendation first):**
+* **Recommended: fix the proof (a P6 defect, no accepted code or threshold change).**
+  * Judge the drop where and when the shim applies it: no controller decision with sim time in
+    [trigger, trigger + window) may use a snapshot processed inside the window.
+  * Every such decision must use a snapshot acquired before the trigger.
+  * Perception must still have published inside the window.
+  * It affects the map-drop family, F4.01 (S-4) and F8.03 (C-5). In memory, this C-5 run then passes.
+* Then a new development candidate and a Gate C rerun.
+* C-2's agent crash needs no change.

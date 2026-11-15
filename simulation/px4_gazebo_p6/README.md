@@ -20,6 +20,18 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 | `scripts/p6_runner.py`, `p6_manifest.py`, `run_p6_gates.py`, `run_p6.sh`, `verify_p6_evidence.sh`, `p6_node.py` | M5: the runner (built on the accepted P5 runner), the candidate manifest (development candidates, dry-run approvals, live-run lock, drift check), the Gate A sequencer with its dry-run mode, the namespace launch, the evaluation wrapper |
 
 Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 complete 2026-11-13 (plan §15): the authorized
-dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gate A rows (plan §15.19), no credit. No P6 gate
-has run; M6 and the real P6 freeze each need their own authorization.
+dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gate A rows (plan §15.19), no credit. M6 in
+progress (plan §16): the runner and sequencer carry the Gate B, S and C flight rows; the Gate B content dry run (B-0, B-1)
+passed in simulated flight on development candidate `33f33c5a` (plan §16.5), and the Gate S content dry run passed 4 of 5
+(S-5′'s four P2-RECOVERY-landing items are now replaced by the RECOVERY_LANDING proof, plan §16.6–16.7), no credit.
+The Gate C content dry run on development candidate `23d513ee` passed 1 of 5; its three P6 defects are fixed and the C-3
+outcome rule adopted (plan §16.8–16.9). The rerun on development candidate `75289deb` (commit `e3c8b69`) passed 4 of 5;
+C-5's 24-worker load made the P2 controller abort before the map loss (plan §16.10). The adopted C-5 load decision is
+implemented (load at the map-loss trigger, the §5.3 LOAD check, the recorder proof, a clean harness stop), and
+development candidate `0db5c60a` (code `4c76455`, frozen at `d25831d`) was rerun: C-1 to C-4 passed, and C-5 failed
+on a gap in the recorder proof (the overflow fell inside the sensor window, adding two P3 delivery items; plan
+§16.11–16.12). The adopted extension is implemented, and the rerun on development candidate `6b1d952d` (commit `32b5a6e`)
+passed 3 of 5: C-2 hit a one-off shutdown crash of the accepted DDS agent, and C-5 passed every response check but
+failed on a P6 map-drop proof boundary under load; a proof fix is proposed (plan §16.13–16.14). No P6 gate has run; the real P6
+freeze and every gate need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.
