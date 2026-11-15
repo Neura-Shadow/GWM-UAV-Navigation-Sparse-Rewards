@@ -2104,3 +2104,35 @@ simulated flight with the vehicle armed in SITL only, never real hardware.
    (`bf1ef9b1…`, the same QGC build as P5), with `development_only` false.
 2. The real (non-development) freeze, from a clean tree.
 3. The real Gate A, then B, S and C, each with its own authorization, on that one manifest.
+
+### 16.19 The production Policy A approval (2026-11-15)
+
+**Decision:** the operator, 2026-11-15, "Approve Policy A". It answered the request to approve Policy A for the real P6
+candidate: Gate A on the ground, and Gates B, S and C in simulated flight.
+
+**Record:** `state/p6-policy-A-approval-c08bfc8.json` (contract `p3-native-command-policy-approval-v1`, written
+exclusively):
+* **Policy content:** policy A, `policy_sha256` `bf1ef9b1…`, which is the canonical digest of Policy A in the accepted
+  `p3_native_command_policy.json`, recomputed. It is the same content as P5 and the development candidates, with the
+  same `allowed` text.
+* **The approval:** `approved` true, by Neura-Shadow, with `development_only` false.
+* **Phase and build:** `candidate_phase` "P6 p6-acceptance-v1, the real (non-development) candidate", and the same QGC
+  build (source `4568b585…`, unattended ELF `82994283…`, as in the candidate runtime).
+* **Which sources it binds:** `candidate_repository_commit` `c08bfc8`, and `candidate_p6_source_files_sha256` `68b45c83…`,
+  the canonical digest of the 41 P6 source files of `57b9af72`, the sources that passed all four gates' content.
+* **Scope, stated explicitly:** Gate A on the ground (the vehicle is never armed). Gates B, S and C in simulated flight
+  only (SITL, the vehicle armed in simulation, never real hardware). Each gate is separately authorized, in order A → B
+  → S → C on one manifest, with no transfer to any other candidate, and none to any development candidate.
+
+**Validated, read-only:**
+* `p6_manifest.check_policy_approval` accepts it for a real candidate and refuses it for a development one; the
+  development approval is still refused for a real one.
+* The accepted P3 `load_policy` binds it to Policy A `bf1ef9b1…`.
+* No real P6 candidate manifest exists.
+
+**Next (needs its own authorization): the real freeze.**
+* Run `p6_manifest.py freeze` without `--development`, with the absolute path of this approval, from a clean tree at the
+  head. Since `c08bfc8` only documentation has changed.
+* Before recording the sha, check that the frozen P6 source files digest to `68b45c83…`. The freeze does not check that
+  field, and the approval's scope requires it. Then verify the manifest from `/tmp`.
+* Then the real Gate A, B, S and C, each separately authorized.
