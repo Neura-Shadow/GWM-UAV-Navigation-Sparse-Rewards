@@ -1876,3 +1876,56 @@ contract §8.4 and §10.
 **Next (needs its own authorization):** a Gate C content rerun on `6b1d952d` in simulated flight, no credit. Before
 the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown. S-5′ has not
 re-run live since its rule changed.
+
+### 16.14 Gate C content rerun in simulated flight on `6b1d952d` (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-6b1d952d1266-gateC-flight.json` (Gate C content, simulated flight only, cap 5, all used).
+Verified before launch: AC power, Best-performance overlay `ded574b5`, host CPU 1 %, the manifest, no simulator or P6
+process, no lock.
+
+**Run:** 03:07:28Z–03:23:40Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-6b1d952d1266-20261115T030743Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.993–1.000; Gazebo exited in 0.48–0.59 s on every row.
+
+**Passed (3):** C-1, C-3 (COMPLETE through a supervisor abort) and C-4.
+
+**Failed (2), neither on the stack's response to its fault:**
+1. **C-2, F3.07: a shutdown crash of the accepted P3 DDS agent.**
+   * The flight completed: 5 timeout holds, the goal reached, COMPLETE.
+   * At cleanup, PX4 shut down. The `MicroXRCEAgent` got SIGINT 0.02 s later, logged `server stopped`, then died of
+     SIGSEGV during its own teardown 1.65 s after the request. The item is `cleanup:dds-agent:terminated_by_SIGSEGV`,
+     and cleanup items are never excepted.
+   * It is the first such crash in 137 SIGINT-stopped agent runs since P3 (2026-10-25); the other 135 exited 0 and one
+     has no exit code.
+   * This is accepted P3 code, not changed by P6, and nothing in the evidence ties it to the fault. No change is
+     proposed: it stays a never-excepted item. A formal Gate C with no retries carries this small risk.
+2. **C-5, F8.03: a P6 proof-boundary defect. Every response check passed.**
+   * **The responses all passed:**
+     * H35: the first stale decision came 0.200 s after the trigger. The vehicle then recovered.
+     * LOAD: the 57.4 ms dispatch abort 2.3 s into the load was matched.
+     * LOAD_RECORDER: 16 lost frames, all after the sensor window.
+     * The fail-closed landing (L45R, landed and disarmed in 13.1 s) and LANDING.
+     * INJECTORS: the harness stopped cleanly. STALE_IFF_AGE and UNSAFE also passed.
+   * **What failed:** the map-drop proof (`_map_drop`). It fails if any snapshot that perception *processed* inside
+     (trigger, trigger + 1.0 s) is *ever* used. The shim drops by the controller's *receipt* time in
+     [trigger, trigger + 1.0 s).
+   * **What happened at the window's end:** the last in-window snapshot (processed 80.152 s, published at wall
+     72845.866) had not reached the controller by its decision at 80.200 (wall 72845.874), because the load was
+     slowing the executor. The shim received it after the window closed at 80.196 and correctly passed it; it was
+     first used at 80.232.
+   * **The shim's own ledger** shows 9 drops, received 79.248–80.100.
+   * **Independent proof:** all 22 of the controller's own decisions inside the window used the snapshot acquired
+     before the trigger (79.136), holding stale.
+   * The map loss therefore happened exactly as declared. The proof assumed delivery always beats the window's end,
+     and under load it did not.
+
+**Open decision (recommendation first):**
+* **Recommended: fix the proof (a P6 defect, no accepted code or threshold change).**
+  * Judge the drop where and when the shim applies it: no controller decision with sim time in
+    [trigger, trigger + window) may use a snapshot processed inside the window.
+  * Every such decision must use a snapshot acquired before the trigger.
+  * Perception must still have published inside the window.
+  * It affects the map-drop family, F4.01 (S-4) and F8.03 (C-5). In memory, this C-5 run then passes.
+* Then a new development candidate and a Gate C rerun.
+* C-2's agent crash needs no change.
