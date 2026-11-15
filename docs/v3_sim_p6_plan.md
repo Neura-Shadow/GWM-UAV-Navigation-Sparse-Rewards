@@ -2136,3 +2136,40 @@ exclusively):
 * Before recording the sha, check that the frozen P6 source files digest to `68b45c83…`. The freeze does not check that
   field, and the approval's scope requires it. Then verify the manifest from `/tmp`.
 * Then the real Gate A, B, S and C, each separately authorized.
+
+### 16.20 The real P6 candidate `22292775` frozen (2026-11-15)
+
+**Authorization:** the operator, 2026-11-15, "Authorize the freeze".
+
+**Checked before the freeze:**
+* The working tree was clean (only the untracked `.codegraph/`, outside P6), at head `8e29f3f`.
+* Since `c08bfc8` only the P6 README (not bound) had changed.
+* The live P6 source files digested to `68b45c83…`, the approval's binding.
+* There was no earlier real P6 manifest, no lock and no simulator or P6 process.
+
+**Freeze:** `p6_manifest.py freeze --policy-approval /home/…/state/p6-policy-A-approval-c08bfc8.json --output
+state/p6-candidate-8e29f3f.json`, without `--development`.
+
+**Real candidate `222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41`** (`state/p6-candidate-8e29f3f.json`):
+* **Flags:** `development` false, `acceptance_credit_possible` true, `execution_allowed_without_authorization` false,
+  `frozen_git_head` `8e29f3f`.
+* **Verification:** it verifies from `/tmp` and from home, and P3 `1e205fec…`, P4 `c110bd30…` and P5 `2becfbbb…`
+  re-verify.
+* **Native command policy:** Policy A `bf1ef9b1…`, with the production approval at its absolute path
+  (`development_only` false).
+* **Sources:** 41 P6 source files with canonical digest `68b45c83…`, matching the approval.
+* **Compared with development candidate `57b9af72`:** the same P6 source files, specs, injectors, baselines and P5
+  identity. The only differences are `development`, `acceptance_credit_possible`, the freeze head and time, and the
+  Policy A approval. So the real candidate binds exactly the code that passed Gate A, B, S and C content
+  (§16.16–16.18).
+
+**From now on:** any change to a bound file makes this a different candidate (contract §9). Only documentation may
+change.
+
+**How a real gate runs (contract §8, `p6_manifest.py authorize`):**
+* Each gate needs an operator authorization written with `authorize <manifest> --gate <G>` and the exact phrase
+  `authorize P6 Gate <G> 2229277…`. It allows exactly one execution (`max_attempts` 1). For Gate A it excludes flight.
+* The sequencer writes a permanent consumption marker, so a failed real gate cannot be retried on this candidate.
+* Gates run in order A → B → S → C, each needing its predecessor's accepted result for this manifest.
+
+**Next (needs its own authorization):** the real Gate A, the 18 ground rows, once, on `22292775`, for credit.
