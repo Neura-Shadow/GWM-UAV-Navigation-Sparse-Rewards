@@ -1,6 +1,10 @@
 # v3-SIM P6 — failure injection, fault-tolerant control and safety validation: plan
 
-**Status: CONTRACT APPROVED, NOTHING IMPLEMENTED (2026-11-06).** Nothing in P6 is implemented,
+**Status: P6 COMPLETE (2026-11-15).** The real candidate `22292775` passed Gates A, B, S and C (§16.21–16.24), and
+M7 is complete (§17; [final acceptance](v3_sim_p6_final_acceptance.md)). The rest of this paragraph is the status as
+of 2026-11-06, kept for the record.
+
+**Status on 2026-11-06: CONTRACT APPROVED, NOTHING IMPLEMENTED.** Nothing in P6 is implemented,
 frozen, launched or accepted.
 The [P6 contract](v3_sim_p6_contract.md) is approved. The operator answered decisions D1–D10 on
 2026-11-06, all as recommended (contract §10 decision record). **M0 (the read-only audit) is
@@ -347,7 +351,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
 | **M6** SITL fault validation — **COMPLETE 2026-11-15** (§16; the real Gates A, B, S and C all accepted on the real candidate `22292775`, §16.21–16.24) | Gates B, S and C, each separately authorized | gate results |
-| **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
+| **M7** qualification and report — **COMPLETE 2026-11-15** (§17; [final acceptance](v3_sim_p6_final_acceptance.md)) | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned: **earned, P6 COMPLETE** |
 
 ## 8. Research evaluation
 
@@ -2354,3 +2358,47 @@ P6 manifest").
 * the A/B/C comparison;
 * re-verification of the P3, P4 and P5 baselines;
 * the final report, and P6 final acceptance if earned.
+
+## 17. M7 record: qualification and report (authorized by the operator 2026-11-15: "Authorize M7")
+
+M7 is read-only on the evidence. It ran no simulator, changed no bound file and built no package. The result is the
+[final acceptance report](v3_sim_p6_final_acceptance.md).
+
+**Baseline re-verification** (2026-11-15, after Gate C):
+* The P3 `1e205fec…`, P4 `c110bd30…`, P5 `2becfbbb…` and P6 `22292775…` manifests all verify.
+* The P5 model file hashes to `ee006a80…`.
+* `git diff 1f06f39 HEAD` (P5 acceptance to now, 60 commits) over `simulation/px4_gazebo`, `px4_gazebo_p4` and
+  `px4_gazebo_p5` is empty.
+
+**Coverage report:** `docs/evidence/v3_sim_p6_22292775_coverage.json`.
+* It was made by the bound, unchanged M4 `p6_coverage_report.py` over the 26 evaluated runs of the four real gates.
+  Each evaluation's sha256 matches its gate result.
+* Its result: 26 rows passed, no gated run failed, and 0 unsafe-setpoint runs.
+* It lists F6.01 and F7.09 as "required faults without a passing run", because it ignores the specs' `realized_by`
+  field. Both are realized by passing rows: F6.01 by C-5 (F8.03, the LOAD check); F7.09 by S-4 (F4.01) and C-1
+  (F1.03), through the RECOVERY and UNSAFE checks.
+* No bound file was changed. The M7 comparison counts `realized_by`.
+
+**A/B/C comparison and coverage by class and tier:** `docs/evidence/v3_sim_p6_22292775_m7_comparison.json`, made by
+`diagnostics/p6_m7/m7_arms.py`. The script is outside every manifest scope, reads the retained evidence only, and
+writes with exclusive create.
+* **Coverage:** every required class item is covered: R-O 32/32, R-A 12/12, R-B 1/1, R-S 6/6, R-C 7/7.
+* **Characterization:** of the 35 C-class items, 12 have offline characterization data. No characterization flight
+  ran.
+* **Flights:** 12 in total, 1 in arm A, 9 in B and 2 in C. Every one had:
+  * 0 collisions;
+  * minimum truth clearance of at least 0.370 m;
+  * 0 unsafe commands;
+  * a verified landed-and-disarmed end.
+* **Outcomes:** 4 goals, 6 supervisor-ABORT landings, and 2 P2-RECOVERY landings.
+* **Deadlines:** 2 callbacks over the dispatch budget, both with their declared aborts (S-5′, C-5).
+* **Arm A:** 0 fault labels.
+* **Upper bound:** the exact one-sided 95 % upper bound on the per-flight unsafe-outcome probability is 22.1 %.
+
+**Final acceptance:** earned.
+* The contract's gate condition (§8) holds: A, B, S and C are accepted for the same P6 manifest.
+* Every §1 claim is supported by the evidence above.
+* No threshold was relaxed.
+* The limitations are stated in the report.
+
+**P6 is COMPLETE (2026-11-15).**

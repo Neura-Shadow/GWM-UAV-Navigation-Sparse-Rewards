@@ -19,6 +19,9 @@ P4 and P5 manifest scope, so the accepted baselines keep verifying.
 | `validation/p6_integration_evaluate.py` | M5: rule C11, the injector-process check (A-6), the A-3 relay figures and ground policy replay |
 | `scripts/p6_runner.py`, `p6_manifest.py`, `run_p6_gates.py`, `run_p6.sh`, `verify_p6_evidence.sh`, `p6_node.py` | M5: the runner (built on the accepted P5 runner), the candidate manifest (development candidates, dry-run approvals, live-run lock, drift check), the Gate A sequencer with its dry-run mode, the namespace launch, the evaluation wrapper |
 
+**P6 COMPLETE (2026-11-15):** manifest `22292775` passed Gates A, B, S and C, and M7 is done
+([final acceptance](../../docs/v3_sim_p6_final_acceptance.md)). The history follows.
+
 Status: M0, M1, M2 (2026-11-06), M3 and M4 (2026-11-07) complete. M5 complete 2026-11-13 (plan §15): the authorized
 dry run of development candidate `524f0714` (commit `e5d7fb5`) passed all 18 Gate A rows (plan §15.19), no credit. M6
 complete 2026-11-15 (plan §16): the runner and sequencer carry the Gate B, S and C flight rows; the Gate B content dry run (B-0, B-1)
@@ -41,6 +44,6 @@ candidate is recorded (plan §16.19), and the real P6 candidate `22292775` is fr
 the same sources as `57b9af72`; plan §16.20). **Real Gate A on `22292775` is ACCEPTED (18 of 18, credit; plan §16.21).** **Real Gate B is ACCEPTED (2 of 2,
 credit, simulated flight; plan §16.22).** **Real Gate S is ACCEPTED (5 of 5, credit, simulated flight; plan §16.23).**
 **Real Gate C is ACCEPTED (5 of 5, credit, simulated flight; plan §16.24): all four gates are accepted on
-`22292775`, and M6 is complete.** M7 (coverage report, A/B/C comparison, baseline re-verification, final report)
-comes next and needs its own authorization.
+`22292775`, and M6 is complete.** **M7 is complete, and P6 is COMPLETE (2026-11-15):** see the
+[final acceptance report](../../docs/v3_sim_p6_final_acceptance.md) (plan §17).
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

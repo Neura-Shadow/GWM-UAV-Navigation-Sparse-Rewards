@@ -1,0 +1,138 @@
+{
+  "contract": "p6-coverage-v1",
+  "degraded_sim_s": {
+    "max": 10.048000000000002,
+    "median": 0.3999999999999915,
+    "min": 0.05200000000000671,
+    "n": 9
+  },
+  "detection_latency_sim_s": {
+    "max": 5.0,
+    "median": 0.15199999999999392,
+    "min": 0.04800000000000004,
+    "n": 12
+  },
+  "fault_to_safe_action_sim_s": {
+    "max": 149.964,
+    "median": 0.15200000000000102,
+    "min": 0.04800000000000182,
+    "n": 11
+  },
+  "gated_runs_failed": [],
+  "note": "existence demonstrations under declared conditions; no detection, false-alarm or reliability rate is supported",
+  "passed_rows": [
+    "A-1",
+    "A-3",
+    "A-5.F1.01",
+    "A-5.F1.02",
+    "A-5.F1.04",
+    "A-5.F1.06",
+    "A-5.F1.07",
+    "A-5.F1.11",
+    "A-5.F2.09",
+    "A-5.F3.01",
+    "A-5.F3.02",
+    "A-5.F3.03",
+    "A-5.F4.07",
+    "A-5.F4.13",
+    "B-0",
+    "B-1",
+    "C-1",
+    "C-2",
+    "C-3",
+    "C-4",
+    "C-5",
+    "S-1",
+    "S-2'",
+    "S-3",
+    "S-4",
+    "S-5'"
+  ],
+  "recoveries": 4,
+  "required_faults_without_a_passing_run": [
+    "F6.01",
+    "F7.09"
+  ],
+  "rows": {
+    "A-1": [
+      "passed"
+    ],
+    "A-3": [
+      "passed"
+    ],
+    "A-5.F1.01": [
+      "passed"
+    ],
+    "A-5.F1.02": [
+      "passed"
+    ],
+    "A-5.F1.04": [
+      "passed"
+    ],
+    "A-5.F1.06": [
+      "passed"
+    ],
+    "A-5.F1.07": [
+      "passed"
+    ],
+    "A-5.F1.11": [
+      "passed"
+    ],
+    "A-5.F2.09": [
+      "passed"
+    ],
+    "A-5.F3.01": [
+      "passed"
+    ],
+    "A-5.F3.02": [
+      "passed"
+    ],
+    "A-5.F3.03": [
+      "passed"
+    ],
+    "A-5.F4.07": [
+      "passed"
+    ],
+    "A-5.F4.13": [
+      "passed"
+    ],
+    "B-0": [
+      "passed"
+    ],
+    "B-1": [
+      "passed"
+    ],
+    "C-1": [
+      "passed"
+    ],
+    "C-2": [
+      "passed"
+    ],
+    "C-3": [
+      "passed"
+    ],
+    "C-4": [
+      "passed"
+    ],
+    "C-5": [
+      "passed"
+    ],
+    "S-1": [
+      "passed"
+    ],
+    "S-2'": [
+      "passed"
+    ],
+    "S-3": [
+      "passed"
+    ],
+    "S-4": [
+      "passed"
+    ],
+    "S-5'": [
+      "passed"
+    ]
+  },
+  "runs": 26,
+  "unsafe_setpoint_runs": 0
+}
