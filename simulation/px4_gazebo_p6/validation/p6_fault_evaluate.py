@@ -125,10 +125,6 @@ def _adversarial(run, d, p, _):
 
 
 # ---- map and health inputs (perception's and the adapter's own records vs the controller) ----------------
-def _used_snapshots(run):
-    return {round(e["snapshot_acquisition_sim_s"], 6) for e in run.decisions if e.get("snapshot_acquisition_sim_s") is not None}
-
-
 def _ground_controller_input(run, p):
     """On the ground the controller records no decisions, so a fault in its own map or health input has no
     record outside the injector: it cannot be proved independently (contract C8) and must not pass."""
@@ -139,19 +135,43 @@ def _ground_controller_input(run, p):
 
 
 def _map_drop(run, d, p, _):
+    """F4.01 / F8.03: the controller's map input is dropped for the declared window from the trigger. The shim drops
+    by the controller's own receipt time, in [trigger, trigger + window). M6 fix (operator 2026-11-15, "Adopt the proof
+    fix", plan §16.14-16.15): the proof judges the controller's own decisions in that window, not every later use. On
+    `6b1d952d` C-5, under load, the last snapshot perception processed inside the window reached the controller after
+    the window and was used after it, which the declared drop allows. Required, from perception's and the controller's
+    own records:
+    * perception published inside the window (the source was alive, so the loss is at the controller's input);
+    * the controller decided inside the window;
+    * every decision inside it used one and the same snapshot, processed at or before the trigger (the one current at
+      the trigger). A snapshot let through at any time would change it, and none processed inside the window was used
+      inside it. Snapshots processed inside the window and first used after it are reported."""
     if _ground_controller_input(run, p):
         return
     act = activation(run, "controller_shim")
     p.check(act is not None, "no_activation")
     if act is None:
         return
-    window = d["parameters"]["drop_window_sim_s"]
-    published = [round(s["acquisition_sim_s"], 6) for s in run.local_map
-                 if s.get("usable") and act["sim_s"] < s["processing_sim_s"] < act["sim_s"] + window]
-    used = _used_snapshots(run)
-    p.evidence(published_in_window=len(published), used_from_window=len(set(published) & used))
-    p.check(bool(published), "perception_published_nothing_in_window")  # the source was alive: the drop is the controller's input
-    p.check(not set(published) & used, "controller_used_a_dropped_snapshot")
+    t0, window = act["sim_s"], d["parameters"]["drop_window_sim_s"]
+    processed = {round(s["acquisition_sim_s"], 6): s["processing_sim_s"] for s in run.local_map if s.get("usable")}
+    published = {a for a, t in processed.items() if t0 < t < t0 + window}
+    inside = [e for e in run.decisions if t0 <= e["sim_s"] < t0 + window]
+    used_inside = {None if e.get("snapshot_acquisition_sim_s") is None else round(e["snapshot_acquisition_sim_s"], 6)
+                   for e in inside}
+    first_use = {}
+    for e in run.decisions:
+        a = e.get("snapshot_acquisition_sim_s")
+        if a is not None:
+            first_use.setdefault(round(a, 6), e["sim_s"])
+    later = sorted(first_use[a] for a in published if a in first_use and a not in used_inside)
+    held = next(iter(used_inside)) if len(used_inside) == 1 else None
+    p.evidence(published_in_window=len(published), decisions_in_window=len(inside),
+               used_from_window=len(published & used_inside), snapshot_held_in_window=held,
+               used_after_window=len(later), first_used_after_window_sim_s=later[:5])
+    p.check(bool(published), "perception_published_nothing_in_window")
+    p.check(bool(inside), "no_controller_decision_in_window")
+    p.check(not published & used_inside, "controller_used_a_dropped_snapshot")
+    p.check(held is not None and processed.get(held, float("inf")) <= t0, "controller_map_input_changed_in_window")
 
 
 def _map_delay(run, d, p, _):

@@ -732,3 +732,56 @@ def test_the_retained_75289deb_c5_run_under_the_load_decision():
     assert allowed.get("policy:inference_p99") == "LOAD"
     assert {"proof:no_activation", "response:H35", "response:INJECTORS",
             "p5:cleanup:p6-load-harness:terminated_by_SIGINT"} <= set(out["failures"]), out["failures"]
+
+
+# ---- M6 map-drop proof fix (operator 2026-11-15, "Adopt the proof fix", plan §16.14-16.15) -------------------------
+def map_drop_run(tmp, uses, t0=10.0):
+    """Perception publishes every 0.1 s (acquired at k/10, processed 0.03 s later); the shim's drop window is
+    [t0, t0 + 1.0); `uses` maps each controller decision time to the snapshot acquisition it used."""
+    (tmp / "p6").mkdir(parents=True, exist_ok=True)
+    (tmp / "p4").mkdir(exist_ok=True)
+    (tmp / "p6/fault-ledger-controller_shim.jsonl").write_text(json.dumps({"kind": "activated", "sim_s": t0}) + chr(10))
+    snapshots = [{"usable": True, "acquisition_sim_s": round(k / 10, 3), "processing_sim_s": round(k / 10 + 0.03, 3)}
+                 for k in range(90, 125)]
+    (tmp / "p4/local_map.jsonl").write_text("".join(json.dumps(s) + chr(10) for s in snapshots))
+    events = [{"event": "p4_decision", "sim_s": t, "snapshot_acquisition_sim_s": a} for t, a in sorted(uses.items())]
+    (tmp / "ros-events.jsonl").write_text("".join(json.dumps(e) + chr(10) for e in events))
+    return Run(tmp)
+
+
+def test_the_map_drop_proof_judges_the_controllers_decisions_inside_the_drop_window(tmp_path):
+    """6b1d952d C-5: under load the last snapshot processed inside the window (10.93 s here) reached the controller
+    after the window and was first used after it, as the declared drop allows. Inside the window every decision must
+    hold the one snapshot current at the trigger; any snapshot let through, from before or inside the window, fails."""
+    from p6_fault_evaluate import prove
+    d = declaration.build("C-5")
+    window = [round(10.0 + 0.05 * k, 3) for k in range(20)]  # decisions in [10.0, 11.0)
+    held = {t: 9.9 for t in window}
+    late = {**held, 11.02: 10.9, 11.07: 11.0}
+    ok = prove(map_drop_run(tmp_path / "late", late), d)
+    assert ok["proved"], ok
+    assert ok["evidence"]["snapshot_held_in_window"] == 9.9 and ok["evidence"]["first_used_after_window_sim_s"] == [11.02]
+    leak = {**late, 10.5: 10.4}  # a snapshot processed inside the window, used inside it
+    out = prove(map_drop_run(tmp_path / "leak", leak), d)
+    assert {"proof:controller_used_a_dropped_snapshot", "proof:controller_map_input_changed_in_window"} <= set(out["failures"])
+    early = {**late, 10.3: 10.0}  # processed at 10.03, after the trigger, before any decision could hold it
+    assert "proof:controller_map_input_changed_in_window" in prove(map_drop_run(tmp_path / "early", early), d)["failures"]
+    pre = {t: (9.9 if t < 10.3 else 9.95) for t in window}  # switched to another pre-trigger snapshot inside the window
+    pre_out = prove(map_drop_run(tmp_path / "pre", {**pre, 9.95: 9.9}), d)
+    assert pre_out["failures"] == ["proof:controller_map_input_changed_in_window"], pre_out
+    none_inside = prove(map_drop_run(tmp_path / "none", {9.95: 9.9, 11.02: 10.9}), d)
+    assert "proof:no_controller_decision_in_window" in none_inside["failures"]
+
+
+def test_the_retained_6b1d952d_c5_run_passes_under_the_proof_fix():
+    """The 2026-11-15 C-5 rerun on 6b1d952d: every response check passed; its stored evaluation failed only the old
+    map-drop proof (the 80.092 s snapshot, processed at 80.152 s, reached the controller after the window closed at
+    80.196 s and was used at 80.232 s). All 22 decisions inside the window held the 79.136 s snapshot."""
+    run = _retained("20261115T032134Z-p6dry-C-5-*")
+    stored = json.loads((run / "p6/p6-evaluation.json").read_text())
+    assert stored["failures"] == ["proof:controller_used_a_dropped_snapshot"]
+    out = p6_evaluate.evaluate(run)
+    assert out["status"] == "passed", out["failures"]
+    evidence = out["proof"]["evidence"]
+    assert evidence["decisions_in_window"] == 22 and evidence["snapshot_held_in_window"] == 79.136
+    assert evidence["first_used_after_window_sim_s"] == [80.232]

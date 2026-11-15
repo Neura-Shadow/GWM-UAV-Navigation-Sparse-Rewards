@@ -430,6 +430,18 @@ the map loss fired. The rules are now:
   
   A frame that was really lost before the adapter has no overflowed receipt to match, so it still fails.
 
+**Map-drop proof (M6 fix, approved 2026-11-15, "Adopt the proof fix"; S-4 and C-5).** The controller shim drops map
+snapshots by the controller's own receipt time, in [trigger, trigger + window). The proof judges the controller's own
+decisions in that window. It requires:
+* perception published inside the window;
+* the controller decided inside it;
+* every decision inside it used one and the same snapshot, processed at or before the trigger.
+
+So no snapshot from the window, and no later pre-trigger snapshot, reached the controller during it. A snapshot that
+perception processed inside the window but that reached the controller after it, delivered late under load, may be
+used after the window; such snapshots are reported. Before this fix, any later use of an in-window snapshot failed
+the proof (`6b1d952d` C-5).
+
 P5's S2/S3/S4 qualification is not reused as P6 acceptance. Every Gate C row requires a detected
 fault and its safe handling.
 
@@ -480,6 +492,7 @@ Any change after freeze is a new P6 candidate.
 | M5 trigger point (2026-11-07, "Adopt both") | A-5.F4.07 and A-5.F4.13: `ground_controller` (first transition) → `ground_prestream` (the transition into PRESTREAM_SAFE_SETPOINTS) | at the first transition PX4 had published no attitude yet and its estimator was still starting up, so F4.13's ledger lacked attitude and its window began inside the start-up (`ce73e574` dry run). The proof also requires the injection after that transition and connectivity "passed". Plan §15.11–15.12 |
 | M5 F4.13 detection (2026-11-13, "接受並準備新候選", accept and prepare a new candidate) | A-5.F4.13 also accepts `clock_epoch_mismatch:<state topic>` | from PRESTREAM on the accepted `StateCache.validate` aborts at once, and PX4's timestamps pass the stopped clock by more than 0.1 s before the 1.0 s `clock_stalled` check (`44fa1111` rerun). The proof also requires that evidence in the controller's own ledger; the bound and the stop window are unchanged. Plan §15.14–15.15 |
 | M6 Gate C fixes and C-3 outcome (2026-11-14, "Adopt both") | C-1's drop proof judges the accepted sensor window; C-4 runs LIMITS_UNINJECTED, the check its timing exceptions name; the load harness is dispatchable; C-3 may report a P2 fail-closed RECOVERY landing | from the `23d513ee` Gate C dry run: three P6 defects (the proof judged start-up frames before the relay matched, a rule-table gap, a missing node module) and a host-timing `stale_action` after 70 s of adversarial flight with S0 held. Plan §16.8–16.9 |
+| M6 map-drop proof (2026-11-15, "Adopt the proof fix") | the F4.01/F8.03 proof judges the controller's decisions inside the shim's drop window: all hold the one snapshot current at the trigger | from the `6b1d952d` Gate C rerun: under load the last in-window snapshot reached the controller after the window and was used at 80.232 s; all 22 in-window decisions held the pre-trigger snapshot. §8.4; plan §16.14–16.15 |
 | M6 C-5 recorder extension (2026-11-14, "Adopt the extension") | `LOAD_RECORDER` also replaces `depth:source_to_ros_delivery_loss` and `depth:ros_receipts_not_in_native_ledger`, each undelivered frame matched to an overflowed receipt in its gap | from the `0db5c60a` Gate C rerun: the 43-frame overflow began inside the sensor window, and the accepted P3 evaluator judges delivery by the recorder's index; all 32 undelivered frames matched. §8.4; plan §16.12–16.13 |
 | M6 C-5 load (2026-11-14, "Adopt as recommended") | C-5's load starts at the map-loss trigger; after H35 a §5.3 P2 abort landed through RECOVERY is accepted; `LOAD` implements §5.3; `LOAD_RECORDER` replaces the P3 raw-recorder overflow inside the load window; the load harness stops cleanly on cleanup's SIGINT | from the `75289deb` Gate C rerun: the 24-worker load caused a dispatch abort before the map loss, the harness died on cleanup's SIGINT, §5.3 had no check, and the accepted recorder lost 31 frames inside the window. Workers, window and every threshold unchanged. §8.4; plan §16.10–16.11 |
 | M6 S-5′ RECOVERY landing (2026-11-14, "Adopt") | S-5′ may report exactly `cleanup:ros-controller:nonzero_exit_1`, `rgb_absence:snapshot_missing:window_end`, `p2_integrity_error:ValueError:estimator_reference_reset:final_alignment_lost` and `mc_causal_yaw:p2_integrity_missing` | replaced by the `RECOVERY_LANDING` proof (§8.3); the four items are what accepted code produces for any P2 RECOVERY landing (`33f33c5a` Gate S dry run). Plan §16.6–16.7 |
