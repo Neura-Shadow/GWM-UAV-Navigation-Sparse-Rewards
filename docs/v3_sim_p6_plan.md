@@ -2249,3 +2249,49 @@ true, no first failure, nothing not run.
 
 **Next (needs its own authorization):** the real Gate S on `22292775`, once, for credit, in simulated flight. That is
 S-1, S-2′, S-3, S-4 and S-5′.
+
+### 16.23 Real P6 Gate S on `22292775`: ACCEPTED, 5 of 5 (2026-11-15)
+
+**Authorization:** the operator, 2026-11-15, "Authorize real Gate S". The authorization is
+`state/p6-gate-S-authorization-222927752a50.json` (`p6-runtime-authorization-v1`, scope `p6_safety_critical_faults`,
+sha256 `0f854af0…`). It was written by `p6_manifest.py authorize` with the exact phrase, and allows exactly one
+execution (`max_attempts` 1), in simulated flight only.
+
+Verified before launch:
+* AC power, the Best-performance overlay `ded574b5`, and host CPU 2 %;
+* WSL load 0.53;
+* the manifest, no simulator or P6 process, and no lock;
+* the accepted real Gate B result for this manifest (the predecessor), and no earlier Gate S marker or result.
+
+**Run:**
+* It ran 10:12:01Z–10:25:10Z in simulated flight, with the same launcher `p6_gate.sh`.
+* The authorization was consumed before the first row: `state/p6-gate-S-2229277….consumed.json` (sha256
+  `6f779492…`).
+* The candidate was unchanged at every row and at the end, and still verifies. The lock was released, and no
+  process remained.
+
+**Result:** `state/p6-gate-S-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json` (sha256
+`169b5d34…`): **`accepted` true, `acceptance_credit` true**, `dry_run` false, `development` false, `all_rows_passed`
+true, no first failure, nothing not run.
+
+| Row | Fault | Run | Trigger (sim s) | Detection / safe action (sim s) | Outcome | Response checks |
+|---|---|---|---|---|---|---|
+| S-1 | F1.01 depth loss | `…101236Z-p6-S-1-fbfa0da3` | 89.8 | 0.284 | the P4 §9.1 F1–F4 fault-window response, not recovered (not mission-gated); 202 hold ticks, no unsafe move | FAULT_WINDOW, FAULT_WINDOW_F1F2, PROOF, INJECTORS, C11, UNSAFE |
+| S-2′ | F2.09 pose to perception | `…101515Z-p6-S-2p-1deb786d` | 81.992 | 0.248 | A10, then L45 | H35, A10, L45, PROOF, INJECTORS, C11, UNSAFE |
+| S-3 | F3.04 non-finite policy output | `…101746Z-p6-S-3-905a75fa` | 81.34 | 0.052 | L45 after 3 `output_not_finite` failures | PH3, L45, PROOF, INJECTORS, C11, UNSAFE |
+| S-4 | F4.01 map loss | `…102004Z-p6-S-4-758b6a5e` | 81.436 | 0.152 | recovered, goal reached | H35, RECOVERY, GOAL, PROOF, INJECTORS, C11, UNSAFE |
+| S-5′ | F6.03 control deadline | `…102312Z-p6-S-5p-d8f52054` | 85.692 | 0.048 | P2 `stale_action` abort, landed through RECOVERY (L45R) | R2, L45R, RECOVERY_LANDING, PROOF, INJECTORS, C11, UNSAFE |
+
+Every row had zero unsafe commands. In each row, the P5 items excepted are exactly that row's declared ones, and
+none were refused. On S-4, the map-drop proof (plan §16.15) shows 20 in-window decisions, all on the snapshot held
+from 81.316 s; none used a dropped snapshot.
+
+S-5′'s runtime exit code 1 is expected. It is the accepted P5 runner's exit after a P2 RECOVERY landing
+(`p4_outcome` failed), and the adopted RECOVERY_LANDING proof (plan §16.7) replaces it, with the three other
+RECOVERY-landing items, on this row only.
+
+**Gate S is accepted.** It provides the predecessor that Gate C requires for this manifest. Gates A, B and S are now
+accepted on `22292775`.
+
+**Next (needs its own authorization):** the real Gate C on `22292775`, once, for credit, in simulated flight. That is
+C-1 to C-5, including C-5's 24-worker load at the map-loss trigger (plan §16.11).
