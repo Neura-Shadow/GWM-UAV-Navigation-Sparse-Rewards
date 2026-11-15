@@ -32,6 +32,11 @@ development candidate `0db5c60a` (code `4c76455`, frozen at `d25831d`) was rerun
 on a gap in the recorder proof (the overflow fell inside the sensor window, adding two P3 delivery items; plan
 §16.11–16.12). The adopted extension is implemented, and the rerun on development candidate `6b1d952d` (commit `32b5a6e`)
 passed 3 of 5: C-2 hit a one-off shutdown crash of the accepted DDS agent, and C-5 passed every response check but
-failed on a P6 map-drop proof boundary under load; a proof fix is proposed (plan §16.13–16.14). No P6 gate has run; the real P6
+failed on a P6 map-drop proof boundary under load (plan §16.13–16.14). The adopted proof fix is implemented, and
+the Gate C content dry run on development candidate `57b9af72` (commit `c08bfc8`) passed all 5 rows, no credit (plan
+§16.15–16.16). Gate B (2 of 2) and Gate S (5 of 5) content then passed on that same candidate (plan §16.17): B, S and
+C content have all passed on one unchanged development candidate, with no credit. Gate A content (18 of 18) then
+passed on it too (plan §16.18): all four gates' content on one candidate. The production Policy A approval for the real
+candidate is recorded (plan §16.19); the real freeze and the real gates come next, each separately authorized. No P6 gate has run; the real P6
 freeze and every gate need their own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

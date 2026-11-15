@@ -1929,3 +1929,210 @@ released; no residual process. RTF 0.993–1.000; Gazebo exited in 0.48–0.59 s
   * It affects the map-drop family, F4.01 (S-4) and F8.03 (C-5). In memory, this C-5 run then passes.
 * Then a new development candidate and a Gate C rerun.
 * C-2's agent crash needs no change.
+
+### 16.15 The map-drop proof fix implemented, and candidate `57b9af72` (2026-11-15)
+
+**Decision:** adopted by the operator on 2026-11-15 ("Adopt the proof fix"), as proposed in §16.14. It is recorded in
+contract §8.4 and §10.
+
+**Code (`c08bfc8`), evaluator only. No accepted P2–P5 source, spec or threshold changes.**
+`validation/p6_fault_evaluate.py` `_map_drop` (F4.01 on S-4, F8.03 on C-5) judges the controller's own decisions in
+the shim's drop window [trigger, trigger + window). It requires:
+* perception published inside the window;
+* the controller decided inside it;
+* every decision inside it used one and the same snapshot, processed at or before the trigger.
+
+That fails both a snapshot leaked from inside the window and one leaked from before the trigger. Snapshots processed
+inside the window but first used after it are reported (`first_used_after_window_sim_s`). The unused
+`_used_snapshots` helper is removed.
+
+**Tests:**
+* The late-delivery boundary passes. An in-window leak, an early in-window leak, a switch to another pre-trigger
+  snapshot, and no decision in the window each fail.
+* The S-4 rig flight is unchanged: active passes, and pass-through fails.
+* **The retained `6b1d952d` C-5 run now passes strict evaluation:** 22 decisions held 79.136 s, and one in-window
+  snapshot was first used at 80.232 s.
+
+**All retained map-drop runs replayed:**
+* Gate S's S-4 (`33f33c5a`) still passes, strictly.
+* The `0db5c60a` C-5 run still passes, strictly.
+* The `23d513ee` and `75289deb` C-5 proofs are unchanged (proved, and no activation).
+
+**Offline regression on `c08bfc8`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 169 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 118 passed, 51 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `57b9af72154aacfc82d2f10227e542b6ef20495c6d1ffa8e973deafc1cda9767`**
+(`state/p6-dev-candidate-c08bfc8.json`), frozen at `c08bfc8` from a clean P6 tree:
+* It records the absolute Policy A approval path and verifies from `/tmp` and from home.
+* P3/P4/P5 re-verify.
+* It binds 41 files, faults `97fc5eef…` and scenarios `4e06ab00…`.
+* No dry-run approval has been written.
+
+**Next (needs its own authorization):** a Gate C content rerun on `57b9af72` in simulated flight, no credit. Because
+the proof also judges S-4, and S-5′ has not flown since its rule changed, the real freeze still needs a complete Gate
+B, S and C content pass on one unchanged candidate.
+
+### 16.16 Gate C content rerun in simulated flight on `57b9af72`: 5 of 5 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-57b9af72154a-gateC-flight.json` (Gate C content, simulated flight only, cap 5, all used).
+Verified before launch:
+* AC power and the Best-performance overlay `ded574b5`;
+* host CPU 2 %;
+* the manifest, no simulator or P6 process, and no lock.
+
+The WSL load average was 2.3 just after the regression, with CPU and I/O pressure at 0.00 and the CPU 93–97 % idle; the
+only blocked process was the check's own shell on the Windows drive.
+
+**Run:** 03:49:42Z–04:06:16Z, the five rows in frozen order, one run each. The result is
+`state/p6-dryrun-C-57b9af72154a-20261115T034956Z.result.json`: `all_rows_passed` true, `acceptance_credit` false. The
+candidate was unchanged throughout, the lock was released, and no process remained. RTF was 0.997–1.000, and Gazebo
+exited in 0.49–0.63 s on every row.
+
+**All five passed. This is the first complete Gate C content pass:**
+
+| Row | Fault | Outcome |
+|---|---|---|
+| C-1 | F1.03 depth bursts | burst frames dropped inside the sensor window; recovery; GOAL; COMPLETE |
+| C-2 | F3.07 five isolated timeouts | HOLD on exactly the injected ticks; LIMITS_UNINJECTED; GOAL; COMPLETE. The DDS agent shut down cleanly |
+| C-3 | F3.13 adversarial policy | worst allowed slot from the trigger on; UNSAFE passed; COMPLETE through a supervisor abort |
+| C-4 | F8.01 bridge stop + inference delay | detection 0.048 s; NO_INVOKE_AFTER_STALE; L45; FAULT_WINDOW_F1F2; LIMITS_UNINJECTED |
+| C-5 | F8.03 map loss under 24 workers | see below |
+
+**C-5 detail:**
+* **Map loss and H35.** The map loss fired at 79.200 s, and the load started on the same decision. H35 passed: the first
+  stale decision came 0.100 s after the trigger.
+* **The proof.** All 22 decisions in the window held the 79.036 s snapshot. Perception published 9 snapshots in the
+  window, and none was used inside it or after it.
+* **Recovery and LOAD.** The vehicle recovered. Then a 58.5 ms dispatch overrun 1.1 s into the load made the P2
+  controller abort (`stale_action`), and LOAD matched it.
+* **The landing.** FAIL_CLOSED_LANDING and LANDING passed (landed and disarmed in 12.4 s).
+* **Harness and recorder.** INJECTORS passed (the harness was stopped cleanly by cleanup's SIGINT). The recorder did not
+  overflow this time, so LOAD_RECORDER was not recorded and none of its items arose.
+* **S0** held.
+
+**What the real freeze still needs (each step separately authorized):**
+* Gate B and Gate S content dry runs on this same unchanged candidate, so that B, S and C have each passed on one
+  candidate. S-4's proof changed in §16.15, and S-5′ has not flown since its rule changed in §16.7.
+* Optionally, Gate A content on it too. Gate A last passed on `524f0714` (§15.19), and the runner, evaluator and
+  node code it uses have changed since.
+* Then the production Policy A approval, the real freeze, and the real Gates A→B→S→C on that manifest.
+
+### 16.17 Gate B and Gate S content dry runs on `57b9af72`: 2 of 2 and 5 of 5 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize B and S". There are two approvals, each simulated flight only,
+no credit, one run per row:
+* `state/p6-dry-run-approval-57b9af72154a-gateB-flight.json` (cap 2, both used);
+* `state/p6-dry-run-approval-57b9af72154a-gateS-flight.json` (cap 5, all used).
+
+Verified before launch: AC power, the Best-performance overlay `ded574b5`, host CPU 0 %, WSL load 0.28, the
+manifest, no simulator or P6 process, and no lock.
+
+**Runs, one after the other.** Gate B ran 04:12:59Z–04:18:43Z and Gate S ran 04:18:56Z–04:32:19Z. The results are
+`state/p6-dryrun-B-57b9af72154a-20261115T041317Z.result.json` and
+`state/p6-dryrun-S-57b9af72154a-20261115T041911Z.result.json`: both have `all_rows_passed` true and
+`acceptance_credit` false. The candidate was unchanged throughout and still verifies; no process remained. RTF was
+0.999–1.000, and Gazebo exited in 0.44–0.61 s on every row.
+
+| Row | Fault | Outcome |
+|---|---|---|
+| B-0 | none (pass-through) | every injector present in pass-through, nothing acted; GOAL; COMPLETE |
+| B-1 | F3.08 three policy timeouts | PH3; L45; LIMITS_UNINJECTED; detection 0.052 s |
+| S-1 | F1.01 bridge stop at distance | the accepted P4 §9.1 window (FAULT_WINDOW, FAULT_WINDOW_F1F2); detection 0.280 s |
+| S-2′ | F2.09 pose loss to perception | H35 then A10 `snapshot_stale`; L45; detection 0.292 s |
+| S-3 | F3.04 non-finite policy output | PH3; L45; detection 0.048 s |
+| S-4 | F4.01 map loss 1.0 s | under the §16.15 proof: 20 decisions held the 81.448 s snapshot, none used from the window; H35 0.148 s; RECOVERY; GOAL |
+| S-5′ | F6.03 mission tick +60 ms | R2 and L45R `stale_action`; the RECOVERY_LANDING proof (§16.6–16.7), its first live pass since the rule changed; detection 0.048 s |
+
+**Gate B, Gate S and Gate C content have now all passed on one unchanged development candidate, `57b9af72`**
+(§16.16–16.17). These are development dry runs, and none of them is gate credit.
+
+**Next (each separately authorized):**
+* **Recommended:** a Gate A content dry run (18 ground rows) on the same `57b9af72`, so all four gates have passed on
+  one candidate. Gate A last passed on `524f0714` (§15.19). Since then the runner (flight scope), the evaluator rule
+  table and checks, the node dispatcher and the load harness have changed, though no Gate A row's rules have.
+* Then the production Policy A approval (the development approval is refused for a real candidate), the real freeze,
+  and the real Gates A→B→S→C on that manifest.
+
+### 16.18 Gate A content dry run on `57b9af72`: 18 of 18 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate A". Approval
+`state/p6-dry-run-approval-57b9af72154a.json`: Gate A content, ground only (`flight` false, `vehicle_armed` false),
+cap 14. That is the 14 live ground runs of one pass (P3 readiness 1, ground readiness 1, ground fixtures 9, startup
+refusals 3); all were used. Verified before launch: AC power, the Best-performance overlay `ded574b5`, host CPU 0 %,
+WSL load 0.43 with CPU pressure 0.00, the manifest, no simulator or P6 process, and no lock.
+
+**Run:** 05:23:44Z–05:45:15Z, all 18 rows in frozen order, one run each. The result is
+`state/p6-dryrun-A-57b9af72154a-20261115T052359Z.result.json`: `all_rows_passed` true, `acceptance_credit` false. The
+candidate was unchanged throughout and still verifies; the lock was released, and no process remained.
+
+**All 18 passed:**
+* A-1 and A-3 passed with nothing excepted.
+* The A-5 fixtures and refusals passed. Each one's allowed items are those its rules define: the M4 replays, the M5
+  fail-closed proofs for F4.07 and F4.13, and the policy-fault refusal proofs.
+* The offline rows (A-2, A-4) and evaluation rows (A-6, A-7) passed.
+* The host-sensitive A-5.F2.09 passed.
+
+**Gate A, B, S and C content have now all passed on one unchanged development candidate, `57b9af72`:**
+
+| Gate | Result | Record |
+|---|---|---|
+| A | 18 of 18 | §16.18 |
+| B | 2 of 2 | §16.17 |
+| S | 5 of 5 | §16.17 |
+| C | 5 of 5 | §16.16 |
+
+These are development dry runs, with no gate credit. Since `c08bfc8` only documentation has changed, so a real freeze
+at the current head binds the same 41 P6 source files that passed.
+
+**A record to flag for the production approval.** The development Policy A approval
+(`state/p6-policy-A-approval-m5-development.json`, 2026-11-07) states its scope as "ground only, the vehicle is never
+armed". The M6 flight dry runs used development candidates bound to it. Each flight was separately authorized by the
+operator with an explicit simulated-flight dry-run approval (`flight`, `simulated_flight_only`, `vehicle_armed`), and
+the Policy A content checks (never excepted) passed on every flight. The approval file is left unchanged. The
+production approval should therefore name its scope explicitly: Gate A on the ground, and Gates B, S and C in
+simulated flight with the vehicle armed in SITL only, never real hardware.
+
+**Next (each separately authorized):**
+1. The production Policy A approval for the real P6 candidate. The policy content would be unchanged
+   (`bf1ef9b1…`, the same QGC build as P5), with `development_only` false.
+2. The real (non-development) freeze, from a clean tree.
+3. The real Gate A, then B, S and C, each with its own authorization, on that one manifest.
+
+### 16.19 The production Policy A approval (2026-11-15)
+
+**Decision:** the operator, 2026-11-15, "Approve Policy A". It answered the request to approve Policy A for the real P6
+candidate: Gate A on the ground, and Gates B, S and C in simulated flight.
+
+**Record:** `state/p6-policy-A-approval-c08bfc8.json` (contract `p3-native-command-policy-approval-v1`, written
+exclusively):
+* **Policy content:** policy A, `policy_sha256` `bf1ef9b1…`, which is the canonical digest of Policy A in the accepted
+  `p3_native_command_policy.json`, recomputed. It is the same content as P5 and the development candidates, with the
+  same `allowed` text.
+* **The approval:** `approved` true, by Neura-Shadow, with `development_only` false.
+* **Phase and build:** `candidate_phase` "P6 p6-acceptance-v1, the real (non-development) candidate", and the same QGC
+  build (source `4568b585…`, unattended ELF `82994283…`, as in the candidate runtime).
+* **Which sources it binds:** `candidate_repository_commit` `c08bfc8`, and `candidate_p6_source_files_sha256` `68b45c83…`,
+  the canonical digest of the 41 P6 source files of `57b9af72`, the sources that passed all four gates' content.
+* **Scope, stated explicitly:** Gate A on the ground (the vehicle is never armed). Gates B, S and C in simulated flight
+  only (SITL, the vehicle armed in simulation, never real hardware). Each gate is separately authorized, in order A → B
+  → S → C on one manifest, with no transfer to any other candidate, and none to any development candidate.
+
+**Validated, read-only:**
+* `p6_manifest.check_policy_approval` accepts it for a real candidate and refuses it for a development one; the
+  development approval is still refused for a real one.
+* The accepted P3 `load_policy` binds it to Policy A `bf1ef9b1…`.
+* No real P6 candidate manifest exists.
+
+**Next (needs its own authorization): the real freeze.**
+* Run `p6_manifest.py freeze` without `--development`, with the absolute path of this approval, from a clean tree at the
+  head. Since `c08bfc8` only documentation has changed.
+* Before recording the sha, check that the frozen P6 source files digest to `68b45c83…`. The freeze does not check that
+  field, and the approval's scope requires it. Then verify the manifest from `/tmp`.
+* Then the real Gate A, B, S and C, each separately authorized.
