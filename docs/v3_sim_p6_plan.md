@@ -2023,3 +2023,39 @@ exited in 0.49–0.63 s on every row.
 * Optionally, Gate A content on it too. Gate A last passed on `524f0714` (§15.19), and the runner, evaluator and
   node code it uses have changed since.
 * Then the production Policy A approval, the real freeze, and the real Gates A→B→S→C on that manifest.
+
+### 16.17 Gate B and Gate S content dry runs on `57b9af72`: 2 of 2 and 5 of 5 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize B and S". There are two approvals, each simulated flight only,
+no credit, one run per row:
+* `state/p6-dry-run-approval-57b9af72154a-gateB-flight.json` (cap 2, both used);
+* `state/p6-dry-run-approval-57b9af72154a-gateS-flight.json` (cap 5, all used).
+
+Verified before launch: AC power, the Best-performance overlay `ded574b5`, host CPU 0 %, WSL load 0.28, the
+manifest, no simulator or P6 process, and no lock.
+
+**Runs, one after the other.** Gate B ran 04:12:59Z–04:18:43Z and Gate S ran 04:18:56Z–04:32:19Z. The results are
+`state/p6-dryrun-B-57b9af72154a-20261115T041317Z.result.json` and
+`state/p6-dryrun-S-57b9af72154a-20261115T041911Z.result.json`: both have `all_rows_passed` true and
+`acceptance_credit` false. The candidate was unchanged throughout and still verifies; no process remained. RTF was
+0.999–1.000, and Gazebo exited in 0.44–0.61 s on every row.
+
+| Row | Fault | Outcome |
+|---|---|---|
+| B-0 | none (pass-through) | every injector present in pass-through, nothing acted; GOAL; COMPLETE |
+| B-1 | F3.08 three policy timeouts | PH3; L45; LIMITS_UNINJECTED; detection 0.052 s |
+| S-1 | F1.01 bridge stop at distance | the accepted P4 §9.1 window (FAULT_WINDOW, FAULT_WINDOW_F1F2); detection 0.280 s |
+| S-2′ | F2.09 pose loss to perception | H35 then A10 `snapshot_stale`; L45; detection 0.292 s |
+| S-3 | F3.04 non-finite policy output | PH3; L45; detection 0.048 s |
+| S-4 | F4.01 map loss 1.0 s | under the §16.15 proof: 20 decisions held the 81.448 s snapshot, none used from the window; H35 0.148 s; RECOVERY; GOAL |
+| S-5′ | F6.03 mission tick +60 ms | R2 and L45R `stale_action`; the RECOVERY_LANDING proof (§16.6–16.7), its first live pass since the rule changed; detection 0.048 s |
+
+**Gate B, Gate S and Gate C content have now all passed on one unchanged development candidate, `57b9af72`**
+(§16.16–16.17). These are development dry runs, and none of them is gate credit.
+
+**Next (each separately authorized):**
+* **Recommended:** a Gate A content dry run (18 ground rows) on the same `57b9af72`, so all four gates have passed on
+  one candidate. Gate A last passed on `524f0714` (§15.19). Since then the runner (flight scope), the evaluator rule
+  table and checks, the node dispatcher and the load harness have changed, though no Gate A row's rules have.
+* Then the production Policy A approval (the development approval is refused for a real candidate), the real freeze,
+  and the real Gates A→B→S→C on that manifest.
