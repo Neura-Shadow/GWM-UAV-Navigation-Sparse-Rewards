@@ -346,7 +346,7 @@ Two consequences, verified from code and to be confirmed in M3:
 | **M3** offline validation — **COMPLETE 2026-11-07** ([report](v3_sim_p6_m3_offline_report.md), §13) | every O-tier R item: P3 frame decoder and association; P4 perception on retained frames with corruptions; the supervisor and policy on recorded TRANSIT ticks and synthetic inputs; precedence (F8); the F2.04 map-reuse replay (extends P4 S7); F1.09; F4.03 | all R-O items pass; C-O items characterized with a written risk statement |
 | **M4** evaluators — **COMPLETE 2026-11-07** (§14) | `p6_fault_evaluate` (independent injection proof), `p6_safety_evaluate` (composes the unchanged P5/P4 evaluator functions), `p6_timing_evaluate` (clock table), `p6_coverage_report` | tests on synthetic and retained P5 evidence, including negative cases (a fault declared but not observed must fail) |
 | **M5** ground and integration — **COMPLETE 2026-11-13** (§15; the `524f0714` dry run passed all 18 rows, no credit, §15.19) | Gate A content dry-run on a development candidate (no credit), then the PX4-managed characterization needed by D4 on the ground only where safe | Gate A content reproducible |
-| **M6** SITL fault validation — **IN PROGRESS** (§16; Gate B dry run passed; Gate S dry run 4 of 5 and the S-5′ decision implemented; Gate C dry run 1 of 5 on `23d513ee`; the fixes and the C-3 rule implemented; candidate `75289deb` awaits a Gate C content rerun authorization, §16.9) | Gates B, S and C, each separately authorized | gate results |
+| **M6** SITL fault validation — **COMPLETE 2026-11-15** (§16; the real Gates A, B, S and C all accepted on the real candidate `22292775`, §16.21–16.24) | Gates B, S and C, each separately authorized | gate results |
 | **M7** qualification and report | coverage report, A/B/C comparison, baseline re-verification, final report | P6 final acceptance, if earned |
 
 ## 8. Research evaluation
@@ -2295,3 +2295,62 @@ accepted on `22292775`.
 
 **Next (needs its own authorization):** the real Gate C on `22292775`, once, for credit, in simulated flight. That is
 C-1 to C-5, including C-5's 24-worker load at the map-loss trigger (plan §16.11).
+
+### 16.24 Real P6 Gate C on `22292775`: ACCEPTED, 5 of 5; M6 complete (2026-11-15)
+
+**Authorization:** the operator, 2026-11-15, "Authorize real Gate C". The authorization is
+`state/p6-gate-C-authorization-222927752a50.json` (`p6-runtime-authorization-v1`, scope
+`p6_fault_tolerance_qualification`, sha256 `53e6e23b…`). It was written by `p6_manifest.py authorize` with the exact
+phrase, and allows exactly one execution (`max_attempts` 1), in simulated flight only.
+
+Verified before launch:
+* AC power, the Best-performance overlay `ded574b5`, and host CPU 2 %;
+* WSL load 0.31, with 7 GB memory available;
+* the manifest, no simulator or P6 process, and no lock;
+* the accepted real Gate S result for this manifest (the predecessor), and no earlier Gate C marker or result.
+
+**Run:**
+* It ran 12:03:37Z–12:19:49Z in simulated flight, with the same launcher `p6_gate.sh`.
+* The authorization was consumed before the first row: `state/p6-gate-C-2229277….consumed.json` (sha256
+  `89497df7…`).
+* The candidate was unchanged at every row and at the end, and still verifies. The lock was released, and no
+  process remained.
+
+**Result:** `state/p6-gate-C-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json` (sha256
+`1aef8379…`): **`accepted` true, `acceptance_credit` true**, `dry_run` false, `development` false, `all_rows_passed`
+true, no first failure, nothing not run.
+
+| Row | Fault | Run | Trigger (sim s) | Outcome | Response checks |
+|---|---|---|---|---|---|
+| C-1 | F1.03 depth bursts | `…120404Z-p6-C-1-a9b38f97` | 81.184 | recovered, goal reached. 64 raw frames inside the bursts, none relayed; 0 of 3 529 missing outside them in the sensor window. Stale iff the replayed age exceeded 0.25 s on every tick (no violation). | STALE_IFF_AGE, RECOVERY, GOAL, PROOF, INJECTORS, C11, UNSAFE |
+| C-2 | F3.07 isolated timeouts | `…120713Z-p6-C-2-ad2766a1` | 74.576 | recovered, goal reached. Exactly 5 timeout failures, all 5 shim-injected, with 5 HOLD ticks; the P5 inference limits held on every other tick. | LIMITS_UNINJECTED, GOAL, PROOF, INJECTORS, C11, UNSAFE |
+| C-3 | F3.13 adversarial policy | `…121018Z-p6-C-3-bea8cdfa` | 74.708 | the worst allowed choice on all 2 999 invocations after the trigger; no unsafe move. | PROOF, INJECTORS, C11, UNSAFE |
+| C-4 | F8.01 depth and inference compound | `…121524Z-p6-C-4-8623a241` | 81.796 | 3 timeout failures, all shim-injected; no policy invocation after the stale onset; landed by L45. | FAULT_WINDOW_F1F2, NO_INVOKE_AFTER_STALE, LIMITS_UNINJECTED, L45, PROOF, INJECTORS, C11, UNSAFE |
+| C-5 | F8.03 map loss under load | `…121745Z-p6-C-5-14840ae1` | 79.084 | see below | H35, STALE_IFF_AGE, LOAD, LOAD_RECORDER, FAIL_CLOSED_LANDING, LANDING, PROOF, INJECTORS, C11, UNSAFE |
+
+**C-5 in detail:**
+* **Map loss.** The map loss fired at 79.084 s sim. The first `snapshot_stale` came at 79.236 s, inside H35's 0.35 s,
+  with no target motion or yaw change. The map-drop proof shows 24 in-window decisions, all on the snapshot held
+  from 78.94 s, and none on a dropped snapshot.
+* **Load.** 24 workers were active from 79.38 s sim. The harness stopped cleanly on the runner's SIGINT and recorded
+  `cleared`.
+* **§5.3 response (LOAD).** One of the 228 callbacks in the window went over the 0.050 s dispatch budget: 55.4 ms, at
+  80.152 s. The P2 controller raised `stale_action` in that same callback, the declared §5.3 response. No inference
+  exceeded the failure limit. Outside the window, the inference p99 and max were both 3.0 ms.
+* **Landing.** It landed through RECOVERY with exactly one LAND, then landed and disarmed (FAIL_CLOSED_LANDING and
+  LANDING). The runtime exit code 1 is the designed exit after a P2 RECOVERY landing.
+* **Recorder (LOAD_RECORDER).** The accepted P3 raw recorder overflowed by 36 frames. All 36 missing receipts fall in
+  the load window, with no missed periods. P5 reported only the two recorder items, not the delivery items.
+
+In every row, the P5 items excepted are exactly that row's declared ones, none were refused, and there were zero
+unsafe commands.
+
+**Gate C is accepted. All four gates, A, B, S and C, are now accepted on the same P6 manifest `22292775`, and M6 is
+complete.** This meets the contract's gate condition (§8: "P6 is complete only with A, B, S and C accepted for the same
+P6 manifest").
+
+**Next (needs its own authorization):** M7, qualification and report (§7):
+* the coverage report;
+* the A/B/C comparison;
+* re-verification of the P3, P4 and P5 baselines;
+* the final report, and P6 final acceptance if earned.
