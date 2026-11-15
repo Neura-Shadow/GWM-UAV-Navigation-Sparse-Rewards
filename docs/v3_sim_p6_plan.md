@@ -1977,3 +1977,49 @@ inside the window but first used after it are reported (`first_used_after_window
 **Next (needs its own authorization):** a Gate C content rerun on `57b9af72` in simulated flight, no credit. Because
 the proof also judges S-4, and S-5′ has not flown since its rule changed, the real freeze still needs a complete Gate
 B, S and C content pass on one unchanged candidate.
+
+### 16.16 Gate C content rerun in simulated flight on `57b9af72`: 5 of 5 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-57b9af72154a-gateC-flight.json` (Gate C content, simulated flight only, cap 5, all used).
+Verified before launch:
+* AC power and the Best-performance overlay `ded574b5`;
+* host CPU 2 %;
+* the manifest, no simulator or P6 process, and no lock.
+
+The WSL load average was 2.3 just after the regression, with CPU and I/O pressure at 0.00 and the CPU 93–97 % idle; the
+only blocked process was the check's own shell on the Windows drive.
+
+**Run:** 03:49:42Z–04:06:16Z, the five rows in frozen order, one run each. The result is
+`state/p6-dryrun-C-57b9af72154a-20261115T034956Z.result.json`: `all_rows_passed` true, `acceptance_credit` false. The
+candidate was unchanged throughout, the lock was released, and no process remained. RTF was 0.997–1.000, and Gazebo
+exited in 0.49–0.63 s on every row.
+
+**All five passed. This is the first complete Gate C content pass:**
+
+| Row | Fault | Outcome |
+|---|---|---|
+| C-1 | F1.03 depth bursts | burst frames dropped inside the sensor window; recovery; GOAL; COMPLETE |
+| C-2 | F3.07 five isolated timeouts | HOLD on exactly the injected ticks; LIMITS_UNINJECTED; GOAL; COMPLETE. The DDS agent shut down cleanly |
+| C-3 | F3.13 adversarial policy | worst allowed slot from the trigger on; UNSAFE passed; COMPLETE through a supervisor abort |
+| C-4 | F8.01 bridge stop + inference delay | detection 0.048 s; NO_INVOKE_AFTER_STALE; L45; FAULT_WINDOW_F1F2; LIMITS_UNINJECTED |
+| C-5 | F8.03 map loss under 24 workers | see below |
+
+**C-5 detail:**
+* **Map loss and H35.** The map loss fired at 79.200 s, and the load started on the same decision. H35 passed: the first
+  stale decision came 0.100 s after the trigger.
+* **The proof.** All 22 decisions in the window held the 79.036 s snapshot. Perception published 9 snapshots in the
+  window, and none was used inside it or after it.
+* **Recovery and LOAD.** The vehicle recovered. Then a 58.5 ms dispatch overrun 1.1 s into the load made the P2
+  controller abort (`stale_action`), and LOAD matched it.
+* **The landing.** FAIL_CLOSED_LANDING and LANDING passed (landed and disarmed in 12.4 s).
+* **Harness and recorder.** INJECTORS passed (the harness was stopped cleanly by cleanup's SIGINT). The recorder did not
+  overflow this time, so LOAD_RECORDER was not recorded and none of its items arose.
+* **S0** held.
+
+**What the real freeze still needs (each step separately authorized):**
+* Gate B and Gate S content dry runs on this same unchanged candidate, so that B, S and C have each passed on one
+  candidate. S-4's proof changed in §16.15, and S-5′ has not flown since its rule changed in §16.7.
+* Optionally, Gate A content on it too. Gate A last passed on `524f0714` (§15.19), and the runner, evaluator and
+  node code it uses have changed since.
+* Then the production Policy A approval, the real freeze, and the real Gates A→B→S→C on that manifest.
