@@ -1830,3 +1830,49 @@ abort ends the sensor window.
   received but could not record. Then a new development candidate and a C-5 rerun.
 * *Alternative:* 8 workers (§16.10).
 * *Alternative:* keep the rule. C-5 at 24 workers then fails whenever the overflow starts inside the sensor window.
+
+### 16.13 The recorder extension implemented, and candidate `6b1d952d` (2026-11-14)
+
+**Decision:** adopted by the operator on 2026-11-14 ("Adopt the extension"), as proposed in §16.12. It is recorded in
+contract §8.4 and §10.
+
+**Code (`32b5a6e`), evaluator only. No accepted P2–P5 source, spec or threshold changes:**
+* **`validation/p6_safety_evaluate.py`: the extended proof.** `LOAD_RECORDER_ITEMS` gains
+  `depth:source_to_ros_delivery_loss` and `depth:ros_receipts_not_in_native_ledger`. `load_recorder` accepts the P5
+  depth failures being either the two recorder items, or those plus the two delivery items with the new
+  `_undelivered_matched` check passing. That check:
+  * recomputes the accepted delivery computation with the accepted `p3_stream_eval.source_ledger` and
+    `evaluate_source` on the sensor window;
+  * requires every frame counted as undelivered to lie in a gap between written receipts, with at least as many
+    overflowed receipt ids in that gap (each frame matched to its own unrecorded receipt);
+  * requires no written receipt in the window without a native frame.
+* **`validation/p6_evaluate.py`:** the C-5 rule comment. Its exceptions follow `LOAD_RECORDER_ITEMS`, on C-5 only.
+
+**Tests:**
+* The matching. Negative cases: a real loss (a native frame with no overflowed receipt in its gap), two undelivered
+  frames for one overflowed receipt, a written receipt without a native frame, a frame after the last written receipt,
+  and any further depth failure.
+* The two items are allowed on C-5 only, and only with LOAD_RECORDER.
+* **The retained `0db5c60a` C-5 run now passes strict evaluation:** 43 receipts overflowed, all 32 undelivered frames
+  were matched, and it landed through FAIL_CLOSED_LANDING after H35. Its stored evaluation is unchanged.
+* The `75289deb` replay still holds. Its overflow came after the sensor window, so the delivery items never arose.
+
+**Offline regression on `32b5a6e`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 167 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 117 passed, 50 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `6b1d952d1266f1a2b87ac70e3fbe4b252cc7a40bd9574dd29e711a312a258433`**
+(`state/p6-dev-candidate-32b5a6e.json`), frozen at `32b5a6e` from a clean P6 tree:
+* It records the absolute Policy A approval path and verifies from `/tmp` and from home.
+* P3/P4/P5 re-verify.
+* It binds 41 files, faults `97fc5eef…` and scenarios `4e06ab00…`.
+* No dry-run approval has been written.
+
+**Next (needs its own authorization):** a Gate C content rerun on `6b1d952d` in simulated flight, no credit. Before
+the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown. S-5′ has not
+re-run live since its rule changed.
