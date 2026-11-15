@@ -2173,3 +2173,42 @@ change.
 * Gates run in order A → B → S → C, each needing its predecessor's accepted result for this manifest.
 
 **Next (needs its own authorization):** the real Gate A, the 18 ground rows, once, on `22292775`, for credit.
+
+### 16.21 Real P6 Gate A on `22292775`: ACCEPTED, 18 of 18 (2026-11-15)
+
+**Authorization:** the operator, 2026-11-15, "Authorize real Gate A". The authorization is
+`state/p6-gate-A-authorization-222927752a50.json` (`p6-runtime-authorization-v1`, sha256 `7d014f10…`). It was
+written by `p6_manifest.py authorize` with the exact phrase, and allows exactly one execution (`max_attempts` 1),
+excluding flight.
+
+Verified before launch:
+* AC power, the Best-performance overlay `ded574b5`, and host CPU 1 %;
+* WSL load 0.56, with CPU pressure 0.00;
+* the manifest, no simulator or P6 process, no lock, and no earlier P6 gate marker or result.
+
+**Run:**
+* It ran 07:40:35Z–08:00:45Z, ground only. It used the scratchpad launcher `p6_gate.sh`, which is
+  `run_p6_gates.py --gate A` without `--dry-run`.
+* The authorization was consumed before the first row: `state/p6-gate-A-2229277….consumed.json` (sha256 `31d732ba…`).
+* The candidate was unchanged at every row (drift check) and at the end, and still verifies. The lock was released,
+  and no process remained.
+
+**Result:** `state/p6-gate-A-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json` (sha256
+`358ecf5d…`; contract `p6-gate-result-v1`): **`accepted` true, `acceptance_credit` true**, `dry_run` false,
+`development` false, `all_rows_passed` true, no first failure, nothing not run.
+
+| Rows | Scope | Result |
+|---|---|---|
+| A-1 | P3 readiness | passed |
+| A-2, A-4 | offline (baselines; the M3 offline suite) | passed |
+| A-3 | ground readiness, pass-through | passed |
+| A-5.F1.01, F1.02, F1.04, F1.06, F1.07, F1.11, F2.09 | ground fixtures | passed |
+| A-5.F3.01, F3.02, F3.03 | startup refusals | passed |
+| A-5.F4.07, F4.13 | ground fixtures (fail-closed) | passed |
+| A-6, A-7 | aggregate evaluation | passed |
+
+**This is the first accepted P6 gate.** It provides the predecessor that Gate B requires for this manifest.
+
+**Next (needs its own authorization):** the real Gate B on `22292775`, in simulated flight (SITL, the vehicle armed
+in simulation, never real hardware), once, for credit. That is B-0 (pass-through nominal flight) and B-1 (the policy
+timeout smoke).
