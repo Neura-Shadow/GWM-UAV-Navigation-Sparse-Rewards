@@ -1929,3 +1929,51 @@ released; no residual process. RTF 0.993–1.000; Gazebo exited in 0.48–0.59 s
   * It affects the map-drop family, F4.01 (S-4) and F8.03 (C-5). In memory, this C-5 run then passes.
 * Then a new development candidate and a Gate C rerun.
 * C-2's agent crash needs no change.
+
+### 16.15 The map-drop proof fix implemented, and candidate `57b9af72` (2026-11-15)
+
+**Decision:** adopted by the operator on 2026-11-15 ("Adopt the proof fix"), as proposed in §16.14. It is recorded in
+contract §8.4 and §10.
+
+**Code (`c08bfc8`), evaluator only. No accepted P2–P5 source, spec or threshold changes.**
+`validation/p6_fault_evaluate.py` `_map_drop` (F4.01 on S-4, F8.03 on C-5) judges the controller's own decisions in
+the shim's drop window [trigger, trigger + window). It requires:
+* perception published inside the window;
+* the controller decided inside it;
+* every decision inside it used one and the same snapshot, processed at or before the trigger.
+
+That fails both a snapshot leaked from inside the window and one leaked from before the trigger. Snapshots processed
+inside the window but first used after it are reported (`first_used_after_window_sim_s`). The unused
+`_used_snapshots` helper is removed.
+
+**Tests:**
+* The late-delivery boundary passes. An in-window leak, an early in-window leak, a switch to another pre-trigger
+  snapshot, and no decision in the window each fail.
+* The S-4 rig flight is unchanged: active passes, and pass-through fails.
+* **The retained `6b1d952d` C-5 run now passes strict evaluation:** 22 decisions held 79.136 s, and one in-window
+  snapshot was first used at 80.232 s.
+
+**All retained map-drop runs replayed:**
+* Gate S's S-4 (`33f33c5a`) still passes, strictly.
+* The `0db5c60a` C-5 run still passes, strictly.
+* The `23d513ee` and `75289deb` C-5 proofs are unchanged (proved, and no activation).
+
+**Offline regression on `c08bfc8`:**
+
+| Host | Suite | Result |
+|---|---|---|
+| WSL | P6 tests | 169 passed, 0 skipped |
+| WSL | M3 offline suite runner | 89/89, 32/32 required, 12/12 rehearsals |
+| WSL | P5 tests | 199 passed; the ROS harness ran separately with ROS and `ros_ws` sourced, 5 passed |
+| Windows | P6 tests | 118 passed, 51 skipped (Linux-only or retained WSL evidence; not counted as passes) |
+
+**Development candidate `57b9af72154aacfc82d2f10227e542b6ef20495c6d1ffa8e973deafc1cda9767`**
+(`state/p6-dev-candidate-c08bfc8.json`), frozen at `c08bfc8` from a clean P6 tree:
+* It records the absolute Policy A approval path and verifies from `/tmp` and from home.
+* P3/P4/P5 re-verify.
+* It binds 41 files, faults `97fc5eef…` and scenarios `4e06ab00…`.
+* No dry-run approval has been written.
+
+**Next (needs its own authorization):** a Gate C content rerun on `57b9af72` in simulated flight, no credit. Because
+the proof also judges S-4, and S-5′ has not flown since its rule changed, the real freeze still needs a complete Gate
+B, S and C content pass on one unchanged candidate.
