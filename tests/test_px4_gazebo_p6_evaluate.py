@@ -565,13 +565,24 @@ def test_the_load_check_matches_each_breach_to_its_declared_response(tmp_path):
     assert load_check(Run(no_load)) == {"passed": False, "error": "no_load_activation"}
 
 
-def recorder_run(tmp, missing=(5, 6, 9), lost_wall=None, missed_periods=0, depth_failures=None, error=None, exit_code=3):
-    """A recorder overflow: 12 receipts at wall 1001.0 + 0.1 k, the load window [1000.0, 1014.0]."""
+def _stamp(k):
+    return 1_000_000_000 + 33_000_000 * k
+
+
+def recorder_run(tmp, missing=(5, 6, 9), lost_wall=None, missed_periods=0, depth_failures=None, error=None, exit_code=3,
+                 native_extra=(), foreign=()):
+    """A recorder overflow: 12 receipts at wall 1001.0 + 0.1 k, the load window [1000.0, 1014.0]; the native source
+    ledger has one frame per receipt (plus `native_extra` stamps), the sensor window is [0.5, 2.0] s."""
     load_run(tmp)
     (tmp / "sensors").mkdir(exist_ok=True)
     walls = {k: 1001.0 + 0.1 * k for k in range(1, 13)}
     walls.update(lost_wall or {})
-    index = [{"receipt_id": k, "receipt_wall_s": walls[k]} for k in range(1, 13) if k not in missing]
+    index = [{"receipt_id": k, "receipt_wall_s": walls[k], "acquisition_stamp_ns": _stamp(k) + (7 if k in foreign else 0),
+              "accepted": True} for k in range(1, 13) if k not in missing]
+    native = sorted([_stamp(k) for k in range(1, 13)] + list(native_extra))
+    (tmp / "source").mkdir(exist_ok=True)
+    (tmp / "source/depth-headers.jsonl").write_text("".join(
+        json.dumps({"id": n, "seq": n, "stamp_ns": s}) + chr(10) for n, s in enumerate(native, 1)))
     (tmp / "sensors/depth-index.jsonl").write_text("".join(json.dumps(r) + chr(10) for r in index))
     recorder = {"accepted": len(index), "written": len(index), "overflow": len(missing), "drained": True, "fsynced": True,
                 "error": error, "complete": False}
@@ -583,6 +594,7 @@ def recorder_run(tmp, missing=(5, 6, 9), lost_wall=None, missed_periods=0, depth
     summary["processes"] = [{"name": "sensor-adapter", "exit_code": exit_code, "stop_method": "SIGINT", "reaped": True,
                              "forced": False, "graceful_codes": [0], "stop_requested_monotonic_s": 1013.0,
                              "exit_observed_monotonic_s": 1013.2, "grace_s": 15.0, "remaining_group_members": []}]
+    summary["sensor_window_sim_s"] = [0.5, 2.0]
     (tmp / "summary.json").write_text(json.dumps(summary))
     (tmp / "p5-evaluation.json").write_text(json.dumps({"depth_stream": {"failures": depth_failures or [
         "adapter_result_not_passed", "raw_recorder_incomplete"]}}))
@@ -604,6 +616,51 @@ def test_the_load_recorder_proof_accepts_an_overflow_inside_the_window_only(tmp_
     c = Checks({})
     p6_evaluate.response.load_recorder_check(Run(clean), c)
     assert "LOAD_RECORDER" not in c.out  # no overflow: nothing recorded, so its exceptions apply to nothing
+
+
+DELIVERY = ["adapter_result_not_passed", "raw_recorder_incomplete", "source_to_ros_delivery_loss",
+            "ros_receipts_not_in_native_ledger"]
+
+
+def test_the_extended_recorder_proof_matches_each_undelivered_frame_to_an_overflowed_receipt(tmp_path):
+    """0db5c60a C-5 (plan §16.12): with the overflow inside the sensor window, the accepted P3 evaluator (which judges
+    delivery by the recorder's index) also reports its two delivery items. They are explained only when each frame it
+    counts as undelivered lies in a gap between written receipts holding an overflowed receipt of its own."""
+    ok = p6_evaluate.response.load_recorder(recorder_run(tmp_path / "ok", depth_failures=DELIVERY))
+    assert ok["passed"] and ok["delivery"]["undelivered_by_index"] == 3 and ok["delivery"]["gaps"] == 2, ok
+    real_loss = recorder_run(tmp_path / "real_loss", depth_failures=DELIVERY, native_extra=(_stamp(2) + 10_000_000,))
+    out = p6_evaluate.response.load_recorder(real_loss)  # a native frame between receipts 2 and 3: nothing overflowed there
+    assert not out["passed"] and out["delivery"]["gaps_short_of_overflowed_receipts"] == [[2, 3]], out
+    two_in_one = recorder_run(tmp_path / "two", depth_failures=DELIVERY, native_extra=(_stamp(9) + 10_000_000,))
+    assert not p6_evaluate.response.load_recorder(two_in_one)["passed"]  # 2 undelivered, 1 overflowed receipt in the gap
+    foreign = recorder_run(tmp_path / "foreign", depth_failures=DELIVERY, foreign=(3,))
+    assert p6_evaluate.response.load_recorder(foreign)["delivery"]["receipts_not_native_ns"], "a receipt without a native frame"
+    edge = recorder_run(tmp_path / "edge", depth_failures=DELIVERY, native_extra=(_stamp(12) + 10_000_000,))
+    assert not p6_evaluate.response.load_recorder(edge)["passed"]  # after the last written receipt: not in any gap
+    other = recorder_run(tmp_path / "other", depth_failures=DELIVERY + ["observation_age"])
+    assert not p6_evaluate.response.load_recorder(other)["passed"] and p6_evaluate.response.load_recorder(other)["delivery"] is None
+    rules = p6_evaluate.ROWS["C-5"]["exceptions"]
+    items = ["depth:source_to_ros_delivery_loss", "depth:ros_receipts_not_in_native_ledger"]
+    assert p6_evaluate.compose(items, rules, {"LOAD_RECORDER": {"passed": True}})[1] == []
+    assert p6_evaluate.compose(items, rules, {})[1] == items
+    for row in ("C-1", "C-4", "S-1"):  # nowhere else
+        assert p6_evaluate.compose(items, p6_evaluate.ROWS[row]["exceptions"], {"LOAD_RECORDER": {"passed": True}})[1] == items, row
+
+
+def test_the_retained_0db5c60a_c5_run_passes_under_the_extension():
+    """The 2026-11-14 C-5 rerun on 0db5c60a (its declaration is the frozen row): the map loss under load, H35, recovery,
+    the 52.2 ms dispatch abort matched by LOAD, a clean harness stop; the 43-frame overflow began inside the sensor
+    window, and all 32 frames the P3 evaluator counted as undelivered match overflowed receipts. Stored evaluation
+    unchanged; it failed under the rule as first adopted and passes under the extension."""
+    run = _retained("20261114T123723Z-p6dry-C-5-*")
+    assert json.loads((run / "p6/p6-evaluation.json").read_text())["status"] == "failed"
+    out = p6_evaluate.evaluate(run)
+    assert out["status"] == "passed", out["failures"]
+    proof = out["response"]["LOAD_RECORDER"]
+    assert proof["missing_receipts"] == 43 and proof["delivery"]["undelivered_by_index"] == 32, proof
+    assert out["response"]["LANDING"]["path"] == "FAIL_CLOSED_LANDING" and out["response"]["H35"]["passed"]
+    allowed = {a["item"]: a["replacement"] for a in out["p5_failures_allowed"]}
+    assert all(allowed[item] == "LOAD_RECORDER" for item in p6_evaluate.response.LOAD_RECORDER_ITEMS), allowed
 
 
 def test_c5_allows_its_load_items_only_with_their_checks():
@@ -667,7 +724,11 @@ def test_the_retained_75289deb_c5_run_under_the_load_decision():
     assert landing["l45r"]["passed"], landing
     assert landing["recovery_landing"]["other_items"] == ["cleanup:p6-load-harness:terminated_by_SIGINT"], landing
     allowed = {a["item"]: a["replacement"] for a in out["p5_failures_allowed"]}
-    assert all(allowed.get(item) == "LOAD_RECORDER" for item in p6_evaluate.response.LOAD_RECORDER_ITEMS), allowed
+    recorder_items = [x for x in p6_evaluate.response.LOAD_RECORDER_ITEMS if not x.startswith(("depth:source_to_ros",
+                                                                                              "depth:ros_receipts"))]
+    assert len(recorder_items) == 3 and all(allowed.get(item) == "LOAD_RECORDER" for item in recorder_items), allowed
+    # its overflow came after the sensor window ended (76.568 s), so the P3 delivery items never arose
+    assert response["LOAD_RECORDER"]["delivery"] is None and "depth:source_to_ros_delivery_loss" not in allowed
     assert allowed.get("policy:inference_p99") == "LOAD"
     assert {"proof:no_activation", "response:H35", "response:INJECTORS",
             "p5:cleanup:p6-load-harness:terminated_by_SIGINT"} <= set(out["failures"]), out["failures"]

@@ -71,7 +71,9 @@ ROWS = {
     # loss. After H35 the row lands through COMPLETE (L45) or, on the contract §5.3 dispatch response, through RECOVERY
     # (FAIL_CLOSED_LANDING); LANDING passes on the path taken. LOAD implements §5.3 and alone allows the P5 inference
     # statistics. LOAD_RECORDER replaces exactly the accepted P3 raw-recorder overflow's three items, when every lost
-    # frame is inside the load window and perception kept every period.
+    # frame is inside the load window and perception kept every period; and (extension, operator 2026-11-14, "Adopt
+    # the extension", plan §16.12-16.13) the two P3 delivery items an overflow inside the sensor window produces, when
+    # each frame they count as undelivered is matched to an overflowed receipt.
     "C-5": {"response": ["H35", "STALE_IFF_AGE", "LOAD", "LOAD_RECORDER", "FAIL_CLOSED_LANDING", "LANDING", "UNSAFE"],
             "exceptions": {"performance:": "STALE_IFF_AGE", "outcome:": "LANDING",
                            "=policy:inference_p99": "LOAD", "=policy:inference_max": "LOAD",

@@ -341,8 +341,48 @@ def load(run, c, limits, dispatch_budget_s):
 
 
 LOAD_RECORDER_ITEMS = ("cleanup:sensor-adapter:nonzero_exit_3", "depth:adapter_result_not_passed",
-                       "depth:raw_recorder_incomplete")
+                       "depth:raw_recorder_incomplete",
+                       # M6 extension (operator 2026-11-14, "Adopt the extension", plan §16.12-16.13): the accepted P3
+                       # stream evaluator judges delivery by the recorder's own index, so frames the adapter received
+                       # but could not record count as undelivered when the overflow falls inside the sensor window.
+                       "depth:source_to_ros_delivery_loss", "depth:ros_receipts_not_in_native_ledger")
 DEPTH_RECORDER_FAILURES = ["adapter_result_not_passed", "raw_recorder_incomplete"]
+DEPTH_DELIVERY_FAILURES = ["source_to_ros_delivery_loss", "ros_receipts_not_in_native_ledger"]
+
+
+def _undelivered_matched(run, index, missing):
+    """The accepted P3 delivery check's own computation (`p3_stream_eval`: the native source frames in the accepted
+    sensor window, delivered only if their stamp is in the recorder's index). Every native frame it counts as
+    undelivered must lie in a gap between two written receipts, and each gap must hold at least as many overflowed
+    receipt ids as such frames, so each one is matched to a distinct receipt the adapter got but did not record (the
+    gaps are disjoint). No written receipt in the window may lack a native frame."""
+    import bisect
+    from collections import Counter
+    import p3_evaluate
+    import p3_stream_eval
+    window = run.summary.get("sensor_window_sim_s")
+    if not window:
+        return False, {"error": "no_sensor_window"}
+    begin, end = window
+    _, chosen = p3_stream_eval.evaluate_source(p3_stream_eval.source_ledger(run.path, "depth-headers.jsonl"), window,
+                                               p3_evaluate.configs()[0], "depth")
+    by_stamp = sorted(index, key=lambda r: r["acquisition_stamp_ns"])
+    stamps = [r["acquisition_stamp_ns"] for r in by_stamp]
+    indexed = set(stamps)
+    undelivered = [r["stamp_ns"] for r in chosen if r["stamp_ns"] not in indexed]
+    gaps, unmatched = Counter(), []
+    for stamp in undelivered:
+        k = bisect.bisect_left(stamps, stamp)
+        if k == 0 or k == len(stamps):
+            unmatched.append(stamp)
+            continue
+        gaps[(by_stamp[k - 1]["receipt_id"], by_stamp[k]["receipt_id"])] += 1
+    short = [gap for gap, n in gaps.items() if sum(1 for i in missing if gap[0] < i < gap[1]) < n]
+    in_window = {r["acquisition_stamp_ns"] for r in index if r["accepted"] and begin * 1e9 <= r["acquisition_stamp_ns"] <= end * 1e9}
+    foreign = sorted(in_window - {r["stamp_ns"] for r in chosen})
+    ok = not unmatched and not short and not foreign
+    return ok, {"undelivered_by_index": len(undelivered), "gaps": len(gaps), "unmatched_ns": unmatched[:10],
+                "gaps_short_of_overflowed_receipts": [list(g) for g in short[:10]], "receipts_not_native_ns": foreign[:10]}
 
 
 def load_recorder(run):
@@ -353,7 +393,9 @@ def load_recorder(run):
       marker equals the result; accepted == written == indexed; the missing receipts are exactly the overflow count;
     * every missing receipt lies inside the load window (its written neighbours do; a trailing one, the adapter's stop);
     * the adapter met every processing period and rejected nothing, and the accepted P5 depth-stream evaluation failed
-      only on the two recorder items (delivery, rate, ages and health all passed on the same evidence);
+      only on the two recorder items (delivery, rate, ages and health all passed on the same evidence), or, when the
+      overflow fell inside the sensor window, on those plus its two delivery items, each undelivered frame matched to
+      an overflowed receipt (`_undelivered_matched`; M6 extension, plan §16.13);
     * the adapter's exit is the designed one for that result (3), not forced and reaped."""
     import bisect
     import p6_run
@@ -385,14 +427,17 @@ def load_recorder(run):
                    and recorder.get("accepted") == recorder.get("written") == len(index)
                    and len(missing) == recorder.get("overflow"))
     depth = ((run.p5_evaluation or {}).get("depth_stream") or {}).get("failures")
-    processing_ok = (accounting.get("missed_periods") == 0 and not accounting.get("rejected")
-                     and depth == DEPTH_RECORDER_FAILURES)
+    delivery = None
+    depth_ok = depth == DEPTH_RECORDER_FAILURES
+    if depth == DEPTH_RECORDER_FAILURES + DEPTH_DELIVERY_FAILURES:
+        depth_ok, delivery = _undelivered_matched(run, index, set(missing))
+    processing_ok = accounting.get("missed_periods") == 0 and not accounting.get("rejected") and depth_ok
     exit_ok = process.get("exit_code") == 3 and classify(process) == ("failed", "nonzero_exit_3")
     ok = recorder_ok and processing_ok and exit_ok and not outside
     return {"passed": ok, "overflow": recorder.get("overflow"), "missing_receipts": len(missing),
             "missing_outside_window": outside[:10], "recorder_ok": recorder_ok, "processing_ok": processing_ok,
             "exit_ok": exit_ok, "p5_depth_failures": depth, "missed_periods": accounting.get("missed_periods"),
-            "window_wall_s": window and window["wall_s"]}
+            "delivery": delivery, "window_wall_s": window and window["wall_s"]}
 
 
 def load_recorder_check(run, c):
