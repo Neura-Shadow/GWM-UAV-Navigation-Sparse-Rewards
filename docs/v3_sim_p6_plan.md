@@ -2059,3 +2059,48 @@ manifest, no simulator or P6 process, and no lock.
   table and checks, the node dispatcher and the load harness have changed, though no Gate A row's rules have.
 * Then the production Policy A approval (the development approval is refused for a real candidate), the real freeze,
   and the real Gates A→B→S→C on that manifest.
+
+### 16.18 Gate A content dry run on `57b9af72`: 18 of 18 passed (2026-11-15, no credit)
+
+**Authorization:** the operator, 2026-11-15, "Authorize Gate A". Approval
+`state/p6-dry-run-approval-57b9af72154a.json`: Gate A content, ground only (`flight` false, `vehicle_armed` false),
+cap 14. That is the 14 live ground runs of one pass (P3 readiness 1, ground readiness 1, ground fixtures 9, startup
+refusals 3); all were used. Verified before launch: AC power, the Best-performance overlay `ded574b5`, host CPU 0 %,
+WSL load 0.43 with CPU pressure 0.00, the manifest, no simulator or P6 process, and no lock.
+
+**Run:** 05:23:44Z–05:45:15Z, all 18 rows in frozen order, one run each. The result is
+`state/p6-dryrun-A-57b9af72154a-20261115T052359Z.result.json`: `all_rows_passed` true, `acceptance_credit` false. The
+candidate was unchanged throughout and still verifies; the lock was released, and no process remained.
+
+**All 18 passed:**
+* A-1 and A-3 passed with nothing excepted.
+* The A-5 fixtures and refusals passed. Each one's allowed items are those its rules define: the M4 replays, the M5
+  fail-closed proofs for F4.07 and F4.13, and the policy-fault refusal proofs.
+* The offline rows (A-2, A-4) and evaluation rows (A-6, A-7) passed.
+* The host-sensitive A-5.F2.09 passed.
+
+**Gate A, B, S and C content have now all passed on one unchanged development candidate, `57b9af72`:**
+
+| Gate | Result | Record |
+|---|---|---|
+| A | 18 of 18 | §16.18 |
+| B | 2 of 2 | §16.17 |
+| S | 5 of 5 | §16.17 |
+| C | 5 of 5 | §16.16 |
+
+These are development dry runs, with no gate credit. Since `c08bfc8` only documentation has changed, so a real freeze
+at the current head binds the same 41 P6 source files that passed.
+
+**A record to flag for the production approval.** The development Policy A approval
+(`state/p6-policy-A-approval-m5-development.json`, 2026-11-07) states its scope as "ground only, the vehicle is never
+armed". The M6 flight dry runs used development candidates bound to it. Each flight was separately authorized by the
+operator with an explicit simulated-flight dry-run approval (`flight`, `simulated_flight_only`, `vehicle_armed`), and
+the Policy A content checks (never excepted) passed on every flight. The approval file is left unchanged. The
+production approval should therefore name its scope explicitly: Gate A on the ground, and Gates B, S and C in
+simulated flight with the vehicle armed in SITL only, never real hardware.
+
+**Next (each separately authorized):**
+1. The production Policy A approval for the real P6 candidate. The policy content would be unchanged
+   (`bf1ef9b1…`, the same QGC build as P5), with `development_only` false.
+2. The real (non-development) freeze, from a clean tree.
+3. The real Gate A, then B, S and C, each with its own authorization, on that one manifest.
