@@ -38,7 +38,7 @@ the Gate C content dry run on development candidate `57b9af72` (commit `c08bfc8`
 C content have all passed on one unchanged development candidate, with no credit. Gate A content (18 of 18) then
 passed on it too (plan §16.18): all four gates' content on one candidate. The production Policy A approval for the real
 candidate is recorded (plan §16.19), and the real P6 candidate `22292775` is frozen (`state/p6-candidate-8e29f3f.json`,
-the same sources as `57b9af72`; plan §16.20). **Real Gate A on `22292775` is ACCEPTED (18 of 18, credit; plan §16.21).** Gates B, S and C come next on
-the same manifest, each separately authorized. No P6 gate has run; the real P6
-freeze and every gate need their own authorization.
+the same sources as `57b9af72`; plan §16.20). **Real Gate A on `22292775` is ACCEPTED (18 of 18, credit; plan §16.21).** **Real Gate B is ACCEPTED (2 of 2,
+credit, simulated flight; plan §16.22).** Gates S and C come next on the same manifest, each separately authorized;
+every gate needs its own authorization.
 Tests: `tests/test_px4_gazebo_p6_specs.py`, `_injection.py`, `_offline.py`, `_evaluate.py`, `_runner.py`.

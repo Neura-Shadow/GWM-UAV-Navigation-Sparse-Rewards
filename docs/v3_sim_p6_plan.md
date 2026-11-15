@@ -2212,3 +2212,40 @@ Verified before launch:
 **Next (needs its own authorization):** the real Gate B on `22292775`, in simulated flight (SITL, the vehicle armed
 in simulation, never real hardware), once, for credit. That is B-0 (pass-through nominal flight) and B-1 (the policy
 timeout smoke).
+
+### 16.22 Real P6 Gate B on `22292775`: ACCEPTED, 2 of 2 (2026-11-15)
+
+**Authorization:** the operator, 2026-11-15, "Authorize real Gate B". The authorization is
+`state/p6-gate-B-authorization-222927752a50.json` (`p6-runtime-authorization-v1`, scope `p6_smoke`, sha256
+`8316fac1…`). It was written by `p6_manifest.py authorize` with the exact phrase, and allows exactly one execution
+(`max_attempts` 1). Flight is not excluded: simulated flight only (SITL, the vehicle armed in simulation, never real
+hardware).
+
+Verified before launch:
+* AC power and the Best-performance overlay `ded574b5`;
+* WSL load 0.76;
+* the manifest, no simulator or P6 process, and no lock;
+* the accepted real Gate A result for this manifest (the predecessor), and no earlier Gate B marker or result.
+
+**Run:**
+* It ran 09:08:24Z–09:14:32Z in simulated flight. It used the same scratchpad launcher `p6_gate.sh`
+  (`run_p6_gates.py --gate B` without `--dry-run`). The sequencer passed `--allow-simulated-flight` and set
+  `GWM_ALLOW_SITL_COMMANDS=1` for the flight rows only.
+* The sequencer checked the predecessor, then consumed the authorization before the first row:
+  `state/p6-gate-B-2229277….consumed.json` (sha256 `4f38309d…`).
+* The candidate was unchanged at every row and at the end, and still verifies. The lock was released, and no
+  process remained.
+
+**Result:** `state/p6-gate-B-222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41.result.json` (sha256
+`7bf387d1…`): **`accepted` true, `acceptance_credit` true**, `dry_run` false, `development` false, `all_rows_passed`
+true, no first failure, nothing not run.
+
+| Row | Role | Run | Result |
+|---|---|---|---|
+| B-0 | pass-through nominal flight | `20261115T090859Z-p6-B-0-c6cb047e` | passed, no failures. The pass-through proof covers the controller shim and both relays; C11 matched the runner record; no P5 item excepted. |
+| B-1 | policy-timeout smoke (F3.08) | `20261115T091223Z-p6-B-1-b942e065` | passed, no failures. Trigger at 81.84 s sim; 3 timeout failures in the ledger, all 3 affected by the shim; detection and safe action 0.048 s sim after the trigger; not recovered, so it landed by L45. The P5 items excepted are exactly the row's declared ones (L45 outcome, PROOF policy items, LIMITS_UNINJECTED inference limits); none refused. |
+
+**Gate B is accepted.** It provides the predecessor that Gate S requires for this manifest.
+
+**Next (needs its own authorization):** the real Gate S on `22292775`, once, for credit, in simulated flight. That is
+S-1, S-2′, S-3, S-4 and S-5′.
