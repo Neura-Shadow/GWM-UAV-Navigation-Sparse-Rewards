@@ -1772,3 +1772,61 @@ verifies.
   loss, and of the new LOAD, LOAD_RECORDER and LANDING checks on live evidence.
 * Before the real freeze, a complete Gate B, S and C content pass on one unchanged candidate is still to be shown.
   S-5′ has not re-run live since its rule changed.
+
+### 16.12 Gate C content rerun in simulated flight on `0db5c60a` (2026-11-14, no credit)
+
+**Authorization:** the operator, 2026-11-14, "Authorize Gate C rerun". Approval
+`state/p6-dry-run-approval-0db5c60a20b3-gateC-flight.json` (Gate C content, simulated flight only, cap 5: one run per
+row, no retry; all 5 used). Verified before launch: AC power, Best-performance overlay `ded574b5`, host CPU 5 %, the
+manifest, no simulator or P6 process, no lock.
+
+**Run:** 12:23:05Z–12:39:42Z, the five rows in frozen order, one run each; result
+`state/p6-dryrun-C-0db5c60a20b3-20261114T122319Z.result.json`. The candidate was unchanged throughout; the lock was
+released; no residual process. RTF 0.987–1.000 over each flight; Gazebo exited in 0.42–0.56 s on every row.
+
+**Passed (4):** C-1, C-2, C-3 (COMPLETE through a supervisor abort) and C-4, as in §16.10.
+
+**Failed (1): C-5, F8.03, on a gap in the adopted LOAD_RECORDER proof.** The §16.11 changes otherwise worked live:
+* **The map loss ran under load.** It fired at `avoiding_first` (78.46 s), and the load started on the same decision.
+  H35 passed (first stale 0.148 s after the trigger), the vehicle recovered, and STALE_IFF_AGE and UNSAFE passed.
+* **The harness stopped cleanly.** Cleanup's SIGINT ended the workers, the harness recorded `cleared` with
+  `stopped_early` SIGINT, and INJECTORS passed.
+* **LOAD passed.** At 85.66 s, 7.2 s into the load, one callback took 52.2 ms against the 50 ms budget. The accepted
+  P2 controller aborted (`stale_action`) and landed through RECOVERY, and LOAD matched that abort to the overrun.
+  `policy:inference_p99` was allowed by LOAD (every in-window inference was under 20 ms; outside the window p99 was
+  0.69 ms).
+* **L45R passed:** one LAND, landed and disarmed in 18.95 s.
+* **What failed: LOAD_RECORDER.**
+  * The accepted P3 raw recorder overflowed again, losing 43 frames, all inside the load window (82.95–87.34 s). The
+    recorder drained and fsynced with no error, the exit was the designed 3, and there were 0 missed periods.
+  * This time the overflow began before the sensor window ended at RECOVERY (85.66 s). In the `75289deb` run it came
+    after the window.
+  * The accepted P3 stream evaluator judges delivery by the recorder's own index, so 32 native frames the adapter had
+    received count as undelivered. That added `depth:source_to_ros_delivery_loss` (recorded fraction 0.9856) and
+    `depth:ros_receipts_not_in_native_ledger`.
+  * The adopted proof requires exactly the two recorder items, so it failed. FAIL_CLOSED_LANDING and LANDING then
+    failed too, because the adapter's exit 3 was left unexplained.
+* **Cause.** All 32 undelivered native frames lie in the 26 gaps between written receipts. Each gap holds exactly as many
+  native frames as overflowed receipt ids (one gap straddles the window end at 85.66 s). No written receipt lacks a
+  native frame. The adapter received every frame (receipt ids are assigned on receipt); only the recorder failed to
+  write them.
+* **In memory, with no file changed:** extending LOAD_RECORDER to also explain those two delivery items, only under
+  this one-to-one match, makes the run pass with every item allowed by its own check.
+
+**A plain retry on `0db5c60a` would probably fail the same way.** The recorder overflowed in both 24-worker flights (31
+and 43 frames), and whether the two delivery items appear depends only on whether the overflow starts before the P2
+abort ends the sensor window.
+
+**Open decision (recommendation first):**
+* **Recommended: extend LOAD_RECORDER** to replace `depth:source_to_ros_delivery_loss` and
+  `depth:ros_receipts_not_in_native_ledger` too, under all of the following:
+  * every native frame counted as undelivered lies in a gap between written receipts;
+  * each gap holds no more native frames than overflowed receipt ids;
+  * every overflowed receipt is inside the load window;
+  * no written receipt lacks a native frame;
+  * every other depth check passed.
+  
+  This narrows two more accepted P3 delivery checks, inside the declared load window only, to frames the adapter
+  received but could not record. Then a new development candidate and a C-5 rerun.
+* *Alternative:* 8 workers (§16.10).
+* *Alternative:* keep the rule. C-5 at 24 workers then fails whenever the overflow starts inside the sensor window.
