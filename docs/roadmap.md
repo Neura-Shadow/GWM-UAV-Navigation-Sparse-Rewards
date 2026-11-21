@@ -308,7 +308,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   C:, restore check 0 problems). **M0 read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md));
   its decisions D13 and D14 were approved as recommended the same day, so **M0 is complete**. **M1 specifications
   generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)): layout sets, schedules and analysis plan,
-  awaiting the operator's approval. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  **approved 2026-11-21, so M1 is complete**. M2 (runner and orchestrator, offline) awaits its own authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.

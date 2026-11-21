@@ -1,11 +1,14 @@
 # v3-SIM P7 M1 — specifications: layout sets, schedule and analysis plan
 
-**Status: generated and tested (2026-11-21); awaiting operator approval.** This is M1 of the
-[P7 plan](v3_sim_p7_plan.md) (§7), authorized by the operator on 2026-11-21 ("Authorize M1").
+**Status: APPROVED (2026-11-21); M1 COMPLETE.** This is M1 of the [P7 plan](v3_sim_p7_plan.md) (§7).
+* **Authorized:** by the operator on 2026-11-21 ("Authorize M1").
+* **Approved:** the operator approved the three specifications, as hashed in §1, on 2026-11-21 ("Approve specs").
+  That approval includes the choices of §4 and the 250-pair disk note of §5.
 
-**Exit criterion: the operator approves; the hashes are recorded.** The hashes are below. Nothing is frozen or bound
-yet: the specifications are hash-bound in the P7 manifest at freeze (contract C7). Any change after approval needs
-a new approval.
+**Exit criterion met: the operator approved, and the hashes are recorded in §1.**
+* Nothing is frozen yet. The specifications are hash-bound in the P7 manifest at freeze (contract C7). The freeze
+  must use exactly these canonical hashes.
+* Any change to them is a new specification and needs a new approval.
 
 **What M1 did and did not do:**
 * Everything ran offline under WSL `/usr/bin/python3` (Python 3.12.3, NumPy 1.26.4).
@@ -128,6 +131,6 @@ floor. It would then need verified copies off the WSL disk under D4, which needs
 
 ## 6. Next
 
-* **Operator approval** of the three specifications as hashed in §1. That is M1's exit criterion.
+* **Operator approval** of the three specifications as hashed in §1: given on 2026-11-21 ("Approve specs").
 * **M2** (runner and orchestrator, offline) needs its own authorization. It uses `scenario_mapping()` from
   `p7_specs.py` and each layout's recorded world SHA-256.

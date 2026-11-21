@@ -15,6 +15,15 @@
   ([inventory report §8](v3_sim_p7_m0_dependency_inventory.md)).
 * **Any freeze, Policy A approval, pilot or batch block.**
 
+**M1 specifications approved (operator, 2026-11-21, "Approve specs").** These are the pre-registered items C7
+freezes. Their canonical SHA-256s are:
+* layout sets `d742b7af47c6339fb6d8478870d0cf767b6f09cf41d0ef23d6661bc0b1d2258d`;
+* schedule `ef74c71d4242409793c6de759454a498481564c75a3dd13e3402294277ba7c88`;
+* analysis plan `c9c7a6f3781d3d90cd858de4f2ea9ef8e4bdebcd1b0a8e6ab84918a4f46d9548`.
+
+See the [M1 report](v3_sim_p7_m1_specs.md). The validity rule in the analysis plan makes §7.1's "the vehicle armed"
+exact.
+
 Each milestone, freeze and block still needs its own operator authorization. See the [P7 plan](v3_sim_p7_plan.md).
 Every limit not defined here is reused unchanged from P2–P6.
 
