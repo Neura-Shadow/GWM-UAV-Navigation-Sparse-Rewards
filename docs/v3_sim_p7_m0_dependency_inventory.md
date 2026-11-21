@@ -266,8 +266,11 @@ the backup's `inventory/` folder (SHA-256 `fb3cde7a4e7b15c376e5c2e78584de1107f7f
 * The tool exited through its own STOP path: `tar S1-apt-cache.tar failed … Operation not permitted`.
 * No automatic retry.
 * The folder was renamed, not deleted, to `C:\GWM-UAV-Backup\p7-selective-20261121.attempt1-stopped\`. It holds the
-  13 complete tars and a 0-byte `S1-apt-cache.tar`, with no receipt. Attempt 2 supersedes it. Deleting it needs the
-  operator's approval.
+  13 complete tars and a 0-byte `S1-apt-cache.tar`, with no receipt. Attempt 2 supersedes it.
+* **Removed on the operator's instruction ("Delete it", 2026-11-21).**
+  * First, the kept backup was re-checked against its `SHA256SUMS`: all 20 entries OK.
+  * The folder (14 files, 12,059,729,920 bytes) was then sent to the Windows Recycle Bin, not deleted permanently.
+  * Emptying the bin is the operator's choice.
 
 **The fix:**
 * tar's stderr goes to a scratch file, not a pipe.
