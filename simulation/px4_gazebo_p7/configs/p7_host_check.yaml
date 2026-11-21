@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "contract": "p7-host-check-v1",
+  "status": "M2 definition; hash-bound in the P7 manifest (contract §9); read-only, changes no host setting (C4)",
+  "decision": "D10: this host only; the Best performance overlay and AC power checked before every block",
+  "windows": {
+    "ac_overlay_guid": "ded574b5-45a0-4f42-8737-46345c09c238",
+    "ac_overlay_name": "Best performance",
+    "power_line_status": "Online",
+    "cpu_load_max_percent": 15,
+    "cpu_samples": 5,
+    "cpu_sample_interval_s": 1
+  },
+  "wsl": {
+    "simulator_process_pattern": "/bin/px4( |$)|gz sim|QGroundControl|MicroXRCEAgent|parameter_bridge|_namespace_owner\\.py|p[3-7]_runner\\.py",
+    "workspace_lock": "state/p1.lock",
+    "disk_floor_bytes": 150000000000,
+    "planned_bytes_per_flight": 1300000000
+  },
+  "rule": "the block starts only if every check passes; a failed check means nothing is flown (contract §7.1 'not flown') and the authorization is not consumed"
+}

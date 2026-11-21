@@ -18,7 +18,39 @@
     §5 and §7.3.
   * It corrects two planning facts: the power at 200 pairs on the sampled population is 0.83 (§4.5), and the
     population statement (§4.1).
-* **Next, needing its own authorization:** M1 (specs: layout sets, schedule, analysis plan).
+* **M1 specifications generated and tested (2026-11-21, on "Authorize M1"):** [spec report](v3_sim_p7_m1_specs.md).
+  * Layout sets: pilot 10, confirmatory 250 (the first 200 planned).
+  * Schedules: pilot and confirmatory, for 200 and for 250 pairs.
+  * The analysis plan.
+  * 17 offline tests pass. Nothing is frozen.
+  * **APPROVED by the operator on 2026-11-21 ("Approve specs"), so M1 is COMPLETE.**
+  * Canonical hashes: layouts `d742b7af…`, schedule `ef74c71d…`, analysis plan `c9c7a6f3…`. The P7 freeze binds
+    exactly these.
+* **M2 built and tested offline (2026-11-21, on "Authorize M2"):** [M2 report](v3_sim_p7_m2_runner.md).
+  * New code: the P7 manifest and authorizations, the P4 and P5 runner subclasses, the read-only host check and
+    the block sequencer.
+  * C6 is met offline. 48 P7 tests pass. A live read-only host check passes.
+  * **ACCEPTED by the operator on 2026-11-21 ("Accept M2"), so M2 is COMPLETE.** The acceptance includes the
+    host-check numbers and the six design choices (report §4, §6). Among them, the real candidate is frozen before
+    the pilot.
+* **M3 built, tested and frozen offline (2026-11-21, on "Authorize M3"):**
+  [M3 report](v3_sim_p7_m3_classifier_analysis.md).
+  * The flight classifier (D13/D14, validity, the two restated P6 rules, goal success), run in the evaluators'
+    environment.
+  * The analysis code, frozen as `p7_analysis.py` `bd036a2b…`.
+  * 113 P7 tests pass: R1–R4, the 12 P6 flights, negative cases, and SciPy references.
+  * **ACCEPTED by the operator on 2026-11-21 ("Accept M3"), so M3 is COMPLETE.** The analysis code and the
+    classifier are frozen; changing them needs a new approval.
+  * The missed `venv-px4` backup was authorized ("Authorize venv backup") and executed and verified as Part E:
+    `E10-venv-px4.tar`, 16,387 entries, 0 problems (inventory erratum §9).
+* **M4 parity dry run done (2026-11-21, on "Authorize M4"):** [M4 report](v3_sim_p7_m4_parity_dry_run.md).
+  * Policy A approved for P7 development ("Approve for M4 (Recommended)"); development candidate `ac983564…`.
+  * S2 flown by P4 and P5 through the P7 path. Both unchanged evaluators passed, and both flights are valid goal
+    successes.
+  * The world, accepted label and lineage are identical; the metrics are within run-to-run variation.
+  * No stop. **ACCEPTED by the operator on 2026-11-21 ("Accept M4"), so M4 is COMPLETE.**
+* **Next, needing its own authorization:** M5, the pilot. It needs a production Policy A approval and the real P7
+  freeze first.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -310,10 +342,10 @@ simulation/px4_gazebo_p7/
 | M | Content | Exit criterion |
 |---|---|---|
 | **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8); **read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md)), raising D13 and D14 (approved 2026-11-21); **M0 complete** | written audit; D1–D14 answered (done) |
-| **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
-| **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
-| **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
-| **M4** parity dry run | development candidate; S2 flown through the P7 path with P4 and P5, compared with the accepted flights | the P7 path reproduces the accepted outcomes within run-to-run variation; no credit |
+| **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan; **generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)); **approved 2026-11-21; M1 complete** | operator approves; hashes recorded (done) |
+| **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger; **built and tested 2026-11-21** ([report](v3_sim_p7_m2_runner.md)); **accepted 2026-11-21; M2 complete** | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
+| **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics; **built, tested and frozen 2026-11-21** ([report](v3_sim_p7_m3_classifier_analysis.md)); **accepted 2026-11-21; M3 complete** | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
+| **M4** parity dry run | development candidate; S2 flown through the P7 path with P4 and P5, compared with the accepted flights; **done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)); **accepted 2026-11-21; M4 complete** | the P7 path reproduces the accepted outcomes within run-to-run variation; no credit |
 | **M5** pilot | 10 pilot layouts × 2 controllers × 2 repeats | pilot report; the nuisance-parameter update by the declared rule |
 | **M6** confirmatory P7-A | real freeze; blocks of 20 pairs, each authorized | all pre-registered pairs flown, or a stop rule met |
 | **M7** P7-B / P7-C | only if decided | their own records |

@@ -347,3 +347,38 @@ each submodule's git directory, which updates that directory's timestamps.
 **What a restore cannot recover:**
 * host state: the Windows GPU driver and the apt package selection;
 * the loss of the laptop. This is the only copy, on C:.
+
+## 9. Erratum (2026-11-21, found in M3): `venv-px4` is Essential, not Optional
+
+**What was wrong.** §3 classified `~/uav_autonomy/venv-px4` (0.47 GB, tree digest `0c798cc9…`, group `O-venv-px4`)
+as Optional, "not required by P7-A". That is wrong.
+* The unchanged `verify_p4_evidence.sh` and `verify_p5_evidence.sh`, which evaluate every P7 flight, run under
+  `$SIM_ROOT/venv-px4/bin/python`.
+* The M3 classifier needs the venv's `pyulog`.
+
+**Why it can't be rebuilt instead.** The venv was built by `pip` from PX4's `requirements.txt` without pinned
+versions (it now holds NumPy 2.5.3 and pyulog 1.2.4), so a rebuild is not verified to reproduce it.
+
+**Consequence.** The executed selective backup (§8) does not contain it.
+
+**Proposal.** A supplementary backup, Part E, under its own authorization; see the
+[M3 report §5](v3_sim_p7_m3_classifier_analysis.md). Nothing has been copied.
+
+**Executed (2026-11-21, operator "Authorize venv backup"): supplementary Part E.**
+
+| Step | Result |
+|---|---|
+| Tool | [`diagnostics/p7_m0/p7_backup_part_e.py`](../diagnostics/p7_m0/p7_backup_part_e.py), SHA-256 `6a98ff98…`. It reuses `p7_backup.py`'s `write_tar`, `verify_tree` and drift check unchanged. |
+| Preconditions | no runtime process; the four manifests verify; C: 145.6 GB free; the main receipt `dce92626…` and `SHA256SUMS` `28202390…` unchanged; no Part E output yet |
+| Drift check | the 13 main groups and 1,242 debs unchanged; `venv-px4` tree digest `0c798cc9866bb47fcebb57d01ec592e87a317214030ee19479db0b7a12d713fc`, as inventoried |
+| Copy | `E10-venv-px4.tar`, 495,738,880 bytes, SHA-256 `bb247931760c26b1e3eb9e7a141da60122cf0f4272d37181a1065333a83275ad`; the read-back matches |
+| Restore check | 16,387 entries (14,803 files, 1,580 directories, 4 links), **0 problems**; the temporary directory was removed |
+| Records | `SHA256SUMS-part-e` (`3ba050e0346f291731447f9aea44785141101a48548f493ce033efd067103216`), `backup-receipt-part-e.json` (`39bdd61657d61a01e9f738bac68b09093b18a2eb8ca3cbc6d46872a287bc872b`), and `inventory/part-e/`; all written with exclusive create |
+
+**What did not change:**
+* The main backup's files were not modified.
+* `~/uav_autonomy` was only read.
+* The four manifests verify afterwards.
+
+**Restore note.** The venv's `bin/python*` links point to the system `/usr/bin/python3.12`, whose packages are in
+the backed-up apt cache. The backup now holds the minimal set plus `venv-px4`: 13.28 GB in 15 tars.

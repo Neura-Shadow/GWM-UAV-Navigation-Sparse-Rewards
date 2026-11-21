@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "contract": "p7-analysis-plan-v1",
+  "status": "M1 specification for operator approval; frozen and hash-bound in the P7 manifest before the first confirmatory flight (contract C7)",
+  "normative_sources": ["contract p7-evaluation-v1 §5 (endpoints, D13, D14), §6 (analysis), §7 (validity and stops)", "decisions D1-D14"],
+  "sign_convention": "every difference is P5 minus P4",
+  "population": "admitted layouts of the bound P5 generator from seed base 4,000,000 that are not near-duplicates of a P5 train, validation or held-out layout (contract §4.1); reports state it with the family mix",
+  "unit": "a pair: one confirmatory layout flown once by each controller, back to back, in the scheduled order",
+
+  "validity": {
+    "armed_evidence": "the ULog vehicle_status shows arming_state ARMED (2) at least once, or the P2 controller recorded a transition to TAKEOFF (entered only after VERIFY_ARMED succeeded)",
+    "valid": "a flight with armed evidence; every outcome is data (contract §7.1, C8)",
+    "infrastructure_invalid": "a flight without armed evidence, including a host-timing abort before arming; re-flown once at the end of its block, capped at 10 % of the block's flights (D6)",
+    "disagreement": "if the ULog and the transition list disagree, the flight is valid and the disagreement is an integrity event"
+  },
+
+  "outcome": {
+    "goal_success": "contract §5 as approved (D13, D14): goal_reached_sim_s recorded; final goal distance <= 0.30 m (last truth position against the takeoff origin + 8 m along +x, as the accepted outcome()); final_state COMPLETE with the ULog landed and disarmed; no safety event; safety verified; no tracking or response-latency failure",
+    "failure": "every other valid ending",
+    "classes": "safety event, safety-unverified, mission failure, integrity event (contract §5, D14)"
+  },
+
+  "sample_size": {
+    "planned_pairs": 200,
+    "ceiling_pairs": 250,
+    "schedules": "p7_schedule.json holds both pre-registered schedules (200 and 250 pairs)",
+    "pilot_rule": {
+      "statistic": "pilot discordance d = (pilot pairs where exactly one controller succeeded) / (valid pilot pairs); a pilot pair is one layout and one repeat, flown once by each controller",
+      "planning_value": "27/243 = 0.1111 (P5 held-out layouts that are not near-duplicates; M0 audit §4.4)",
+      "rule": "if d < 27/243 the 250-pair schedule is used, otherwise the 200-pair schedule",
+      "when": "after the pilot is evaluated and before the first confirmatory flight; recorded with the pilot report",
+      "only_effect": "chooses N; pilot outcomes never enter the confirmatory analysis"
+    },
+    "power_at_planning_values": {"200": 0.83, "250": 0.91}
+  },
+
+  "primary": {
+    "hypothesis": "H1: P(only P5 succeeds) != P(only P4 succeeds)",
+    "counts": "b = pairs where only P5 succeeded, c = pairs where only P4 succeeded, n = analysed pairs",
+    "test": "exact two-sided McNemar: p = min(1, 2 * P(X <= min(b, c))) with X ~ Binomial(b + c, 1/2); p = 1 if b + c = 0",
+    "alpha": 0.05,
+    "estimate": "difference in success proportions (b - c) / n",
+    "interval": "95 % Tango score interval for the difference of paired proportions (Tango 1998)",
+    "also_reported": ["both-success, neither, b, c", "success proportion per controller with Clopper-Pearson 95 % intervals"]
+  },
+
+  "secondaries": {
+    "procedure": "fixed sequence: S1 is tested only if the primary rejects at alpha 0.05, S2 only if S1 passes, S3 only if S2 rejects; a secondary not reached is reported descriptively and claims nothing",
+    "S1": {
+      "name": "minimum truth clearance, non-inferiority",
+      "data": "per analysed pair, D = min_truth_clearance_m (P5) - min_truth_clearance_m (P4), both from the accepted evaluator; pairs where either value is missing are excluded and listed",
+      "statistic": "mean of D",
+      "interval": "paired bootstrap percentile interval: 10,000 resamples of pairs with replacement, numpy.random.default_rng(20261121), two-sided 95 %",
+      "margin_m": 0.05,
+      "decision": "non-inferior if the lower limit (2.5th percentile) > -0.05 m"
+    },
+    "S2": {
+      "name": "time to goal",
+      "data": "pairs where both flights succeeded; D = time_to_goal_sim_s (P5) - time_to_goal_sim_s (P4), from p5_evaluate.reported through p5_comparison.flight_metrics",
+      "test": "two-sided Wilcoxon signed-rank, alpha 0.05; zero differences dropped (Wilcoxon); exact null distribution if at most 25 non-zero differences and no ties, else the normal approximation with the tie correction and a 0.5 continuity correction",
+      "estimate": "Hodges-Lehmann: the median of the Walsh averages (D_i + D_j) / 2, i <= j",
+      "interval": "95 % distribution-free interval from the ordered Walsh averages, with the critical value of the same exact or normal distribution as the test"
+    },
+    "S3": {
+      "name": "path length",
+      "data": "the S2 pairs; D = path_length_m (P5) - path_length_m (P4)",
+      "test": "as S2", "estimate": "as S2", "interval": "as S2"
+    }
+  },
+
+  "safety": {
+    "reported": "per controller over its valid flights: safety events by kind, safety-unverified flights, and the mission failures of contract §5 (tracking, response latency)",
+    "bound": "zero events in M flights: exact one-sided 95 % upper bound 1 - 0.05^(1/M); otherwise the Clopper-Pearson two-sided 95 % interval",
+    "trade_off": "no safety result is traded against efficiency"
+  },
+
+  "missing_and_unflown_pairs": {
+    "missing": "a pair still infrastructure-invalid after its one replacement is excluded from every analysis and listed",
+    "sensitivity": "the primary is recomputed with each missing pair counted as P4 succeeded and P5 failed",
+    "unflown": "pairs not flown because the batch stopped (contract §7.3) are listed with the stop; the analysis runs on the completed pairs only if the operator decides to analyse after a stop"
+  },
+
+  "exploratory": [
+    "results by layout family and by box count",
+    "abort types per controller (P4 abort_reason, P2 failure)",
+    "hover time",
+    "P5 per-decision disagreement with P4 (policy ledger)",
+    "order effect: discordance by which controller flew first",
+    "drift across blocks: success and discordance per block",
+    "RTF and host covariates per flight",
+    "the pilot: variation between repeats within a layout (time to goal, clearance, path length), infrastructure-invalid rate, wall time and disk per flight"
+  ],
+
+  "software": {
+    "code": "simulation/px4_gazebo_p7/analysis/p7_analysis.py (M3), frozen and hash-bound before the first confirmatory flight",
+    "runtime": "WSL /usr/bin/python3 with NumPy 1.26.4",
+    "interim": "no interim efficacy analysis; the confirmatory analysis runs once, on all pre-registered pairs"
+  }
+}

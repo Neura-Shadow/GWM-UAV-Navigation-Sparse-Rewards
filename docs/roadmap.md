@@ -306,8 +306,16 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   Selective Dependency Backup: the M0 dependency inventory is done and proposes a ≈ 12.6 GB minimal set
   ([inventory](v3_sim_p7_m0_dependency_inventory.md)), set and C: destination approved 2026-11-21; **backup executed and verified 2026-11-21** (14 tars, 12.79 GB on
   C:, restore check 0 problems). **M0 read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md));
-  its decisions D13 and D14 were approved as recommended the same day, so **M0 is complete**. M1 awaits its own
-  authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  its decisions D13 and D14 were approved as recommended the same day, so **M0 is complete**. **M1 specifications
+  generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)): layout sets, schedules and analysis plan,
+  **approved 2026-11-21, so M1 is complete**. **M2 (runner and orchestrator, offline) built and tested
+  2026-11-21** ([report](v3_sim_p7_m2_runner.md)): C6 is met offline and 48 P7 tests pass. **Accepted 2026-11-21,
+  so M2 is complete.** **M3 classifier and frozen analysis code built and tested 2026-11-21**
+  ([report](v3_sim_p7_m3_classifier_analysis.md)): 113 P7 tests pass. M3 found that the M0 backup missed
+  `venv-px4`, now added as a verified Part E. **M3 accepted 2026-11-21, so M3 is
+  complete.** **M4 parity dry run done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)): S2 was flown
+  by P4 and P5 through the P7 path, the unchanged evaluators passed, and the result is identical to the accepted
+  S2 outcome. **Accepted 2026-11-21, so M4 is complete.** M5 (the pilot) awaits its own authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
