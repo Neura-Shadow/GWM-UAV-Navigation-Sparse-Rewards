@@ -347,3 +347,19 @@ each submodule's git directory, which updates that directory's timestamps.
 **What a restore cannot recover:**
 * host state: the Windows GPU driver and the apt package selection;
 * the loss of the laptop. This is the only copy, on C:.
+
+## 9. Erratum (2026-11-21, found in M3): `venv-px4` is Essential, not Optional
+
+**What was wrong.** §3 classified `~/uav_autonomy/venv-px4` (0.47 GB, tree digest `0c798cc9…`, group `O-venv-px4`)
+as Optional, "not required by P7-A". That is wrong.
+* The unchanged `verify_p4_evidence.sh` and `verify_p5_evidence.sh`, which evaluate every P7 flight, run under
+  `$SIM_ROOT/venv-px4/bin/python`.
+* The M3 classifier needs the venv's `pyulog`.
+
+**Why it can't be rebuilt instead.** The venv was built by `pip` from PX4's `requirements.txt` without pinned
+versions (it now holds NumPy 2.5.3 and pyulog 1.2.4), so a rebuild is not verified to reproduce it.
+
+**Consequence.** The executed selective backup (§8) does not contain it.
+
+**Proposal.** A supplementary backup, Part E, under its own authorization; see the
+[M3 report §5](v3_sim_p7_m3_classifier_analysis.md). Nothing has been copied.
