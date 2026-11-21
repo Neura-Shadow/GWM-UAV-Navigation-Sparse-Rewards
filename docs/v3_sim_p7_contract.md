@@ -8,8 +8,8 @@ encodes those choices.
 * **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
   new decisions first, as P6's M0 did.
 * **Implementation and the M0 audit.**
-* **The backup:** D5, revised on 2026-11-21 to a Selective Dependency Backup, makes it a precondition. The minimal
-  set and its destination need the operator's approval, and executing it needs its own authorization.
+* **The backup:** D5, revised on 2026-11-21 to a Selective Dependency Backup, makes it a precondition. Its minimal
+  set and destination were approved on 2026-11-21. Executing it needs its own authorization.
 * **Any freeze, Policy A approval, pilot or batch block.**
 
 Each milestone, freeze and block still needs its own operator authorization. See the [P7 plan](v3_sim_p7_plan.md).
@@ -246,7 +246,8 @@ Dependency Backup**. It revises D5 only; every other decision stands as recorded
 * **Nothing existing** is deleted, moved, overwritten, compressed or uploaded. No runtime build is treated as
   disposable unless its reproducibility or replacement has been verified.
 * **P7-A independence:** P7-A code and tests may depend only on the Essential set and the Required reference runs.
-* **Approvals:** the minimal set and the destination need the operator's approval; execution needs its own
+* **Approvals:** the operator approved the minimal set (≈ 12.6 GB) and the destination
+  `C:\GWM-UAV-Backup\p7-selective-20261121\` on 2026-11-21 ("Approve set and C:"). Execution needs its own
   authorization.
 
 The options below are kept for the record.

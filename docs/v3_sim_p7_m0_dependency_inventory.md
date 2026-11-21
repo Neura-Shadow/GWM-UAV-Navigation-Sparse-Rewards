@@ -4,8 +4,11 @@
 item for the revised D5. Nothing was copied, moved, deleted, overwritten, compressed or uploaded. No simulator
 ran, and no P2–P6 file changed. The P3, P4, P5 and P6 manifests verify before and after.
 
-**What this proposes:** a minimal backup set and a destination. Both need the operator's approval, and executing
-the backup needs its own authorization.
+**Approved (operator, 2026-11-21, "Approve set and C:"):**
+* the minimal backup set of §5 (≈ 12.6 GB);
+* the destination `C:\GWM-UAV-Backup\p7-selective-20261121\`.
+
+**Executing the backup still needs its own authorization** (§7). Nothing has been copied.
 
 ## 1. Revised D5
 
@@ -196,7 +199,36 @@ These are constraints of the revised D5, checked in M2/M3:
 * Any existing test that needs other retained runs must skip when they are absent. The P6 tests that use F2 and F3
   already do.
 
-**Approval needed (operator):**
-1. this minimal set;
-2. the destination `C:\GWM-UAV-Backup\p7-selective-20261121\`;
-3. then, separately, the authorization to execute the backup.
+**Approvals:**
+1. this minimal set: **approved 2026-11-21**;
+2. the destination `C:\GWM-UAV-Backup\p7-selective-20261121\`: **approved 2026-11-21**;
+3. the authorization to execute the backup: **pending**.
+
+## 7. Execution procedure (runs only under its own authorization)
+
+At approval time: C: had 147.6 GB free; the destination did not exist; C: is physical disk 0 and D: is disk 1.
+
+1. **Preconditions** (checked read-only; any failure stops the run before anything is written):
+   * no simulator or P6/P7 runtime process;
+   * the P3–P6 manifests verify;
+   * C: has at least 12.6 GB plus 20 GB of margin free;
+   * the destination directory does not exist.
+2. **Drift check:** re-run the inventory tool to new outputs in the session scratchpad. Compare the tree digests of
+   E1–E9 and R1–R4 and the apt-cache digest with this report. Any difference stops the run, and is reported rather
+   than silently backed up.
+3. **Copy:**
+   * **Destination:** create the directory once, with exclusive create.
+   * **Per group:** one uncompressed `tar` (pax format, numeric owners, symlinks stored as links, nothing
+     followed), read from `~/uav_autonomy` with `-C`, so the sources are only read. The apt cache's `.deb` files go
+     into their own tar.
+   * **Inventory:** the two JSON files, this report, and the full per-file list are copied next to the tars.
+4. **Read-back:** write `SHA256SUMS` for every tar, then read each tar back from C: and check it against
+   `SHA256SUMS`.
+5. **Restore verification:**
+   * Extract every tar into a new scratch directory in WSL, never over `~/uav_autonomy`.
+   * Compare every file's SHA-256 and every symlink target with the inventory's per-file list. All entries must
+     match.
+   * Then remove only that scratch extraction. It is this procedure's own temporary copy, not evidence.
+6. **Report:** a `backup-receipt.json` in the destination, with tar names, sizes, SHA-256s, the verification result
+   and timestamps, recorded in this report and the plan. `~/uav_autonomy` is left unchanged: no file is moved,
+   deleted, overwritten or compressed.

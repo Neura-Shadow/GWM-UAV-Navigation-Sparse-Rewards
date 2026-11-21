@@ -8,7 +8,8 @@
   * the M0 read-only audit (§7);
   * the Selective Dependency Backup (D5, revised 2026-11-21), which must happen before any P7 runtime. The M0
     dependency inventory is done ([report](v3_sim_p7_m0_dependency_inventory.md)). Its minimal set (≈ 12.6 GB) and
-    destination await the operator's approval, then a separate execution authorization.
+    the destination `C:\GWM-UAV-Backup\p7-selective-20261121\` were approved on 2026-11-21. Execution needs a
+    separate authorization, under the procedure in report §7.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
