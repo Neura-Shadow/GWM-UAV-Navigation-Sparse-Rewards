@@ -312,7 +312,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   2026-11-21** ([report](v3_sim_p7_m2_runner.md)): C6 is met offline and 48 P7 tests pass. **Accepted 2026-11-21,
   so M2 is complete.** **M3 classifier and frozen analysis code built and tested 2026-11-21**
   ([report](v3_sim_p7_m3_classifier_analysis.md)): 113 P7 tests pass. M3 found that the M0 backup missed
-  `venv-px4`, and awaits the operator's review. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  `venv-px4`, now added as a verified Part E. M3 awaits the operator's review. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.

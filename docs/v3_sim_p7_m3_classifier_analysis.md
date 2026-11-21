@@ -151,7 +151,10 @@ So it is an Essential runtime dependency. It is **not** in the C: backup.
 NumPy 2.5.3 and pyulog 1.2.4. A rebuild could therefore resolve different versions, so its reproducibility is not
 verified ("do not assume a runtime build can be discarded").
 
-**Proposal (needs your authorization; nothing has been done):**
+**Done (2026-11-21, operator "Authorize venv backup"):** Part E was executed and verified (`E10-venv-px4.tar`
+`bb247931…`, 16,387 entries, 0 problems, receipt `39bdd616…`). See inventory §9.
+
+**The proposal as made:**
 * A supplementary backup, Part E: `venv-px4` as one more uncompressed tar.
 * It goes into the same destination, `C:\GWM-UAV-Backup\p7-selective-20261121\`, under a new sub-receipt.
 * It uses the same procedure: drift check against the inventory's `O-venv-px4` tree digest `0c798cc9…`, read-back

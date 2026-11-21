@@ -39,8 +39,9 @@
     environment.
   * The analysis code, frozen as `p7_analysis.py` `bd036a2b…`.
   * 113 P7 tests pass: R1–R4, the 12 P6 flights, negative cases, and SciPy references.
-  * **Awaiting the operator's review**, and a decision on the missed `venv-px4` backup (report §5; inventory
-    erratum §9).
+  * **Awaiting the operator's review.**
+  * The missed `venv-px4` backup was authorized ("Authorize venv backup") and executed and verified as Part E:
+    `E10-venv-px4.tar`, 16,387 entries, 0 problems (inventory erratum §9).
 * **Next, needing its own authorization:** M4, the parity dry run, which is the first simulator launch.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.

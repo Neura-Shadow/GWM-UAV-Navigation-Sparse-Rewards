@@ -309,6 +309,12 @@ Dependency Backup**. It revises D5 only; every other decision stands as recorded
   * Receipt SHA-256 `dce926264a0320cf060eb0af6c0d5b81beacbaf5f434d3978cb21e952b2e8184`.
 
   D5's precondition for P7 runtime is met.
+* **Supplement (2026-11-21):** M3 found that `venv-px4`, which the accepted evaluators run under, had been
+  misclassified as Optional (inventory erratum §9). On "Authorize venv backup" it was added as Part E:
+  * `E10-venv-px4.tar`;
+  * restore check: 16,387 entries, 0 problems;
+  * receipt `39bdd616…`;
+  * the main receipt unchanged.
 
 The options below are kept for the record.
 
