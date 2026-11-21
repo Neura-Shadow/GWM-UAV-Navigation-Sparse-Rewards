@@ -26,7 +26,13 @@
   * **APPROVED by the operator on 2026-11-21 ("Approve specs"), so M1 is COMPLETE.**
   * Canonical hashes: layouts `d742b7af…`, schedule `ef74c71d…`, analysis plan `c9c7a6f3…`. The P7 freeze binds
     exactly these.
-* **Next, needing its own authorization:** M2 (runner and orchestrator, offline).
+* **M2 code written and tested offline (2026-11-21, on "Authorize M2"); its report is not yet written.**
+  * New files in `simulation/px4_gazebo_p7/scripts/`: `p7_manifest.py`, `p7_runner.py`, `p7_host.py`,
+    `run_p7_block.py`, `run_p7.sh`, the owner copy and the shim.
+  * New config: `configs/p7_host_check.yaml`.
+  * Tests: 31 pass, including C6 for S1–S6 and all 260 layouts.
+  * Not yet done: the M2 report, and the operator's review of the host-check numbers (CPU ≤ 15 %, 1.3 GB planned
+    per flight). Blocks also need the M3 classifier.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
