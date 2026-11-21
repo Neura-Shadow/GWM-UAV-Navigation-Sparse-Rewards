@@ -299,7 +299,16 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
   [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The development dry runs (no credit) remain
   on record. P7 is the next phase.
-- [ ] P7 Batch evaluation
+- [ ] P7 Batch evaluation — **planning underway (2026-11-21): plan and draft contract `p7-evaluation-v1`; decisions
+  D1–D14 approved as recommended (2026-11-21); the contract as a whole is not yet approved; nothing implemented or
+  run.** P7-A, the confirmatory part: paired P4 vs P5 SITL flights on fresh pre-registered layouts from the P5
+  layout generator (primary: goal success, exact McNemar; 200 pairs after a 40-flight pilot). D5 was revised to a
+  Selective Dependency Backup: the M0 dependency inventory is done and proposes a ≈ 12.6 GB minimal set
+  ([inventory](v3_sim_p7_m0_dependency_inventory.md)), set and C: destination approved 2026-11-21; **backup executed and verified 2026-11-21** (14 tars, 12.79 GB on
+  C:, restore check 0 problems). **M0 read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md));
+  its decisions D13 and D14 were approved as recommended the same day, so **M0 is complete**. M1 awaits its own
+  authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
 The existing Isaac and Cosys-AirSim integration paths retain their own status.

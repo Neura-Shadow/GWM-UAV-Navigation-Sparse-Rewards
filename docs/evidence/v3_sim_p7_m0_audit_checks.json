@@ -1,0 +1,316 @@
+{
+ "c6_world_parity": {
+  "S1": {
+   "accepted_flights": 2,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "c3e5ff97710ae7b32e704b6bfa92e8d56a80dd5501535bdef75c481783049275"
+  },
+  "S2": {
+   "accepted_flights": 4,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "65dc596c20ebb247830fa3dc1e30149dca4054b15c75384e270373c7f75393db"
+  },
+  "S3": {
+   "accepted_flights": 2,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "540f3da6405f62984c30675653696318d37c69f8e5319fc524e643512e7ab801"
+  },
+  "S4": {
+   "accepted_flights": 2,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "94daf31eb7f77b54b8b769f4460819451b52ea28d74bdb54a60bfc6c2b0593da"
+  },
+  "S5": {
+   "accepted_flights": 2,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "effd475bf127516708c3b5a345db2b78f2647986d78a9e259e42804de76d6b39"
+  },
+  "S6": {
+   "accepted_flights": 2,
+   "all_equal": true,
+   "phases": [
+    "p4",
+    "p5"
+   ],
+   "regenerated_sha256": "65dc596c20ebb247830fa3dc1e30149dca4054b15c75384e270373c7f75393db"
+  }
+ },
+ "contract": "p7-m0-audit-checks-v1",
+ "exclusion_layouts": 1650,
+ "held_out_by_near_duplicate": {
+  "all": {
+   "both": 210,
+   "layouts": 300,
+   "neither": 59,
+   "p4_only": 5,
+   "p5_only": 26
+  },
+  "matched": {
+   "both": 49,
+   "layouts": 57,
+   "neither": 4,
+   "p4_only": 0,
+   "p5_only": 4
+  },
+  "mixed/unmatched": {
+   "both": 24,
+   "layouts": 61,
+   "neither": 29,
+   "p4_only": 3,
+   "p5_only": 5
+  },
+  "partial_wall/matched": {
+   "both": 6,
+   "layouts": 7,
+   "neither": 0,
+   "p4_only": 0,
+   "p5_only": 1
+  },
+  "partial_wall/unmatched": {
+   "both": 35,
+   "layouts": 47,
+   "neither": 5,
+   "p4_only": 0,
+   "p5_only": 7
+  },
+  "pillars/matched": {
+   "both": 5,
+   "layouts": 8,
+   "neither": 1,
+   "p4_only": 0,
+   "p5_only": 2
+  },
+  "pillars/unmatched": {
+   "both": 60,
+   "layouts": 92,
+   "neither": 21,
+   "p4_only": 2,
+   "p5_only": 9
+  },
+  "unmatched": {
+   "both": 161,
+   "layouts": 243,
+   "neither": 55,
+   "p4_only": 5,
+   "p5_only": 22
+  },
+  "wall_with_gap/matched": {
+   "both": 38,
+   "layouts": 42,
+   "neither": 3,
+   "p4_only": 0,
+   "p5_only": 1
+  },
+  "wall_with_gap/unmatched": {
+   "both": 42,
+   "layouts": 43,
+   "neither": 0,
+   "p4_only": 0,
+   "p5_only": 1
+  }
+ },
+ "mcnemar_power": {
+  "excluded_population_unmatched": {
+   "discordant_proportion": 0.1111111111111111,
+   "p5_only_share": 0.8148148148148148,
+   "power": {
+    "150": 0.69,
+    "200": 0.83,
+    "250": 0.91
+   }
+  },
+  "planned_all_held_out": {
+   "discordant_proportion": 0.10333333333333333,
+   "p5_only_share": 0.8387096774193549,
+   "power": {
+    "150": 0.73,
+    "200": 0.866,
+    "250": 0.935
+   }
+  }
+ },
+ "numpy": "1.26.4",
+ "p5_split_reproduction": {
+  "held_out": {
+   "count": true,
+   "layouts_equal_readiness_report": true,
+   "rejected": true,
+   "seed_base": true,
+   "seeds_tried": true
+  },
+  "train": {
+   "count": true,
+   "rejected": true,
+   "seed_base": true,
+   "seeds_tried": true
+  },
+  "validation": {
+   "count": true,
+   "rejected": true,
+   "seed_base": true,
+   "seeds_tried": true
+  }
+ },
+ "p7_seed_screen": {
+  "confirmatory": {
+   "by_family_and_box_count": {
+    "mixed/2-box": {
+     "admissible": 31,
+     "p5_match": 0
+    },
+    "mixed/3-box": {
+     "admissible": 27,
+     "p5_match": 0
+    },
+    "partial_wall/1-box": {
+     "admissible": 69,
+     "p5_match": 20
+    },
+    "pillars/1-box": {
+     "admissible": 24,
+     "p5_match": 5
+    },
+    "pillars/2-box": {
+     "admissible": 26,
+     "p5_match": 0
+    },
+    "pillars/3-box": {
+     "admissible": 28,
+     "p5_match": 0
+    },
+    "pillars/4-box": {
+     "admissible": 14,
+     "p5_match": 0
+    },
+    "wall_with_gap/2-box": {
+     "admissible": 71,
+     "p5_match": 34
+    }
+   },
+   "outcomes": {
+    "acceptance_layout": 1,
+    "admitted": 231,
+    "goal_unreachable_inflated": 25,
+    "p5_split_match": 59,
+    "start_or_goal_disc": 84
+   },
+   "seed_base": 4000000,
+   "seeds_screened": 400
+  },
+  "pilot": {
+   "by_family_and_box_count": {
+    "mixed/2-box": {
+     "admissible": 7,
+     "p5_match": 0
+    },
+    "mixed/3-box": {
+     "admissible": 6,
+     "p5_match": 0
+    },
+    "partial_wall/1-box": {
+     "admissible": 13,
+     "p5_match": 2
+    },
+    "pillars/1-box": {
+     "admissible": 9,
+     "p5_match": 1
+    },
+    "pillars/2-box": {
+     "admissible": 5,
+     "p5_match": 0
+    },
+    "pillars/3-box": {
+     "admissible": 6,
+     "p5_match": 0
+    },
+    "pillars/4-box": {
+     "admissible": 2,
+     "p5_match": 0
+    },
+    "wall_with_gap/2-box": {
+     "admissible": 18,
+     "p5_match": 8
+    }
+   },
+   "outcomes": {
+    "admitted": 55,
+    "goal_unreachable_inflated": 5,
+    "p5_split_match": 11,
+    "start_or_goal_disc": 29
+   },
+   "seed_base": 5000000,
+   "seeds_screened": 100
+  }
+ },
+ "python": "3.12.3",
+ "reference_flights": {
+  "20261030T141506Z-p4-flight-S2-9b8ef2b0": {
+   "armed_transition_recorded": true,
+   "bytes": 1267408119,
+   "controller": "p4_control",
+   "evaluation_status": "passed",
+   "final_goal_distance_m": 0.06659148776965594,
+   "final_state": "COMPLETE",
+   "goal_reached_sim_s": 122.232,
+   "min_truth_clearance_m": 0.4094855651742625,
+   "p4_outcome": "completed",
+   "wall_duration_s": 166.87780289999955
+  },
+  "20261030T144136Z-p4-flight-S2-abeea2d5": {
+   "armed_transition_recorded": true,
+   "bytes": 1231860134,
+   "controller": "p4_control",
+   "evaluation_status": "passed",
+   "final_goal_distance_m": 0.022856806211457584,
+   "final_state": "COMPLETE",
+   "goal_reached_sim_s": 118.884,
+   "min_truth_clearance_m": 0.4459285091918256,
+   "p4_outcome": "completed",
+   "wall_duration_s": 163.0289036920003
+  },
+  "20261106T130044Z-p5-flight-S2-679dd050": {
+   "armed_transition_recorded": true,
+   "bytes": 1204637117,
+   "controller": "p5_control",
+   "evaluation_status": "passed",
+   "final_goal_distance_m": 0.02908181519857779,
+   "final_state": "COMPLETE",
+   "goal_reached_sim_s": 117.556,
+   "min_truth_clearance_m": 0.420083641679011,
+   "p4_outcome": "completed",
+   "wall_duration_s": 177.23134876199947
+  },
+  "20261106T132442Z-p5-flight-S2-184a5a5e": {
+   "armed_transition_recorded": true,
+   "bytes": 1201461631,
+   "controller": "p5_control",
+   "evaluation_status": "passed",
+   "final_goal_distance_m": 0.025503966354246052,
+   "final_state": "COMPLETE",
+   "goal_reached_sim_s": 117.344,
+   "min_truth_clearance_m": 0.3744021526686968,
+   "p4_outcome": "completed",
+   "wall_duration_s": 171.3347472610003
+  }
+ }
+}
