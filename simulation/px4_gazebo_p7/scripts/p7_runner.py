@@ -17,6 +17,10 @@ fallback or control path (C3).
   `p7_not_predeclared`, plus the accepted S1-S6 unchanged, for the M4 parity dry run.
 * `prepare_world`: the accepted world generation, then a check that the world equals the frozen one (the layout's
   recorded SHA-256, or the accepted S1-S6 hash, C6). A mismatch stops the flight before PX4 starts.
+* `run_controller` (D15): the accepted P4 flight loop, with one addition copied from the P6 runner. The accepted
+  flight window (PRESTREAM to COMPLETE, or to RECOVERY for a fail-closed landing) is written before a non-zero
+  controller exit is reported. Without it, a P2 RECOVERY leaves the unchanged evaluator without
+  `sensor_window_sim_s`, and every result of a flight that landed safely is lost.
 * `execute`: the accepted sequence, with the summary fields the unchanged P4/P5 evaluators read, a `p7` block, and
   `acceptance_credit_possible: false`. P7 flights never count toward a P4 or P5 gate.
 
@@ -89,6 +93,14 @@ def expected_world(item, doc=None):
     if item in ACCEPTED_WORLDS:
         return ACCEPTED_WORLDS[item]
     return layout_records(doc)[item]["world_sha256"]
+
+
+def flight_window(result):
+    """As `p6_runner.flight_window`: PRESTREAM to COMPLETE, or to RECOVERY for a fail-closed landing; else None."""
+    transitions = {t["to"]: t["sim_s"] for t in (result or {}).get("transitions", [])}
+    end = transitions.get("COMPLETE") or transitions.get("RECOVERY")
+    begin = transitions.get("PRESTREAM_SAFE_SETPOINTS")
+    return None if begin is None or end is None else [begin, end]
 
 
 def schedule_slot(scope, block, slot, doc=None):
@@ -203,6 +215,32 @@ class P7Flight:
         self.summary["p7"]["world"] = {"generated_sha256": got, "expected_sha256": want, "identical": got == want}
         if got != want:
             raise base.Abort("p7_world_differs_from_the_frozen_world")
+
+    # ---- controller phase (D15) ------------------------------------------------------------------------------
+    def run_controller(self, config):
+        """The accepted P4 flight loop (S6 injection watch included), unchanged, except that the accepted flight window
+        is written before a non-zero controller exit is reported, as the P6 runner does."""
+        deadline = self.start + config["wall_deadline_s"] + 90
+        events = base.Tail(self.run / "ros-events.jsonl")
+        while self.controller.poll() is None:
+            self.pump()
+            if (self.declaration or {}).get("fault") == "bridge_stop_at_distance" and self.injection is None:
+                self.watch_injection(events.read())
+            if time.monotonic() > deadline:
+                raise base.Abort("deadline:controller")
+            time.sleep(0.05)
+        result_path = self.run / "controller-result.json"
+        self.summary["controller_exit_code"] = code = self.controller.record["exit_code"]
+        self.summary["controller_result"] = result = strict_json(result_path) if result_path.exists() else None
+        if result is not None:
+            self.summary["controller_publishers_only_from_controller"] = bool(result.get("graph_valid"))
+        window = flight_window(result)
+        if window is None:
+            raise base.Abort("controller_failed:" + str((result or {}).get("failure")))
+        self.summary["sensor_window_sim_s"] = window
+        if code != 0:  # as the accepted P4 runner: the run fails; the window lets the unchanged evaluator still run
+            raise base.Abort("controller_failed:" + str(result.get("failure")))
+        self.summary["status"] = "passed"
 
     # ---- entry ----------------------------------------------------------------------------------
     def controller_summary(self, frozen):

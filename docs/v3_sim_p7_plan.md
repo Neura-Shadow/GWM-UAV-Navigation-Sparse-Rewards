@@ -49,8 +49,13 @@
     successes.
   * The world, accepted label and lineage are identical; the metrics are within run-to-run variation.
   * No stop. **ACCEPTED by the operator on 2026-11-21 ("Accept M4"), so M4 is COMPLETE.**
-* **Next, needing its own authorization:** M5, the pilot. It needs a production Policy A approval and the real P7
-  freeze first.
+* **M5 pilot STOPPED after 6 of 40 flights (2026-11-21):** [pilot record](v3_sim_p7_m5_pilot.md).
+  * Production Policy A was approved and the real candidate `6f60492f…` frozen; the pilot was authorized.
+  * Flight 6 had a P2 `observation_gap` RECOVERY. It was safe by every raw record and landed and disarmed. But a
+    runner gap (P6 had solved it) plus a P2 evaluator limitation made it safety-unverified, so the batch stopped.
+  * **D15, Option A, decided by the operator (2026-11-21):** the runner fix and the classifier ULog check are
+    implemented and tested on the real stopped flight; 122 P7 tests pass.
+  * Next: a new production Policy A approval, a real freeze and a new pilot authorization, each explicit.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 

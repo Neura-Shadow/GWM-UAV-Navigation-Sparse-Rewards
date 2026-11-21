@@ -21,6 +21,12 @@
   * **Mission failures:** tracking, response latency.
   * **Integrity events:** everything else.
   * **For a flight that never armed,** only Policy A and a competing publisher apply, since nothing moved.
+  * **D15, when the accepted P2 integrity check raises** (for example on the stale state a P2 observation-gap
+    RECOVERY leaves). Its safety facts are then read from the ULog with the accepted P2 reader: own commands exactly
+    176, 400, 21, landed and disarmed, and no PX4 failsafe. The accepted Policy A check must also have run.
+    * If they all hold, the error is an integrity event.
+    * A failed fact is a safety event.
+    * An unreadable ULog leaves the flight safety-unverified.
 * **The restated P6 §6.3 rules.** They use the same rule and threshold as the accepted P6 functions, applied to P7
   runs:
   * **hold-tick motion:** on a tick that must hold (a stale decision, or a P5 policy-failure tick), the next
@@ -62,6 +68,8 @@ UNVERIFIED_PREFIXES = ("evaluator_incomplete_evidence:", "p2_integrity_error:", 
                        "p4_evaluation_error:", "p5_evaluation_error:")
 MISSION_ITEMS = ("safety:tracking", "safety:response_latency")
 NEVER_ARMED_STOPS = ("competing_flight_publisher",)
+P2_ERROR_PREFIX = "p2_integrity_error:"
+P2_COMMANDS = [176, 400, 21]  # the accepted P2 sequence (p4_evaluate p2_integrity: set mode, arm, land)
 HOLD_MOTION_M = strict_json(P6 / "configs/p6_faults.yaml")["codes"]["H35"]["stale_target_motion_m"]  # 0.01 m
 
 
@@ -69,6 +77,35 @@ HOLD_MOTION_M = strict_json(P6 / "configs/p6_faults.yaml")["codes"]["H35"]["stal
 def events(run):
     path = Path(run) / "ros-events.jsonl"
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()] if path.exists() else []
+
+
+def p2_ulog_facts(summary):
+    """D15: the safety-relevant P2 facts from the ULog with the accepted P2 reader, or None if it cannot be read."""
+    files, config = summary.get("ulog_files") or [], summary.get("config") or {}
+    if not files or not Path(files[0]["path"]).exists() or "source_system" not in config:
+        return None
+    try:
+        import collect_p2_evidence as p2
+        _, streams = p2.read_ulog(files[0]["path"], flight=True)
+        own = [r["command"] for r in streams["vehicle_command"]
+               if r["source_system"] == config["source_system"] and r["source_component"] == config["source_component"]]
+        status, land = streams["vehicle_status"], streams["vehicle_land_detected"]
+        return {"own_commands": own, "final_disarmed": status[-1]["arming_state"] == 1,
+                "final_landed": bool(land[-1]["landed"]), "failsafe_observed": any(s["failsafe"] for s in status)}
+    except Exception:
+        return None
+
+
+def p2_ulog_failures(facts):
+    """D15: the P2 safety facts the accepted P2 integrity check could not establish, as safety events."""
+    failures = []
+    if facts["own_commands"] != P2_COMMANDS:
+        failures.append("p2_ulog:command_sequence")
+    if not (facts["final_landed"] and facts["final_disarmed"]):
+        failures.append("p2_ulog:final_landed_disarmed")
+    if facts["failsafe_observed"]:
+        failures.append("p2_ulog:failsafe_observed")
+    return failures
 
 
 def ulog_armed(summary):
@@ -147,7 +184,7 @@ def final_goal_distance(run, result, evaluation, mission):
     return math.dist(track[-1][1][:2], goal)
 
 
-def build_record(run, ulog_reader=ulog_armed):
+def build_record(run, ulog_reader=ulog_armed, p2_facts_reader=p2_ulog_facts):
     run = Path(run)
     summary = strict_json(run / "summary.json")
     result = summary.get("controller_result") or {}
@@ -194,6 +231,19 @@ def build_record(run, ulog_reader=ulog_armed):
     if not (run / "p4/contacts.jsonl").exists():
         classes["safety_unverified"].append("contact_ledger_missing")
     integrity = (evaluation or {}).get("p2_integrity") or {}
+    p2_errors = [i for i in classes["safety_unverified"] if i.startswith(P2_ERROR_PREFIX)]
+    p2_check = None
+    if p2_errors:  # D15: the accepted P2 integrity check raised; establish its safety facts from the ULog instead
+        facts = p2_facts_reader(summary)
+        policy_checked = "native_commands" in (evaluation or {})
+        p2_check = {"facts": facts, "policy_a_checked": policy_checked, "failures": None}
+        if facts is not None and policy_checked:
+            p2_check["failures"] = p2_ulog_failures(facts)
+            for item in p2_errors:
+                classes["safety_unverified"].remove(item)
+                classes["integrity_events"].append(item)
+            classes["safety_events"] += p2_check["failures"]
+            integrity = {"final_landed": facts["final_landed"], "final_disarmed": facts["final_disarmed"]}
     distance = final_goal_distance(run, result, evaluation or {}, config["mission"])
     tolerance = config["mission"]["goal_tolerance_m"]
     conditions = {"goal_reached_recorded": (result.get("p4") or {}).get("goal_reached_sim_s") is not None,
@@ -219,7 +269,7 @@ def build_record(run, ulog_reader=ulog_armed):
     policy = (evaluation or {}).get("policy") or {}
     metrics["policy"] = {k: policy.get(k) for k in ("invoked", "disagreements", "disagreement_rate", "interventions")} if policy else None
     record.update(outcome="goal_success" if all(conditions.values()) else "failure", goal_conditions=conditions,
-                  classes=classes, unsafe_rules=rules, metrics=metrics,
+                  classes=classes, unsafe_rules=rules, metrics=metrics, p2_ulog_check=p2_check,
                   stop_reasons=["safety_event:" + i for i in classes["safety_events"]]
                   + ["safety_unverified:" + i for i in classes["safety_unverified"]])
     return record

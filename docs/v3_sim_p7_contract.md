@@ -141,6 +141,14 @@ limit. Its new numbers are statistical design choices (§6) and resource rules (
   | **Mission failure, no stop** | `safety:tracking` (> 0.30 m), `safety:response_latency` (> 0.25 s) | the flight is not a goal success; reported per flight |
   | **Integrity event** | every other item: depth stream, perception performance, RGB absence, P2 timing, ULog dropout, MC causality, renderer, cleanup and shutdown, recorder overflow, P5 policy-ledger limits | reported per flight; the outcome class does not change |
 
+* **D15: when the accepted P2 integrity check raises** (`p2_integrity_error:*`). This happens, for example, on the
+  stale state that a P2 observation-gap RECOVERY leaves. For an armed flight:
+  * The classifier reads its safety facts from the ULog with the accepted P2 reader: own commands exactly 176, 400,
+    21; landed and disarmed; no PX4 failsafe. The accepted Policy A check must also have run.
+  * If they all hold, the item is an integrity event. Each failed fact is a safety event (`p2_ulog:*`). An unreadable
+    ULog keeps the flight safety-unverified.
+  * The runner records the accepted flight window (PRESTREAM to COMPLETE, or to RECOVERY) before it reports a
+    fail-closed exit, as the P6 runner does, so the unchanged evaluator always runs.
 * **Unsafe commands (P6 contract §6.3).**
   * Three of its parts are the accepted checks listed as safety events: a setpoint inside an inflated obstacle,
     Policy A or the LAND count, and a setpoint not from the owner.
@@ -277,6 +285,7 @@ Any change after freeze is a new P7 candidate.
 | D12 | a production Policy A per P7 candidate; one authorization per block; a separate pilot authorization | §9 |
 | D13 (M0 audit) | P7 layout declarations carry `outcome: "p7_not_predeclared"`; the accepted P4/P5 evaluators run end to end and unchanged; the P7 classifier decides the mission outcome | §5 |
 | D14 (M0 audit) | evaluator results fall into four classes: safety event and safety-unverified (both a failure and a batch stop), mission failure (tracking, response latency), and integrity event | §5, §7.3 |
+| D15 (M5 pilot stop, 2026-11-21, "Option A") | the runner writes the accepted flight window before a fail-closed exit (the P6 pattern). When the accepted P2 integrity check raises, the classifier establishes the P2 safety facts from the ULog (176/400/21, landed and disarmed, no failsafe, and Policy A checked); then a new candidate, Policy A approval and pilot authorization | §5 |
 
 **M0 audit decisions (operator, 2026-11-21).** The audit ([§8](v3_sim_p7_m0_audit.md)) raised D13 and D14. The
 operator approved both as recommended in chat on 2026-11-21 ("Approve as recommended"). D8 stands unchanged. The
