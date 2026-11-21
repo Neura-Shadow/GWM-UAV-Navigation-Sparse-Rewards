@@ -305,7 +305,8 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   layout generator (primary: goal success, exact McNemar; 200 pairs after a 40-flight pilot). D5 was revised to a
   Selective Dependency Backup: the M0 dependency inventory is done and proposes a ≈ 12.6 GB minimal set
   ([inventory](v3_sim_p7_m0_dependency_inventory.md)), set and C: destination approved 2026-11-21; **backup executed and verified 2026-11-21** (14 tars, 12.79 GB on
-  C:, restore check 0 problems). P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  C:, restore check 0 problems). **M0 read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md));
+  it raises decisions D13 and D14, which await the operator before M1. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.

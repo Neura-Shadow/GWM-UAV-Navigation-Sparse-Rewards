@@ -4,6 +4,10 @@
 chat on 2026-11-21 ("照建議核准", approve as recommended), each as recommended. The normative text below already
 encodes those choices.
 
+**New decisions from the M0 audit (2026-11-21), not yet answered:** D13 (how the accepted evaluators run on
+generated layouts) and D14 (which evaluator results decide what). See [audit §8](v3_sim_p7_m0_audit.md). §5 and §7
+are edited once they are answered.
+
 **What this approval does not cover:**
 * **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
   new decisions first, as P6's M0 did.

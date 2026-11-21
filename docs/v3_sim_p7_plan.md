@@ -10,7 +10,13 @@
   * The restore check covered 137,925 entries with 0 problems.
   * Receipt SHA-256 `dce92626…`. The record is in [report §8](v3_sim_p7_m0_dependency_inventory.md).
   * This meets D5's precondition for P7 runtime.
-* **Next, needing its own authorization:** the rest of the M0 read-only audit (§7).
+* **The M0 read-only audit is DONE (2026-11-21, on "現在繼續p7"):** [audit report](v3_sim_p7_m0_audit.md).
+  * Nothing was launched, and no P2–P6 file changed.
+  * It raises two new decisions, **D13** (how the accepted evaluators run on generated layouts) and **D14** (which
+    evaluator results decide what). Both await the operator.
+  * It corrects two planning facts: the power at 200 pairs on the sampled population is 0.83 (§4.5), and the
+    population statement (§4.1).
+* **Next, needing the operator:** answers to D13 and D14, then M1 under its own authorization.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -130,6 +136,10 @@ P7 answers those questions in SITL, under a fixed analysis plan, without changin
   * confirmatory: base 4,000,000.
 * **Extra exclusion:** besides the acceptance sets, a layout is rejected if it matches any P5 train, validation or
   held-out layout under the same §4.1 match rule. This keeps the test in-distribution but on unseen layouts.
+  * **M0 audit ([§4.3](v3_sim_p7_m0_audit.md)):** the exclusion removes about 15 % of admissible layouts, mostly
+    wall-with-gap (48 % of that family) and one-box layouts, which are almost all concordant. So the confirmatory
+    population is "generator layouts that are not near-duplicates of a P5 layout". Every report states it with the
+    family mix.
 * **Frozen before any confirmatory flight:** the admitted list is generated offline, and its seeds, boxes, families
   and SHA-256 are bound in the P7 manifest. Layouts are taken in seed order until the pre-registered count is
   reached. No layout is added, removed or replaced afterwards.
@@ -196,6 +206,10 @@ P7 answers those questions in SITL, under a fixed analysis plan, without changin
 | **200** | **0.87** | 0.26 | 0.10 |
 | 250 | 0.94 | 0.33 | 0.12 |
 | 300 | 0.97 | 0.40 | 0.14 |
+
+**M0 audit correction:** these powers use all 300 held-out layouts. On the population P7 actually samples (P5
+near-duplicates excluded: 11.1 % discordant, P5-only share 0.81) they are 0.69 / **0.83** / 0.91 at 150 / 200 / 250
+pairs ([audit §4.4](v3_sim_p7_m0_audit.md)). N stays 200 (D3). The pilot rule may raise it to 250.
 
 **Other endpoints, at the offline variances:**
 * **Time to goal:** 0.5 s needs about 160 both-reached pairs. Roughly 70 % of layouts are both-reached offline.
@@ -286,7 +300,7 @@ simulation/px4_gazebo_p7/
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8) | written audit; D1–D12 answered |
+| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8); **read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md)), raising D13 and D14 | written audit; D1–D12 answered (done); D13–D14 answered |
 | **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
