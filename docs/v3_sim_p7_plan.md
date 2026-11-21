@@ -18,7 +18,13 @@
     §5 and §7.3.
   * It corrects two planning facts: the power at 200 pairs on the sampled population is 0.83 (§4.5), and the
     population statement (§4.1).
-* **Next, needing its own authorization:** M1 (specs: layout sets, schedule, analysis plan).
+* **M1 specifications generated and tested (2026-11-21, on "Authorize M1"):** [spec report](v3_sim_p7_m1_specs.md).
+  * Layout sets: pilot 10, confirmatory 250 (the first 200 planned).
+  * Schedules: pilot and confirmatory, for 200 and for 250 pairs.
+  * The analysis plan.
+  * 17 offline tests pass. Nothing is frozen.
+  * **Awaiting the operator's approval** of the three hashed specifications, M1's exit criterion.
+* **Next, needing its own authorization:** M2 (runner and orchestrator, offline).
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -310,7 +316,7 @@ simulation/px4_gazebo_p7/
 | M | Content | Exit criterion |
 |---|---|---|
 | **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8); **read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md)), raising D13 and D14 (approved 2026-11-21); **M0 complete** | written audit; D1–D14 answered (done) |
-| **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
+| **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan; **generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)), awaiting approval | operator approves; hashes recorded |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
 | **M4** parity dry run | development candidate; S2 flown through the P7 path with P4 and P5, compared with the accepted flights | the P7 path reproduces the accepted outcomes within run-to-run variation; no credit |
