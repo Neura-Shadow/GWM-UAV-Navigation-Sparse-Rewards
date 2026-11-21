@@ -1,7 +1,11 @@
 # v3-SIM P7 M3 — flight classifier and frozen analysis code (offline)
 
-**Status: built, tested and frozen (2026-11-21); awaiting operator review.** This is M3 of the
-[P7 plan](v3_sim_p7_plan.md) (§7), authorized by the operator on 2026-11-21 ("Authorize M3").
+**Status: ACCEPTED (2026-11-21); M3 COMPLETE.** This is M3 of the [P7 plan](v3_sim_p7_plan.md) (§7).
+* **Authorized:** by the operator on 2026-11-21 ("Authorize M3").
+* **Accepted:** by the operator on 2026-11-21 ("Accept M3"), with the classifier rules of §2 and the frozen
+  analysis code `p7_analysis.py` `bd036a2b…` of §4.
+* **Frozen:** from here, any change to the analysis code or the classifier is a new version and needs a new
+  approval.
 
 **What M3 did and did not do:**
 * It ran offline only. Nothing flew, and no namespace or simulator started.
@@ -164,7 +168,7 @@ verified ("do not assume a runtime build can be discarded").
 
 ## 6. Next
 
-* **Operator review** of M3: the classifier rules of §2 and the frozen analysis code of §4.
+* **Operator review** of M3: done; accepted on 2026-11-21 ("Accept M3").
 * **Operator decision** on the supplementary `venv-px4` backup (§5).
 * **M4** (the parity dry run: a development freeze and S2 flown by P4 and P5 through the P7 path) needs its own
   authorization. It is the first step that launches a simulator.
