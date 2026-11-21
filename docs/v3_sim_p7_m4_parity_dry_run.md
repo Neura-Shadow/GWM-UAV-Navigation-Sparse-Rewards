@@ -1,7 +1,9 @@
 # v3-SIM P7 M4 — parity dry run (S2 through the P7 path)
 
-**Status: complete (2026-11-21); awaiting operator review.** This is M4 of the [P7 plan](v3_sim_p7_plan.md) (§7),
-authorized by the operator on 2026-11-21 ("Authorize M4"). It was P7's first simulator launch.
+**Status: ACCEPTED (2026-11-21); M4 COMPLETE.** This is M4 of the [P7 plan](v3_sim_p7_plan.md) (§7). It was P7's
+first simulator launch.
+* **Authorized:** by the operator on 2026-11-21 ("Authorize M4").
+* **Accepted:** by the operator on 2026-11-21 ("Accept M4").
 
 **What it was:**
 * a development candidate;
@@ -76,7 +78,7 @@ Neither is a change of behaviour. This is the run-to-run variation the pilot is 
 
 ## 4. Next
 
-**Operator review of M4.**
+**Operator review of M4:** done; accepted on 2026-11-21 ("Accept M4").
 
 **M5, the pilot, needs its own authorization**, plus these steps from the accepted M2 design choices:
 1. A **production Policy A approval** for the real P7 candidate (D12; development approvals never transfer).

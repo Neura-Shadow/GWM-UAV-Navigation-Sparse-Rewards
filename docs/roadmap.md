@@ -315,7 +315,7 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   `venv-px4`, now added as a verified Part E. **M3 accepted 2026-11-21, so M3 is
   complete.** **M4 parity dry run done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)): S2 was flown
   by P4 and P5 through the P7 path, the unchanged evaluators passed, and the result is identical to the accepted
-  S2 outcome. M5 (the pilot) awaits its own authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  S2 outcome. **Accepted 2026-11-21, so M4 is complete.** M5 (the pilot) awaits its own authorization. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.

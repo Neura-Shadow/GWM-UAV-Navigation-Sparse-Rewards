@@ -48,7 +48,7 @@
   * S2 flown by P4 and P5 through the P7 path. Both unchanged evaluators passed, and both flights are valid goal
     successes.
   * The world, accepted label and lineage are identical; the metrics are within run-to-run variation.
-  * No stop. **Awaiting the operator's review.**
+  * No stop. **ACCEPTED by the operator on 2026-11-21 ("Accept M4"), so M4 is COMPLETE.**
 * **Next, needing its own authorization:** M5, the pilot. It needs a production Policy A approval and the real P7
   freeze first.
 * Each milestone, freeze and batch block needs its own operator authorization.
@@ -345,7 +345,7 @@ simulation/px4_gazebo_p7/
 | **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan; **generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)); **approved 2026-11-21; M1 complete** | operator approves; hashes recorded (done) |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger; **built and tested 2026-11-21** ([report](v3_sim_p7_m2_runner.md)); **accepted 2026-11-21; M2 complete** | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics; **built, tested and frozen 2026-11-21** ([report](v3_sim_p7_m3_classifier_analysis.md)); **accepted 2026-11-21; M3 complete** | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
-| **M4** parity dry run | development candidate; S2 flown through the P7 path with P4 and P5, compared with the accepted flights; **done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)), awaiting review | the P7 path reproduces the accepted outcomes within run-to-run variation; no credit |
+| **M4** parity dry run | development candidate; S2 flown through the P7 path with P4 and P5, compared with the accepted flights; **done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)); **accepted 2026-11-21; M4 complete** | the P7 path reproduces the accepted outcomes within run-to-run variation; no credit |
 | **M5** pilot | 10 pilot layouts × 2 controllers × 2 repeats | pilot report; the nuisance-parameter update by the declared rule |
 | **M6** confirmatory P7-A | real freeze; blocks of 20 pairs, each authorized | all pre-registered pairs flown, or a stop rule met |
 | **M7** P7-B / P7-C | only if decided | their own records |
