@@ -4,12 +4,13 @@
 * The operator's answer was "照建議核准" (approve as recommended). The record is in contract §10.
 * Nothing in P7 is implemented, frozen, launched or authorized.
 * The [`p7-evaluation-v1`](v3_sim_p7_contract.md) contract is still a draft until the operator approves it as a whole.
-* **Next, each needing its own authorization:**
-  * the M0 read-only audit (§7);
-  * the Selective Dependency Backup (D5, revised 2026-11-21), which must happen before any P7 runtime. The M0
-    dependency inventory is done ([report](v3_sim_p7_m0_dependency_inventory.md)). Its minimal set (≈ 12.6 GB) and
-    the destination `C:\GWM-UAV-Backup\p7-selective-20261121\` were approved on 2026-11-21. Execution needs a
-    separate authorization, under the procedure in report §7.
+* **The Selective Dependency Backup (D5, revised 2026-11-21) is DONE and verified (2026-11-21).**
+  * The operator approved the minimal set and the destination, and authorized the execution and a re-run.
+  * 14 uncompressed tars (12.79 GB) are in `C:\GWM-UAV-Backup\p7-selective-20261121\`.
+  * The restore check covered 137,925 entries with 0 problems.
+  * Receipt SHA-256 `dce92626…`. The record is in [report §8](v3_sim_p7_m0_dependency_inventory.md).
+  * This meets D5's precondition for P7 runtime.
+* **Next, needing its own authorization:** the rest of the M0 read-only audit (§7).
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -285,7 +286,7 @@ simulation/px4_gazebo_p7/
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)) | written audit; D1–D12 answered |
+| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8) | written audit; D1–D12 answered |
 | **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
@@ -305,7 +306,8 @@ simulation/px4_gazebo_p7/
   looking at outcomes.
 * **The effect may be smaller in SITL than offline:** the power table shows that 200 pairs cannot detect half the
   offline effect. The report then gives the CI and no superiority claim.
-* **Disk:** P7-A uses most of the free WSL space. The Selective Dependency Backup comes first (D5, revised).
+* **Disk:** P7-A uses most of the free WSL space. The Selective Dependency Backup came first (D5, revised); it was done and
+  verified on 2026-11-21. It holds only the minimal set, as one copy on C:.
 * **Host packages:** no apt package is held. An `apt upgrade` of the pinned ROS or mesa packages, or a Windows
   GPU-driver update, would break verification of all four manifests. These are the operator's host settings; the
   M0 inventory records the exact versions, and the apt cache holds every installed ros-jazzy `.deb`.

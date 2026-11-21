@@ -8,8 +8,9 @@ encodes those choices.
 * **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
   new decisions first, as P6's M0 did.
 * **Implementation and the M0 audit.**
-* **The backup:** D5, revised on 2026-11-21 to a Selective Dependency Backup, makes it a precondition. Its minimal
-  set and destination were approved on 2026-11-21. Executing it needs its own authorization.
+* **The backup:** D5, revised on 2026-11-21 to a Selective Dependency Backup, makes it a precondition. It was
+  approved and authorized separately, and executed and verified on 2026-11-21
+  ([inventory report §8](v3_sim_p7_m0_dependency_inventory.md)).
 * **Any freeze, Policy A approval, pilot or batch block.**
 
 Each milestone, freeze and block still needs its own operator authorization. See the [P7 plan](v3_sim_p7_plan.md).
@@ -247,8 +248,15 @@ Dependency Backup**. It revises D5 only; every other decision stands as recorded
   disposable unless its reproducibility or replacement has been verified.
 * **P7-A independence:** P7-A code and tests may depend only on the Essential set and the Required reference runs.
 * **Approvals:** the operator approved the minimal set (≈ 12.6 GB) and the destination
-  `C:\GWM-UAV-Backup\p7-selective-20261121\` on 2026-11-21 ("Approve set and C:"). Execution needs its own
-  authorization.
+  `C:\GWM-UAV-Backup\p7-selective-20261121\` on 2026-11-21 ("Approve set and C:").
+* **Execution:** authorized on 2026-11-21 ("Authorize the backup"). Attempt 1 stopped on a tool bug, and its folder
+  was kept, renamed. The re-run was authorized ("Authorize re-run").
+* **Result:** executed and verified on 2026-11-21.
+  * 14 tars, 12.79 GB.
+  * Restore check: 137,925 entries, 0 problems.
+  * Receipt SHA-256 `dce926264a0320cf060eb0af6c0d5b81beacbaf5f434d3978cb21e952b2e8184`.
+
+  D5's precondition for P7 runtime is met.
 
 The options below are kept for the record.
 

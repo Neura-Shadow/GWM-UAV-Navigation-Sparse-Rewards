@@ -8,7 +8,13 @@ ran, and no P2–P6 file changed. The P3, P4, P5 and P6 manifests verify before 
 * the minimal backup set of §5 (≈ 12.6 GB);
 * the destination `C:\GWM-UAV-Backup\p7-selective-20261121\`.
 
-**Executing the backup still needs its own authorization** (§7). Nothing has been copied.
+**Executed and verified (2026-11-21, §8).**
+* Authorized by the operator with "Authorize the backup". Attempt 1 stopped on a tool bug; the re-run was authorized
+  with "Authorize re-run".
+* 14 uncompressed tars (12.79 GB) are in `C:\GWM-UAV-Backup\p7-selective-20261121\`.
+* The restore check covered 137,925 entries with 0 problems.
+* Receipt SHA-256 `dce926264a0320cf060eb0af6c0d5b81beacbaf5f434d3978cb21e952b2e8184`.
+* `~/uav_autonomy` was only read.
 
 ## 1. Revised D5
 
@@ -202,7 +208,8 @@ These are constraints of the revised D5, checked in M2/M3:
 **Approvals:**
 1. this minimal set: **approved 2026-11-21**;
 2. the destination `C:\GWM-UAV-Backup\p7-selective-20261121\`: **approved 2026-11-21**;
-3. the authorization to execute the backup: **pending**.
+3. the authorization to execute the backup: **authorized 2026-11-21** ("Authorize the backup"; re-run authorized
+   with "Authorize re-run"). **Executed and verified** (§8).
 
 ## 7. Execution procedure (runs only under its own authorization)
 
@@ -232,3 +239,108 @@ At approval time: C: had 147.6 GB free; the destination did not exist; C: is phy
 6. **Report:** a `backup-receipt.json` in the destination, with tar names, sizes, SHA-256s, the verification result
    and timestamps, recorded in this report and the plan. `~/uav_autonomy` is left unchanged: no file is moved,
    deleted, overwritten or compressed.
+
+## 8. Execution record (2026-11-21)
+
+**Authorizations:**
+* "Authorize the backup" (operator, 2026-11-21).
+* "Authorize re-run" (operator, 2026-11-21), after attempt 1 stopped.
+
+**Tool:** [`diagnostics/p7_m0/p7_backup.py`](../diagnostics/p7_m0/p7_backup.py). The version that ran is copied to
+the backup's `inventory/` folder (SHA-256 `fb3cde7a4e7b15c376e5c2e78584de1107f7f87f50f48747e42bc59d98e3cff6`).
+
+### Attempt 1: stopped (12:30–16:04)
+
+**What passed:**
+* the preconditions and the drift check;
+* the 13 tars E1–R4, each written to C: with a read-back hash that matched.
+
+**What failed:** the 14th tar, the apt cache. The run hung instead of stopping.
+* `--atime-preserve=system` makes tar open files with `O_NOATIME`.
+* The kernel refuses that flag (EPERM) on files the caller does not own, and the debs belong to root.
+* So tar reported one error per file. The tool read tar's stderr only after stdout ended. After 64 KB of messages
+  the stderr pipe was full, and tar and the tool each waited for the other.
+
+**What was done:**
+* At 16:04 only that `tar` process was terminated.
+* The tool exited through its own STOP path: `tar S1-apt-cache.tar failed … Operation not permitted`.
+* No automatic retry.
+* The folder was renamed, not deleted, to `C:\GWM-UAV-Backup\p7-selective-20261121.attempt1-stopped\`. It holds the
+  13 complete tars and a 0-byte `S1-apt-cache.tar`, with no receipt. Attempt 2 supersedes it. Deleting it needs the
+  operator's approval.
+
+**The fix:**
+* tar's stderr goes to a scratch file, not a pipe.
+* The apt-cache tar runs without `--atime-preserve`. The debs' access times are not evidence.
+* `--atime-preserve=system` is kept for the operator-owned `~/uav_autonomy` groups.
+* A read-only dry run of the fixed apt-cache tar produced 0.726 GB, rc 0 and an empty stderr.
+
+### Attempt 2: passed (16:07–16:19, 757 s)
+
+| Step | Result |
+|---|---|
+| Preconditions | no simulator or runtime process; P3 `1e205fec…`, P4 `c110bd30…`, P5 `2becfbbb…` and P6 `22292775…` verify; C: 145.0 GB free; destination absent; the per-file inventory hash is `2303055a…` |
+| Drift check | the 13 group tree digests and the 1,242 deb hashes equal the approved inventory |
+| Copy and read-back | 14 tars; each write-time SHA-256 equals its read-back SHA-256 |
+| Restore verification | every tar was extracted into `~/p7-backup-verify-20261121` and every entry checked: size, SHA-256, symlink target, no extras. **137,925 entries, 0 problems.** The tool then removed its own scratch extraction. |
+| Afterwards | the four manifests verify again with the same digests; no simulator process |
+
+**Tars** (uncompressed pax format, numeric owners, symlinks stored as links):
+
+| Tar | Bytes | SHA-256 |
+|---|---:|---|
+| E1-state.tar | 686,080 | `58eccc3d881da4e4e06f76adfb1dd400eb3b75306a87c20788f959568bd87b6f` |
+| E2-mc-benchmark-run.tar | 31,846,400 | `8ef559ab50e6fe3fec0245deb5b730702583e7e2c61f36023f5ac1332258ea42` |
+| E3-px4-mc-trace-build.tar | 3,022,837,760 | `2621d39cc23ef57d664fa73af0b10859fe503f6dcd88ae7468cfb9ea9a3d7f5e` |
+| E4-px4-upstream.tar | 3,039,180,800 | `e5fdd67c93a73a8b7d85538742d95b185839203d0814b91e8d34e73e431e997c` |
+| E5-qgc-bundle.tar | 60,303,360 | `b29874f8eb802784048e25136c9b78c26583ba63ba2c0114417db207087e2d19` |
+| E6-qgc-stock-tree.tar | 717,987,840 | `b5877e5fb85ab0e9d074c3d66de0afcc436dab09a9022b310f1a50faf9f91cee` |
+| E7-dds-agent.tar | 8,161,280 | `fa6b5bf7bf3123cddb0d8e2a7dc88e9a94d602d38181ad52bf63a7e54c229208` |
+| E8-ros-overlay.tar | 267,755,520 | `d6a4a93c93e63b1727b0f1fc74cd8c601356a6a0364736ae5ec1a9fa2071d9e4` |
+| E9-workspaces.tar | 3,256,320 | `c1f7d12341763bf5f49454cd18b9e0aa42707221614a69be701f643ebcb63f10` |
+| R1-p4-S2-gateC.tar | 1,232,445,440 | `ecaa3ff5ec119296a0d5e3413632727ec15ca90f1ab46c95dc531388e8dfbdf1` |
+| R2-p4-S2-gateB.tar | 1,267,988,480 | `83e8db879b5f6e436c9f0e8544cd9ea28d5567f9f0c3e06f7553db205b54de2e` |
+| R3-p5-S2-gateC.tar | 1,202,053,120 | `d8e5212ec1e7f07ee9353a38e7ef1e2885ad73508b526ee54435bf2a2653aaaf` |
+| R4-p5-S2-gateB.tar | 1,205,227,520 | `31ba41c0254d41d3549de259b8fb44433f1b538a7e6539acfe1869b9138d92db` |
+| S1-apt-cache.tar | 725,565,440 | `cfb9964ea9f58cbdf146a78ad48491f62fd5198e560043c1590ccf78a7d6dc16` |
+| **Total** | **12,785,295,360** | |
+
+**Other files in the destination:**
+* `inventory/`: the summary and system JSONs, the full per-file list (`2303055a…`), this report as it stood before
+  this section was added (`cf4ef31d…`), and both tools.
+* `SHA256SUMS`: covers every tar and every `inventory/` file. Its SHA-256 is
+  `2820239062bed1d2192b7a1c62cc0218ebc0ec2eba28dcdee6b51e7a804925fa`.
+* `backup-receipt.json` (contract `p7-selective-backup-receipt-v1`, written with exclusive create). Its SHA-256 is
+  `dce926264a0320cf060eb0af6c0d5b81beacbaf5f434d3978cb21e952b2e8184`.
+
+### E3's tar bytes differ between runs
+
+Attempt 1's E3 tar (`6e00e142…`) and attempt 2's (`2621d39c…`) differ only in the headers of 39 directories under
+`PX4-Autopilot/.git/modules/`. Their mtime, ctime and atime equal the second of each run's precondition step
+(12:30:28 and 16:07:09).
+
+**Cause:** the bound P3 MC-trace check
+([`mc_trace_runtime.py`](../simulation/px4_gazebo/validation/mc_trace_runtime.py)) runs `git diff` and
+`git submodule status --recursive` in that tree on every manifest verify. Git takes and releases an index lock in
+each submodule's git directory, which updates that directory's timestamps.
+
+**What this does and does not affect:**
+* No file content, link or mode changed. The group tree digests do not cover directory times, and the drift check
+  passed both times.
+* Every manifest verify since P3 has done this; the backup did not cause it.
+* The receipt's `sources_modified: false` refers to the backup's own actions. The manifest verifies before and
+  after it touched only these directory times.
+* **Consequence:** check a restore against the per-file inventory, as done here, not by comparing tar hashes between
+  runs.
+
+### Restoring (not performed; needs its own authorization)
+
+1. Check the tars against `SHA256SUMS`.
+2. Extract each group tar with `tar --extract --numeric-owner` into `/home/joker0625/uav_autonomy`, onto a system
+   where that tree is missing or empty. The receipts and manifests carry absolute paths.
+3. Restore the debs to `/var/cache/apt/archives` as root.
+4. Verify against `inventory/p7_m0_inventory_files.jsonl`, then against the four manifests.
+
+**What a restore cannot recover:**
+* host state: the Windows GPU driver and the apt package selection;
+* the loss of the laptop. This is the only copy, on C:.
