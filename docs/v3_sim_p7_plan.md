@@ -6,7 +6,9 @@
 * The [`p7-evaluation-v1`](v3_sim_p7_contract.md) contract is still a draft until the operator approves it as a whole.
 * **Next, each needing its own authorization:**
   * the M0 read-only audit (§7);
-  * the P3–P6 evidence backup. D5 requires it before any P7 runtime.
+  * the Selective Dependency Backup (D5, revised 2026-11-21), which must happen before any P7 runtime. The M0
+    dependency inventory is done ([report](v3_sim_p7_m0_dependency_inventory.md)). Its minimal set (≈ 12.6 GB) and
+    destination await the operator's approval, then a separate execution authorization.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -100,7 +102,13 @@ P7 answers those questions in SITL, under a fixed analysis plan, without changin
    * **Free space:** WSL has 783 GB free, with 95 GB already in `runs/`; `D:` has 892 GB free.
 7. **The evidence has no backup.** The P3–P5 evidence (about 52 GB with the runtime trees) and the P6 runs and
    state exist only on this machine. The [backup plan](v3_sim_p3_p5_evidence_backup_plan.md) was written but never
-   executed.
+   executed. Under the revised D5, only the dependencies P7-A needs are backed up.
+   * **Essential:** 6.91 GB.
+   * **Required reference runs:** 4.91 GB.
+   * **System package cache:** 0.72 GB.
+
+   The other 108 GB stay in place: 85.7 GB Optional historical and 22.6 GB Future-only. See the
+   [M0 dependency inventory](v3_sim_p7_m0_dependency_inventory.md).
 
 ## 3. Structure
 
@@ -276,7 +284,7 @@ simulation/px4_gazebo_p7/
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass) | written audit; D1–D12 answered |
+| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)) | written audit; D1–D12 answered |
 | **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
@@ -296,7 +304,10 @@ simulation/px4_gazebo_p7/
   looking at outcomes.
 * **The effect may be smaller in SITL than offline:** the power table shows that 200 pairs cannot detect half the
   offline effect. The report then gives the CI and no superiority claim.
-* **Disk:** P7-A uses most of the free WSL space. Backup comes first (D5).
+* **Disk:** P7-A uses most of the free WSL space. The Selective Dependency Backup comes first (D5, revised).
+* **Host packages:** no apt package is held. An `apt upgrade` of the pinned ROS or mesa packages, or a Windows
+  GPU-driver update, would break verification of all four manifests. These are the operator's host settings; the
+  M0 inventory records the exact versions, and the apt cache holds every installed ros-jazzy `.deb`.
 
 ## 9. Decisions requiring operator approval (recommendation first; detail in contract §10)
 
@@ -308,7 +319,7 @@ simulation/px4_gazebo_p7/
 | D2 | primary endpoint | paired goal success, exact McNemar, two-sided α = 0.05 |
 | D3 | sample size | 200 confirmatory pairs, plus a 40-flight pilot |
 | D4 | retention | full evidence for every P7 flight; no deletion; verified copies only |
-| D5 | backup first | execute the P3–P6 evidence backup before any P7 runtime |
+| D5 | backup first | **revised 2026-11-21:** a Selective Dependency Backup of the M0-inventoried minimal set (Essential, Required reference runs, system package cache; ≈ 12.6 GB) before any P7 runtime; Optional evidence stays in place, and Future-only evidence is backed up only if P7-B is approved |
 | D6 | validity and replacement | §4.6: a pre-arming failure is re-flown once, capped at 10 % of a block's flights; post-arming outcomes are data |
 | D7 | clearance non-inferiority margin | 0.05 m |
 | D8 | layout source | the bound P5 generator; fresh seed bases 4,000,000 / 5,000,000; P5 split-match exclusion |

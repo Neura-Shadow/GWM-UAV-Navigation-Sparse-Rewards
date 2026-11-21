@@ -8,7 +8,8 @@ encodes those choices.
 * **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
   new decisions first, as P6's M0 did.
 * **Implementation and the M0 audit.**
-* **The evidence backup:** D5 makes it a precondition, but its execution needs its own authorization.
+* **The backup:** D5, revised on 2026-11-21 to a Selective Dependency Backup, makes it a precondition. The minimal
+  set and its destination need the operator's approval, and executing it needs its own authorization.
 * **Any freeze, Policy A approval, pilot or batch block.**
 
 Each milestone, freeze and block still needs its own operator authorization. See the [P7 plan](v3_sim_p7_plan.md).
@@ -221,7 +222,7 @@ Any change after freeze is a new P7 candidate.
 | D2 | paired goal success, exact McNemar, α = 0.05 two-sided | §5, §6 primary |
 | D3 | N = 200 pairs, ceiling 250 after the pilot; a 40-flight pilot | plan §4.3, §4.5 |
 | D4 | full evidence for every flight; no deletion; verified copies only | §8 |
-| D5 | the P3–P6 evidence backup runs before any P7 runtime | no pilot or block before a verified backup |
+| D5 (revised 2026-11-21) | **Selective Dependency Backup** (see below); originally "the P3–P6 evidence backup runs before any P7 runtime" | no pilot or block before a verified backup of the approved minimal set |
 | D6 | a pre-arming failure is re-flown once, capped at 10 % of a block's flights; post-arming outcomes are data | §7.1, §7.2 |
 | D7 | clearance non-inferiority margin δ = 0.05 m | §6 S1 |
 | D8 | the bound P5 generator; seed bases 5,000,000 (pilot) and 4,000,000 (confirmatory); P5 split-match exclusion | §4.1 |
@@ -229,6 +230,24 @@ Any change after freeze is a new P7 candidate.
 | D10 | this host only; Best performance overlay and AC checked before every block | §7.1 |
 | D11 | a new `simulation/px4_gazebo_p7/` subclassing the accepted runners; the C6 world-identity check | §2 C5, C6 |
 | D12 | a production Policy A per P7 candidate; one authorization per block; a separate pilot authorization | §9 |
+
+**D5 revision (operator, 2026-11-21).** D5 is changed from a full historical evidence backup to a **Selective
+Dependency Backup**. It revises D5 only; every other decision stands as recorded.
+* **What is backed up:** before any P7 runtime, only what P7-A needs, as identified by the M0 dependency inventory
+  ([report](v3_sim_p7_m0_dependency_inventory.md)):
+  * the Essential set (accepted manifests, build receipts, accepted approvals and gate records, and the runtime
+    trees and builds the manifests pin);
+  * the Required reference runs;
+  * the system package cache.
+
+  It goes to a destination the operator approves.
+* **Optional historical evidence** stays in place, untouched, and is not backed up.
+* **Future-only P6 evidence** is backed up only if P7-B is approved.
+* **Nothing existing** is deleted, moved, overwritten, compressed or uploaded. No runtime build is treated as
+  disposable unless its reproducibility or replacement has been verified.
+* **P7-A independence:** P7-A code and tests may depend only on the Essential set and the Required reference runs.
+* **Approvals:** the minimal set and the destination need the operator's approval; execution needs its own
+  authorization.
 
 The options below are kept for the record.
 
@@ -238,7 +257,7 @@ The options below are kept for the record.
 | D2 | primary endpoint | paired goal success, exact McNemar, α = 0.05 two-sided | time to goal as primary (needs about 160 both-reached pairs); co-primaries with Holm |
 | D3 | sample size and ceiling | N = 200 pairs (87 % power at the offline effect); ceiling 250 after the pilot | 150 (73 %); 300 (97 %, about 720 GB, needs off-disk storage) |
 | D4 | retention | full evidence for every flight; no deletion; verified copies only | full for safety and failed flights and a 10 % sample, others hash-and-index only (narrows re-evaluation; not recommended) |
-| D5 | backup first | execute the P3–P6 evidence backup before any P7 runtime | back up after P7-A |
+| D5 | backup first | (revised) a Selective Dependency Backup of the M0-inventoried minimal set before any P7 runtime; originally a full P3–P6 evidence backup | back up after P7-A |
 | D6 | validity and replacement | §7: pre-arming failures re-flown once, capped at 10 %; post-arming outcomes are data | no replacement at all |
 | D7 | clearance non-inferiority margin δ | 0.05 m | 0.03 m (needs about 200 pairs); report only |
 | D8 | layout source | the bound P5 generator; seed bases 5,000,000 (pilot) and 4,000,000 (confirmatory); P5 split-match exclusion | the P5 held-out list (already used for readiness); a new out-of-distribution family (a separate study) |
