@@ -299,11 +299,12 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
   [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The development dry runs (no credit) remain
   on record. P7 is the next phase.
-- [ ] P7 Batch evaluation — **planning underway (2026-11-21): plan and draft contract `p7-evaluation-v1`, proposed,
-  not approved; nothing implemented or run.** P7-A, the confirmatory part: paired P4 vs P5 SITL flights on fresh
-  pre-registered layouts from the P5 layout generator (primary: goal success, exact McNemar; recommended 200 pairs
-  after a 40-flight pilot). P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each decided
-  separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
+- [ ] P7 Batch evaluation — **planning underway (2026-11-21): plan and draft contract `p7-evaluation-v1`; decisions
+  D1–D12 approved as recommended (2026-11-21); the contract as a whole is not yet approved; nothing implemented or
+  run.** P7-A, the confirmatory part: paired P4 vs P5 SITL flights on fresh pre-registered layouts from the P5
+  layout generator (primary: goal success, exact McNemar; 200 pairs after a 40-flight pilot). The P3–P6 evidence
+  backup comes before any P7 runtime. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
 The existing Isaac and Cosys-AirSim integration paths retain their own status.

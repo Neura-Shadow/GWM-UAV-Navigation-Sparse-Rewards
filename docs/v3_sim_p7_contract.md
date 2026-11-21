@@ -1,9 +1,18 @@
 # v3-SIM P7 contract `p7-evaluation-v1` — batch evaluation (DRAFT)
 
-**Status: PROPOSED (2026-11-21), NOT APPROVED.**
-* Nothing here authorizes implementation, a freeze, a simulator run or a batch.
-* Once approved, each milestone, freeze and batch block still needs its own operator authorization.
-* See the [P7 plan](v3_sim_p7_plan.md). Every limit not defined here is reused unchanged from P2–P6.
+**Status: DRAFT; DECISIONS D1–D12 APPROVED (2026-11-21).** The operator answered all twelve decisions of §10 in
+chat on 2026-11-21 ("照建議核准", approve as recommended), each as recommended. The normative text below already
+encodes those choices.
+
+**What this approval does not cover:**
+* **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
+  new decisions first, as P6's M0 did.
+* **Implementation and the M0 audit.**
+* **The evidence backup:** D5 makes it a precondition, but its execution needs its own authorization.
+* **Any freeze, Policy A approval, pilot or batch block.**
+
+Each milestone, freeze and block still needs its own operator authorization. See the [P7 plan](v3_sim_p7_plan.md).
+Every limit not defined here is reused unchanged from P2–P6.
 
 ## 1. Scope and claims
 
@@ -203,6 +212,25 @@ Any change after freeze is a new P7 candidate.
 * a separate authorization for the pilot and for any P7-B or P7-C batch.
 
 ## 10. Decisions requiring operator approval (recommendation first)
+
+**Decision record.** The operator answered all twelve in chat on 2026-11-21 ("照建議核准"), each as recommended:
+
+| Decision | Answer | Effect |
+|---|---|---|
+| D1 | P7-A first; P7-B and P7-C later, each decided separately | only P7-A is confirmatory |
+| D2 | paired goal success, exact McNemar, α = 0.05 two-sided | §5, §6 primary |
+| D3 | N = 200 pairs, ceiling 250 after the pilot; a 40-flight pilot | plan §4.3, §4.5 |
+| D4 | full evidence for every flight; no deletion; verified copies only | §8 |
+| D5 | the P3–P6 evidence backup runs before any P7 runtime | no pilot or block before a verified backup |
+| D6 | a pre-arming failure is re-flown once, capped at 10 % of a block's flights; post-arming outcomes are data | §7.1, §7.2 |
+| D7 | clearance non-inferiority margin δ = 0.05 m | §6 S1 |
+| D8 | the bound P5 generator; seed bases 5,000,000 (pilot) and 4,000,000 (confirmatory); P5 split-match exclusion | §4.1 |
+| D9 | secondaries in the order clearance NI, time to goal, path length | §6 |
+| D10 | this host only; Best performance overlay and AC checked before every block | §7.1 |
+| D11 | a new `simulation/px4_gazebo_p7/` subclassing the accepted runners; the C6 world-identity check | §2 C5, C6 |
+| D12 | a production Policy A per P7 candidate; one authorization per block; a separate pilot authorization | §9 |
+
+The options below are kept for the record.
 
 | ID | Decision | Recommended | Alternatives |
 |---|---|---|---|

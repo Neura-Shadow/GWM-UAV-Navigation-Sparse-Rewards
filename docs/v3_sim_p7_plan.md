@@ -1,9 +1,13 @@
 # v3-SIM P7 — batch evaluation: plan
 
-**Status: PROPOSED (2026-11-21). Planning only.**
+**Status: PLANNING. Decisions D1–D12 APPROVED (2026-11-21), all as recommended.**
+* The operator's answer was "照建議核准" (approve as recommended). The record is in contract §10.
 * Nothing in P7 is implemented, frozen, launched or authorized.
-* The draft contract is [`p7-evaluation-v1`](v3_sim_p7_contract.md), proposed and not approved.
-* Each milestone, each freeze and each batch block needs its own operator authorization.
+* The [`p7-evaluation-v1`](v3_sim_p7_contract.md) contract is still a draft until the operator approves it as a whole.
+* **Next, each needing its own authorization:**
+  * the M0 read-only audit (§7);
+  * the P3–P6 evidence backup. D5 requires it before any P7 runtime.
+* Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
 P7 turns the existence demonstrations of P4–P6 into paired, pre-registered statistics. P4, P5 and P6 were accepted
@@ -296,7 +300,9 @@ simulation/px4_gazebo_p7/
 
 ## 9. Decisions requiring operator approval (recommendation first; detail in contract §10)
 
-| ID | Decision | Recommendation |
+**All twelve were approved as recommended on 2026-11-21.**
+
+| ID | Decision | Recommendation (approved) |
 |---|---|---|
 | D1 | scope and order | P7-A first and confirmatory; P7-B and P7-C later, each decided separately |
 | D2 | primary endpoint | paired goal success, exact McNemar, two-sided α = 0.05 |
