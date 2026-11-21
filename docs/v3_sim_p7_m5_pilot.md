@@ -1,6 +1,7 @@
 # v3-SIM P7 M5 — pilot: stopped after 6 of 40 flights (2026-11-21)
 
-**Status: STOPPED by a stop rule. Nothing more is flown until the operator decides (contract §7.3).**
+**Status: STOPPED by a stop rule. The operator decided D15, Option A (2026-11-21); the fix is implemented and tested (§4).
+Nothing flies until the new candidate is approved, frozen and its pilot authorized.**
 
 **Approvals (operator, 2026-11-21):**
 
@@ -70,3 +71,28 @@ controllers alike under the randomized order. But it adds noise to the compariso
   abort it reports.
 * Option A keeps safety verified, now from the raw ULog, without lowering any threshold. A flight that fails those
   checks still stops the batch.
+
+## 4. D15, Option A: implemented and tested (2026-11-21)
+
+**What changed.** The operator chose Option A. Only two P7 files changed. The analysis code (`bd036a2b…`), the
+approved specifications and every P2–P6 file are unchanged.
+
+| File | Change | SHA-256 |
+|---|---|---|
+| `scripts/p7_runner.py` | `run_controller`: the accepted P4 flight loop, with the accepted flight window written before a fail-closed exit (`flight_window`, the P6 rule) | `f7e9f0e8…` |
+| `validation/p7_classify.py` | when `p2_integrity_error:*` appears, the P2 safety facts come from the ULog with the accepted reader (176/400/21, landed and disarmed, no failsafe) and Policy A must have been checked; otherwise the flight stays safety-unverified | `7a46258f…` |
+
+**Tests.** 122 P7 tests pass. The new ones cover the window written before a fail-closed exit, the window never
+invented, each D15 fact as a safety event, and an unreadable ULog or a missing Policy A check as safety-unverified.
+
+**The real stopped flight through the fixed path.** The test builds a scratch view of it, with the window as the
+fixed runner writes it; the retained run is only read and stays unchanged.
+* The unchanged P5 evaluator then completes: `p2_integrity_error`, 0 collisions, Policy A clean.
+* The classifier records a valid failure (`observation_gap`) with **no stop**, its ULog facts all holding.
+
+**Next, each step needing the operator's explicit approval:**
+1. A new production Policy A approval, because it binds the P7 source digest, which has changed.
+2. The real freeze of the new candidate.
+3. A new pilot authorization.
+
+The stopped pilot on `6f60492f…` stays on record as diagnostic data.

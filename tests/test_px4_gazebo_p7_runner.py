@@ -193,9 +193,9 @@ def test_the_owner_copy_shim_and_launcher():
 
 def test_only_the_declared_methods_are_overridden():
     for cls, accepted in ((r.P7P4Runner, r.p4.P4Runner), (r.P7P5Runner, r.p5r.P5Runner)):
-        for name in ("preconditions", "prepare_run", "prepare_world", "execute"):
+        for name in ("preconditions", "prepare_run", "prepare_world", "execute", "run_controller"):
             assert getattr(cls, name) is getattr(r.P7Flight, name), (cls, name)
-        for name in ("run_controller", "launch", "stop", "stop_qgc", "p4_controller_command", "point_px4_at_world",
+        for name in ("launch", "stop", "stop_qgc", "p4_controller_command", "point_px4_at_world", "watch_injection",
                      "launch_p4_sensing", "shutdown", "finalize", "px4_stack"):
             assert getattr(cls, name) is getattr(accepted, name), (cls, name)
     assert r.P7P5Runner.p4_controller_command is r.p5r.P5Runner.p4_controller_command
@@ -488,3 +488,48 @@ def test_blocks_run_in_order_and_not_before_the_m3_classifier(tmp_path):
     if not seq.CLASSIFIER.exists():
         with pytest.raises(SystemExit, match="M3"):
             seq.classifier()
+
+
+# ---- D15: the flight window before a fail-closed exit -------------------------------------------------------
+P2_PATH = ["WAIT_FOR_VALID_ESTIMATION", "PRESTREAM_SAFE_SETPOINTS", "REQUEST_OFFBOARD", "VERIFY_OFFBOARD", "REQUEST_ARM",
+           "VERIFY_ARMED", "TAKEOFF", "TRANSIT"]
+
+
+def transitions(*ends):
+    return [{"to": name, "sim_s": 10.0 + i} for i, name in enumerate(P2_PATH + list(ends))]
+
+
+def test_the_flight_window_is_the_accepted_prestream_to_complete_or_recovery():
+    assert r.flight_window({"transitions": transitions("COMPLETE")}) == [11.0, 18.0]
+    assert r.flight_window({"transitions": transitions("RECOVERY")}) == [11.0, 18.0]
+    assert r.flight_window({"transitions": transitions()}) is None and r.flight_window(None) is None
+    p6_text = (REPO / "simulation/px4_gazebo_p6/scripts/p6_runner.py").read_text()
+    assert 'end = transitions.get("COMPLETE") or transitions.get("RECOVERY")' in p6_text  # the same rule as P6
+
+
+def controlled(run, exit_code, ends):
+    run.mkdir()
+    fake = object.__new__(r.P7P5Runner)
+    fake.run, fake.start, fake.declaration, fake.injection = run, 0.0, {"fault": None}, None
+    fake.summary = {"status": "incomplete"}
+    fake.controller = SimpleNamespace(poll=lambda: exit_code, record={"exit_code": exit_code})
+    fake.pump = lambda: None
+    (run / "ros-events.jsonl").write_text("")
+    (run / "controller-result.json").write_text(json.dumps(
+        {"transitions": transitions(*ends), "failure": "observation_gap" if exit_code else None, "graph_valid": True}))
+    return fake
+
+
+def test_a_fail_closed_exit_keeps_the_flight_window_for_the_unchanged_evaluator(tmp_path):
+    fake = controlled(tmp_path / "a", 1, ["RECOVERY"])
+    with pytest.raises(r.base.Abort, match="controller_failed:observation_gap"):
+        fake.run_controller({"wall_deadline_s": 1e9})
+    assert fake.summary["sensor_window_sim_s"] == [11.0, 18.0] and fake.summary["controller_exit_code"] == 1
+    assert fake.summary["controller_publishers_only_from_controller"] is True and fake.summary["status"] == "incomplete"
+    ok = controlled(tmp_path / "b", 0, ["COMPLETE"])
+    ok.run_controller({"wall_deadline_s": 1e9})
+    assert ok.summary["status"] == "passed" and ok.summary["sensor_window_sim_s"] == [11.0, 18.0]
+    early = controlled(tmp_path / "c", 1, [])
+    with pytest.raises(r.base.Abort):
+        early.run_controller({"wall_deadline_s": 1e9})
+    assert "sensor_window_sim_s" not in early.summary  # no PRESTREAM-to-end window exists: nothing is invented

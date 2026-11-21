@@ -32,6 +32,7 @@ needs_refs = pytest.mark.skipif(not all((RUNS / n / "summary.json").exists() for
 SMALL = ("summary.json", "p4-evaluation.json", "p5-evaluation.json", "p4_avoidance.yaml", "ros-events.jsonl",
          "resources.jsonl", "p4/scenario.json", "p4/truth_poses.jsonl", "p4/contacts.jsonl", "p5/policy-ledger.jsonl")
 ARMED = lambda summary: True  # noqa: E731  (the ULog itself is read in the full-chain test)
+NO_FACTS = lambda summary: None  # noqa: E731  (D15: an unreadable ULog)
 
 
 def copy(name, tmp_path):
@@ -98,7 +99,7 @@ def test_the_full_chain_reads_the_real_ulog_and_writes_the_record_once(tmp_path)
     ("performance:compute_p99", "integrity_events", False), ("p2:timing", "integrity_events", False),
     ("cleanup:dds-agent:signal_11", "integrity_events", False), ("policy:fallback_decisions", "integrity_events", False)])
 def test_each_evaluator_item_falls_into_its_d14_class(tmp_path, item, klass, stops):
-    record = c.build_record(with_failures(copy(R["R3"], tmp_path), item), ulog_reader=ARMED)
+    record = c.build_record(with_failures(copy(R["R3"], tmp_path), item), ulog_reader=ARMED, p2_facts_reader=NO_FACTS)
     assert item in record["classes"][klass]
     assert bool(record["stop_reasons"]) == stops
     assert record["outcome"] == ("goal_success" if klass == "integrity_events" else "failure")
@@ -219,3 +220,70 @@ def test_the_restated_rules_agree_with_the_accepted_p6_functions_on_every_retain
         assert ours == checks.out["RECOVERY"]["unrevalidated"], path.name
         returns += checks.out["RECOVERY"]["returns"]
     assert returns > 0  # at least one retained flight exercises a HOVER -> AVOIDING return
+
+
+# ---- D15: when the accepted P2 integrity check raises ---------------------------------------------------------
+GOOD_FACTS = {"own_commands": [176, 400, 21], "final_disarmed": True, "final_landed": True, "failsafe_observed": False}
+P2_ERROR = "p2_integrity_error:ValueError:stale_state:vehicle_local_position"
+
+
+@needs_refs
+@pytest.mark.parametrize("facts, events", [
+    (GOOD_FACTS, []), (dict(GOOD_FACTS, final_landed=False), ["p2_ulog:final_landed_disarmed"]),
+    (dict(GOOD_FACTS, final_disarmed=False), ["p2_ulog:final_landed_disarmed"]),
+    (dict(GOOD_FACTS, own_commands=[176, 400]), ["p2_ulog:command_sequence"]),
+    (dict(GOOD_FACTS, failsafe_observed=True), ["p2_ulog:failsafe_observed"])])
+def test_d15_the_ulog_establishes_the_p2_safety_facts(tmp_path, facts, events):
+    run = with_failures(copy(R["R3"], tmp_path), P2_ERROR)
+    record = c.build_record(run, ulog_reader=ARMED, p2_facts_reader=lambda s: facts)
+    assert P2_ERROR in record["classes"]["integrity_events"] and P2_ERROR not in record["classes"]["safety_unverified"]
+    assert [e for e in record["classes"]["safety_events"] if e.startswith("p2_ulog:")] == events
+    assert record["stop_reasons"] == ["safety_event:" + e for e in events]
+    assert record["p2_ulog_check"]["failures"] == events
+
+
+@needs_refs
+def test_d15_without_the_ulog_or_the_policy_a_check_the_flight_stays_safety_unverified(tmp_path):
+    run = with_failures(copy(R["R3"], tmp_path), P2_ERROR)
+    record = c.build_record(run, ulog_reader=ARMED, p2_facts_reader=NO_FACTS)
+    assert record["stop_reasons"] == ["safety_unverified:" + P2_ERROR]
+    run = with_failures(copy(R["R3"], tmp_path / "b"), P2_ERROR)
+    edit_json(run / "p5-evaluation.json", lambda v: v.pop("native_commands"))
+    record = c.build_record(run, ulog_reader=ARMED, p2_facts_reader=lambda s: GOOD_FACTS)
+    assert record["stop_reasons"] == ["safety_unverified:" + P2_ERROR] and record["p2_ulog_check"]["policy_a_checked"] is False
+
+
+STOPPED = sorted(RUNS.glob("*-p7-p5-p7p-5000016-0706459a"))
+
+
+@pytest.mark.skipif(not STOPPED or not (ROOT / "venv-px4/bin/python").exists(),
+                    reason="the stopped pilot flight or the evaluators' venv is not available")
+def test_d15_the_real_stopped_pilot_flight_through_the_fixed_path(tmp_path):
+    """The flight that stopped the M5 pilot (a P2 observation-gap RECOVERY), as the fixed runner records it, with the
+    flight window written. The unchanged P5 evaluator and the P7 classifier then run on a scratch view of it. The
+    retained run is only read: every file but the summary is a symbolic link."""
+    import subprocess
+    sys.path.insert(0, str(P7 / "scripts"))
+    import p7_runner
+    src, view = STOPPED[0], tmp_path / STOPPED[0].name
+    before = c.digest(src / "summary.json"), c.digest(src / "p5-evaluation.json")
+    view.mkdir()
+    for entry in src.iterdir():
+        if entry.name not in ("summary.json", "p5-evaluation.json", "p7"):
+            (view / entry.name).symlink_to(entry)
+    (view / "p7").mkdir()
+    (view / "p7/layout.json").symlink_to(src / "p7/layout.json")
+    summary = json.loads((src / "summary.json").read_text())
+    summary["sensor_window_sim_s"] = p7_runner.flight_window(summary["controller_result"])
+    (view / "summary.json").write_text(json.dumps(summary))
+    done = subprocess.run(["bash", str(REPO / "simulation/px4_gazebo_p5/scripts/verify_p5_evidence.sh"), str(view)],
+                          capture_output=True, text=True)
+    evaluation = json.loads((view / "p5-evaluation.json").read_text())
+    assert not any(i.startswith("evaluator_incomplete_evidence") for i in evaluation["failures"]), done.stderr[-500:]
+    assert any(i.startswith("p2_integrity_error:") for i in evaluation["failures"])
+    assert evaluation["safety"]["collisions"] == 0 and evaluation["native_commands"]["failures"] == []
+    record = c.classify(view)
+    assert record["validity"] == "valid" and record["outcome"] == "failure" and record["stop_reasons"] == []
+    assert record["p2_ulog_check"]["facts"] == GOOD_FACTS and record["p2_ulog_check"]["failures"] == []
+    assert record["metrics"]["p2_failure"] == "observation_gap" and record["metrics"]["min_truth_clearance_m"] > 0.9
+    assert (c.digest(src / "summary.json"), c.digest(src / "p5-evaluation.json")) == before  # the retained run is unchanged
