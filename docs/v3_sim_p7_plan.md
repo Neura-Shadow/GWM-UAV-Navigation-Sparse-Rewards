@@ -1,7 +1,8 @@
 # v3-SIM P7 — batch evaluation: plan
 
-**Status: PLANNING. Decisions D1–D12 APPROVED (2026-11-21), all as recommended.**
-* The operator's answer was "照建議核准" (approve as recommended). The record is in contract §10.
+**Status: PLANNING. Decisions D1–D14 APPROVED (2026-11-21), all as recommended.**
+* The operator's answers were "照建議核准" for D1–D12 and "Approve as recommended" for D13–D14, which the M0 audit
+  raised. The record is in contract §10.
 * Nothing in P7 is implemented, frozen, launched or authorized.
 * The [`p7-evaluation-v1`](v3_sim_p7_contract.md) contract is still a draft until the operator approves it as a whole.
 * **The Selective Dependency Backup (D5, revised 2026-11-21) is DONE and verified (2026-11-21).**
@@ -12,11 +13,12 @@
   * This meets D5's precondition for P7 runtime.
 * **The M0 read-only audit is DONE (2026-11-21, on "現在繼續p7"):** [audit report](v3_sim_p7_m0_audit.md).
   * Nothing was launched, and no P2–P6 file changed.
-  * It raises two new decisions, **D13** (how the accepted evaluators run on generated layouts) and **D14** (which
-    evaluator results decide what). Both await the operator.
+  * It raised two new decisions, **D13** (how the accepted evaluators run on generated layouts) and **D14** (which
+    evaluator results decide what). Both were approved as recommended on 2026-11-21 and are encoded in contract
+    §5 and §7.3.
   * It corrects two planning facts: the power at 200 pairs on the sampled population is 0.83 (§4.5), and the
     population statement (§4.1).
-* **Next, needing the operator:** answers to D13 and D14, then M1 under its own authorization.
+* **Next, needing its own authorization:** M1 (specs: layout sets, schedule, analysis plan).
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 
@@ -176,6 +178,12 @@ P7 answers those questions in SITL, under a fixed analysis plan, without changin
 * **Primary (RQ1):** goal success, paired by layout.
   * **Definition:** the goal was reached (the P4 `goal_reached_sim_s` record, final goal distance within the mission
     tolerance), the vehicle landed and disarmed, and there was no safety violation.
+  * **D13/D14 (contract §5):**
+    * The accepted evaluators run unchanged on the declaration label `p7_not_predeclared`, and the P7 classifier
+      decides the outcome.
+    * A safety event or a safety-unverified flight is a failure and stops the batch.
+    * Tracking > 0.30 m or response latency > 0.25 s is a failure without a stop.
+    * Every other evaluator item is an integrity event.
   * **Test:** exact two-sided McNemar on the discordant pairs, α = 0.05.
   * **Estimate:** the paired difference in success proportion, with a 95 % CI.
 * **Key secondaries, in a fixed sequence (each tested only if the one before passes, which controls the
@@ -244,7 +252,8 @@ pairs ([audit §4.4](v3_sim_p7_m0_audit.md)). N stays 200 (D3). The pilot rule m
   * truth clearance below 0.20 m;
   * an unsafe command (P6 contract §6.3);
   * a Policy A breach;
-  * a failure to land and disarm.
+  * a failure to land and disarm;
+  * a safety-unverified flight (missing or broken truth records, D14).
 * **Resource stop:** the batch stops if WSL free space would fall below 150 GB.
 * **No interim efficacy analysis.** The confirmatory analysis runs once, on all pre-registered pairs.
 
@@ -300,7 +309,7 @@ simulation/px4_gazebo_p7/
 
 | M | Content | Exit criterion |
 |---|---|---|
-| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8); **read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md)), raising D13 and D14 | written audit; D1–D12 answered (done); D13–D14 answered |
+| **M0** read-only audit | runner override point, evaluator behaviour on non-acceptance layouts, metric reuse, time/disk budget, backup status (§2 is its first pass); **dependency inventory for the revised D5: done 2026-11-21** ([report](v3_sim_p7_m0_dependency_inventory.md)); **selective backup executed and verified 2026-11-21** (report §8); **read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md)), raising D13 and D14 (approved 2026-11-21); **M0 complete** | written audit; D1–D14 answered (done) |
 | **M1** specs | P7 layout sets (pilot, confirmatory), randomization schedule, analysis plan | operator approves; hashes recorded |
 | **M2** runner and orchestrator (offline) | P7 runner subclasses, block runner, host checks, disk floor, ledger | byte-identical worlds for S1–S6 through the P7 path; offline tests; P3–P6 still verify |
 | **M3** classifier and analysis (offline) | validity and outcome classes, metrics, statistics | tests on retained runs and synthetic data, including negative cases; analysis code frozen |
@@ -328,7 +337,8 @@ simulation/px4_gazebo_p7/
 
 ## 9. Decisions requiring operator approval (recommendation first; detail in contract §10)
 
-**All twelve were approved as recommended on 2026-11-21.**
+**All fourteen were approved as recommended on 2026-11-21.** D1–D12 were approved on "照建議核准". D13 and D14,
+which the M0 audit raised, were approved on "Approve as recommended".
 
 | ID | Decision | Recommendation (approved) |
 |---|---|---|
@@ -344,3 +354,5 @@ simulation/px4_gazebo_p7/
 | D10 | host conditions | this host only, Best performance overlay, checked before every block |
 | D11 | architecture | a new `simulation/px4_gazebo_p7/` tree subclassing the accepted runners; no bound file changes |
 | D12 | approvals | a production Policy A approval for the P7 candidate; per-block authorizations |
+| D13 | evaluators on generated layouts (M0 audit) | the declaration label `p7_not_predeclared`; the accepted evaluators run unchanged; the P7 classifier decides the outcome |
+| D14 | evaluator result classes (M0 audit) | safety event and safety-unverified: failure and batch stop; tracking or response-latency failure: failure, no stop; everything else: integrity event |

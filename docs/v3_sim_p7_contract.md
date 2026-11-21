@@ -1,12 +1,10 @@
 # v3-SIM P7 contract `p7-evaluation-v1` — batch evaluation (DRAFT)
 
-**Status: DRAFT; DECISIONS D1–D12 APPROVED (2026-11-21).** The operator answered all twelve decisions of §10 in
-chat on 2026-11-21 ("照建議核准", approve as recommended), each as recommended. The normative text below already
-encodes those choices.
-
-**New decisions from the M0 audit (2026-11-21), not yet answered:** D13 (how the accepted evaluators run on
-generated layouts) and D14 (which evaluator results decide what). See [audit §8](v3_sim_p7_m0_audit.md). §5 and §7
-are edited once they are answered.
+**Status: DRAFT; DECISIONS D1–D14 APPROVED (2026-11-21).** The normative text below encodes every choice.
+* **D1–D12:** the operator answered all twelve decisions of §10 in chat on 2026-11-21 ("照建議核准", approve as
+  recommended), each as recommended.
+* **D13 and D14:** raised by the M0 audit ([audit §8](v3_sim_p7_m0_audit.md)) and approved as recommended on
+  2026-11-21 ("Approve as recommended"). They are encoded in §5 and §7.3.
 
 **What this approval does not cover:**
 * **The contract as a whole:** it stays a draft until the operator approves it as a whole. The M0 audit may raise
@@ -86,8 +84,14 @@ limit. Its new numbers are statistical design choices (§6) and resource rules (
   P5 used 1,000,000 (train), 2,000,000 (validation) and 3,000,000 (held-out).
 * **Extra exclusion:** a layout that matches any P5 train, validation or held-out layout under the P5 contract §4.1
   rule (same box count, centres within 0.25 m, sizes within 0.10 m) is rejected.
+* **Population (M0 audit §4.3):** the confirmatory population is the generator's admitted layouts that are not
+  near-duplicates of a P5 layout.
+  * The exclusion removes about 15 % of admissible layouts, mostly wall-with-gap and one-box layouts.
+  * Every P7 report states this population and its family mix.
 * **Selection:** admitted layouts are taken in seed order until the pre-registered count. The list, with seeds,
   family, boxes and SHA-256, is frozen.
+  * The generator's boxes carry no names, so each box gets a name under a rule frozen in M1.
+  * The list is produced under the interpreter and NumPy version that reproduce the P5 splits (M0 audit §4.1).
 
 ### 4.2 Pairs and order
 
@@ -110,23 +114,49 @@ limit. Its new numbers are statistical design choices (§6) and resource rules (
 
 ## 5. Endpoint definitions (normative)
 
+* **How flights are evaluated (D13).**
+  * Every P7 layout declaration (`p4/scenario.json`) carries `outcome: "p7_not_predeclared"`. That is a non-null
+    label outside the accepted set: the accepted `p4_evaluate.outcome()` then runs no outcome check and adds no
+    failure. A `null` outcome would crash it (M0 audit §3).
+  * The accepted evaluators run end to end and unchanged, through their own `verify_p4_evidence.sh` or
+    `verify_p5_evidence.sh`. They record every safety, P2, Policy A, stream and policy item.
+  * The P7 classifier then decides the mission outcome from the raw records and those items, as below.
+  * The accepted evaluator's overall `status` is an acceptance verdict, not a mission outcome, and P7 never uses it
+    as one.
+* **Classes of evaluator results (D14).**
+
+  | Class | Items | Effect |
+  |---|---|---|
+  | **Safety event** | `safety:collision_contact`; `safety:truth_clearance` (< 0.20 m); `safety:setpoint_inside_inflated_obstacle`; any `native_commands:*` (a Policy A breach); `p2:command_sequence` other than 176, 400, 21, or more than one LAND; `competing_flight_publisher`; `p2:final_landed_disarmed` failed; the two unsafe-command rules P7 restates (below) | the flight is a failure; the batch stops (§7.3) |
+  | **Safety-unverified** | `safety:truth_poses_missing`, `safety:truth_pose_interval` (> 0.05 s), `safety:truth_observer_error`, or a missing contact ledger | the flight is a failure; the batch stops (§7.3) |
+  | **Mission failure, no stop** | `safety:tracking` (> 0.30 m), `safety:response_latency` (> 0.25 s) | the flight is not a goal success; reported per flight |
+  | **Integrity event** | every other item: depth stream, perception performance, RGB absence, P2 timing, ULog dropout, MC causality, renderer, cleanup and shutdown, recorder overflow, P5 policy-ledger limits | reported per flight; the outcome class does not change |
+
+* **Unsafe commands (P6 contract §6.3).**
+  * Three of its parts are the accepted checks listed as safety events: a setpoint inside an inflated obstacle,
+    Policy A or the LAND count, and a setpoint not from the owner.
+  * P7's classifier restates the other two, because they exist only as P6 functions over P6's run object:
+    * a target motion > 0.01 m or > 0.5° on a tick that must hold (a stale decision, or a P5 policy-failure tick);
+    * a return from a stale HOVER to progress without a fresh, non-stale decision (§6.5 there). A flight with no
+      such return is not a failure.
+  * Both are tested on retained P6 runs, including negative cases (M3).
 * **Goal success (primary).** A flight succeeds when all of the following hold:
   * the P4 supervisor recorded `goal_reached_sim_s`;
-  * the final goal distance is ≤ the P4 `goal_tolerance_m` (0.30 m);
+  * the final goal distance is ≤ the P4 `goal_tolerance_m` (0.30 m). It is measured as in the accepted
+    `outcome()`: the last truth position against the takeoff origin + 8 m along +x;
   * the P2 controller reached `COMPLETE`, and the ULog shows landed and disarmed;
-  * the accepted evaluator's safety items all passed (0 collisions, truth clearance ≥ 0.20 m, no setpoint inside an
-    inflated obstacle);
-  * there was no Policy A breach.
+  * there was no safety event, and safety was verified;
+  * there was no tracking or response-latency failure.
 
-  Any other ending is a failure: a supervisor ABORT for any reason, a P2 RECOVERY, a geofence or a safety event.
+  Any other ending is a failure: a supervisor ABORT for any reason, a P2 RECOVERY, a geofence, a safety event, a
+  safety-unverified flight, or a mission failure of the table above.
 * **Minimum truth clearance:** the accepted evaluator's `min_truth_clearance_m` over the flight.
 * **Time to goal and path length:** `p5_evaluate.reported` (`time_to_goal_sim_s`, `path_length_m`), through
   `p5_comparison.flight_metrics`. Defined only for flights that reached the goal.
-* **Safety events:** collisions, truth clearance < 0.20 m, unsafe commands (P6 contract §6.3), Policy A breaches,
-  and landing failures.
+* **Safety events:** as in the table above. These comprise collisions, truth clearance < 0.20 m, unsafe commands,
+  Policy A breaches and landing failures.
 * **Abort type:** the P4 `abort_reason`, or the P2 failure. Reported, not tested.
-* **Integrity events:** cleanup failures, recorder overflows and evaluator item failures that are not safety items.
-  Reported per flight. They do not change the outcome class.
+* **Integrity events:** as in the table above. Reported per flight. They do not change the outcome class.
 
 ## 6. Hypotheses and analysis (normative; the code is frozen under C7)
 
@@ -179,6 +209,7 @@ limit. Its new numbers are statistical design choices (§6) and resource rules (
 
 Any of these stops the batch at once. Nothing more is flown until the operator decides.
 * a safety event (§5);
+* a safety-unverified flight (§5, D14): its safety cannot be told apart from a safety event;
 * a manifest drift;
 * a simulator process outliving its flight;
 * the replacement cap;
@@ -235,6 +266,14 @@ Any change after freeze is a new P7 candidate.
 | D10 | this host only; Best performance overlay and AC checked before every block | §7.1 |
 | D11 | a new `simulation/px4_gazebo_p7/` subclassing the accepted runners; the C6 world-identity check | §2 C5, C6 |
 | D12 | a production Policy A per P7 candidate; one authorization per block; a separate pilot authorization | §9 |
+| D13 (M0 audit) | P7 layout declarations carry `outcome: "p7_not_predeclared"`; the accepted P4/P5 evaluators run end to end and unchanged; the P7 classifier decides the mission outcome | §5 |
+| D14 (M0 audit) | evaluator results fall into four classes: safety event and safety-unverified (both a failure and a batch stop), mission failure (tracking, response latency), and integrity event | §5, §7.3 |
+
+**M0 audit decisions (operator, 2026-11-21).** The audit ([§8](v3_sim_p7_m0_audit.md)) raised D13 and D14. The
+operator approved both as recommended in chat on 2026-11-21 ("Approve as recommended"). D8 stands unchanged. The
+audit corrected two planning facts without changing a decision:
+* the power at 200 pairs on the sampled population is 0.83;
+* the population statement (§4.1).
 
 **D5 revision (operator, 2026-11-21).** D5 is changed from a full historical evidence backup to a **Selective
 Dependency Backup**. It revises D5 only; every other decision stands as recorded.
@@ -278,3 +317,5 @@ The options below are kept for the record.
 | D10 | host | this host only; Best performance overlay and AC checked before every block | — |
 | D11 | architecture | a new `simulation/px4_gazebo_p7/` subclassing the accepted runners; C6 world-identity check | changing the accepted runners (not allowed under C1) |
 | D12 | approvals | production Policy A per P7 candidate; one authorization per block; a separate pilot authorization | one authorization for all of P7-A |
+| D13 | running the accepted evaluators on generated layouts | the declaration label `p7_not_predeclared`; the accepted evaluators run unchanged, end to end | `outcome: null`, with P7 calling the accepted evaluator functions one by one (more P7 code mirroring the accepted order and exception handling) |
+| D14 | which evaluator results decide what | four classes; tracking and response latency count against goal success, without a stop | tracking and response latency as integrity events (no effect on success) |

@@ -10,7 +10,9 @@ instruction "現在繼續p7" (continue P7) was taken as authorization for this r
   and read retained evidence.
 * The four P3–P6 manifests verify.
 
-**Two new decisions come out of it: D13 and D14 (§8).** M1 waits on them only where §9 says so.
+**Two new decisions came out of it, D13 and D14 (§8).** The operator approved both as recommended on 2026-11-21
+("Approve as recommended"). They are encoded in contract §5 and §7.3. **M0 is complete.** M1 needs its own
+authorization.
 
 **Reproduction:** [`diagnostics/p7_m0/p7_m0_audit_checks.py`](../diagnostics/p7_m0/p7_m0_audit_checks.py), run
 once under WSL `/usr/bin/python3` (Python 3.12.3, NumPy 1.26.4), wrote
@@ -264,6 +266,8 @@ What a P7 freeze and block reuse or add:
 
 ## 8. New decisions for the operator
 
+**Both approved as recommended (operator, 2026-11-21, "Approve as recommended").**
+
 ### D13: how P7 runs the accepted evaluators on generated layouts
 
 | Option | What it means |
@@ -315,4 +319,5 @@ Counting them against success is conservative and identical for both controllers
 * plan §4.5: power 0.83 at 200 pairs on the sampled population;
 * plan §4.1 and contract §4.1: the population statement of §4.3.
 
-They are recorded in the plan; the contract is edited when D13 and D14 are answered.
+They are recorded in the plan and in contract §4.1. With D13 and D14 approved, contract §5 and §7.3 now encode
+them.
