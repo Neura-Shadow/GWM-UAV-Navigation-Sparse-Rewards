@@ -1,7 +1,9 @@
 # v3-SIM P7 M2 — runner, manifest, host check and block sequencer (offline)
 
-**Status: built and tested offline (2026-11-21); awaiting operator review.** This is M2 of the
-[P7 plan](v3_sim_p7_plan.md) (§7), authorized by the operator on 2026-11-21 ("Authorize M2").
+**Status: ACCEPTED (2026-11-21); M2 COMPLETE.** This is M2 of the [P7 plan](v3_sim_p7_plan.md) (§7).
+* **Authorized:** by the operator on 2026-11-21 ("Authorize M2").
+* **Accepted:** by the operator on 2026-11-21 ("Accept M2"), including the host-check numbers of §4 (CPU ≤ 15 %,
+  1.3 GB planned per flight) and the six design choices of §6.
 
 **What M2 did and did not do:**
 * Nothing flew, and no simulator, namespace or flight was started.
@@ -176,6 +178,6 @@ Two things need the M4 parity dry run (S2 with P4 and P5 through the P7 path, on
 
 ## 8. Next
 
-* **Operator review** of §4 and §6.
+* **Operator review** of §4 and §6: done; accepted on 2026-11-21 ("Accept M2").
 * **M3 (classifier and analysis, offline)** needs its own authorization: the validity rule, the outcome classes,
   the two restated P6 §6.3 rules, metrics, the analysis code, and tests on R1–R4 and retained P6 runs.
