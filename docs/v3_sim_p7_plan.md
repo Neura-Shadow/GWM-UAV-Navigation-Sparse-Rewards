@@ -55,7 +55,9 @@
     runner gap (P6 had solved it) plus a P2 evaluator limitation made it safety-unverified, so the batch stopped.
   * **D15, Option A, decided by the operator (2026-11-21):** the runner fix and the classifier ULog check are
     implemented and tested on the real stopped flight; 122 P7 tests pass.
-  * Next: a new production Policy A approval, a real freeze and a new pilot authorization, each explicit.
+  * Approved and frozen: real candidate `0799c37e…`.
+  * **PILOT COMPLETE (2026-11-22): 40/40 flights, no stop, 2.13 h.**
+  * The pilot rule gives d = 0.15, so **200 pairs**. The schedule selection awaits the operator's confirmation.
 * Each milestone, freeze and batch block needs its own operator authorization.
 * This plan changes no P2–P6 file. The P3, P4, P5 and P6 manifests still verify.
 

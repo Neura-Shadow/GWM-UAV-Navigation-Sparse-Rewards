@@ -1,7 +1,10 @@
-# v3-SIM P7 M5 — pilot: stopped after 6 of 40 flights (2026-11-21)
+# v3-SIM P7 M5 — pilot (stopped once; completed on the D15 candidate, 2026-11-22)
 
-**Status: STOPPED by a stop rule. The operator decided D15, Option A (2026-11-21); the fix is implemented and tested (§4).
-Nothing flies until the new candidate is approved, frozen and its pilot authorized.**
+**Status: PILOT COMPLETE (2026-11-22) on candidate `0799c37e…`: 40 of 40 flights, no stop.**
+* **The pilot rule selects 200 pairs** (§5).
+* **The schedule selection awaits the operator's confirmation.**
+* **History:** the first pilot attempt, on `6f60492f…`, stopped after 6 flights (§1–§3). D15 fixed the cause
+  (§4). Both pilot attempts are diagnostic data only, and pilot data never enters the confirmatory analysis.
 
 **Approvals (operator, 2026-11-21):**
 
@@ -96,3 +99,54 @@ fixed runner writes it; the retained run is only read and stays unchanged.
 3. A new pilot authorization.
 
 The stopped pilot on `6f60492f…` stays on record as diagnostic data.
+
+## 5. The pilot on the D15 candidate: complete (2026-11-21/22)
+
+**Approvals (operator, 2026-11-21):**
+* "Approve (Recommended)": production Policy A, `state/p7-policy-A-approval-a8bd50e.json`, binding the 19 P7
+  files `eae2c798…`.
+* "Freeze it (Recommended)": real candidate
+  `0799c37e800c06c278acbc45fdec90b84159ee9d41eb7aaf868cb65a0b950aa5` (`state/p7-candidate-a8bd50e.json`).
+* "Authorize (Recommended)": `state/p7-authorization-pilot-block-01-0799c37e800c.json`.
+
+**Execution:**
+* The host check passed, so the authorization was consumed.
+* **All 40 flights were flown in schedule order in 2.13 h.**
+* No stop, no replacement, no missing pair; the candidate was unchanged at the end.
+* Result `6e4c6a25…`, ledger `4da3bbb9…`.
+
+**D15 at work.** Flight 1 (P5, `p7p-5000010`) had a P2 `observation_gap` RECOVERY again. This time:
+* the unchanged evaluator completed;
+* the ULog facts held (176/400/21, landed and disarmed, no failsafe);
+* the flight was classified a valid failure, with **no stop**.
+
+**Nuisance measurements (the pilot's purpose; descriptive only):**
+
+| Quantity | Measured |
+|---|---|
+| Infrastructure-invalid flights | 0 of 40 (no replacement) |
+| P2 observation-gap RECOVERY | 1 of 40 (with the first attempt: 2 of 46) |
+| Outcome agreement between a controller's two repeats on a layout | 17 of 20 |
+| Repeat difference in time to goal (both repeats succeeded, n = 9) | median 0.096 s, max 0.336 s |
+| Repeat difference in path length | median 0.145 m, max 0.264 m |
+| Repeat difference in minimum clearance | median 0.033 m, max 0.372 m |
+| Runner time per flight | 140–188 s (median 169 s) |
+| Full cycle (flight, evaluation, classification) | median 191 s, max 218 s |
+| Disk per flight | 1.04–1.82 GB, median 1.24 GB, mean 1.33 GB (53.0 GB total) |
+| Integrity events | 7 items over 40 flights: the observation-gap flight's 4 (runtime status, controller cleanup, P2 integrity error, MC causality), and one each of RGB-absence snapshot, P2 timing and Gazebo cleanup |
+| Safety | no safety event, no safety-unverified flight; minimum truth clearance over all 40 flights 0.315 m |
+
+**What the measurements mean for the confirmatory batch:**
+* **Disk.** The mean of 1.33 GB per flight is slightly above the host check's 1.3 GB planning value. 400
+  confirmatory flights need about 530 GB. WSL has 776.4 GB free, so about 245 GB would remain, above the 150 GB
+  floor.
+* **Time.** 400 flights at about 191 s is about 21 h in 10 blocks of about 2.1 h.
+
+**The pilot rule** (frozen analysis code `bd036a2b…`, `p7_analysis.py pilot-rule`; record
+`state/p7-pilot-rule-0799c37e800c.json`, `52c8c880…`):
+* 20 valid pilot pairs; 3 discordant; **d = 0.15**.
+* d is not below 27/243 = 0.111, so the rule selects **200 pairs** (the 200-pair schedule `ef74c71d…`, 10 blocks).
+
+**Next.** The operator confirms the schedule selection. It is written as
+`state/p7-schedule-selection-0799c37e….json`, and the confirmatory blocks require it. Then M6: each of the 10
+confirmatory blocks is separately authorized.
