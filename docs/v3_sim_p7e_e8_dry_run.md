@@ -1,6 +1,7 @@
 # v3-SIM P7-E E8 — development dry run of the P7-E launch path (S2, P4 and P5)
 
-**Status: RUN (2026-11-22); exit criterion MET; for operator acceptance.** See §4 for the results.
+**Status: ACCEPTED by the operator (2026-11-22, "Accept E8"); E8 COMPLETE.** The exit criterion was met; see §4.
+The development candidate `2cc7a579…` and its approvals stay development-only and are never used for a block.
 * **Authorized:** preparation ("Prepare them"), then three separate answers:
   * item 1, Policy A for P7-E development: "Approve (Recommended)";
   * item 2, the development freeze: "Freeze it (Recommended)";
@@ -144,7 +145,7 @@ disk floor met.
 within run-to-run variation. It carries no engineering credit.
 
 **Next, each needing its own explicit authorization (contract §13):**
-1. Acceptance of E8.
+1. ~~Acceptance of E8~~ (done, 2026-11-22).
 2. The production Policy A approval for the real P7-E candidate.
 3. The real freeze.
 4. Blocks 1–3, each separately authorized.
