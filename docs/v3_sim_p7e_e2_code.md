@@ -1,6 +1,8 @@
 # v3-SIM P7-E E2 — the P7-E code, offline
 
-**Status: WRITTEN AND TESTED, FOR OPERATOR ACCEPTANCE (2026-11-22).**
+**Status: ACCEPTED by the operator (2026-11-22, "Accept E2"), including the 8 fail-closed interpretations of §4;
+E2 COMPLETE.** The accepted code is commit `2b6ee5d`. The P7-E candidate must bind exactly these files; any change
+is new code and needs a new acceptance.
 * **Authorized:** by the operator ("Authorize E2"), under the approved contract
   [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) E-C1, E-C2, §4–§8 and §13 item 4.
 * **What it did:** the P7-E code in `simulation/px4_gazebo_p7e/` and three new test files. It covers the manifest,
@@ -186,7 +188,7 @@ test matrix). Output: `v3_sim_p7e_e2_pilot_check.json`.
 
 ## 7. What comes next (each needs its own explicit authorization, contract §13)
 
-1. **E2 acceptance** (this report).
+1. ~~E2 acceptance~~ (done, 2026-11-22).
 2. **The retention-policy approval** (D4-A/D4-B). It is separate from any deletion.
 3. **The development dry run** of the new launch path: 2 flights on S2, one per controller. It needs three things:
    * a development-only Policy A approval that names P7-E;

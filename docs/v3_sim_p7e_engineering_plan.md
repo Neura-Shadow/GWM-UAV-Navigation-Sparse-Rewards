@@ -11,9 +11,17 @@
   * It covers the P7-E manifest, runner and launcher, FC-1 to FC-3, and the report code.
   * 76 P7-E tests pass; with the frozen P7 suites, 198 pass. The frozen P7 candidate `0799c37e…` is untouched and
     still verifies.
-  * **Awaiting operator acceptance.**
-* **Next, each needing its own explicit authorization:** E2 acceptance; the retention-policy approval (separate from
-  any deletion); then the development dry run (E8).
+  * **ACCEPTED by the operator on 2026-11-22 ("Accept E2"), with the 8 fail-closed interpretations of its §4, so E2
+    is COMPLETE** (code commit `2b6ee5d`).
+* **Retention policy D4-A/D4-B APPROVED by the operator on 2026-11-22 ("Approve retention"):**
+  [retention proposal](v3_sim_p7e_retention_proposal.md), decisions E9 and E10. It is a policy only and authorizes no
+  deletion; nothing was deleted.
+* **E8 development dry run RUN on 2026-11-22, exit criterion met:** [E8 report](v3_sim_p7e_e8_dry_run.md).
+  * Development candidate `2cc7a579…`; S2 flown with P4 and with P5 through the P7-E path.
+  * Both passed the unchanged evaluators as valid goal successes, with parity to M4. No credit.
+  * **ACCEPTED by the operator on 2026-11-22 ("Accept E8"), so E8 is COMPLETE.**
+* **Next, each needing its own explicit authorization:** the production Policy A approval for the real P7-E
+  candidate, the real freeze, blocks 1–3 (each separately) and E5.
 * Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
