@@ -229,6 +229,7 @@ As `p7-evaluation-v1` §8.
 3. **E1** specifications: the 30-pair schedule and the report plan, approved by hash. **Done on 2026-11-22
    ("Approve specs"):** schedule `9b3deacb…` and report plan `15e7f7b4…`.
 4. **E2** implementation (offline): the P7-E tree, FC-1 to FC-3 and the tests. Its acceptance is separate.
+   **Done on 2026-11-22:** authorized ("Authorize E2") and accepted ("Accept E2"); code commit `2b6ee5d`.
 5. The **development dry run** of the new launch path (2 flights, S2), with its own dry-run approval.
 6. The **production Policy A approval** for the P7-E candidate.
 7. The **real freeze** of the P7-E candidate.

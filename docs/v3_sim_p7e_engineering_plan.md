@@ -11,9 +11,10 @@
   * It covers the P7-E manifest, runner and launcher, FC-1 to FC-3, and the report code.
   * 76 P7-E tests pass; with the frozen P7 suites, 198 pass. The frozen P7 candidate `0799c37e…` is untouched and
     still verifies.
-  * **Awaiting operator acceptance.**
-* **Next, each needing its own explicit authorization:** E2 acceptance; the retention-policy approval (separate from
-  any deletion); then the development dry run (E8).
+  * **ACCEPTED by the operator on 2026-11-22 ("Accept E2"), with the 8 fail-closed interpretations of its §4, so E2
+    is COMPLETE** (code commit `2b6ee5d`).
+* **Next, each needing its own explicit authorization:** the retention-policy approval (separate from any deletion);
+  then the development dry run (E8).
 * Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
