@@ -1,8 +1,10 @@
 # v3-SIM P7-E E8 — development dry run of the P7-E launch path (S2, P4 and P5)
 
-**Status: PREPARED (2026-11-22), awaiting three separate operator approvals. Nothing has been written to `state/`,
-frozen or launched.**
-* **Authorized so far:** preparation only ("Prepare them").
+**Status: RUN (2026-11-22); exit criterion MET; for operator acceptance.** See §4 for the results.
+* **Authorized:** preparation ("Prepare them"), then three separate answers:
+  * item 1, Policy A for P7-E development: "Approve (Recommended)";
+  * item 2, the development freeze: "Freeze it (Recommended)";
+  * item 3, the dry run: "Authorize (Recommended)".
 * **Under:** contract [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) §13 item 5, plan decision E8.
 * **What it is:** the first SITL use of the P7-E code accepted in E2 (commit `2b6ee5d`). It is the M4 pattern:
   * S2 flown once with the accepted P4 stack and once with the accepted P5 stack;
@@ -80,3 +82,70 @@ frozen or launched.**
 
 It carries no engineering credit. The result goes to you for acceptance before the production Policy A approval and
 the real freeze.
+
+## 4. Results (2026-11-22)
+
+**Approvals and candidate:**
+
+| Item | File | SHA-256 |
+|---|---|---|
+| Policy A, P7-E development only | `state/p7e-policy-A-approval-e8-development.json` | `cafbc47f…` |
+| Development candidate | `state/p7e-candidate-dev-2b6ee5d.json`, frozen at git HEAD `6d73f6d`; it verified from `/tmp` | manifest `2cc7a579846933ae102cbeb961e702456297aab13af83566d5beb4d67791d6de` |
+| Dry-run approval | `state/p7e-dry-run-approval-2cc7a5798469-e8.json`, through `approve-dry-run` and its phrase | `cc65ddc9…` |
+| Result | `state/p7e-dryrun-2cc7a5798469-20261122T071843Z.result.json` | `b7eb6779…` |
+| Ledger | `…071843Z.ledger.jsonl` (hash matches the result) | `c8f32466…` |
+
+**Execution.** 407 s for both flights. The FC-2 host check passed: CPU 0, 1, 2, 1, 1 %, no simulator, lock free,
+disk floor met.
+
+**The flights:**
+* **S2 with P4** (`20261122T071921Z-p7edry-p4-S2-e87f7cc7`):
+  * runtime exit 0;
+  * `p4_evaluate` passed with no failure item;
+  * the frozen classifier: valid goal success, no event;
+  * FC-3: valid, no change.
+* **S2 with P5** (`20261122T072244Z-p7edry-p5-S2-ff61de6e`):
+  * runtime exit 0;
+  * `p5_evaluate` passed with no failure item, the bit-exact policy replay included;
+  * the frozen classifier: valid goal success, no event;
+  * FC-3: valid, no change.
+
+**Parity with the accepted S2 (M4):**
+
+| | P4 now | P4 at M4 | P5 now | P5 at M4 |
+|---|---|---|---|---|
+| world SHA-256 | `65dc596c…`, identical to the expected | same | `65dc596c…`, identical | same |
+| D13 label | `goal_reached_with_detour` (S2's accepted label) | same | same | same |
+| supervisor lineage | OBSTACLE_DETECTED → AVOIDING → RESUME → NORMAL | identical | same | identical |
+| time to goal | 44.25 s | 44.80 s | 42.69 s | 42.65 s |
+| min truth clearance | 0.403 m | 0.375 m | 0.416 m | 0.417 m |
+| path length | 10.15 m | 9.86 m | 9.75 m | 9.76 m |
+| wall time, size | 181 s, 1.26 GB | | 170 s, 1.20 GB | |
+
+**P5 policy:**
+* 829 decisions invoked; 0 failure ticks, 0 outside the mask, 0 fallbacks; participation 1.0;
+* 0 score or SHA mismatches in the replay;
+* inference p99 0.94 ms.
+
+**The new path, checked:**
+* `p7e/flight-assessment.json` written for both flights, with its hash in the ledger.
+* The `p7e` summary block names the development manifest `2cc7a579…` and the dry-run approval `cc65ddc9…`. The
+  gate is `P7-E`, and no credit is possible.
+* **The QGC ownership receipt:**
+  * the owner, PID 1, is `px4_gazebo_p7e/scripts/p7e_namespace_owner.py`;
+  * its SHA-256 is `0d1c2d27…`, the hash the QGC build pins.
+* **The result:**
+  * not stopped, nothing unflown or interrupted, no exception;
+  * accounting complete: 2 `flown_valid`;
+  * the candidate unchanged at the end;
+  * the live lock released.
+
+**Exit criterion (§3): met.** The P7-E launch path reproduces the accepted S2 outcome with both controllers,
+within run-to-run variation. It carries no engineering credit.
+
+**Next, each needing its own explicit authorization (contract §13):**
+1. Acceptance of E8.
+2. The production Policy A approval for the real P7-E candidate.
+3. The real freeze.
+4. Blocks 1–3, each separately authorized.
+5. E5.
