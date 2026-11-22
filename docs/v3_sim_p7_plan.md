@@ -1,6 +1,14 @@
 # v3-SIM P7 — batch evaluation: plan
 
 **Status: PLANNING. Decisions D1–D14 APPROVED (2026-11-21), all as recommended.**
+* **2026-11-22: the next stage is P7-E.** The operator approved the engineering-validation contract
+  [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) ("Approve contract"), after approving the direction
+  in principle. See the [P7-E plan](v3_sim_p7e_engineering_plan.md).
+  * **P7-A, this plan's confirmatory study, is suspended, not cancelled.** The 200-pair schedule selection is not
+    written.
+  * The frozen candidate `0799c37e…`, the pilot evidence, the M1 specifications and the analysis code are
+    unchanged.
+  * Every P7-E step needs its own authorization.
 * The operator's answers were "照建議核准" for D1–D12 and "Approve as recommended" for D13–D14, which the M0 audit
   raised. The record is in contract §10.
 * Nothing in P7 is implemented, frozen, launched or authorized.

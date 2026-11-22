@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "contract": "p7e-report-plan-v1",
+  "status": "E1 specification for operator approval; frozen and hash-bound in the P7-E candidate before the first P7-E flight",
+  "governed_by": "p7-engineering-validation-v1 §5 (acceptance), §6 (reporting), §7 (no superiority), §8 (fail-closed), §10 (risk register)",
+  "sign_convention": "every paired difference is P5 minus P4",
+  "unit": "a pair: one P7-E layout flown once by P4 and once by P5, back to back, in the scheduled order (p7e_schedule.json)",
+  "flight_record": "the frozen classifier of P7 candidate 0799c37e (validation/p7_classify.py), with the P7-E fail-closed rules FC-1..FC-3 applied by P7-E code",
+
+  "hard_criteria": [
+    {"id": "H1", "name": "collision count", "measure": "evaluator item safety:collision_contact; safety.collisions",
+     "limit": 0, "limit_source": "simulation/px4_gazebo_p4/configs/p4_validation.yaml safety.collisions_allowed", "scope": "every flight", "on_failure": "safety event: the batch stops"},
+    {"id": "H2", "name": "minimum truth clearance", "measure": "safety.min_truth_clearance_m (accepted P4 evaluator)",
+     "limit": 0.20, "unit": "m", "comparison": ">=", "limit_source": "p4_validation.yaml safety.min_truth_clearance_m", "scope": "every flight", "on_failure": "safety event: the batch stops"},
+    {"id": "H3", "name": "unsafe commands", "measure": "safety:setpoint_inside_inflated_obstacle, competing_flight_publisher, unsafe:hold_tick_motion, unsafe:unrevalidated_resume",
+     "limit": 0, "limit_source": "P6 contract §6.3 as restated by D14 (hold motion 0.01 m from p6_faults.yaml codes.H35; setpoint margin 0.10 m from p4_validation.yaml)", "scope": "every flight", "on_failure": "safety event: the batch stops"},
+    {"id": "H4", "name": "Policy A breaches", "measure": "native_commands:* (accepted Policy A check)",
+     "limit": 0, "limit_source": "native command policy A, bf1ef9b1080a52eab1673ac2a1ac6e20d30cfa7fd85b703cae8433dc55f7b3b0", "scope": "every flight", "on_failure": "safety event: the batch stops"},
+    {"id": "H5", "name": "landing and disarm integrity", "measure": "p2:final_landed_disarmed, p2:command_sequence; or, under D15, the ULog facts (own commands 176/400/21, landed and disarmed, no failsafe)",
+     "limit": "every valid flight landed and disarmed with own commands exactly 176, 400, 21", "limit_source": "P2 integrity (p4_evaluate p2_integrity), D15", "scope": "every valid flight", "on_failure": "safety event: the batch stops"},
+    {"id": "H6", "name": "safety verifiable", "measure": "classifier safety_unverified, plus FC-3 (unknown arm state)",
+     "limit": 0, "limit_source": "D14, D15, contract §8", "scope": "every flight", "on_failure": "safety-unverified: the batch stops"},
+    {"id": "H7", "name": "evidence completeness", "measure": "each flown flight has summary.json, the accepted evaluation, p7/flight-record.json, and a block-ledger line with the record hash",
+     "limit": "100 %", "limit_source": "contract p7-evaluation-v1 §8 (inherited)", "scope": "the batch"},
+    {"id": "H8", "name": "batch execution reliability", "measure": "flights flown against scheduled; replacements; stops; FC-1 block accounting",
+     "limit": "all 60 flown, or every unflown flight explained by a stop rule; at most 2 replacements per 20-flight block and one per flight",
+     "limit_source": "D6; contract §8", "scope": "the batch"},
+    {"id": "H9", "name": "reproducibility", "measure": "re-running the frozen classifier on a read-only view of every retained flight reproduces its recorded flight record (except the record's own file hash); every manifest, world and spec hash re-verifies",
+     "limit": "identical", "limit_source": "contract §5", "scope": "the batch, after the last block"}
+  ],
+
+  "reported_criteria": [
+    {"id": "R1", "name": "mission success rate", "measure": "classifier outcome goal_success, per controller", "interval": "Clopper-Pearson 95 %", "accepted_limit": null},
+    {"id": "R2", "name": "paired outcomes", "measure": "both, P5-only, P4-only, neither; the success difference (b - c) / n", "interval": "Tango score 95 % (descriptive)", "accepted_limit": null},
+    {"id": "R3", "name": "P2 timing and freshness", "measure": "evaluator item p2:timing; P2 aborts by reason (e.g. observation_gap) per controller",
+     "accepted_limit": "P2 timing contract p2-timing-v1 (p2_timing.yaml); state freshness max_sample_gap_sim_s 0.2 (p2_control.yaml)"},
+    {"id": "R4", "name": "P3 stream and P4 perception timing", "measure": "evaluator items depth:* and performance:*",
+     "accepted_limit": "snapshot rate >= 8.0 Hz; snapshot latency max <= 0.25 s and p95 <= 0.15 s; perception compute p99 <= 0.050 s and max <= 0.090 s; receipt gap <= 1.0 s (p4_validation.yaml performance)"},
+    {"id": "R5", "name": "P5 inference", "measure": "policy-ledger inference p99 and max; failure ticks; outside-mask; fallback decisions; participation",
+     "accepted_limit": "p99 <= 0.005 s; max <= 0.010 s; failure ticks 0; outside mask 0; fallback 0; participation 1.0 (p5_validation.yaml policy)"},
+    {"id": "R6", "name": "tracking and response latency", "measure": "safety:tracking, safety:response_latency (D14 mission failures)",
+     "accepted_limit": "tracking <= 0.30 m; response latency <= 0.25 s (p4_validation.yaml safety)"},
+    {"id": "R7", "name": "time to goal and path length", "measure": "p5_comparison.flight_metrics on both-success pairs; per-controller medians; the paired difference",
+     "interval": "Hodges-Lehmann with the Walsh-average 95 % interval (descriptive)", "accepted_limit": null},
+    {"id": "R8", "name": "host and cost", "measure": "pre-block host check; per-flight process CPU fractions, minimum memory available, mean RTF, stall count (interval RTF < 0.5), wall time and disk per flight",
+     "accepted_limit": "host check p7_host_check.yaml (overlay ded574b5, AC Online, CPU <= 15 %, disk floor 150 GB)"},
+    {"id": "R9", "name": "abort types", "measure": "P4 abort_reason and P2 failure, per controller", "accepted_limit": null},
+    {"id": "R10", "name": "integrity events", "measure": "every other evaluator item, per flight and per controller", "accepted_limit": "the accepted item limits"}
+  ],
+
+  "engineering_completion": {
+    "passed": "H1-H9 all met and the R1-R10 report complete: the report records 'engineering validation passed'",
+    "not_passed": "any H criterion not met; a failed H1-H6 stops the batch under contract §8 and the operator decides",
+    "a_breach_of_an_R_limit": "an integrity event entered in the risk register; not by itself an engineering failure"
+  },
+
+  "reporting": {
+    "per_controller": ["R1 with its interval", "safety counts with zero-event one-sided 95 % bounds 1 - 0.05^(1/M), or Clopper-Pearson if an event occurred", "R3-R6, R8-R10"],
+    "paired": ["R2", "R7", "minimum truth clearance per pair (no non-inferiority test)"],
+    "p_values": "none (decision E7)",
+    "functions": "the frozen P7 analysis code p7_analysis.py (bd036a2b…), imported unchanged: clopper_pearson, tango_interval, hodges_lehmann; labelled descriptive",
+    "runtime": "WSL /usr/bin/python3 with NumPy 1.26.4"
+  },
+
+  "required_statement": "This engineering validation was not designed to compare P5 with P4. With 30 pairs, a test of the planning effect would have about 3 % power. Observed differences between the controllers are descriptive and do not show that either is superior.",
+  "not_claimed": ["superiority or inferiority of either ranker", "statistical significance", "real-hardware behaviour", "results outside the declared layouts, mission, speed, static boxes or this host", "any change to P2-P6 acceptance"],
+  "limits_30_pairs": {"mcnemar_power_at_planning_effect": 0.03, "mcnemar_power_at_pilot_discordance": 0.08, "tango_ci_width": "about 0.29-0.32", "success_rate_15_of_30_ci95": [0.313, 0.687], "zero_event_upper_bound_per_flight": {"30_flights": 0.0950, "60_flights": 0.0487}},
+
+  "risk_register": {
+    "open": ["RR1 P2 observation-gap RECOVERY", "RR2 P5 repeat-behaviour inconsistency"],
+    "reported_against_them": ["observation-gap count per controller (R3, R9)", "stall statistics per controller (R8)"],
+    "rule": "P7-E closes neither; no threshold changes in response (contract §10)"
+  },
+
+  "software": {
+    "code": "simulation/px4_gazebo_p7e/analysis/p7e_report.py (E2)",
+    "freeze": "the report code and this plan are hash-bound in the P7-E candidate before the first P7-E flight"
+  }
+}

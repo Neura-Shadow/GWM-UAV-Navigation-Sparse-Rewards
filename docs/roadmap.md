@@ -317,7 +317,10 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   by P4 and P5 through the P7 path, the unchanged evaluators passed, and the result is identical to the accepted
   S2 outcome. **Accepted 2026-11-21, so M4 is complete.** **M5 pilot stopped 2026-11-21 after 6 of 40 flights** ([record](v3_sim_p7_m5_pilot.md)): a safe P2
   observation-gap RECOVERY was classified safety-unverified. D15 (Option A) fixed it. **The pilot completed
-  2026-11-22 on candidate `0799c37e`:** 40/40 flights, no stop; the pilot rule gives 200 pairs. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  2026-11-22 on candidate `0799c37e`:** 40/40 flights, no stop; the pilot rule gives 200 pairs. **2026-11-22: the P7-E engineering-validation contract was
+  approved** ([plan](v3_sim_p7e_engineering_plan.md), [contract](v3_sim_p7e_contract_draft.md)): 30 pairs from pool
+  indices 200–229 in 3 blocks. P7-A is suspended (the selection is not written), and every P7-E step is separately
+  authorized. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
