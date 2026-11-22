@@ -1,6 +1,9 @@
 # v3-SIM P7-E — engineering validation: proposed revision of the P7 next stage
 
-**Status: PROPOSAL for operator review (2026-11-22). Nothing in it is approved or implemented.**
+**Status: DECISIONS E1–E11 APPROVED as recommended (operator, 2026-11-22, "Approve as recommended").**
+* P7-E is the next P7 stage. P7-A is suspended, not cancelled.
+* Nothing is implemented yet.
+* **Next, needing its own authorization:** E1 (the specifications).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
 proposal preparation only).
@@ -240,6 +243,8 @@ covering the 48 P7 flights, read-only.
 | Space a future cleanup could reclaim | 39.5 GB of raw depth from 107 P6 development dry runs (retention proposal). Under D4-B, P7-E's own raw depth (about 63 GB) becomes eligible only after its report is accepted and integrity-verified, and only by a separate approval. |
 
 ## 11. Decisions requiring operator approval
+
+**All eleven approved as recommended (operator, 2026-11-22).**
 
 | ID | Decision | Recommendation |
 |---|---|---|

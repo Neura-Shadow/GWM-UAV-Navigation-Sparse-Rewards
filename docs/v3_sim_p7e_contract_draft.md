@@ -1,6 +1,7 @@
 # v3-SIM P7 contract revision `p7-engineering-validation-v1` — DRAFT for operator review
 
-**Status: DRAFT (2026-11-22). Not approved; nothing in it is in force.** It is proposed in the
+**Status: DRAFT (2026-11-22). Decisions E1–E11 are approved as recommended (operator, 2026-11-22), and this text
+encodes them.** The contract as a whole is approved with the E1 specifications. It is proposed in the
 [P7-E engineering plan](v3_sim_p7e_engineering_plan.md).
 
 **Relation to `p7-evaluation-v1`.** If approved, it governs the next P7 stage. The existing contract
