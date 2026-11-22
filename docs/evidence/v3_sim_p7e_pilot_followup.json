@@ -1,0 +1,2323 @@
+{
+ "contract": "p7e-pilot-followup-v1",
+ "flights": [
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.038,
+    "gazebo": 0.877,
+    "p4-perception": 0.389,
+    "px4": 0.292,
+    "ros-controller": 0.438,
+    "sensor-adapter": 0.67,
+    "sensor-bridge": 0.113
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "S2",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 3.20263671875,
+   "min_truth_clearance_m": 0.37533146570651765,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9952857773073499,
+   "rtf_min_at_sim_s": 3.52,
+   "rtf_min_interval": 0.0027,
+   "run": "20261121T130806Z-p7dry-p4-S2-d94cbdf7",
+   "set": "M4 dry run",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 44.8,
+   "validity": "valid",
+   "wall_duration_s": 173.85912375100452
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.039,
+    "gazebo": 0.881,
+    "p4-perception": 0.404,
+    "px4": 0.301,
+    "ros-controller": 0.431,
+    "sensor-adapter": 0.657,
+    "sensor-bridge": 0.108
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "S2",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 8.57666015625,
+   "min_truth_clearance_m": 0.4171504558214264,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6882494004796164,
+    "disagreements": 574,
+    "interventions": {
+     "none": 834
+    },
+    "invoked": 834
+   },
+   "rtf_mean": 0.9964071551244227,
+   "rtf_min_at_sim_s": 3.704,
+   "rtf_min_interval": 0.031,
+   "run": "20261121T131125Z-p7dry-p5-S2-97a1db5f",
+   "set": "M4 dry run",
+   "stall_wall_s_total": 1.8,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 42.647999999999996,
+   "validity": "valid",
+   "wall_duration_s": 175.4375109649991
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.032,
+    "gazebo": 0.831,
+    "p4-perception": 0.346,
+    "px4": 0.268,
+    "ros-controller": 0.391,
+    "sensor-adapter": 0.601,
+    "sensor-bridge": 0.106
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 7.9208984375,
+   "min_truth_clearance_m": 0.8248750093601167,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.5842696629213483,
+    "disagreements": 468,
+    "interventions": {
+     "none": 801
+    },
+    "invoked": 801
+   },
+   "rtf_mean": 0.9975217968808806,
+   "rtf_min_at_sim_s": 3.5,
+   "rtf_min_interval": 0.0484,
+   "run": "20261121T132917Z-p7-p5-p7p-5000010-2ce73d50",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.18400000000001,
+   "validity": "valid",
+   "wall_duration_s": 165.5295463750008
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.839,
+    "p4-perception": 0.394,
+    "px4": 0.278,
+    "ros-controller": 0.398,
+    "sensor-adapter": 0.607,
+    "sensor-bridge": 0.097
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 5.84033203125,
+   "min_truth_clearance_m": 0.775062377859213,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9971924279903185,
+   "rtf_min_at_sim_s": 3.94,
+   "rtf_min_interval": 0.0285,
+   "run": "20261121T133229Z-p7-p4-p7p-5000010-ca37da0a",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.040000000000006,
+   "validity": "valid",
+   "wall_duration_s": 170.48624722200475
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.042,
+    "gazebo": 0.961,
+    "p4-perception": 0.475,
+    "px4": 0.323,
+    "ros-controller": 0.491,
+    "sensor-adapter": 0.741,
+    "sensor-bridge": 0.111
+   },
+   "hover_time_sim_s": 20.036,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 4.21044921875,
+   "min_truth_clearance_m": 0.4455296198774734,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.8327228327228328,
+    "disagreements": 682,
+    "interventions": {
+     "none": 819
+    },
+    "invoked": 819
+   },
+   "rtf_mean": 0.9955727307887555,
+   "rtf_min_at_sim_s": 3.392,
+   "rtf_min_interval": 0.018,
+   "run": "20261121T133544Z-p7-p5-p7p-5000013-64b2c3ab",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 190.88110145899554
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.911,
+    "p4-perception": 0.434,
+    "px4": 0.296,
+    "ros-controller": 0.429,
+    "sensor-adapter": 0.705,
+    "sensor-bridge": 0.105
+   },
+   "hover_time_sim_s": 20.051999999999992,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 3.4609375,
+   "min_truth_clearance_m": 0.5430789153099924,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9974866143153703,
+   "rtf_min_at_sim_s": 3.616,
+   "rtf_min_interval": 0.0165,
+   "run": "20261121T133923Z-p7-p4-p7p-5000013-19f26451",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 177.18947696399846
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.032,
+    "gazebo": 0.815,
+    "p4-perception": 0.38,
+    "px4": 0.26,
+    "ros-controller": 0.366,
+    "sensor-adapter": 0.598,
+    "sensor-bridge": 0.093
+   },
+   "hover_time_sim_s": 20.048000000000002,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 6.30224609375,
+   "min_truth_clearance_m": 0.7626639817665026,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.997522795956877,
+   "rtf_min_at_sim_s": 3.868,
+   "rtf_min_interval": 0.0361,
+   "run": "20261121T134234Z-p7-p4-p7p-5000016-d7f7dd1f",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 158.065493453003
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.032,
+    "gazebo": 0.806,
+    "p4-perception": 0.343,
+    "px4": 0.256,
+    "ros-controller": 0.351,
+    "sensor-adapter": 0.593,
+    "sensor-bridge": 0.097
+   },
+   "gap": {
+    "abort_monotonic_s": 40685.879614177,
+    "abort_sim_s": 79.008,
+    "clock_steps_within_3_sim_s": [
+     {
+      "rtf": 0.202,
+      "sim_s": 78.628,
+      "wall_s": 0.357
+     },
+     {
+      "rtf": 0.899,
+      "sim_s": 80.208,
+      "wall_s": 0.102
+     }
+    ],
+    "resources_around": {
+     "cpu_fraction": {
+      "dds-agent": 0.036,
+      "gazebo": 0.827,
+      "p4-perception": 0.332,
+      "px4": 0.286,
+      "ros-controller": 0.368,
+      "sensor-adapter": 0.703,
+      "sensor-bridge": 0.1
+     },
+     "load1": [
+      2.99,
+      2.91,
+      2.91,
+      2.91,
+      2.91,
+      2.91
+     ],
+     "mem_available_gb_min": 6.91,
+     "window_s": 5.01
+    }
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING"
+   ],
+   "load1_max": 4.6142578125,
+   "min_truth_clearance_m": null,
+   "outcome": "failure",
+   "p2_failure": "observation_gap",
+   "policy": null,
+   "rtf_mean": 0.996691794949339,
+   "rtf_min_at_sim_s": 3.844,
+   "rtf_min_interval": 0.0132,
+   "run": "20261121T134526Z-p7-p5-p7p-5000016-0706459a",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 2.05,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 115.67247516899806
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.902,
+    "p4-perception": 0.417,
+    "px4": 0.29,
+    "ros-controller": 0.42,
+    "sensor-adapter": 0.646,
+    "sensor-bridge": 0.103
+   },
+   "gap": {
+    "abort_monotonic_s": 41937.449907989,
+    "abort_sim_s": 103.208,
+    "clock_steps_within_3_sim_s": [
+     {
+      "rtf": 0.233,
+      "sim_s": 102.876,
+      "wall_s": 0.309
+     }
+    ],
+    "resources_around": {
+     "cpu_fraction": {
+      "dds-agent": 0.036,
+      "gazebo": 0.821,
+      "p4-perception": 0.37,
+      "px4": 0.284,
+      "ros-controller": 0.386,
+      "sensor-adapter": 0.595,
+      "sensor-bridge": 0.094
+     },
+     "load1": [
+      2.88,
+      2.88,
+      2.88,
+      2.88,
+      2.88,
+      2.73
+     ],
+     "mem_available_gb_min": 7.07,
+     "window_s": 5.01
+    }
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 3.1259765625,
+   "min_truth_clearance_m": 0.8224773753079726,
+   "outcome": "failure",
+   "p2_failure": "observation_gap",
+   "policy": {
+    "disagreement_rate": 0.6323268206039077,
+    "disagreements": 356,
+    "interventions": {
+     "none": 563
+    },
+    "invoked": 563
+   },
+   "rtf_mean": 0.9969287460939564,
+   "rtf_min_at_sim_s": 3.536,
+   "rtf_min_interval": 0.0417,
+   "run": "20261121T140556Z-p7-p5-p7p-5000010-692a5544",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 2.2,
+   "stalls_below_0_5": 4,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 140.1979088270018
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.884,
+    "p4-perception": 0.416,
+    "px4": 0.289,
+    "ros-controller": 0.424,
+    "sensor-adapter": 0.639,
+    "sensor-bridge": 0.101
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 5.0390625,
+   "min_truth_clearance_m": 0.7886633390893796,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9966949635959637,
+   "rtf_min_at_sim_s": 3.552,
+   "rtf_min_interval": 0.0444,
+   "run": "20261121T140835Z-p7-p4-p7p-5000010-57f3b14a",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.120000000000005,
+   "validity": "valid",
+   "wall_duration_s": 167.59833510099998
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.039,
+    "gazebo": 0.944,
+    "p4-perception": 0.42,
+    "px4": 0.313,
+    "ros-controller": 0.449,
+    "sensor-adapter": 0.715,
+    "sensor-bridge": 0.063
+   },
+   "hover_time_sim_s": 20.028000000000006,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 6.0078125,
+   "min_truth_clearance_m": 0.42114814331148454,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.8626974483596598,
+    "disagreements": 710,
+    "interventions": {
+     "none": 823
+    },
+    "invoked": 823
+   },
+   "rtf_mean": 0.9972542145347147,
+   "rtf_min_at_sim_s": 3.592,
+   "rtf_min_interval": 0.0473,
+   "run": "20261121T141143Z-p7-p5-p7p-5000013-5de0ece6",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 184.88977141500072
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.04,
+    "gazebo": 0.967,
+    "p4-perception": 0.454,
+    "px4": 0.323,
+    "ros-controller": 0.461,
+    "sensor-adapter": 0.731,
+    "sensor-bridge": 0.065
+   },
+   "hover_time_sim_s": 20.048000000000002,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 7.91357421875,
+   "min_truth_clearance_m": 0.3976820325841768,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9969745747056952,
+   "rtf_min_at_sim_s": 3.644,
+   "rtf_min_interval": 0.0341,
+   "run": "20261121T141526Z-p7-p4-p7p-5000013-c03924e3",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 182.9383531899948
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.882,
+    "p4-perception": 0.404,
+    "px4": 0.286,
+    "ros-controller": 0.403,
+    "sensor-adapter": 0.654,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 20.051999999999992,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 5.20849609375,
+   "min_truth_clearance_m": 0.7817886736865789,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.996998331606794,
+   "rtf_min_at_sim_s": 3.584,
+   "rtf_min_interval": 0.0376,
+   "run": "20261121T141844Z-p7-p4-p7p-5000016-f908b9c0",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 164.37079458199878
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.919,
+    "p4-perception": 0.429,
+    "px4": 0.297,
+    "ros-controller": 0.421,
+    "sensor-adapter": 0.675,
+    "sensor-bridge": 0.102
+   },
+   "hover_time_sim_s": 20.052000000000007,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 8.6005859375,
+   "min_truth_clearance_m": 0.7849901728660413,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.5697674418604651,
+    "disagreements": 196,
+    "interventions": {
+     "none": 317,
+     "yaw_to_l4": 27
+    },
+    "invoked": 344
+   },
+   "rtf_mean": 0.9974518167088612,
+   "rtf_min_at_sim_s": 3.836,
+   "rtf_min_interval": 0.0311,
+   "run": "20261121T142144Z-p7-p5-p7p-5000016-b357f143",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 158.41112803699798
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.038,
+    "gazebo": 0.839,
+    "p4-perception": 0.43,
+    "px4": 0.305,
+    "ros-controller": 0.431,
+    "sensor-adapter": 0.663,
+    "sensor-bridge": 0.103
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000001",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 11.10400390625,
+   "min_truth_clearance_m": 1.0939911598566348,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9971685805465762,
+   "rtf_min_at_sim_s": 3.66,
+   "rtf_min_interval": 0.0185,
+   "run": "20261121T142444Z-p7-p4-p7p-5000001-3bf0012f",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.69,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.751999999999995,
+   "validity": "valid",
+   "wall_duration_s": 184.26901676099806
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.867,
+    "p4-perception": 0.4,
+    "px4": 0.285,
+    "ros-controller": 0.411,
+    "sensor-adapter": 0.628,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000001",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 5.5302734375,
+   "min_truth_clearance_m": 1.1310849479926166,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.531442663378545,
+    "disagreements": 431,
+    "interventions": {
+     "none": 811
+    },
+    "invoked": 811
+   },
+   "rtf_mean": 0.9978208584933986,
+   "rtf_min_at_sim_s": 3.856,
+   "rtf_min_interval": 0.0158,
+   "run": "20261121T142806Z-p7-p5-p7p-5000001-7384e1b0",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.852000000000004,
+   "validity": "valid",
+   "wall_duration_s": 168.20996482999908
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.866,
+    "p4-perception": 0.403,
+    "px4": 0.285,
+    "ros-controller": 0.408,
+    "sensor-adapter": 0.645,
+    "sensor-bridge": 0.096
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000008",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 6.02392578125,
+   "min_truth_clearance_m": 0.4054950476947753,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.8641114982578397,
+    "disagreements": 744,
+    "interventions": {
+     "none": 861
+    },
+    "invoked": 861
+   },
+   "rtf_mean": 0.9977977399002789,
+   "rtf_min_at_sim_s": 3.52,
+   "rtf_min_interval": 0.0215,
+   "run": "20261121T143118Z-p7-p5-p7p-5000008-ec83f859",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 44.10000000000001,
+   "validity": "valid",
+   "wall_duration_s": 171.9817509179993
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.849,
+    "p4-perception": 0.396,
+    "px4": 0.274,
+    "ros-controller": 0.387,
+    "sensor-adapter": 0.629,
+    "sensor-bridge": 0.058
+   },
+   "hover_time_sim_s": 20.000000000000014,
+   "item": "p7p-5000008",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 8.6484375,
+   "min_truth_clearance_m": 0.4916082489565695,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9977550411779834,
+   "rtf_min_at_sim_s": 3.58,
+   "rtf_min_interval": 0.044,
+   "run": "20261121T143430Z-p7-p4-p7p-5000008-e89246e9",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 188.1326456320021
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.039,
+    "gazebo": 0.936,
+    "p4-perception": 0.443,
+    "px4": 0.31,
+    "ros-controller": 0.451,
+    "sensor-adapter": 0.723,
+    "sensor-bridge": 0.106
+   },
+   "hover_time_sim_s": 20.036,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 8.30517578125,
+   "min_truth_clearance_m": 0.40344919983918126,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.997685350368386,
+   "rtf_min_at_sim_s": 3.56,
+   "rtf_min_interval": 0.043,
+   "run": "20261121T143800Z-p7-p4-p7p-5000013-23625265",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 184.36328764599602
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.889,
+    "p4-perception": 0.419,
+    "px4": 0.289,
+    "ros-controller": 0.423,
+    "sensor-adapter": 0.664,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 20.051999999999992,
+   "item": "p7p-5000013",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 3.763671875,
+   "min_truth_clearance_m": 0.44429723352534245,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.8406326034063261,
+    "disagreements": 691,
+    "interventions": {
+     "none": 822
+    },
+    "invoked": 822
+   },
+   "rtf_mean": 0.9976299014331833,
+   "rtf_min_at_sim_s": 3.548,
+   "rtf_min_interval": 0.0215,
+   "run": "20261121T144126Z-p7-p5-p7p-5000013-5b3a9d7f",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 182.84312402600335
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.04,
+    "gazebo": 0.934,
+    "p4-perception": 0.442,
+    "px4": 0.31,
+    "ros-controller": 0.455,
+    "sensor-adapter": 0.685,
+    "sensor-bridge": 0.106
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000001",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 5.5361328125,
+   "min_truth_clearance_m": 1.149947014264958,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.5862068965517241,
+    "disagreements": 476,
+    "interventions": {
+     "none": 812
+    },
+    "invoked": 812
+   },
+   "rtf_mean": 0.9972372538524171,
+   "rtf_min_at_sim_s": 3.828,
+   "rtf_min_interval": 0.0286,
+   "run": "20261121T144452Z-p7-p5-p7p-5000001-6ce92362",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.78,
+   "validity": "valid",
+   "wall_duration_s": 169.43436727300286
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.862,
+    "p4-perception": 0.403,
+    "px4": 0.281,
+    "ros-controller": 0.404,
+    "sensor-adapter": 0.635,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000001",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 3.9912109375,
+   "min_truth_clearance_m": 1.0623916498108963,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9975563010082347,
+   "rtf_min_at_sim_s": 3.896,
+   "rtf_min_interval": 0.0053,
+   "run": "20261121T144803Z-p7-p4-p7p-5000001-7c973048",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.628,
+   "validity": "valid",
+   "wall_duration_s": 168.61710881800536
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.87,
+    "p4-perception": 0.396,
+    "px4": 0.283,
+    "ros-controller": 0.401,
+    "sensor-adapter": 0.651,
+    "sensor-bridge": 0.098
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000004",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 7.939453125,
+   "min_truth_clearance_m": 1.1467208213557953,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9975695773967852,
+   "rtf_min_at_sim_s": 3.552,
+   "rtf_min_interval": 0.0421,
+   "run": "20261121T145112Z-p7-p4-p7p-5000004-3dc8491e",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.836,
+   "validity": "valid",
+   "wall_duration_s": 168.6640092069938
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.866,
+    "p4-perception": 0.409,
+    "px4": 0.288,
+    "ros-controller": 0.411,
+    "sensor-adapter": 0.666,
+    "sensor-bridge": 0.06
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000004",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 6.55615234375,
+   "min_truth_clearance_m": 1.1346941256133223,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6938271604938272,
+    "disagreements": 562,
+    "interventions": {
+     "none": 810
+    },
+    "invoked": 810
+   },
+   "rtf_mean": 0.9974967889299445,
+   "rtf_min_at_sim_s": 3.576,
+   "rtf_min_interval": 0.0413,
+   "run": "20261121T145420Z-p7-p5-p7p-5000004-fa991910",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.78800000000001,
+   "validity": "valid",
+   "wall_duration_s": 167.12597871400067
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.038,
+    "gazebo": 0.922,
+    "p4-perception": 0.415,
+    "px4": 0.306,
+    "ros-controller": 0.426,
+    "sensor-adapter": 0.664,
+    "sensor-bridge": 0.104
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000012",
+   "lineage": [],
+   "load1_max": 6.4638671875,
+   "min_truth_clearance_m": 0.6021453995502568,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6704119850187266,
+    "disagreements": 537,
+    "interventions": {
+     "none": 801
+    },
+    "invoked": 801
+   },
+   "rtf_mean": 0.9976191748136096,
+   "rtf_min_at_sim_s": 3.792,
+   "rtf_min_interval": 0.0106,
+   "run": "20261121T145758Z-p7-p5-p7p-5000012-438c53df",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.7,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.292,
+   "validity": "valid",
+   "wall_duration_s": 187.1556653919979
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.855,
+    "p4-perception": 0.41,
+    "px4": 0.279,
+    "ros-controller": 0.407,
+    "sensor-adapter": 0.626,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000012",
+   "lineage": [],
+   "load1_max": 3.40869140625,
+   "min_truth_clearance_m": 0.6826916452195253,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9977989364938552,
+   "rtf_min_at_sim_s": 3.86,
+   "rtf_min_interval": 0.0235,
+   "run": "20261121T150108Z-p7-p4-p7p-5000012-99ff0092",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.348,
+   "validity": "valid",
+   "wall_duration_s": 167.91153789500095
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.869,
+    "p4-perception": 0.405,
+    "px4": 0.28,
+    "ros-controller": 0.398,
+    "sensor-adapter": 0.642,
+    "sensor-bridge": 0.099
+   },
+   "hover_time_sim_s": 20.052000000000007,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 4.3427734375,
+   "min_truth_clearance_m": 0.8135401712606971,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.7063953488372093,
+    "disagreements": 243,
+    "interventions": {
+     "none": 317,
+     "yaw_to_l4": 27
+    },
+    "invoked": 344
+   },
+   "rtf_mean": 0.9973334745289822,
+   "rtf_min_at_sim_s": 3.58,
+   "rtf_min_interval": 0.0222,
+   "run": "20261121T150415Z-p7-p5-p7p-5000016-4f75b2a2",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 158.09056867100298
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.866,
+    "p4-perception": 0.383,
+    "px4": 0.279,
+    "ros-controller": 0.388,
+    "sensor-adapter": 0.64,
+    "sensor-bridge": 0.096
+   },
+   "hover_time_sim_s": 20.048000000000002,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 4.15966796875,
+   "min_truth_clearance_m": 0.7340720619372338,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9975960894050442,
+   "rtf_min_at_sim_s": 3.556,
+   "rtf_min_interval": 0.0228,
+   "run": "20261121T150713Z-p7-p4-p7p-5000016-a2ec1edf",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 158.09178594599507
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.857,
+    "p4-perception": 0.406,
+    "px4": 0.282,
+    "ros-controller": 0.395,
+    "sensor-adapter": 0.636,
+    "sensor-bridge": 0.101
+   },
+   "hover_time_sim_s": 20.040000000000006,
+   "item": "p7p-5000002",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 5.83642578125,
+   "min_truth_clearance_m": 0.8096832075646743,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9973169956508944,
+   "rtf_min_at_sim_s": 3.576,
+   "rtf_min_interval": 0.0426,
+   "run": "20261121T151009Z-p7-p4-p7p-5000002-12c586c7",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 149.1646570189987
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.904,
+    "p4-perception": 0.414,
+    "px4": 0.297,
+    "ros-controller": 0.422,
+    "sensor-adapter": 0.65,
+    "sensor-bridge": 0.061
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000002",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 9.98193359375,
+   "min_truth_clearance_m": 0.4915188466634729,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.47512437810945274,
+    "disagreements": 382,
+    "interventions": {
+     "none": 804
+    },
+    "invoked": 804
+   },
+   "rtf_mean": 0.9972198061433438,
+   "rtf_min_at_sim_s": 3.556,
+   "rtf_min_interval": 0.0405,
+   "run": "20261121T151258Z-p7-p5-p7p-5000002-c2a77f3e",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.416,
+   "validity": "valid",
+   "wall_duration_s": 168.35739782699966
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.902,
+    "p4-perception": 0.403,
+    "px4": 0.294,
+    "ros-controller": 0.406,
+    "sensor-adapter": 0.728,
+    "sensor-bridge": 0.099
+   },
+   "hover_time_sim_s": 20.000000000000014,
+   "item": "p7p-5000005",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 10.85400390625,
+   "min_truth_clearance_m": 0.8801295810793388,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.997846885600124,
+   "rtf_min_at_sim_s": 3.8,
+   "rtf_min_interval": 0.0285,
+   "run": "20261121T151607Z-p7-p4-p7p-5000005-44c16a22",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 177.27195776099688
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.891,
+    "p4-perception": 0.393,
+    "px4": 0.289,
+    "ros-controller": 0.414,
+    "sensor-adapter": 0.69,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 20.051999999999992,
+   "item": "p7p-5000005",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 8.52392578125,
+   "min_truth_clearance_m": 0.7083814083035163,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.2802547770700637,
+    "disagreements": 220,
+    "interventions": {
+     "none": 407,
+     "yaw_to_l4": 378
+    },
+    "invoked": 785
+   },
+   "rtf_mean": 0.9978028924621168,
+   "rtf_min_at_sim_s": 3.616,
+   "rtf_min_interval": 0.0451,
+   "run": "20261121T151925Z-p7-p5-p7p-5000005-1f140144",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 180.2097447729975
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.039,
+    "gazebo": 0.93,
+    "p4-perception": 0.442,
+    "px4": 0.311,
+    "ros-controller": 0.454,
+    "sensor-adapter": 0.683,
+    "sensor-bridge": 0.063
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000006",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 5.05517578125,
+   "min_truth_clearance_m": 0.8411642180792851,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.711352657004831,
+    "disagreements": 589,
+    "interventions": {
+     "none": 827,
+     "yaw_to_l4": 1
+    },
+    "invoked": 828
+   },
+   "rtf_mean": 0.9968552211419371,
+   "rtf_min_at_sim_s": 3.9,
+   "rtf_min_interval": 0.0027,
+   "run": "20261121T152249Z-p7-p5-p7p-5000006-204c98c2",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 42.572,
+   "validity": "valid",
+   "wall_duration_s": 168.9368001260009
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.039,
+    "gazebo": 0.87,
+    "p4-perception": 0.422,
+    "px4": 0.286,
+    "ros-controller": 0.419,
+    "sensor-adapter": 0.644,
+    "sensor-bridge": 0.101
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000006",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 2.89111328125,
+   "min_truth_clearance_m": 0.7658402108972988,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9976834013036481,
+   "rtf_min_at_sim_s": 3.88,
+   "rtf_min_interval": 0.0158,
+   "run": "20261121T152601Z-p7-p4-p7p-5000006-cf8f4e84",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.86,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 43.49199999999999,
+   "validity": "valid",
+   "wall_duration_s": 169.91449739000382
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.878,
+    "p4-perception": 0.406,
+    "px4": 0.291,
+    "ros-controller": 0.414,
+    "sensor-adapter": 0.638,
+    "sensor-bridge": 0.1
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 5.76025390625,
+   "min_truth_clearance_m": 0.8308873437606605,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9975146776832707,
+   "rtf_min_at_sim_s": 3.56,
+   "rtf_min_interval": 0.0148,
+   "run": "20261121T152909Z-p7-p4-p7p-5000010-c7219ab7",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.147999999999996,
+   "validity": "valid",
+   "wall_duration_s": 167.83804288999818
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.86,
+    "p4-perception": 0.403,
+    "px4": 0.282,
+    "ros-controller": 0.403,
+    "sensor-adapter": 0.631,
+    "sensor-bridge": 0.099
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 4.02978515625,
+   "min_truth_clearance_m": 0.8183397684144014,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.5767790262172284,
+    "disagreements": 462,
+    "interventions": {
+     "none": 801
+    },
+    "invoked": 801
+   },
+   "rtf_mean": 0.9979236778481249,
+   "rtf_min_at_sim_s": 3.556,
+   "rtf_min_interval": 0.0229,
+   "run": "20261121T153216Z-p7-p5-p7p-5000010-81addb13",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.2,
+   "validity": "valid",
+   "wall_duration_s": 167.11445740899944
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.044,
+    "gazebo": 0.914,
+    "p4-perception": 0.43,
+    "px4": 0.306,
+    "ros-controller": 0.446,
+    "sensor-adapter": 0.756,
+    "sensor-bridge": 0.101
+   },
+   "hover_time_sim_s": 20.02799999999999,
+   "item": "p7p-5000005",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 6.72802734375,
+   "min_truth_clearance_m": 0.8989083228387578,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.281767955801105,
+    "disagreements": 204,
+    "interventions": {
+     "none": 354,
+     "yaw_to_l4": 370
+    },
+    "invoked": 724
+   },
+   "rtf_mean": 0.9972291154743548,
+   "rtf_min_at_sim_s": 3.5,
+   "rtf_min_interval": 0.0173,
+   "run": "20261121T153525Z-p7-p5-p7p-5000005-90049070",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 176.8386493739963
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.901,
+    "p4-perception": 0.413,
+    "px4": 0.289,
+    "ros-controller": 0.407,
+    "sensor-adapter": 0.689,
+    "sensor-bridge": 0.099
+   },
+   "hover_time_sim_s": 20.000000000000014,
+   "item": "p7p-5000005",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL",
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 4.642578125,
+   "min_truth_clearance_m": 0.8235846347963496,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.99810334482432,
+   "rtf_min_at_sim_s": 3.792,
+   "rtf_min_interval": 0.0395,
+   "run": "20261121T153844Z-p7-p4-p7p-5000005-ad8bf816",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.8,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 185.68919479599572
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.038,
+    "gazebo": 0.904,
+    "p4-perception": 0.419,
+    "px4": 0.302,
+    "ros-controller": 0.428,
+    "sensor-adapter": 0.7,
+    "sensor-bridge": 0.102
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000004",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 3.95947265625,
+   "min_truth_clearance_m": 1.1165092671660652,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6444444444444445,
+    "disagreements": 522,
+    "interventions": {
+     "none": 810
+    },
+    "invoked": 810
+   },
+   "rtf_mean": 0.9974469459794922,
+   "rtf_min_at_sim_s": 3.84,
+   "rtf_min_interval": 0.0053,
+   "run": "20261121T154216Z-p7-p5-p7p-5000004-ab27b1b0",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.712,
+   "validity": "valid",
+   "wall_duration_s": 172.30269078999845
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.034,
+    "gazebo": 0.878,
+    "p4-perception": 0.411,
+    "px4": 0.286,
+    "ros-controller": 0.407,
+    "sensor-adapter": 0.672,
+    "sensor-bridge": 0.101
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000004",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 2.9853515625,
+   "min_truth_clearance_m": 1.136768165140879,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9978100210114511,
+   "rtf_min_at_sim_s": 3.544,
+   "rtf_min_interval": 0.0423,
+   "run": "20261121T154530Z-p7-p4-p7p-5000004-c4b7f268",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 41.5,
+   "validity": "valid",
+   "wall_duration_s": 168.91444255299575
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.894,
+    "p4-perception": 0.415,
+    "px4": 0.292,
+    "ros-controller": 0.422,
+    "sensor-adapter": 0.645,
+    "sensor-bridge": 0.103
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000006",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 4.8701171875,
+   "min_truth_clearance_m": 0.8230860730202256,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9974492053887387,
+   "rtf_min_at_sim_s": 3.584,
+   "rtf_min_interval": 0.0382,
+   "run": "20261121T154842Z-p7-p4-p7p-5000006-23f63f0e",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.8,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 43.587999999999994,
+   "validity": "valid",
+   "wall_duration_s": 173.15945413900045
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.035,
+    "gazebo": 0.868,
+    "p4-perception": 0.4,
+    "px4": 0.279,
+    "ros-controller": 0.399,
+    "sensor-adapter": 0.617,
+    "sensor-bridge": 0.06
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000006",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "RESUME",
+    "NORMAL"
+   ],
+   "load1_max": 3.37939453125,
+   "min_truth_clearance_m": 0.8335479060216024,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6968599033816425,
+    "disagreements": 577,
+    "interventions": {
+     "none": 827,
+     "yaw_to_l4": 1
+    },
+    "invoked": 828
+   },
+   "rtf_mean": 0.9975530206075603,
+   "rtf_min_at_sim_s": 3.556,
+   "rtf_min_interval": 0.0191,
+   "run": "20261121T155152Z-p7-p5-p7p-5000006-9c92e761",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.89,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": 42.647999999999996,
+   "validity": "valid",
+   "wall_duration_s": 168.12214030200266
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.038,
+    "gazebo": 0.939,
+    "p4-perception": 0.443,
+    "px4": 0.307,
+    "ros-controller": 0.441,
+    "sensor-adapter": 0.698,
+    "sensor-bridge": 0.106
+   },
+   "hover_time_sim_s": 20.048000000000002,
+   "item": "p7p-5000002",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 7.28662109375,
+   "min_truth_clearance_m": 0.8638688531210397,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.5316455696202531,
+    "disagreements": 84,
+    "interventions": {
+     "none": 158
+    },
+    "invoked": 158
+   },
+   "rtf_mean": 0.9972804570138069,
+   "rtf_min_at_sim_s": 3.588,
+   "rtf_min_interval": 0.0162,
+   "run": "20261121T155506Z-p7-p5-p7p-5000002-5e7ab6ab",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.8,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 151.21144779199676
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.034,
+    "gazebo": 0.816,
+    "p4-perception": 0.375,
+    "px4": 0.267,
+    "ros-controller": 0.361,
+    "sensor-adapter": 0.609,
+    "sensor-bridge": 0.094
+   },
+   "hover_time_sim_s": 20.052000000000007,
+   "item": "p7p-5000002",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 5.798828125,
+   "min_truth_clearance_m": 0.9895781210554319,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9976244433749446,
+   "rtf_min_at_sim_s": 3.864,
+   "rtf_min_interval": 0.0209,
+   "run": "20261121T155751Z-p7-p4-p7p-5000002-20e31541",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.69,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 144.85142101499514
+  },
+  {
+   "abort_reason": null,
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.036,
+    "gazebo": 0.806,
+    "p4-perception": 0.378,
+    "px4": 0.273,
+    "ros-controller": 0.39,
+    "sensor-adapter": 0.593,
+    "sensor-bridge": 0.096
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000012",
+   "lineage": [],
+   "load1_max": 3.86669921875,
+   "min_truth_clearance_m": 0.6153436893017232,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9980013856469044,
+   "rtf_min_at_sim_s": 3.596,
+   "rtf_min_interval": 0.047,
+   "run": "20261121T160033Z-p7-p4-p7p-5000012-5ceed96c",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.2,
+   "validity": "valid",
+   "wall_duration_s": 165.1511887719971
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.032,
+    "gazebo": 0.793,
+    "p4-perception": 0.371,
+    "px4": 0.261,
+    "ros-controller": 0.369,
+    "sensor-adapter": 0.582,
+    "sensor-bridge": 0.091
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000012",
+   "lineage": [],
+   "load1_max": 3.1357421875,
+   "min_truth_clearance_m": 0.6374372954409309,
+   "outcome": "goal_success",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.6604244694132334,
+    "disagreements": 529,
+    "interventions": {
+     "none": 801
+    },
+    "invoked": 801
+   },
+   "rtf_mean": 0.9978307910364435,
+   "rtf_min_at_sim_s": 3.78,
+   "rtf_min_interval": 0.037,
+   "run": "20261121T160337Z-p7-p5-p7p-5000012-b35b8b0c",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.8,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": 41.14399999999999,
+   "validity": "valid",
+   "wall_duration_s": 166.07592588999978
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p4",
+   "cpu_fraction": {
+    "dds-agent": 0.033,
+    "gazebo": 0.815,
+    "p4-perception": 0.373,
+    "px4": 0.265,
+    "ros-controller": 0.366,
+    "sensor-adapter": 0.607,
+    "sensor-bridge": 0.093
+   },
+   "hover_time_sim_s": 20.000000000000014,
+   "item": "p7p-5000008",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 6.875,
+   "min_truth_clearance_m": 0.46997153215347576,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": null,
+   "rtf_mean": 0.9979776021392669,
+   "rtf_min_at_sim_s": 3.58,
+   "rtf_min_interval": 0.0422,
+   "run": "20261121T160642Z-p7-p4-p7p-5000008-d4ce54fa",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.9,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 183.09100373000547
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.845,
+    "p4-perception": 0.396,
+    "px4": 0.285,
+    "ros-controller": 0.401,
+    "sensor-adapter": 0.631,
+    "sensor-bridge": 0.095
+   },
+   "hover_time_sim_s": 20.016000000000005,
+   "item": "p7p-5000008",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING",
+    "HOVER",
+    "ABORT"
+   ],
+   "load1_max": 10.62548828125,
+   "min_truth_clearance_m": 0.31517739698815017,
+   "outcome": "failure",
+   "p2_failure": null,
+   "policy": {
+    "disagreement_rate": 0.8492822966507177,
+    "disagreements": 710,
+    "interventions": {
+     "none": 836
+    },
+    "invoked": 836
+   },
+   "rtf_mean": 0.997711759350858,
+   "rtf_min_at_sim_s": 3.556,
+   "rtf_min_interval": 0.0209,
+   "run": "20261121T161004Z-p7-p5-p7p-5000008-7a4ca9e3",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 1.79,
+   "stalls_below_0_5": 2,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 181.13944547199935
+  }
+ ],
+ "gap_events": [
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.032,
+    "gazebo": 0.806,
+    "p4-perception": 0.343,
+    "px4": 0.256,
+    "ros-controller": 0.351,
+    "sensor-adapter": 0.593,
+    "sensor-bridge": 0.097
+   },
+   "gap": {
+    "abort_monotonic_s": 40685.879614177,
+    "abort_sim_s": 79.008,
+    "clock_steps_within_3_sim_s": [
+     {
+      "rtf": 0.202,
+      "sim_s": 78.628,
+      "wall_s": 0.357
+     },
+     {
+      "rtf": 0.899,
+      "sim_s": 80.208,
+      "wall_s": 0.102
+     }
+    ],
+    "resources_around": {
+     "cpu_fraction": {
+      "dds-agent": 0.036,
+      "gazebo": 0.827,
+      "p4-perception": 0.332,
+      "px4": 0.286,
+      "ros-controller": 0.368,
+      "sensor-adapter": 0.703,
+      "sensor-bridge": 0.1
+     },
+     "load1": [
+      2.99,
+      2.91,
+      2.91,
+      2.91,
+      2.91,
+      2.91
+     ],
+     "mem_available_gb_min": 6.91,
+     "window_s": 5.01
+    }
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000016",
+   "lineage": [
+    "OBSTACLE_DETECTED",
+    "AVOIDING"
+   ],
+   "load1_max": 4.6142578125,
+   "min_truth_clearance_m": null,
+   "outcome": "failure",
+   "p2_failure": "observation_gap",
+   "policy": null,
+   "rtf_mean": 0.996691794949339,
+   "rtf_min_at_sim_s": 3.844,
+   "rtf_min_interval": 0.0132,
+   "run": "20261121T134526Z-p7-p5-p7p-5000016-0706459a",
+   "set": "pilot attempt 1",
+   "stall_wall_s_total": 2.05,
+   "stalls_below_0_5": 3,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 115.67247516899806
+  },
+  {
+   "abort_reason": null,
+   "controller": "p5",
+   "cpu_fraction": {
+    "dds-agent": 0.037,
+    "gazebo": 0.902,
+    "p4-perception": 0.417,
+    "px4": 0.29,
+    "ros-controller": 0.42,
+    "sensor-adapter": 0.646,
+    "sensor-bridge": 0.103
+   },
+   "gap": {
+    "abort_monotonic_s": 41937.449907989,
+    "abort_sim_s": 103.208,
+    "clock_steps_within_3_sim_s": [
+     {
+      "rtf": 0.233,
+      "sim_s": 102.876,
+      "wall_s": 0.309
+     }
+    ],
+    "resources_around": {
+     "cpu_fraction": {
+      "dds-agent": 0.036,
+      "gazebo": 0.821,
+      "p4-perception": 0.37,
+      "px4": 0.284,
+      "ros-controller": 0.386,
+      "sensor-adapter": 0.595,
+      "sensor-bridge": 0.094
+     },
+     "load1": [
+      2.88,
+      2.88,
+      2.88,
+      2.88,
+      2.88,
+      2.73
+     ],
+     "mem_available_gb_min": 7.07,
+     "window_s": 5.01
+    }
+   },
+   "hover_time_sim_s": 0.0,
+   "item": "p7p-5000010",
+   "lineage": [],
+   "load1_max": 3.1259765625,
+   "min_truth_clearance_m": 0.8224773753079726,
+   "outcome": "failure",
+   "p2_failure": "observation_gap",
+   "policy": {
+    "disagreement_rate": 0.6323268206039077,
+    "disagreements": 356,
+    "interventions": {
+     "none": 563
+    },
+    "invoked": 563
+   },
+   "rtf_mean": 0.9969287460939564,
+   "rtf_min_at_sim_s": 3.536,
+   "rtf_min_interval": 0.0417,
+   "run": "20261121T140556Z-p7-p5-p7p-5000010-692a5544",
+   "set": "pilot attempt 2",
+   "stall_wall_s_total": 2.2,
+   "stalls_below_0_5": 4,
+   "time_to_goal_sim_s": null,
+   "validity": "valid",
+   "wall_duration_s": 140.1979088270018
+  }
+ ],
+ "p4_vs_p5": {
+  "p4": {
+   "controller_cpu_fraction": {
+    "max": 0.461,
+    "median": 0.4065,
+    "min": 0.361,
+    "n": 24
+   },
+   "flights": 24,
+   "flights_with_a_stall": 24,
+   "gazebo_cpu_fraction": {
+    "max": 0.967,
+    "median": 0.87,
+    "min": 0.806,
+    "n": 24
+   },
+   "observation_gap_aborts": 0,
+   "rtf_mean": {
+    "max": 0.99810334482432,
+    "median": 0.9975629392025099,
+    "min": 0.9952857773073499,
+    "n": 24
+   },
+   "rtf_min_interval": {
+    "max": 0.047,
+    "median": 0.0351,
+    "min": 0.0027,
+    "n": 24
+   },
+   "stalls_below_0_5": {
+    "max": 3,
+    "median": 3.0,
+    "min": 2,
+    "n": 24
+   }
+  },
+  "p5": {
+   "controller_cpu_fraction": {
+    "max": 0.491,
+    "median": 0.4205,
+    "min": 0.351,
+    "n": 24
+   },
+   "flights": 24,
+   "flights_with_a_stall": 24,
+   "gazebo_cpu_fraction": {
+    "max": 0.961,
+    "median": 0.89,
+    "min": 0.793,
+    "n": 24
+   },
+   "observation_gap_aborts": 2,
+   "rtf_mean": {
+    "max": 0.9979236778481249,
+    "median": 0.9974493813441767,
+    "min": 0.9955727307887555,
+    "n": 24
+   },
+   "rtf_min_interval": {
+    "max": 0.0484,
+    "median": 0.02185,
+    "min": 0.0027,
+    "n": 24
+   },
+   "stalls_below_0_5": {
+    "max": 4,
+    "median": 3.0,
+    "min": 2,
+    "n": 24
+   }
+  }
+ },
+ "read_only": true,
+ "repeat_inconsistencies_pilot2": [
+  {
+   "controller": "p5",
+   "layout": "p7p-5000002",
+   "repeats": [
+    {
+     "abort_reason": null,
+     "hover_time_sim_s": 0.0,
+     "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "RESUME",
+      "NORMAL"
+     ],
+     "min_truth_clearance_m": 0.4915188466634729,
+     "outcome": "goal_success",
+     "p2_failure": null,
+     "policy": {
+      "disagreement_rate": 0.47512437810945274,
+      "disagreements": 382,
+      "interventions": {
+       "none": 804
+      },
+      "invoked": 804
+     },
+     "rtf_min_interval": 0.0405,
+     "run": "20261121T151258Z-p7-p5-p7p-5000002-c2a77f3e",
+     "stalls_below_0_5": 3,
+     "time_to_goal_sim_s": 41.416
+    },
+    {
+     "abort_reason": "hover_timeout",
+     "hover_time_sim_s": 20.048000000000002,
+     "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+     ],
+     "min_truth_clearance_m": 0.8638688531210397,
+     "outcome": "failure",
+     "p2_failure": null,
+     "policy": {
+      "disagreement_rate": 0.5316455696202531,
+      "disagreements": 84,
+      "interventions": {
+       "none": 158
+      },
+      "invoked": 158
+     },
+     "rtf_min_interval": 0.0162,
+     "run": "20261121T155506Z-p7-p5-p7p-5000002-5e7ab6ab",
+     "stalls_below_0_5": 2,
+     "time_to_goal_sim_s": null
+    }
+   ]
+  },
+  {
+   "controller": "p5",
+   "layout": "p7p-5000008",
+   "repeats": [
+    {
+     "abort_reason": null,
+     "hover_time_sim_s": 0.0,
+     "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "RESUME",
+      "NORMAL"
+     ],
+     "min_truth_clearance_m": 0.4054950476947753,
+     "outcome": "goal_success",
+     "p2_failure": null,
+     "policy": {
+      "disagreement_rate": 0.8641114982578397,
+      "disagreements": 744,
+      "interventions": {
+       "none": 861
+      },
+      "invoked": 861
+     },
+     "rtf_min_interval": 0.0215,
+     "run": "20261121T143118Z-p7-p5-p7p-5000008-ec83f859",
+     "stalls_below_0_5": 3,
+     "time_to_goal_sim_s": 44.10000000000001
+    },
+    {
+     "abort_reason": "hover_timeout",
+     "hover_time_sim_s": 20.016000000000005,
+     "lineage": [
+      "OBSTACLE_DETECTED",
+      "AVOIDING",
+      "HOVER",
+      "ABORT"
+     ],
+     "min_truth_clearance_m": 0.31517739698815017,
+     "outcome": "failure",
+     "p2_failure": null,
+     "policy": {
+      "disagreement_rate": 0.8492822966507177,
+      "disagreements": 710,
+      "interventions": {
+       "none": 836
+      },
+      "invoked": 836
+     },
+     "rtf_min_interval": 0.0209,
+     "run": "20261121T161004Z-p7-p5-p7p-5000008-7a4ca9e3",
+     "stalls_below_0_5": 2,
+     "time_to_goal_sim_s": null
+    }
+   ]
+  },
+  {
+   "controller": "p5",
+   "layout": "p7p-5000010",
+   "repeats": [
+    {
+     "abort_reason": null,
+     "hover_time_sim_s": 0.0,
+     "lineage": [],
+     "min_truth_clearance_m": 0.8224773753079726,
+     "outcome": "failure",
+     "p2_failure": "observation_gap",
+     "policy": {
+      "disagreement_rate": 0.6323268206039077,
+      "disagreements": 356,
+      "interventions": {
+       "none": 563
+      },
+      "invoked": 563
+     },
+     "rtf_min_interval": 0.0417,
+     "run": "20261121T140556Z-p7-p5-p7p-5000010-692a5544",
+     "stalls_below_0_5": 4,
+     "time_to_goal_sim_s": null
+    },
+    {
+     "abort_reason": null,
+     "hover_time_sim_s": 0.0,
+     "lineage": [],
+     "min_truth_clearance_m": 0.8183397684144014,
+     "outcome": "goal_success",
+     "p2_failure": null,
+     "policy": {
+      "disagreement_rate": 0.5767790262172284,
+      "disagreements": 462,
+      "interventions": {
+       "none": 801
+      },
+      "invoked": 801
+     },
+     "rtf_min_interval": 0.0229,
+     "run": "20261121T153216Z-p7-p5-p7p-5000010-81addb13",
+     "stalls_below_0_5": 3,
+     "time_to_goal_sim_s": 41.2
+    }
+   ]
+  }
+ ],
+ "stall_rtf": 0.5
+}
