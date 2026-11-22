@@ -1,6 +1,10 @@
-# v3-SIM P7 contract revision `p7-engineering-validation-v1` — FINAL TEXT for operator approval
+# v3-SIM P7 contract revision `p7-engineering-validation-v1` — APPROVED
 
-**Status: FINAL TEXT, presented for separate approval (2026-11-22). Not in force until the operator approves it.**
+**Status: APPROVED by the operator (2026-11-22, "Approve contract"). In force for the P7-E stage.**
+* It governs the next P7 stage, P7-E. P7-A (`p7-evaluation-v1`) is suspended, not cancelled.
+* **This approval authorizes nothing to run, freeze or delete.** Each step of §13 (2–10) still needs its own
+  explicit authorization.
+* The retention policy (§13, step 2) is approved separately.
 
 **The basis:**
 * The operator approved the P7-E direction and the recommended E1–E11 design **in principle** (2026-11-22), subject
