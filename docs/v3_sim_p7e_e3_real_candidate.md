@@ -1,8 +1,20 @@
 # v3-SIM P7-E E3 — the real P7-E candidate: production Policy A and the real freeze
 
-**Status: PREPARED (2026-11-22), awaiting two separate operator approvals. Nothing has been written to `state/` or
-frozen.**
-* **Authorized so far:** preparation only ("Prepare them").
+**Status: DONE (2026-11-22). The real P7-E candidate is frozen:
+`38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be`.** Nothing has been flown on it.
+* **Authorized:** preparation ("Prepare them"), then two separate answers:
+  * item 1, production Policy A: "Approve (Recommended)";
+  * item 2, the real freeze: "Freeze it (Recommended)".
+* **Records:**
+
+  | Item | File | SHA-256 |
+  |---|---|---|
+  | Production Policy A | `state/p7e-policy-A-approval-2b6ee5d.json` (`development_only: false`) | `26595bba…` |
+  | Real candidate | `state/p7e-candidate-2b6ee5d.json`, frozen at git HEAD `d969f48`; it verified from `/tmp` | file `a44ef63a…`; manifest `38e23bad…` |
+
+* **What the candidate is:** development false, engineering credit possible, scope `engineering-30` with 3 blocks.
+  It binds P7 `0799c37e…`, the 16 files and the four specs.
+* **From now on, no bound file may change until E5.**
 * **Under:** contract [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) §13 items 6 and 7.
 * **What it leads to.** Once frozen, the real candidate is the only one that can fly the 3 blocks of scope
   `engineering-30`. Each block still needs its own authorization (§13 item 8). Freezing flies nothing.

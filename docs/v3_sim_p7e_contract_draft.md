@@ -233,8 +233,10 @@ As `p7-evaluation-v1` §8.
    **Done on 2026-11-22:** authorized ("Authorize E2") and accepted ("Accept E2"); code commit `2b6ee5d`.
 5. The **development dry run** of the new launch path (2 flights, S2), with its own dry-run approval. **Done on
    2026-11-22:** development candidate `2cc7a579…`; exit criterion met; accepted ("Accept E8").
-6. The **production Policy A approval** for the P7-E candidate.
-7. The **real freeze** of the P7-E candidate.
+6. The **production Policy A approval** for the P7-E candidate. **Done on 2026-11-22:**
+   `state/p7e-policy-A-approval-2b6ee5d.json` ("Approve (Recommended)").
+7. The **real freeze** of the P7-E candidate. **Done on 2026-11-22:** `state/p7e-candidate-2b6ee5d.json`, manifest
+   `38e23bad…` ("Freeze it (Recommended)").
 8. **Block 1**, **block 2** and **block 3**, each with its own authorization.
 9. **E5**: the engineering report and its acceptance.
 10. Any future cleanup procedure, tested and then approved, and each execution of it.

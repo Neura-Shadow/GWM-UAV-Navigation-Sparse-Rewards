@@ -20,8 +20,10 @@
   * Development candidate `2cc7a579…`; S2 flown with P4 and with P5 through the P7-E path.
   * Both passed the unchanged evaluators as valid goal successes, with parity to M4. No credit.
   * **ACCEPTED by the operator on 2026-11-22 ("Accept E8"), so E8 is COMPLETE.**
-* **Next, each needing its own explicit authorization:** the production Policy A approval for the real P7-E
-  candidate, the real freeze, blocks 1–3 (each separately) and E5.
+* **The real P7-E candidate was FROZEN on 2026-11-22** ([E3 report](v3_sim_p7e_e3_real_candidate.md)): production
+  Policy A `26595bba…` ("Approve"), then the freeze ("Freeze it"). Manifest `38e23bad…`
+  (`state/p7e-candidate-2b6ee5d.json`). No bound file may change until E5.
+* **Next, each needing its own explicit authorization:** block 1, then block 2, then block 3, then E5.
 * Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
