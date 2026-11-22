@@ -1,0 +1,509 @@
+{
+  "block_pairs": 10,
+  "blocks": 3,
+  "contract": "p7e-schedule-v1",
+  "controllers": {
+    "p4": "accepted P4 stack, manifest c110bd30",
+    "p5": "accepted P5 stack, manifest 2becfbbb"
+  },
+  "flights": 60,
+  "governed_by": "p7-engineering-validation-v1 \u00a73",
+  "layouts_canonical_sha256": "d742b7af47c6339fb6d8478870d0cf767b6f09cf41d0ef23d6661bc0b1d2258d",
+  "non_contamination": {
+    "limitation": "a future P7-A expansion beyond 200 pairs in pool order would include these 30 layouts; it must exclude them by a pre-fixed rule or state they are no longer unseen (contract \u00a73.2)",
+    "overlap_with_p7a_200_pair_schedule": 0,
+    "overlap_with_unselected_250_pair_alternative": 30,
+    "p7a_schedule_canonical_sha256": "ef74c71d4242409793c6de759454a498481564c75a3dd13e3402294277ba7c88"
+  },
+  "pair_rule": "the two flights of a pair run back to back in the listed order",
+  "pairs": 30,
+  "pool": "confirmatory",
+  "pool_indices": [
+    200,
+    229
+  ],
+  "rng": "the frozen P7 stream: draw(label, i) = int(SHA-256('<layouts_canonical_sha256>:<label>:<i>')), big-endian; Fisher-Yates from the end; labels 'p7e-30-order' and 'p7e-30-block-0-first'",
+  "schema_version": 1,
+  "slots": [
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "pillars",
+      "first": "p4",
+      "layout": "p7c-4000351",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 1,
+      "pool_index": 201,
+      "seed": 4000351,
+      "slot": 1,
+      "world_sha256": "b957807fd5f2507d018308ee093de547ddf87f51c6882bb42f4e2fa3e81f89bd"
+    },
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p4",
+      "layout": "p7c-4000367",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 2,
+      "pool_index": 214,
+      "seed": 4000367,
+      "slot": 2,
+      "world_sha256": "9973dfa989fcd3c1c8ef652f962dbacb1a08b40cfd81443788c2d390d22639ed"
+    },
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000355",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 3,
+      "pool_index": 204,
+      "seed": 4000355,
+      "slot": 3,
+      "world_sha256": "b957f29f2a502c923a4742a7cc2aff2593818ce909d264a7c5be473e41d4babf"
+    },
+    {
+      "block": 1,
+      "boxes": 1,
+      "family": "partial_wall",
+      "first": "p5",
+      "layout": "p7c-4000398",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 4,
+      "pool_index": 229,
+      "seed": 4000398,
+      "slot": 4,
+      "world_sha256": "f521d61a99a86cc94a334b16081de757edcaca7bf67d2b15b3156bd6fee40abf"
+    },
+    {
+      "block": 1,
+      "boxes": 1,
+      "family": "pillars",
+      "first": "p5",
+      "layout": "p7c-4000394",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 5,
+      "pool_index": 227,
+      "seed": 4000394,
+      "slot": 5,
+      "world_sha256": "f85c8d94e1d881bbea4163908009d06704a93aafbd8121ff0d501dccdeee1d21"
+    },
+    {
+      "block": 1,
+      "boxes": 3,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000396",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 6,
+      "pool_index": 228,
+      "seed": 4000396,
+      "slot": 6,
+      "world_sha256": "cf824528ab724d6f49e1ded1631866a789c8477bb53bef97b0789896d113e125"
+    },
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000381",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 7,
+      "pool_index": 222,
+      "seed": 4000381,
+      "slot": 7,
+      "world_sha256": "68f735de16c4ddac01f976f21f564037c8e8a0056f1bf4b2869abfc1d6d683c6"
+    },
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000373",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 8,
+      "pool_index": 216,
+      "seed": 4000373,
+      "slot": 8,
+      "world_sha256": "75d3b5e0050072def23bf27a2e44d8d64608c1295481fe72454fada962e9d593"
+    },
+    {
+      "block": 1,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000377",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 9,
+      "pool_index": 219,
+      "seed": 4000377,
+      "slot": 9,
+      "world_sha256": "a76c243b9ce2d42bd8226aa5ddcc0cb9cf551a68ae9500d8d494fd98c190e7cc"
+    },
+    {
+      "block": 1,
+      "boxes": 3,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000349",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 10,
+      "pool_index": 200,
+      "seed": 4000349,
+      "slot": 10,
+      "world_sha256": "bfcd9e5ab687306e750157310a42af57772ea3f89966aa36732c0b8ef6664fc6"
+    },
+    {
+      "block": 2,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000357",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 1,
+      "pool_index": 206,
+      "seed": 4000357,
+      "slot": 11,
+      "world_sha256": "42b41caa05fafb83acad95709f3cbd23c11e2530981ebca4adfd42c7482e64af"
+    },
+    {
+      "block": 2,
+      "boxes": 2,
+      "family": "mixed",
+      "first": "p5",
+      "layout": "p7c-4000375",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 2,
+      "pool_index": 218,
+      "seed": 4000375,
+      "slot": 12,
+      "world_sha256": "34f4a15adafebf9e52f91ce1461da128415be1e1e735050ec700f096f13a2224"
+    },
+    {
+      "block": 2,
+      "boxes": 1,
+      "family": "pillars",
+      "first": "p5",
+      "layout": "p7c-4000374",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 3,
+      "pool_index": 217,
+      "seed": 4000374,
+      "slot": 13,
+      "world_sha256": "afb091efa70c656aa59be829df17520872e997bd238f162ac75e2eed742cf8e7"
+    },
+    {
+      "block": 2,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p4",
+      "layout": "p7c-4000379",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 4,
+      "pool_index": 221,
+      "seed": 4000379,
+      "slot": 14,
+      "world_sha256": "9f6342a47ad1e9eb7874c698b8a1b427202f52e976822a62db61d5786b643329"
+    },
+    {
+      "block": 2,
+      "boxes": 3,
+      "family": "pillars",
+      "first": "p4",
+      "layout": "p7c-4000385",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 5,
+      "pool_index": 224,
+      "seed": 4000385,
+      "slot": 15,
+      "world_sha256": "ea276895bc309b14d946dd7a0f661ccaa272c3078c7481358e03068e278b1434"
+    },
+    {
+      "block": 2,
+      "boxes": 3,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000363",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 6,
+      "pool_index": 210,
+      "seed": 4000363,
+      "slot": 16,
+      "world_sha256": "7abd7812b838388375f2128ff15f9a526ad140a4fa105dde50917f38e24cd65d"
+    },
+    {
+      "block": 2,
+      "boxes": 2,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000359",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 7,
+      "pool_index": 208,
+      "seed": 4000359,
+      "slot": 17,
+      "world_sha256": "45cb6ba07c8ed1e342922985c58766f32ffae63ceb70ecc4816c923c290c4bb8"
+    },
+    {
+      "block": 2,
+      "boxes": 1,
+      "family": "partial_wall",
+      "first": "p4",
+      "layout": "p7c-4000360",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 8,
+      "pool_index": 209,
+      "seed": 4000360,
+      "slot": 18,
+      "world_sha256": "c18fb59630f4f8b0cd6d50ff4a5680636af40383fb96f0a6418403eeb4b75b9a"
+    },
+    {
+      "block": 2,
+      "boxes": 3,
+      "family": "mixed",
+      "first": "p5",
+      "layout": "p7c-4000382",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 9,
+      "pool_index": 223,
+      "seed": 4000382,
+      "slot": 19,
+      "world_sha256": "a6702056bbcd83d807019c54c4b2e739bde685c20d563581081856e06d2fe449"
+    },
+    {
+      "block": 2,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000354",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 10,
+      "pool_index": 203,
+      "seed": 4000354,
+      "slot": 20,
+      "world_sha256": "15cdfa6c667e656adcfe7c47b5f20add3c78f6d8ead79fcb85f85fe02749f918"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "pillars",
+      "first": "p5",
+      "layout": "p7c-4000364",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 1,
+      "pool_index": 211,
+      "seed": 4000364,
+      "slot": 21,
+      "world_sha256": "8a4ede6159e933f238e53135ab0cca1dc3c0b98ef4a3b661f9d5d2b439328b8a"
+    },
+    {
+      "block": 3,
+      "boxes": 1,
+      "family": "partial_wall",
+      "first": "p5",
+      "layout": "p7c-4000388",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 2,
+      "pool_index": 225,
+      "seed": 4000388,
+      "slot": 22,
+      "world_sha256": "ef6dee27336ca3e7193083e4223a1f92328b6c631827aed7eb1415aa48965304"
+    },
+    {
+      "block": 3,
+      "boxes": 3,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000366",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 3,
+      "pool_index": 213,
+      "seed": 4000366,
+      "slot": 23,
+      "world_sha256": "0ea64cd34341e862b40aa88037a73f497455bd357e0fd962dfb9ce1c3aa54d1f"
+    },
+    {
+      "block": 3,
+      "boxes": 1,
+      "family": "pillars",
+      "first": "p5",
+      "layout": "p7c-4000368",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 4,
+      "pool_index": 215,
+      "seed": 4000368,
+      "slot": 24,
+      "world_sha256": "6a5e1ca55a106cb27e49a99468b3314a7fb9e739e072f8781c7d3fc97940ce33"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "mixed",
+      "first": "p4",
+      "layout": "p7c-4000378",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 5,
+      "pool_index": 220,
+      "seed": 4000378,
+      "slot": 25,
+      "world_sha256": "bcb08a5b9aaa493809ccb24a49e335be1e91253b819be2501733eacae627d9be"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p5",
+      "layout": "p7c-4000356",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 6,
+      "pool_index": 205,
+      "seed": 4000356,
+      "slot": 26,
+      "world_sha256": "87e26a73c79b3cbf838701171a4bedcd18be01c620dbbae5cafb018e15845517"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "pillars",
+      "first": "p4",
+      "layout": "p7c-4000352",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 7,
+      "pool_index": 202,
+      "seed": 4000352,
+      "slot": 27,
+      "world_sha256": "dbf9a550bcb424888164b97e7be6be3945a7aa6aae5ac6335fb42cf7b202c43d"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "wall_with_gap",
+      "first": "p4",
+      "layout": "p7c-4000358",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 8,
+      "pool_index": 207,
+      "seed": 4000358,
+      "slot": 28,
+      "world_sha256": "2dee5bc115c61f60c46197b77a13f0a295ada8bebba69a2899f72de3dde16bba"
+    },
+    {
+      "block": 3,
+      "boxes": 2,
+      "family": "pillars",
+      "first": "p5",
+      "layout": "p7c-4000389",
+      "order": [
+        "p5",
+        "p4"
+      ],
+      "pair_in_block": 9,
+      "pool_index": 226,
+      "seed": 4000389,
+      "slot": 29,
+      "world_sha256": "ee4b1a12b5f723cb10987c00c6dd64abb694e9ee7bb261f95f1f8bae7ce37188"
+    },
+    {
+      "block": 3,
+      "boxes": 1,
+      "family": "pillars",
+      "first": "p4",
+      "layout": "p7c-4000365",
+      "order": [
+        "p4",
+        "p5"
+      ],
+      "pair_in_block": 10,
+      "pool_index": 212,
+      "seed": 4000365,
+      "slot": 30,
+      "world_sha256": "424b1f8663304056182021b0efdcfcfa04ce0945d4ddb3f60fb2061f0c610fb1"
+    }
+  ]
+}
