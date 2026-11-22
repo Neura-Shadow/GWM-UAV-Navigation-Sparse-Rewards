@@ -225,7 +225,8 @@ As `p7-evaluation-v1` §8.
 ## 13. Authorizations required, each separate and explicit
 
 1. Approval of this contract.
-2. Approval of the retention policy D4-A/D4-B. It is separate from any deletion (§11).
+2. Approval of the retention policy D4-A/D4-B. It is separate from any deletion (§11). **Done on 2026-11-22
+   ("Approve retention"):** policy only; no deletion authorized or made.
 3. **E1** specifications: the 30-pair schedule and the report plan, approved by hash. **Done on 2026-11-22
    ("Approve specs"):** schedule `9b3deacb…` and report plan `15e7f7b4…`.
 4. **E2** implementation (offline): the P7-E tree, FC-1 to FC-3 and the tests. Its acceptance is separate.

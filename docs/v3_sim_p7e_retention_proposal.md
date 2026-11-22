@@ -1,7 +1,11 @@
 # v3-SIM P7-E — evidence retention revision (D4-A / D4-B) and read-only cleanup manifest
 
-**Status: PROPOSAL for operator approval (2026-11-22). The policy is approved separately from any deletion, and
-approving it authorizes no deletion (contract §11, clarification 5).**
+**Status: POLICY APPROVED by the operator (2026-11-22, "Approve retention"): D4-A and D4-B (decision E9) and the
+P7-E rule E10 are in force, as written below.**
+* **No deletion is authorized by this approval** (contract §11, clarification 5; §5 below). No file was deleted,
+  moved or compressed, and the 107 ELIGIBLE, 28 REVIEW and 241 PROTECTED runs, and the protected P2 file, all stay.
+* **Any cleanup still needs:** a separately designed, tested and approved procedure (§4), then a separate
+  authorization of each execution, naming the manifest version and the exact file set.
 * **Nothing was deleted, moved or changed.** No cleanup is implemented, and none can run without a separately
   tested and separately approved procedure (§4).
 * **What exists:** the manifest tool [`diagnostics/p7e/p7e_cleanup_manifest.py`](../diagnostics/p7e/p7e_cleanup_manifest.py),

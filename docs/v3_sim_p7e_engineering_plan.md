@@ -13,8 +13,11 @@
     still verifies.
   * **ACCEPTED by the operator on 2026-11-22 ("Accept E2"), with the 8 fail-closed interpretations of its §4, so E2
     is COMPLETE** (code commit `2b6ee5d`).
-* **Next, each needing its own explicit authorization:** the retention-policy approval (separate from any deletion);
-  then the development dry run (E8).
+* **Retention policy D4-A/D4-B APPROVED by the operator on 2026-11-22 ("Approve retention"):**
+  [retention proposal](v3_sim_p7e_retention_proposal.md), decisions E9 and E10. It is a policy only and authorizes no
+  deletion; nothing was deleted.
+* **Next, each needing its own explicit authorization:** the development dry run (E8), then the production Policy A
+  approval, the real freeze, blocks 1–3 and E5.
 * Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
