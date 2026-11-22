@@ -1,9 +1,10 @@
 # v3-SIM P7-E — engineering validation: proposed revision of the P7 next stage
 
-**Status: DECISIONS E1–E11 APPROVED as recommended (operator, 2026-11-22, "Approve as recommended").**
-* P7-E is the next P7 stage. P7-A is suspended, not cancelled.
-* Nothing is implemented yet.
-* **Next, needing its own authorization:** E1 (the specifications).
+**Status: DIRECTION AND E1–E11 APPROVED IN PRINCIPLE (operator, 2026-11-22), subject to clarifications 1–6.**
+* The clarifications are addressed in §12.
+* The **final contract text** ([`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md)) is presented for
+  separate approval.
+* Nothing is implemented, frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
 proposal preparation only).
@@ -17,7 +18,8 @@ proposal preparation only).
 * this plan;
 * the [draft contract revision](v3_sim_p7e_contract_draft.md);
 * the [retention and cleanup proposal](v3_sim_p7e_retention_proposal.md);
-* two read-only tools in `diagnostics/p7e/`, with their outputs in `docs/evidence/v3_sim_p7e_*.json`.
+* two read-only tools in `diagnostics/p7e/`, with their outputs in `docs/evidence/v3_sim_p7e_*.json`. The cleanup
+  manifest is now version 2, reconciled (§12).
 
 ## 1. Where P7 stands, preserved unchanged
 
@@ -209,8 +211,8 @@ covering the 48 P7 flights, read-only.
 
 | ID | Risk | Evidence | Treatment |
 |---|---|---|---|
-| RR1 | **P2 observation-gap RECOVERY** | 2 of 46 pilot flights, both P5. Each followed a brief simulator slowdown just before the abort (RTF ≈ 0.20 for 0.36 s; 0.23 for 0.31 s). Process CPU (Gazebo 0.82, controller 0.37–0.39, perception 0.33–0.37), load (≈ 2.9) and memory (≈ 7 GB free) were normal. Stalls below RTF 0.5 occur in **all** 48 P7 flights, mostly at start-up; median 3 for both controllers; controller CPU 0.41 (P4) vs 0.42 (P5). P4 0/24 vs P5 2/24: Fisher exact p ≈ 0.49. | Safe in both cases (D15). No threshold change. Counted as an outcome (a failure), reported per controller (R3, R9), monitored in P7-E. The slowdown's source (Gazebo or WSL scheduling) is not visible at the 1 s resource resolution; finding it would need new instrumentation, which is not proposed now. |
-| RR2 | **P5 repeat-outcome inconsistency** | 3 of 20 controller repeats disagree, all P5; P4 is 10/10 consistent. Two are behavioural: on `p7p-5000002` and `p7p-5000008` one repeat avoided the obstacle and the other ended in HOVER → `hover_timeout`, with similar clocks. One is RR1 (`p7p-5000010`). | P5's choice at a decision point is sensitive to small timing differences, so a single flight per layout carries run-to-run variance in P5's success. Reported as a limitation of R1/R2. P7-E (one flight per controller per layout) cannot measure it; the pilot's 17/20 is the available estimate. |
+| RR1 (open) | **P2 observation-gap RECOVERY** | 2 of 46 pilot flights, both P5. Each followed a brief simulator slowdown just before the abort (RTF ≈ 0.20 for 0.36 s; 0.23 for 0.31 s). Process CPU (Gazebo 0.82, controller 0.37–0.39, perception 0.33–0.37), load (≈ 2.9) and memory (≈ 7 GB free) were normal. Stalls below RTF 0.5 occur in **all** 48 P7 flights, mostly at start-up; median 3 for both controllers; controller CPU 0.41 (P4) vs 0.42 (P5). P4 0/24 vs P5 2/24: Fisher exact p ≈ 0.49. | Safe in both cases (D15). No threshold change. Counted as an outcome (a failure), reported per controller (R3, R9), monitored in P7-E. The slowdown's source (Gazebo or WSL scheduling) is not visible at the 1 s resource resolution; finding it would need new instrumentation, which is not proposed now. |
+| RR2 (open) | **P5 repeat-outcome inconsistency** | 3 of 20 controller repeats disagree, all P5; P4 is 10/10 consistent. Two are behavioural: on `p7p-5000002` and `p7p-5000008` one repeat avoided the obstacle and the other ended in HOVER → `hover_timeout`, with similar clocks. One is RR1 (`p7p-5000010`). | P5's choice at a decision point is sensitive to small timing differences, so a single flight per layout carries run-to-run variance in P5's success. Reported as a limitation of R1/R2. P7-E (one flight per controller per layout) cannot measure it; the pilot's 17/20 is the available estimate. |
 | RR3 | Hover-timeout prevalence | about half of the pilot pairs ended in `hover_timeout` for both controllers | An outcome, not a safety issue. Expect many "neither" pairs (R2, R9). |
 | RR4 | Disk per flight above the planning value | mean 1.33 GB, max 1.82 GB, against the host check's 1.3 GB | 60 flights need about 80 GB of 776 GB free; no change proposed |
 | RR5 | Line-ending fragility | `core.autocrlf` on, no `.gitattributes`; the P3–P6 manifests hash CRLF working copies | P7 specs use canonical hashes. Do not re-checkout the working tree. A `.gitattributes` decision is left for later. |
@@ -244,7 +246,8 @@ covering the 48 P7 flights, read-only.
 
 ## 11. Decisions requiring operator approval
 
-**All eleven approved as recommended (operator, 2026-11-22).**
+**Approved in principle as recommended (operator, 2026-11-22), subject to clarifications 1–6 (§12).** The final
+contract is approved separately.
 
 | ID | Decision | Recommendation |
 |---|---|---|
@@ -259,3 +262,14 @@ covering the 48 P7 flights, read-only.
 | E9 | retention | D4 revised into A (full evidence while flying and evaluating) and B (long-term retention after evaluation and integrity verification), as in the retention proposal; no cleanup now |
 | E10 | P7-E runs under D4-B | kept complete until the P7-E report is accepted; then their raw depth is eligible for a separately approved cleanup, except safety incidents, unresolved failures and runs named by tests or evidence |
 | E11 | risk register | adopt RR1–RR7 with the stated treatments; no threshold change |
+
+## 12. Clarifications 1–6 (operator, 2026-11-22) and how they are met
+
+| # | Clarification | Resolution |
+|---|---|---|
+| 1 | Reconcile 377 reported runs against 376 classified, and mark nothing eligible until every run is accounted for | `runs/` holds 377 entries: 376 run directories and **one file**, `20260912-p2-r3-historical-timing.json` (64 KB, a P2-era read-only timing reconstruction named by `v3_sim_p2_timing_contract.md`). Version 1 of the manifest read directories only and skipped it silently. **Version 2** accounts for every entry and marks nothing eligible unless the count reconciles. The file is **PROTECTED**. Result: `reconciled: true`, 377 of 377 ([`v3_sim_p7e_cleanup_manifest_v2.json`](evidence/v3_sim_p7e_cleanup_manifest_v2.json), `8e04e6be…`; v1 `e87ec4c5…` is superseded). |
+| 2 | Layouts 200–229 must not contaminate or alter the 200-pair P7-A schedule; document any overlap with a future expansion | Verified: the 200-pair schedule is exactly pool indices 0–199, with **0** overlap. `p7_schedule.json` and `p7_layouts.json` are untouched. **Limitation:** the unselected 250-pair alternative (indices 0–249) includes all 30 layouts, so a future P7-A expansion beyond 200 must exclude them by a pre-fixed rule, or state they are no longer unseen (contract §3.2). |
+| 3 | Distinguish engineering acceptance from evidence that P5 is superior | Contract §7: what a pass states, what must not be stated or implied, a mandatory verbatim statement in the report, and that superiority needs a separately approved confirmatory study |
+| 4 | Keep the observation-gap incidents and the P5 repeat inconsistencies in the risk register | RR1 and RR2 are kept **open** (§8, contract §10). P7-E reports what bears on them, closes neither, and changes no threshold. |
+| 5 | Separate approval of the retention policy from authorization to delete; no P3–P7 evidence may be deleted under this approval | Contract §11 and the retention proposal §2 and §5: approving the policy authorizes no deletion, move or compression. Each deletion needs its own authorization naming the tested procedure, the manifest version and the file set. No P3–P7 evidence, including the 107 eligible P6 development dry runs, may be deleted under the policy approval. |
+| 6 | Every safety event, safety-unverified result and stop condition stays fail-closed | Contract §8. The audit of the reused P7 code found **three fail-open gaps**: FC-1, a sequencer exception recorded as an unstopped block; FC-2, a `pgrep` failure read as "no process"; FC-3, an unknown arm state classed as infrastructure-invalid. P7-E closes each in its own code (E2). The frozen P7 code is untouched, and the same gaps are recorded for any P7-A resumption. |

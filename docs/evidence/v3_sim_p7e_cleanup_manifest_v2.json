@@ -1,5 +1,5 @@
 {
- "contract": "p7e-cleanup-manifest-v1",
+ "contract": "p7e-cleanup-manifest-v2",
  "deletes_nothing": true,
  "estimated_savings_if_approved": {
   "depth_bin_bytes": 39492698518,
@@ -7,7 +7,28 @@
   "total_bytes": 39502320386
  },
  "not_in_scope": "build trees, toolchains and runtime installs (reproducibility not verified); state; the C: backup",
+ "other_entries": [
+  {
+   "bytes": 63971,
+   "classification": "PROTECTED",
+   "dependencies": [
+    "documentation:/mnt/d/GWM-UAV-Navigation-Sparse-Rewards/docs/v3_sim_p2_timing_contract.md"
+   ],
+   "entry": "20260912-p2-r3-historical-timing.json",
+   "reasons": [
+    "a non-run evidence file named by documentation"
+   ],
+   "type": "file"
+  }
+ ],
  "read_only": true,
+ "reconciliation": {
+  "accounted": 377,
+  "entries_in_runs": 377,
+  "other_entries": 1,
+  "reconciled": true,
+  "run_directories": 376
+ },
  "review_depth_bin_bytes": 3109384907,
  "root": "/home/joker0625/uav_autonomy/runs",
  "rows": [

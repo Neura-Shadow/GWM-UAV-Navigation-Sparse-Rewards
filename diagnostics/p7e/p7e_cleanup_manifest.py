@@ -20,6 +20,10 @@ Classes:
 
 Sizes come from `stat`. SHA-256s are the M0 inventory's where it has the file. The output is one JSON file, written
 with exclusive create.
+
+**Reconciliation (version 2).** Every entry of `runs/` is accounted for: run directories are classified as above, and
+any other entry (a file or a link) is PROTECTED when a record names it, otherwise REVIEW, and never ELIGIBLE. If the
+count of accounted entries differs from the directory listing, nothing is marked ELIGIBLE.
 Usage: python3 p7e_cleanup_manifest.py <output.json>
 """
 import json
@@ -52,11 +56,15 @@ def size(path):
 def references(names, sources):
     """name -> sorted list of 'kind:path' that mention it (whole-name matches only)."""
     found = {n: set() for n in names}
+    plain = [n for n in names if not re.fullmatch(r"\d{8}T\d{6}Z-.+", n)]  # names outside the timestamped run pattern
     for kind, path in sources:
         try:
             text = Path(path).read_text(errors="ignore")
         except OSError:
             continue
+        for n in plain:
+            if n in text:
+                found[n].add("%s:%s" % (kind, path))
         for token in TOKEN.findall(text):
             for n in (token, token.rstrip(".")):
                 if n in found:
@@ -99,12 +107,28 @@ def evaluation_state(run):
     return {"present": True, "statuses": statuses, "safety_relevant_items": sorted(set(items))[:20]}
 
 
+def other_entries(entries, refs):
+    """Every entry of runs/ that is not a run directory (files, links): never eligible; PROTECTED when referenced."""
+    out = []
+    for p in entries:
+        kinds = {d.split(":", 1)[0] for d in refs[p.name]}
+        protected = bool(kinds & {"state", "test", "code_or_config", "evidence_json", "documentation"})
+        out.append({"entry": p.name, "type": "symlink" if p.is_symlink() else ("file" if p.is_file() else "other"),
+                    "bytes": p.lstat().st_size, "dependencies": refs[p.name],
+                    "classification": "PROTECTED" if protected else "REVIEW",
+                    "reasons": ["a non-run evidence file named by " + ", ".join(sorted(kinds))] if protected
+                    else ["a non-run entry with no recorded dependency (a person must review it)"]})
+    return out
+
+
 def main(argv):
     output = Path(argv[0])
     if output.exists():
         raise SystemExit("output exists")
-    runs = sorted(p for p in (ROOT / "runs").iterdir() if p.is_dir())
-    refs = references({r.name for r in runs}, sources())
+    entries = sorted((ROOT / "runs").iterdir())
+    runs = [p for p in entries if p.is_dir() and not p.is_symlink()]
+    others = [p for p in entries if p not in runs]
+    refs = references({p.name for p in entries}, sources())
     known = {}
     if INVENTORY.exists():
         with INVENTORY.open(encoding="utf-8") as stream:
@@ -154,8 +178,21 @@ def main(argv):
         totals[cls][0] += 1
         totals[cls][1] += row["bytes"]
         rows.append(row)
-    value = {"contract": "p7e-cleanup-manifest-v1", "read_only": True, "deletes_nothing": True,
+    non_runs = other_entries(others, refs)
+    accounted = len(rows) + len(non_runs)
+    reconciled = accounted == len(entries) == len(list((ROOT / "runs").iterdir()))
+    if not reconciled:  # clarification 1: nothing is eligible until every entry of runs/ is accounted for
+        for row in rows:
+            if row["classification"] == "ELIGIBLE":
+                row.update(classification="REVIEW", eligible_items=[], reasons=row["reasons"] + ["inventory not reconciled"])
+        eligible_depth = eligible_tmp = 0
+        totals = {"PROTECTED": totals["PROTECTED"], "REVIEW": [totals["REVIEW"][0] + totals["ELIGIBLE"][0],
+                                                               totals["REVIEW"][1] + totals["ELIGIBLE"][1]], "ELIGIBLE": [0, 0]}
+    value = {"contract": "p7e-cleanup-manifest-v2", "read_only": True, "deletes_nothing": True,
              "root": str(ROOT / "runs"), "runs": len(rows),
+             "reconciliation": {"entries_in_runs": len(entries), "run_directories": len(rows),
+                                "other_entries": len(non_runs), "accounted": accounted, "reconciled": reconciled},
+             "other_entries": non_runs,
              "totals": {k: {"runs": v[0], "bytes": v[1]} for k, v in totals.items()},
              "estimated_savings_if_approved": {"depth_bin_bytes": eligible_depth, "tmp_bytes": eligible_tmp,
                                                "total_bytes": eligible_depth + eligible_tmp},
@@ -164,7 +201,8 @@ def main(argv):
              "rows": rows}
     with open(output, "x", encoding="utf-8") as stream:
         stream.write(json.dumps(value, indent=1, sort_keys=True) + "\n")
-    print(json.dumps({k: value[k] for k in ("runs", "totals", "estimated_savings_if_approved", "review_depth_bin_bytes")}, indent=1))
+    print(json.dumps({k: value[k] for k in ("runs", "reconciliation", "other_entries", "totals",
+                                            "estimated_savings_if_approved", "review_depth_bin_bytes")}, indent=1))
 
 
 if __name__ == "__main__":

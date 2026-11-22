@@ -1,12 +1,15 @@
 # v3-SIM P7-E — evidence retention revision (D4-A / D4-B) and read-only cleanup manifest
 
-**Status: POLICY APPROVED (operator, 2026-11-22, decisions E9 and E10 "as recommended").**
+**Status: PROPOSAL for operator approval (2026-11-22). The policy is approved separately from any deletion, and
+approving it authorizes no deletion (contract §11, clarification 5).**
 * **Nothing was deleted, moved or changed.** No cleanup is implemented, and none can run without a separately
   tested and separately approved procedure (§4).
 * **What exists:** the manifest tool [`diagnostics/p7e/p7e_cleanup_manifest.py`](../diagnostics/p7e/p7e_cleanup_manifest.py),
   which only reads (`stat` and existing records), and its output
-  [`docs/evidence/v3_sim_p7e_cleanup_manifest.json`](evidence/v3_sim_p7e_cleanup_manifest.json) (SHA-256
-  `e87ec4c5f329bd60eb07ed3b7cb5b80a2def30c5a2c7e437f5be456121b4cdff`).
+  [`docs/evidence/v3_sim_p7e_cleanup_manifest_v2.json`](evidence/v3_sim_p7e_cleanup_manifest_v2.json) (SHA-256
+  `8e04e6be414bd842415ce377807208db4d05707f485bd2d4265ba30c204464d4`).
+* **Version 2 is reconciled:** 377 of 377 entries of `runs/` are accounted for. Version 1 (`e87ec4c5…`) read
+  directories only and missed one file; it is superseded.
 
 ## 1. The current rule, and why revise it
 
@@ -14,7 +17,7 @@
 copies only.
 
 **Why revise.** The raw depth recording (`sensors/depth.bin`) is about 85 % of a flight's 1.2–1.3 GB and does not
-compress (1.04:1). `runs/` already holds 376 runs and 164.1 GB.
+compress (1.04:1). `runs/` already holds 376 runs (377 entries) and 164.1 GB.
 
 **What depth.bin is needed for.** The accepted evaluators use it to re-evaluate the depth stream. A flight's
 evaluation, its classification and every safety result are separate files, and they stay.
@@ -44,7 +47,12 @@ evaluation, its classification and every safety result are separate files, and t
 
 ## 3. The read-only cleanup manifest (2026-11-22)
 
-**What each run gets.** The tool walks all 376 runs and records each one's:
+**Reconciliation (clarification 1).** `runs/` has 377 entries: 376 run directories and one file,
+`20260912-p2-r3-historical-timing.json` (64 KB, a P2-era read-only timing reconstruction named by
+`v3_sim_p2_timing_contract.md`). The file is **PROTECTED** and never eligible. The tool marks nothing eligible
+unless every entry is accounted for; here it is (`reconciled: true`).
+
+**What each run gets.** The tool walks all 376 run directories and records each one's:
 * size, its `depth.bin` and `tmp/` sizes;
 * every record that depends on it: gate, block and dry-run results, candidates and approvals in `state/`, tests,
   simulation code and configs, evidence JSON, documentation;
@@ -90,7 +98,19 @@ They carry no gate credit, and none is named by a test, code, config or evidence
 6. **It never runs while a block holds the live lock.** The P3–P6 manifests and the P7 candidate must verify before
    and after.
 
-## 5. Decisions
+## 5. Policy approval is not a deletion authorization (clarification 5)
+
+* **Policy only.** Approving D4-A/D4-B approves a retention **policy**. It authorizes no deletion, move or
+  compression of any file.
+* **Each deletion** needs its own explicit authorization, naming:
+  * the procedure, already tested on copies (§4);
+  * the reconciled manifest version;
+  * the exact file set.
+* **Protected evidence.** No existing P3–P7 evidence may be deleted under the policy approval. That includes the 107
+  P6 development dry runs listed as ELIGIBLE, the 28 REVIEW runs, and every PROTECTED run and file.
+* **Eligible is not approved.** "Eligible" only means a candidate for a future, separately authorized decision.
+
+## 6. Decisions
 
 * **E9:** adopt D4-A and D4-B as above.
 * **E10:** P7-E runs stay complete until the P7-E report is accepted. Then their raw depth becomes eligible under D4-B,
