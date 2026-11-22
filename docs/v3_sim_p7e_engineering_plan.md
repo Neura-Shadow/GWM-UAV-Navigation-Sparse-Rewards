@@ -6,7 +6,7 @@
   (2026-11-22, "Approve contract").**
 * **E1 specifications generated and tested (2026-11-22, "Authorize E1"):** [E1 report](v3_sim_p7e_e1_specs.md).
   * Schedule `9b3deacb…`; report plan `15e7f7b4…`.
-  * **Awaiting the operator's approval by hash.**
+  * **APPROVED by the operator on 2026-11-22 ("Approve specs"), so E1 is COMPLETE.**
 * **Next, each needing its own explicit authorization:** the retention-policy approval (separate from any deletion),
   then E2.
 * Nothing is implemented, frozen or flown, and every later step needs its own explicit authorization (contract §13).

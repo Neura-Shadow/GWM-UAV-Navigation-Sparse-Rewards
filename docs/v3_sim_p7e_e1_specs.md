@@ -1,6 +1,9 @@
 # v3-SIM P7-E E1 — specifications: the 30-pair schedule and the engineering report plan
 
-**Status: generated and tested (2026-11-22); awaiting operator approval by hash.**
+**Status: APPROVED by the operator (2026-11-22, "Approve specs"); E1 COMPLETE.**
+* **Approved canonical SHA-256s:** schedule `9b3deacb3ee77a0baa38c78fa9197c22e569150ff6d4c76b489c494b6aea377b`, report
+  plan `15e7f7b460277e650823342bbf33a63426c226730192f3bbc2c536ab70c31d94`.
+* The P7-E candidate must bind exactly these. Any change is a new specification and needs a new approval.
 * **Authorized:** by the operator ("Authorize E1"), under the approved contract
   [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) §3, §5–§8 and §10.
 * **What it did not do:** no frozen P7 file, candidate or evidence changed; no selection record; no freeze, SITL,
@@ -107,6 +110,6 @@ register.
 
 ## 4. Next
 
-* **Operator approval** of the two specifications as hashed in §1. That is E1's exit criterion.
+* **Operator approval** of the two specifications as hashed in §1: given on 2026-11-22 ("Approve specs").
 * **E2** (the P7-E code, offline, including FC-1 to FC-3 and the report code) needs its own authorization.
 * **The retention-policy approval** is still a separate decision.
