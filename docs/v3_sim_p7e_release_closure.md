@@ -1,6 +1,9 @@
 # v3-SIM P7-E release closure: documentation audit, integrity audit, release summary and proposed tag
 
 **Status: PREPARED FOR THE OPERATOR'S REVIEW (2026-11-28).**
+* **RC-1 ACCEPTED** (operator, 2026-11-28, "Accept RC-1"): the documentation corrections D1–D12 of §1.1 stand, as
+  committed in `7156017`.
+* RC-2 to RC-7 are still open (§5).
 * **Authority:** the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation". It authorizes
   read-only auditing and proposal preparation only.
 * **What changed:**
@@ -153,7 +156,7 @@ git push origin v3.7.0-p7e-engineering-validation
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| RC-1 | Accept the documentation corrections D1–D12 (§1.1), as committed locally | accept |
+| RC-1 | Accept the documentation corrections D1–D12 (§1.1), as committed locally | **ACCEPTED by the operator on 2026-11-28 ("Accept RC-1")**; the corrections are in commit `7156017` |
 | RC-2 | Write the clarification record of §1.2 (no value changes; the report untouched) | write it: it makes the field's meaning permanent next to the report |
 | RC-3 | Create the annotated tag of §4, locally | after RC-1 |
 | RC-4 | Push the branch (46 + closure commits) and the tag | separate authorization; no PR or merge implied |
