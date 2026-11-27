@@ -1,0 +1,3017 @@
+{
+  "blocks": {
+    "1": {
+      "flights": 20,
+      "stop_reason": null,
+      "stopped": false
+    },
+    "2": {
+      "flights": 20,
+      "stop_reason": null,
+      "stopped": false
+    },
+    "3": {
+      "flights": 20,
+      "stop_reason": null,
+      "stopped": false
+    }
+  },
+  "contract": "p7e-engineering-report-v1",
+  "flights_flown": 60,
+  "generated_unix_ns": 1795798036647123343,
+  "hard_criteria": [
+    {
+      "flights": [],
+      "id": "H1",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "below": [],
+      "comparison": ">=",
+      "id": "H2",
+      "limit": 0.2,
+      "met": true,
+      "unmeasured": [],
+      "valid_flights": 60,
+      "value": 0.310398820989346
+    },
+    {
+      "events": [],
+      "id": "H3",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "breaches": [],
+      "flights_checked": 60,
+      "id": "H4",
+      "limit": 0,
+      "met": true,
+      "unchecked": [],
+      "value": 0
+    },
+    {
+      "failed": [],
+      "id": "H5",
+      "limit": "every valid flight landed and disarmed, own commands [176, 400, 21]",
+      "met": true,
+      "valid_flights": 60,
+      "value": 60
+    },
+    {
+      "flights": [],
+      "id": "H6",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "id": "H7",
+      "incomplete": [],
+      "ledgers": {
+        "1": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        },
+        "2": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        },
+        "3": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        }
+      },
+      "limit": "100 %",
+      "met": true,
+      "value": "60/60"
+    },
+    {
+      "batch_completed": true,
+      "blocks": {
+        "1": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "missing_pairs": [],
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        },
+        "2": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "missing_pairs": [],
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        },
+        "3": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "missing_pairs": [],
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        }
+      },
+      "id": "H8",
+      "limit": "all 60 flown, or every unflown flight explained by a stop rule; at most 2 replacements per 20-flight block and one per flight",
+      "met": true,
+      "value": "completed"
+    },
+    {
+      "assessment": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+          "slot": 30
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+          "slot": 30
+        }
+      ],
+      "id": "H9",
+      "limit": "identical",
+      "manifest": {
+        "sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+        "verified": true
+      },
+      "met": true,
+      "reclassification": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+          "slot": 30
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+          "slot": 30
+        }
+      ],
+      "results_bind_manifest": true,
+      "specs": {
+        "verified": true
+      },
+      "unchanged": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+          "slot": 1,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+          "slot": 1,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+          "slot": 2,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+          "slot": 2,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+          "slot": 3,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+          "slot": 3,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+          "slot": 4,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+          "slot": 4,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+          "slot": 5,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+          "slot": 5,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+          "slot": 6,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+          "slot": 6,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+          "slot": 7,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+          "slot": 7,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+          "slot": 8,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+          "slot": 8,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+          "slot": 9,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+          "slot": 9,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+          "slot": 10,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+          "slot": 11,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+          "slot": 11,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+          "slot": 12,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+          "slot": 12,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+          "slot": 13,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+          "slot": 13,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+          "slot": 14,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+          "slot": 14,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+          "slot": 15,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+          "slot": 15,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+          "slot": 16,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+          "slot": 16,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+          "slot": 17,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+          "slot": 17,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+          "slot": 18,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+          "slot": 18,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+          "slot": 19,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+          "slot": 19,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+          "slot": 20,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+          "slot": 20,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+          "slot": 21,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+          "slot": 21,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+          "slot": 22,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+          "slot": 22,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+          "slot": 23,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+          "slot": 23,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+          "slot": 24,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+          "slot": 24,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+          "slot": 25,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+          "slot": 25,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+          "slot": 26,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+          "slot": 26,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+          "slot": 27,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+          "slot": 28,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+          "slot": 28,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+          "slot": 29,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+          "slot": 29,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+          "slot": 30,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+          "slot": 30,
+          "unchanged": true
+        }
+      ],
+      "value": "identical",
+      "worlds": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+          "slot": 1,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+          "slot": 1,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+          "slot": 2,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+          "slot": 2,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+          "slot": 3,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+          "slot": 3,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+          "slot": 4,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+          "slot": 4,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+          "slot": 5,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+          "slot": 5,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+          "slot": 6,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+          "slot": 6,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+          "slot": 7,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+          "slot": 7,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+          "slot": 8,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+          "slot": 8,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+          "slot": 9,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+          "slot": 9,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+          "slot": 10,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+          "slot": 11,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+          "slot": 11,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+          "slot": 12,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+          "slot": 12,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+          "slot": 13,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+          "slot": 13,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+          "slot": 14,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+          "slot": 14,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+          "slot": 15,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+          "slot": 15,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+          "slot": 16,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+          "slot": 16,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+          "slot": 17,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+          "slot": 17,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+          "slot": 18,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+          "slot": 18,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+          "slot": 19,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+          "slot": 19,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+          "slot": 20,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+          "slot": 20,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+          "slot": 21,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+          "slot": 21,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+          "slot": 22,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+          "slot": 22,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+          "slot": 23,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+          "slot": 23,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+          "slot": 24,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+          "slot": 24,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+          "slot": 25,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+          "slot": 25,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+          "slot": 26,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+          "slot": 26,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+          "slot": 27,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+          "slot": 28,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+          "slot": 28,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+          "slot": 29,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+          "slot": 29,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+          "slot": 30,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+          "slot": 30,
+          "verified": true
+        }
+      ]
+    }
+  ],
+  "limits_30_pairs": {
+    "mcnemar_power_at_pilot_discordance": 0.08,
+    "mcnemar_power_at_planning_effect": 0.03,
+    "success_rate_15_of_30_ci95": [
+      0.313,
+      0.687
+    ],
+    "tango_ci_width": "about 0.29-0.32",
+    "zero_event_upper_bound_per_flight": {
+      "30_flights": 0.095,
+      "60_flights": 0.0487
+    }
+  },
+  "manifest": {
+    "baselines": {
+      "p3_sha256": "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c",
+      "p4_sha256": "c110bd30be22fb43e596cf1f4b01397cb97145138f8912d6535a7dc4c15da42b",
+      "p5_sha256": "2becfbbb794006833d0a224b819db702135b0a0c9ff25da6577a7c1dd5238632",
+      "p6_sha256": "222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41",
+      "p7_sha256": "0799c37e800c06c278acbc45fdec90b84159ee9d41eb7aaf868cb65a0b950aa5"
+    },
+    "p7_sha256": "0799c37e800c06c278acbc45fdec90b84159ee9d41eb7aaf868cb65a0b950aa5",
+    "path": "/home/joker0625/uav_autonomy/state/p7e-candidate-2b6ee5d-r2.json",
+    "sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608"
+  },
+  "not_claimed": [
+    "superiority or inferiority of either ranker",
+    "statistical significance",
+    "real-hardware behaviour",
+    "results outside the declared layouts, mission, speed, static boxes or this host",
+    "any change to P2-P6 acceptance"
+  ],
+  "not_passed_reasons": [],
+  "p_values": "none (decision E7)",
+  "paired_min_truth_clearance": {
+    "difference": {
+      "max": 0.5926849861498419,
+      "median": 0.0015100457875583673,
+      "min": -0.09388732753267326,
+      "n": 30
+    },
+    "label": "descriptive; no non-inferiority test",
+    "pairs": [
+      {
+        "difference_p5_minus_p4_m": -0.05556272537789675,
+        "layout": "p7c-4000351",
+        "slot": 1
+      },
+      {
+        "difference_p5_minus_p4_m": -0.04545425814718751,
+        "layout": "p7c-4000367",
+        "slot": 2
+      },
+      {
+        "difference_p5_minus_p4_m": 0.08836529065442844,
+        "layout": "p7c-4000355",
+        "slot": 3
+      },
+      {
+        "difference_p5_minus_p4_m": 0.04666752766455606,
+        "layout": "p7c-4000398",
+        "slot": 4
+      },
+      {
+        "difference_p5_minus_p4_m": -0.09388732753267326,
+        "layout": "p7c-4000394",
+        "slot": 5
+      },
+      {
+        "difference_p5_minus_p4_m": 0.280548535274288,
+        "layout": "p7c-4000396",
+        "slot": 6
+      },
+      {
+        "difference_p5_minus_p4_m": -0.06069711021809987,
+        "layout": "p7c-4000381",
+        "slot": 7
+      },
+      {
+        "difference_p5_minus_p4_m": 0.06558845466552499,
+        "layout": "p7c-4000373",
+        "slot": 8
+      },
+      {
+        "difference_p5_minus_p4_m": 0.2058803389372701,
+        "layout": "p7c-4000377",
+        "slot": 9
+      },
+      {
+        "difference_p5_minus_p4_m": -0.048193671808529626,
+        "layout": "p7c-4000349",
+        "slot": 10
+      },
+      {
+        "difference_p5_minus_p4_m": 0.02655036152508705,
+        "layout": "p7c-4000357",
+        "slot": 11
+      },
+      {
+        "difference_p5_minus_p4_m": -0.02233682245403812,
+        "layout": "p7c-4000375",
+        "slot": 12
+      },
+      {
+        "difference_p5_minus_p4_m": 0.09781434056642713,
+        "layout": "p7c-4000374",
+        "slot": 13
+      },
+      {
+        "difference_p5_minus_p4_m": -0.006651546346525983,
+        "layout": "p7c-4000379",
+        "slot": 14
+      },
+      {
+        "difference_p5_minus_p4_m": 0.001982589575596272,
+        "layout": "p7c-4000385",
+        "slot": 15
+      },
+      {
+        "difference_p5_minus_p4_m": 0.5926849861498419,
+        "layout": "p7c-4000363",
+        "slot": 16
+      },
+      {
+        "difference_p5_minus_p4_m": 0.08735369615442923,
+        "layout": "p7c-4000359",
+        "slot": 17
+      },
+      {
+        "difference_p5_minus_p4_m": 0.0010375019995204626,
+        "layout": "p7c-4000360",
+        "slot": 18
+      },
+      {
+        "difference_p5_minus_p4_m": -0.0021759253099674636,
+        "layout": "p7c-4000382",
+        "slot": 19
+      },
+      {
+        "difference_p5_minus_p4_m": 0.05331764745423173,
+        "layout": "p7c-4000354",
+        "slot": 20
+      },
+      {
+        "difference_p5_minus_p4_m": 0.05308031880837494,
+        "layout": "p7c-4000364",
+        "slot": 21
+      },
+      {
+        "difference_p5_minus_p4_m": -0.04340399465130329,
+        "layout": "p7c-4000388",
+        "slot": 22
+      },
+      {
+        "difference_p5_minus_p4_m": -0.07696967588814307,
+        "layout": "p7c-4000366",
+        "slot": 23
+      },
+      {
+        "difference_p5_minus_p4_m": 0.006260900883843901,
+        "layout": "p7c-4000368",
+        "slot": 24
+      },
+      {
+        "difference_p5_minus_p4_m": -0.007202439857867615,
+        "layout": "p7c-4000378",
+        "slot": 25
+      },
+      {
+        "difference_p5_minus_p4_m": -0.06690957365175554,
+        "layout": "p7c-4000356",
+        "slot": 26
+      },
+      {
+        "difference_p5_minus_p4_m": -0.04315817331383376,
+        "layout": "p7c-4000352",
+        "slot": 27
+      },
+      {
+        "difference_p5_minus_p4_m": -0.08988309289140684,
+        "layout": "p7c-4000358",
+        "slot": 28
+      },
+      {
+        "difference_p5_minus_p4_m": 0.08052297342951442,
+        "layout": "p7c-4000389",
+        "slot": 29
+      },
+      {
+        "difference_p5_minus_p4_m": 0.39904443031056125,
+        "layout": "p7c-4000365",
+        "slot": 30
+      }
+    ]
+  },
+  "report_code_sha256": "8734bbe93369ab6ac13f1f6738f612c373fda511271399cb17ed6c864eaebfed",
+  "report_plan_canonical_sha256": "15e7f7b460277e650823342bbf33a63426c226730192f3bbc2c536ab70c31d94",
+  "reported_criteria": {
+    "R1": {
+      "id": "R1",
+      "per_controller": {
+        "p4": {
+          "ci95_clopper_pearson": [
+            0.4718799552101195,
+            0.8271257784739607
+          ],
+          "goal_success": 20,
+          "rate": 0.6666666666666666,
+          "valid_flights": 30
+        },
+        "p5": {
+          "ci95_clopper_pearson": [
+            0.5411063486052488,
+            0.8772051901276452
+          ],
+          "goal_success": 22,
+          "rate": 0.7333333333333333,
+          "valid_flights": 30
+        }
+      }
+    },
+    "R10": {
+      "id": "R10",
+      "per_controller": {
+        "p4": {
+          "performance:compute_max": 1
+        },
+        "p5": {
+          "cleanup:gazebo:forced_kill_after_grace": 1
+        }
+      },
+      "per_flight": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "cleanup:gazebo:forced_kill_after_grace"
+          ],
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "items": [
+            "performance:compute_max"
+          ],
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27
+        }
+      ]
+    },
+    "R2": {
+      "both_success": 20,
+      "difference_ci95_tango": [
+        -0.05441428605223331,
+        0.21323458362616915
+      ],
+      "difference_p5_minus_p4": 0.06666666666666667,
+      "id": "R2",
+      "label": "descriptive",
+      "missing_pairs": [],
+      "neither": 8,
+      "p4_only": 0,
+      "p5_only": 2,
+      "pairs": 30
+    },
+    "R3": {
+      "accepted_limit": {
+        "max_sample_gap_sim_s": 0.2,
+        "p2_timing": "p2-timing-v1"
+      },
+      "breaches": [],
+      "id": "R3",
+      "per_controller": {
+        "p4": {
+          "flights": 30,
+          "observation_gap_aborts": 0,
+          "p2_failures": {},
+          "p2_timing_status": {
+            "passed": 30
+          }
+        },
+        "p5": {
+          "flights": 30,
+          "observation_gap_aborts": 0,
+          "p2_failures": {},
+          "p2_timing_status": {
+            "passed": 30
+          }
+        }
+      }
+    },
+    "R4": {
+      "accepted_limit": {
+        "perception_compute_max_s": 0.09,
+        "perception_compute_p99_s": 0.05,
+        "perception_receipt_gap_max_wall_s": 1.0,
+        "snapshot_latency_max_sim_s": 0.25,
+        "snapshot_latency_p95_sim_s": 0.15,
+        "snapshot_rate_min_hz": 8.0
+      },
+      "breaches": [
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "item": "performance:compute_max",
+          "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+          "slot": 27
+        }
+      ],
+      "id": "R4",
+      "per_controller": {
+        "p4": {
+          "compute_max_s": {
+            "max": 0.6396636350000335,
+            "median": 0.02468228750012713,
+            "min": 0.0185769459999392,
+            "n": 30
+          },
+          "compute_p99_s": {
+            "max": 0.04535412100085523,
+            "median": 0.018722170499586355,
+            "min": 0.016464154999994207,
+            "n": 30
+          },
+          "depth_delivered_hz_sim": {
+            "max": 30.30382951788163,
+            "median": 30.303281999439353,
+            "min": 30.302238935896096,
+            "n": 30
+          },
+          "depth_receipt_gap_max_wall_s": {
+            "max": 0.10722650600109773,
+            "median": 0.048350943499826826,
+            "min": 0.04360903799988591,
+            "n": 30
+          },
+          "latency_max_sim_s": {
+            "max": 0.0759999999999934,
+            "median": 0.060000000000002274,
+            "min": 0.05200000000000671,
+            "n": 30
+          },
+          "latency_p95_sim_s": {
+            "max": 0.055999999999997385,
+            "median": 0.0519999999999996,
+            "min": 0.04800000000000182,
+            "n": 30
+          },
+          "rate_hz": {
+            "max": 10.005911398567356,
+            "median": 10.000169353746106,
+            "min": 9.95934292927637,
+            "n": 30
+          },
+          "receipt_gap_max_wall_s": {
+            "max": 0.6757816840017767,
+            "median": 0.05794892399944729,
+            "min": 0.05270130200005951,
+            "n": 30
+          }
+        },
+        "p5": {
+          "compute_max_s": {
+            "max": 0.04297395199955645,
+            "median": 0.023752636500830704,
+            "min": 0.017524760000014794,
+            "n": 30
+          },
+          "compute_p99_s": {
+            "max": 0.027095722000012756,
+            "median": 0.018481901500308595,
+            "min": 0.015824689999135444,
+            "n": 30
+          },
+          "depth_delivered_hz_sim": {
+            "max": 30.303816741063706,
+            "median": 30.3030303030303,
+            "min": 30.30211723112772,
+            "n": 30
+          },
+          "depth_receipt_gap_max_wall_s": {
+            "max": 0.06632547000117484,
+            "median": 0.05053920999978345,
+            "min": 0.04406186300002446,
+            "n": 30
+          },
+          "latency_max_sim_s": {
+            "max": 0.06400000000002137,
+            "median": 0.05999999999999339,
+            "min": 0.05200000000000671,
+            "n": 30
+          },
+          "latency_p95_sim_s": {
+            "max": 0.05200000000000671,
+            "median": 0.0519999999999925,
+            "min": 0.04800000000000182,
+            "n": 30
+          },
+          "rate_hz": {
+            "max": 10.008695652173913,
+            "median": 10.0,
+            "min": 9.993737605677904,
+            "n": 30
+          },
+          "receipt_gap_max_wall_s": {
+            "max": 0.07011496600011924,
+            "median": 0.0586257560003105,
+            "min": 0.05200590000094962,
+            "n": 30
+          }
+        }
+      }
+    },
+    "R5": {
+      "accepted_limit": {
+        "inference_max_s": 0.01,
+        "inference_p99_s": 0.005,
+        "participation_fraction": 1.0
+      },
+      "breaches": [],
+      "id": "R5",
+      "p5_flights": 30,
+      "values": {
+        "failure_ticks": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0,
+          "n": 30
+        },
+        "fallback_decisions": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0,
+          "n": 30
+        },
+        "inference_max_s": {
+          "max": 0.0063030149995029205,
+          "median": 0.001734612000063862,
+          "min": 0.0007401490001939237,
+          "n": 30
+        },
+        "inference_p99_s": {
+          "max": 0.0010349089998271666,
+          "median": 0.0007231644995044917,
+          "min": 0.0005668869998771697,
+          "n": 30
+        },
+        "outside_mask": {
+          "max": 0,
+          "median": 0.0,
+          "min": 0,
+          "n": 30
+        },
+        "participation_fraction": {
+          "max": 1.0,
+          "median": 1.0,
+          "min": 1.0,
+          "n": 30
+        }
+      }
+    },
+    "R6": {
+      "accepted_limit": {
+        "response_latency_sim_s": 0.25,
+        "tracking_horizontal_m": 0.3
+      },
+      "breaches": [],
+      "id": "R6",
+      "per_controller": {
+        "p4": {
+          "response_latency_sim_s": {
+            "max": 0.16400000000000148,
+            "median": 0.09999999999999432,
+            "min": 0.04000000000000625,
+            "n": 25
+          },
+          "tracking_max_m": {
+            "max": 0.26325756311238147,
+            "median": 0.24380699707273346,
+            "min": 0.22659875187093312,
+            "n": 30
+          }
+        },
+        "p5": {
+          "response_latency_sim_s": {
+            "max": 0.1519999999999868,
+            "median": 0.09399999999999409,
+            "min": 0.04399999999999693,
+            "n": 24
+          },
+          "tracking_max_m": {
+            "max": 0.26920438948229763,
+            "median": 0.24486313592825043,
+            "min": 0.23176094097640043,
+            "n": 30
+          }
+        }
+      }
+    },
+    "R7": {
+      "both_success_pairs": 20,
+      "id": "R7",
+      "label": "descriptive",
+      "path_length_m": {
+        "p4_median": 9.59529909487921,
+        "p5_median": 9.585339590739713,
+        "paired_difference_p5_minus_p4": {
+          "ci95": [
+            -0.12215149907252698,
+            0.14132302455658152
+          ],
+          "estimate": 0.026709831635238768,
+          "method": "exact",
+          "walsh_critical_rank": 53
+        },
+        "pairs": 20
+      },
+      "time_to_goal_sim_s": {
+        "p4_median": 41.792,
+        "p5_median": 41.846,
+        "paired_difference_p5_minus_p4": {
+          "ci95": [
+            -1.0100000000000051,
+            0.10000000000000142
+          ],
+          "estimate": -0.25500000000000256,
+          "method": "normal",
+          "walsh_critical_rank": 52
+        },
+        "pairs": 20
+      }
+    },
+    "R8": {
+      "accepted_limit": "p7_host_check.yaml (9f78af75\u2026)",
+      "breaches": [],
+      "host_check_per_block": {
+        "1": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 0.0,
+          "passed": true
+        },
+        "2": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 1.4,
+          "passed": true
+        },
+        "3": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 2.0,
+          "passed": true
+        }
+      },
+      "id": "R8",
+      "per_controller": {
+        "p4": {
+          "cpu_fraction": {
+            "clock-bridge": {
+              "max": 0.11847696314861178,
+              "median": 0.08785593715268254,
+              "min": 0.07585896940345795,
+              "n": 30
+            },
+            "dds-agent": {
+              "max": 0.047521015708078894,
+              "median": 0.033814491352022844,
+              "min": 0.029551582341790724,
+              "n": 30
+            },
+            "gazebo": {
+              "max": 1.1086852314571105,
+              "median": 0.8193436967774568,
+              "min": 0.7393555798181133,
+              "n": 30
+            },
+            "p4-perception": {
+              "max": 0.5207149366095583,
+              "median": 0.39203459727290857,
+              "min": 0.35747445035477066,
+              "n": 30
+            },
+            "p4-truth-observer": {
+              "max": 0.03613774595727596,
+              "median": 0.03022716232627846,
+              "min": 0.02855384230561973,
+              "n": 30
+            },
+            "px4": {
+              "max": 0.366502883024111,
+              "median": 0.2743151516201903,
+              "min": 0.24637301028238548,
+              "n": 30
+            },
+            "qgc-monitor": {
+              "max": 0.1401776826988602,
+              "median": 0.11434656103880281,
+              "min": 0.10169009444360891,
+              "n": 30
+            },
+            "ros-controller": {
+              "max": 0.5469956758829597,
+              "median": 0.38971772019321615,
+              "min": 0.3366811992096787,
+              "n": 30
+            },
+            "sensor-adapter": {
+              "max": 0.8367436093830126,
+              "median": 0.6512624511019217,
+              "min": 0.5741247149703292,
+              "n": 30
+            },
+            "sensor-bridge": {
+              "max": 0.10680745575062477,
+              "median": 0.09809948688954302,
+              "min": 0.058045317029602264,
+              "n": 30
+            },
+            "source-probe": {
+              "max": 0.12683686003923658,
+              "median": 0.09405513652034411,
+              "min": 0.0832946505628068,
+              "n": 30
+            }
+          },
+          "flights": 30,
+          "flights_with_a_stall": 30,
+          "mem_available_kb_min": {
+            "max": 7169516,
+            "median": 6978056.0,
+            "min": 6596768,
+            "n": 30
+          },
+          "rtf_mean": {
+            "max": 0.9987846876305481,
+            "median": 0.9983532340259018,
+            "min": 0.9935944411839811,
+            "n": 30
+          },
+          "run_bytes": {
+            "max": 1862893875,
+            "median": 1344732647.5,
+            "min": 1189851678,
+            "n": 30
+          },
+          "stalls_below_0_5": {
+            "max": 4,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          },
+          "wall_duration_s": {
+            "max": 190.32083266099926,
+            "median": 167.8349141080006,
+            "min": 150.90516052199973,
+            "n": 30
+          }
+        },
+        "p5": {
+          "cpu_fraction": {
+            "clock-bridge": {
+              "max": 0.10730340135601592,
+              "median": 0.08763807310543673,
+              "min": 0.07462331313817631,
+              "n": 30
+            },
+            "dds-agent": {
+              "max": 0.04252505567414271,
+              "median": 0.03304804956467551,
+              "min": 0.029252708133632437,
+              "n": 30
+            },
+            "gazebo": {
+              "max": 0.9362628863724692,
+              "median": 0.8088756399506145,
+              "min": 0.725508100780542,
+              "n": 30
+            },
+            "p4-perception": {
+              "max": 0.45352119112667644,
+              "median": 0.3868376353338888,
+              "min": 0.3494028604191237,
+              "n": 30
+            },
+            "p4-truth-observer": {
+              "max": 0.03223485925264893,
+              "median": 0.029964975156494943,
+              "min": 0.027168547658385493,
+              "n": 30
+            },
+            "px4": {
+              "max": 0.3163301120842096,
+              "median": 0.2720115175904551,
+              "min": 0.24346833722162506,
+              "n": 30
+            },
+            "qgc-monitor": {
+              "max": 0.131974387449734,
+              "median": 0.11284671461505741,
+              "min": 0.09846697492540128,
+              "n": 30
+            },
+            "ros-controller": {
+              "max": 0.46289062723502056,
+              "median": 0.3952177790635829,
+              "min": 0.3401288774315169,
+              "n": 30
+            },
+            "sensor-adapter": {
+              "max": 0.7339137712908004,
+              "median": 0.6389621459555819,
+              "min": 0.57006479447265,
+              "n": 30
+            },
+            "sensor-bridge": {
+              "max": 0.10790363384035112,
+              "median": 0.09767172174960989,
+              "min": 0.057007476361822976,
+              "n": 30
+            },
+            "source-probe": {
+              "max": 0.11121761348095234,
+              "median": 0.09253862163353964,
+              "min": 0.08222728710430416,
+              "n": 30
+            }
+          },
+          "flights": 30,
+          "flights_with_a_stall": 30,
+          "mem_available_kb_min": {
+            "max": 7216836,
+            "median": 7073858.0,
+            "min": 6653324,
+            "n": 30
+          },
+          "rtf_mean": {
+            "max": 0.9989383323139414,
+            "median": 0.9984970853741596,
+            "min": 0.9973606486340557,
+            "n": 30
+          },
+          "run_bytes": {
+            "max": 2805644288,
+            "median": 1343244616.0,
+            "min": 1207950690,
+            "n": 30
+          },
+          "stalls_below_0_5": {
+            "max": 3,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          },
+          "wall_duration_s": {
+            "max": 233.11976225499984,
+            "median": 167.78946196300058,
+            "min": 150.0891965410001,
+            "n": 30
+          }
+        }
+      }
+    },
+    "R9": {
+      "id": "R9",
+      "per_controller": {
+        "p4": {
+          "abort_reason": {
+            "hover_timeout": 10
+          },
+          "p2_failure": {}
+        },
+        "p5": {
+          "abort_reason": {
+            "hover_timeout": 8
+          },
+          "p2_failure": {}
+        }
+      }
+    }
+  },
+  "reported_errors": {},
+  "required_statement": "This engineering validation was not designed to compare P5 with P4. With 30 pairs, a test of the planning effect would have about 3 % power. Observed differences between the controllers are descriptive and do not show that either is superior.",
+  "risk_register": {
+    "new_entries_from_R_breaches": [
+      {
+        "attempt": 1,
+        "block": 3,
+        "controller": "p4",
+        "criterion": "R4",
+        "item": "performance:compute_max",
+        "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+        "slot": 27
+      }
+    ],
+    "open": [
+      "RR1 P2 observation-gap RECOVERY",
+      "RR2 P5 repeat-behaviour inconsistency"
+    ],
+    "reported_against_open": {
+      "RR1_RR2_stalls_per_controller": {
+        "p4": {
+          "flights_with_a_stall": 30,
+          "stalls_below_0_5": {
+            "max": 4,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          }
+        },
+        "p5": {
+          "flights_with_a_stall": 30,
+          "stalls_below_0_5": {
+            "max": 3,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          }
+        }
+      },
+      "RR1_observation_gap_aborts_per_controller": {
+        "p4": 0,
+        "p5": 0
+      }
+    },
+    "rule": "P7-E closes neither; no threshold changes in response (contract \u00a710)"
+  },
+  "safety_per_controller": {
+    "p4": {
+      "bound_kind": "one-sided 95 % upper",
+      "flights_with_safety_events": 0,
+      "kinds": [],
+      "mission_failure_flights": 0,
+      "safety_event_bound": 0.09503385285530419,
+      "safety_unverified_flights": 0,
+      "valid_flights": 30
+    },
+    "p5": {
+      "bound_kind": "one-sided 95 % upper",
+      "flights_with_safety_events": 0,
+      "kinds": [],
+      "mission_failure_flights": 0,
+      "safety_event_bound": 0.09503385285530419,
+      "safety_unverified_flights": 0,
+      "valid_flights": 30
+    }
+  },
+  "schedule_canonical_sha256": "9b3deacb3ee77a0baa38c78fa9197c22e569150ff6d4c76b489c494b6aea377b",
+  "sign_convention": "every paired difference is P5 minus P4",
+  "statement_of_a_pass": "the accepted P4 and P5 stacks completed the declared 60-flight engineering validation through the P7 infrastructure, with every hard criterion H1-H9 met",
+  "status": "engineering validation passed"
+}
