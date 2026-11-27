@@ -23,7 +23,13 @@
 * **The real P7-E candidate was FROZEN on 2026-11-22** ([E3 report](v3_sim_p7e_e3_real_candidate.md)): production
   Policy A `26595bba…` ("Approve"), then the freeze ("Freeze it"). Manifest `38e23bad…`
   (`state/p7e-candidate-2b6ee5d.json`). No bound file may change until E5.
-* **Next, each needing its own explicit authorization:** block 1, then block 2, then block 3, then E5.
+* **E4 blocks 1–3 COMPLETED on 2026-11-27** ([E4 record](v3_sim_p7e_e4_blocks.md)).
+  * The first attempt on `38e23bad…` was stopped in block 1 by an external termination. It was recovered into a
+    recorded stop and is kept.
+  * Re-flown with the same code on a second real candidate, `e9561f05…`: 60 of 60 valid, no stop, no replacement.
+* **E5 COMPLETE on 2026-11-28** ([E5 report](v3_sim_p7e_e5_report.md)).
+  * The report says "engineering validation passed", with H1–H9 all met.
+  * It was accepted by the operator ("Accept E5"). **P7-E is COMPLETE.**
 * Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
 
 It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and

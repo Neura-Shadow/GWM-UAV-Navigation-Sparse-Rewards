@@ -353,6 +353,7 @@ success with no safety item, and it is reported under R10.
 * The stopped first attempt on `38e23bad…` (block 1, `sequencer_terminated_externally`) stays protected evidence,
   and the E5 report must describe it.
 
-**Next (needs its own authorization):** E5, offline only. It re-classifies all 60 flights on read-only views (H9),
+**E5 done (2026-11-28):** [E5 report](v3_sim_p7e_e5_report.md), "engineering validation passed", accepted by
+the operator. **As planned:** E5, offline only. It re-classifies all 60 flights on read-only views (H9),
 then writes the engineering report with H1–H9, R1–R10 and the risk register (`analysis/p7e_report.py`). After that
 comes operator acceptance. Bound files stay unchanged until then.

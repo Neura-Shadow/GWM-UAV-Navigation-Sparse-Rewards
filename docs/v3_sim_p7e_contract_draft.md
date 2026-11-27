@@ -238,5 +238,11 @@ As `p7-evaluation-v1` §8.
 7. The **real freeze** of the P7-E candidate. **Done on 2026-11-22:** `state/p7e-candidate-2b6ee5d.json`, manifest
    `38e23bad…` ("Freeze it (Recommended)").
 8. **Block 1**, **block 2** and **block 3**, each with its own authorization.
+   * **Done on 2026-11-27,** on the second real candidate `e9561f05…`: 60 of 60 valid, no stop.
+   * The first attempt on `38e23bad…` stopped in block 1 and is kept as protected evidence.
+   * Record: [E4](v3_sim_p7e_e4_blocks.md).
 9. **E5**: the engineering report and its acceptance.
+   * **Done on 2026-11-28:** authorized ("Authorize (Recommended)"), run once with the result "engineering
+     validation passed", then accepted ("Accept E5").
+   * Record: [E5](v3_sim_p7e_e5_report.md).
 10. Any future cleanup procedure, tested and then approved, and each execution of it.

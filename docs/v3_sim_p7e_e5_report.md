@@ -1,8 +1,11 @@
 # v3-SIM P7-E E5: the engineering report
 
-**Status: RUN, awaiting the operator's acceptance.** The report says **"engineering validation passed"** (§4).
+**Status: ACCEPTED by the operator on 2026-11-28 ("Accept E5"), so E5 is COMPLETE.** The report says
+**"engineering validation passed"** (§4), which completes the P7-E engineering validation under contract
+`p7-engineering-validation-v1`.
 * E5 was authorized on 2026-11-28 ("Authorize (Recommended)") and run once.
-* Accepting the report is a separate step (contract §13 item 9).
+* The acceptance authorizes nothing else (§5): no push or merge, no cleanup or deletion, no change to P2–P6 or to
+  the frozen P7 candidate, and no superiority claim.
 
 **Candidate:** `state/p7e-candidate-2b6ee5d-r2.json`, manifest
 `e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608`.
@@ -64,6 +67,16 @@ The stopped first attempt is described in this document, not in the report JSON:
 * it was recovered under authorization into a recorded stop: `sequencer_terminated_externally`, all 3 flights safe.
 
 That evidence stays protected. Its flights are not part of the 60.
+
+**Re-flown layouts** (as the re-fly decision requires): three of the 60 flights had already been flown once on
+`38e23bad…`, with the same code:
+* slot 1, `p7c-4000351`, P4: then a valid goal success;
+* slot 1, `p7c-4000351`, P5: then a valid failure. P2 `stale_action` ended in RECOVERY; the flight had integrity
+  items only and no safety event;
+* slot 2, `p7c-4000367`, P4: then the interrupted flight, evaluated afterwards as a valid goal success.
+
+On `e9561f05…`, slots 1 and 2 were both-success pairs. This follows the approved re-fly plan: the first attempt was
+not discarded, and its outcomes are not merged into R1 or R2.
 
 ## 3. Pre-check (read-only, 2026-11-28)
 
