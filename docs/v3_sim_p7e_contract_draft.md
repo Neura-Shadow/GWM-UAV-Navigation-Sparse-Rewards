@@ -1,6 +1,7 @@
 # v3-SIM P7 contract revision `p7-engineering-validation-v1` — APPROVED
 
-**Status: APPROVED by the operator (2026-11-22, "Approve contract"). In force for the P7-E stage.**
+**Status: APPROVED by the operator (2026-11-22, "Approve contract"). It governed the P7-E stage, which is COMPLETE
+(2026-11-28, "Accept E5"; §13).**
 * It governs the next P7 stage, P7-E. P7-A (`p7-evaluation-v1`) is suspended, not cancelled.
 * **This approval authorizes nothing to run, freeze or delete.** Each step of §13 (2–10) still needs its own
   explicit authorization.
@@ -237,6 +238,16 @@ As `p7-evaluation-v1` §8.
    `state/p7e-policy-A-approval-2b6ee5d.json` ("Approve (Recommended)").
 7. The **real freeze** of the P7-E candidate. **Done on 2026-11-22:** `state/p7e-candidate-2b6ee5d.json`, manifest
    `38e23bad…` ("Freeze it (Recommended)").
+   * **The first candidate's block 1 stopped** (`sequencer_terminated_externally`). The recovery was authorized on
+     2026-11-27 ("Authorize recovery"): stop record `5f7c2326…`, receipt `0c7c3c77…`. The candidate is retired, and
+     its records are protected evidence.
+   * **The second real candidate** (operator "Re-fly, same code", 2026-11-27) received items 6 and 7 again, each
+     separately:
+     * **item 6 again:** production Policy A r2 `state/p7e-policy-A-approval-2b6ee5d-r2.json` (`56c264e0…`,
+       `development_only: false`; "Approve (Recommended)");
+     * **item 7 again:** the freeze `state/p7e-candidate-2b6ee5d-r2.json`, manifest `e9561f05…` ("Freeze it
+       (Recommended)").
+     * The same 16 files (code commit `2b6ee5d`), specs, P7 binding and baselines.
 8. **Block 1**, **block 2** and **block 3**, each with its own authorization.
    * **Done on 2026-11-27,** on the second real candidate `e9561f05…`: 60 of 60 valid, no stop.
    * The first attempt on `38e23bad…` stopped in block 1 and is kept as protected evidence.

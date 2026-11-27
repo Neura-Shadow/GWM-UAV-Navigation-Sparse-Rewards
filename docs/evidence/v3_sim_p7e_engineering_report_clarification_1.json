@@ -1,0 +1,37 @@
+{
+ "authorized": "operator, 2026-11-28, \"Write RC-2\" (release closure decision RC-2)",
+ "basis": {
+  "computed_by": "p7_analysis.safety",
+  "p7_analysis_sha256": "bd036a2b3d483d78747b2e959be89ec850ddb3093fa5edb53a09bd03f5801edb",
+  "p7_classify.MISSION_ITEMS": "(\"safety:tracking\", \"safety:response_latency\")",
+  "p7_classify_sha256": "7a46258f9f382c98d9b244aef2146b7e7ba6ce7d3327a64ad73259a6e1871d23"
+ },
+ "clarification": 1,
+ "contract": "p7e-report-clarification-v1",
+ "corrected_text": "docs/v3_sim_p7e_e5_report.md section 4 (Mission failures, corrected 2026-11-28)",
+ "field": "safety_per_controller.<controller>.mission_failure_flights",
+ "field_values": {
+  "p4": 0,
+  "p5": 0
+ },
+ "meaning": "valid flights whose frozen P7 classification carries a D14 mission-failure class item (safety:tracking or safety:response_latency; p7_classify.MISSION_ITEMS); not the count of failed missions",
+ "mission_outcome_failures": {
+  "all_safe": true,
+  "note": "every one a hover_timeout abort by the accepted P4 supervisor, then the P2 nominal landing; 0 safety events (H1-H6 met)",
+  "p4": 10,
+  "p5": 8,
+  "source": "reported_criteria.R1 (valid_flights - goal_success) and reported_criteria.R9 abort_reason hover_timeout"
+ },
+ "report": {
+  "contract": "p7e-engineering-report-v1",
+  "manifest_sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+  "paths": [
+   "/home/joker0625/uav_autonomy/state/p7e-engineering-report-e9561f05de28.json",
+   "docs/evidence/v3_sim_p7e_engineering_report.json"
+  ],
+  "sha256": "e2fb96071edb77fdaba7da4f56351b26d1959f850c6e50725e95b0dccc12d09c",
+  "status": "engineering validation passed"
+ },
+ "report_unchanged": true,
+ "values_changed": false
+}

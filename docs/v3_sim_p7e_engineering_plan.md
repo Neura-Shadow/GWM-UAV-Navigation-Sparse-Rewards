@@ -1,7 +1,10 @@
 # v3-SIM P7-E — engineering validation: proposed revision of the P7 next stage
 
-**Status: DIRECTION AND E1–E11 APPROVED IN PRINCIPLE (operator, 2026-11-22), subject to clarifications 1–6.**
-* The clarifications are addressed in §12.
+**Status: P7-E COMPLETE (2026-11-28).** The engineering report ("engineering validation passed") was accepted;
+see the [E5 report](v3_sim_p7e_e5_report.md) and the [release closure](v3_sim_p7e_release_closure.md). The
+milestone history follows.
+* The direction and E1–E11 were approved in principle (operator, 2026-11-22), subject to clarifications 1–6.
+  The clarifications are addressed in §12.
 * The **contract [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) was APPROVED by the operator
   (2026-11-22, "Approve contract").**
 * **E1 specifications generated and tested (2026-11-22, "Authorize E1"):** [E1 report](v3_sim_p7e_e1_specs.md).
@@ -20,9 +23,16 @@
   * Development candidate `2cc7a579…`; S2 flown with P4 and with P5 through the P7-E path.
   * Both passed the unchanged evaluators as valid goal successes, with parity to M4. No credit.
   * **ACCEPTED by the operator on 2026-11-22 ("Accept E8"), so E8 is COMPLETE.**
-* **The real P7-E candidate was FROZEN on 2026-11-22** ([E3 report](v3_sim_p7e_e3_real_candidate.md)): production
-  Policy A `26595bba…` ("Approve"), then the freeze ("Freeze it"). Manifest `38e23bad…`
-  (`state/p7e-candidate-2b6ee5d.json`). No bound file may change until E5.
+* **The first real P7-E candidate was FROZEN on 2026-11-22** ([E3 report](v3_sim_p7e_e3_real_candidate.md)):
+  production Policy A `26595bba…` ("Approve"), then the freeze ("Freeze it"). Manifest `38e23bad…`
+  (`state/p7e-candidate-2b6ee5d.json`).
+  * Its block 1 stopped (E4), and the candidate is retired. Its records are protected evidence.
+* **The second real P7-E candidate was FROZEN on 2026-11-27** with the same code ("Re-fly, same code"; then
+  "Approve" and "Freeze it"): production Policy A r2 `56c264e0…`
+  (`state/p7e-policy-A-approval-2b6ee5d-r2.json`), manifest `e9561f05…` (`state/p7e-candidate-2b6ee5d-r2.json`).
+  It flew blocks 1–3.
+* **Bound files.** No bound file has changed since the freeze, and none may change now. The accepted report's H9
+  reproducibility depends on them; they are release-bound, as the P3–P6 files are.
 * **E4 blocks 1–3 COMPLETED on 2026-11-27** ([E4 record](v3_sim_p7e_e4_blocks.md)).
   * The first attempt on `38e23bad…` was stopped in block 1 by an external termination. It was recovered into a
     recorded stop and is kept.
@@ -30,17 +40,18 @@
 * **E5 COMPLETE on 2026-11-28** ([E5 report](v3_sim_p7e_e5_report.md)).
   * The report says "engineering validation passed", with H1–H9 all met.
   * It was accepted by the operator ("Accept E5"). **P7-E is COMPLETE.**
-* Nothing is frozen or flown, and every later step needs its own explicit authorization (contract §13).
+* Every step above had its own explicit authorization (contract §13). Anything further needs a new operator
+  request: P7-A, a cleanup, a push or tag, or P8.
 
-It was prepared under the operator's request "P7 — Engineering Validation Revision Plan" (read-only review and
-proposal preparation only).
+**At E0 (2026-11-22)** this plan was prepared under the operator's request "P7 — Engineering Validation Revision
+Plan" (read-only review and proposal preparation only). The two lists below describe that preparation step only.
 
-**What was not done:**
+**What was not done at E0:**
 * No existing contract, plan, source, test, manifest, frozen candidate or evidence file was changed.
 * The 200-pair schedule selection was **not** confirmed or written.
 * No candidate was created, no SITL ran, nothing was deleted, nothing was pushed.
 
-**What was added (new files only):**
+**What was added at E0 (new files only):**
 * this plan;
 * the [draft contract revision](v3_sim_p7e_contract_draft.md);
 * the [retention and cleanup proposal](v3_sim_p7e_retention_proposal.md);
@@ -268,7 +279,7 @@ covering the 48 P7 flights, read-only.
 | Disk for P7-E runs | 60 × 1.33 GB, about **80 GB** (range 62–109 GB at the pilot's minimum and maximum). WSL has 776.4 GB free, leaving about 696 GB. D: grows by the same amount. |
 | Optional dry run (E8) | 2 flights, about 7 min, about 2.5 GB |
 | Offline work (E1, E2, E5) | no simulator; re-classifying 60 flights takes minutes |
-| Space a future cleanup could reclaim | 39.5 GB of raw depth from 107 P6 development dry runs (retention proposal). Under D4-B, P7-E's own raw depth (about 63 GB) becomes eligible only after its report is accepted and integrity-verified, and only by a separate approval. |
+| Space a future cleanup could reclaim | 39.5 GB of raw depth from 107 P6 development dry runs (retention proposal). Under D4-B, P7-E's own raw depth (about 63 GB) becomes eligible only after its report is accepted and integrity-verified, and only by a separate approval. **Actual (release closure, 2026-11-28):** the 65 P7-E runs (both candidates and E8) hold 78.4 GB of raw depth. Under manifest v3, 40.0 GB of it (35 flights) is ELIGIBLE and 38.4 GB is PROTECTED ([cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md)). |
 
 ## 11. Decisions requiring operator approval
 
