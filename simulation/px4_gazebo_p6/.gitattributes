@@ -1,0 +1,4 @@
+# The frozen P6 specifications and every P6 source are bound by SHA-256: keep their bytes identical on every checkout.
+configs/* text eol=lf
+*.sh text eol=lf
+*.py text eol=lf

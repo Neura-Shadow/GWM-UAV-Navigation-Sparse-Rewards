@@ -1,0 +1,2 @@
+# The P6 tests are bound by SHA-256 in the P6 manifest and the offline-suite result: keep their bytes identical.
+test_px4_gazebo_p6_*.py text eol=lf

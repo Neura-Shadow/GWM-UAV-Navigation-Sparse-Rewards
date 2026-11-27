@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "contract": "p5-policy-config-v1",
+  "enabled": false,
+  "model": {
+    "path": null,
+    "sha256": null,
+    "architecture": "p5-ranker-mlp-v1",
+    "require_trained": true
+  },
+  "inference": {
+    "failure_wall_s": 0.020,
+    "consecutive_failures_to_abort": 3
+  },
+  "shadow_p4_ranker": true,
+  "fallback": "none"
+}

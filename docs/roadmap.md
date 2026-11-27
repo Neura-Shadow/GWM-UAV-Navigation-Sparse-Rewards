@@ -285,9 +285,43 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   hardware). Candidate `c110bd30`; safety S1/S5/S6 3/3; seven flights, 0 collisions.
   [Final acceptance](v3_sim_p4_final_acceptance.md), [contract](v3_sim_p4_contract.md),
   [design](v3_sim_p4_plan.md). P5 is the next phase.
-- [ ] P5 Fixed-weight policy substitution
-- [ ] P6 Failure validation
-- [ ] P7 Batch evaluation
+- [x] P5 Fixed-weight policy substitution — **P5 COMPLETE — Qualification 3/3 PASSED** (contract
+  `p5-acceptance-v1`, revisions 1–3; Gates A, B, S and C passed for manifest `2becfbbb`; frozen
+  model `ee006a80`, no fallback, no online learning; PX4 SITL only, no hardware). Seven flights,
+  0 collisions, 0 policy failures. [Contract](v3_sim_p5_contract.md), [plan](v3_sim_p5_plan.md).
+  The earlier candidate `db4c4779` failed Gate C and remains on record.
+- [x] P6 Failure validation — **P6 COMPLETE — Gates A, B, S and C ACCEPTED** (contract
+  `p6-acceptance-v1`, with the operator decisions of M5–M6; manifest `22292775`, the accepted P5 stack `2becfbbb`
+  unchanged; PX4 SITL only, no hardware). 26 evaluated rows (Gate A 18/18, B 2/2, S 5/5, C 5/5), 12 flights:
+  0 collisions, minimum truth clearance 0.370 m, 0 unsafe commands, every flight landed and disarmed; every
+  required fault class covered. Existence demonstrations only, no rates. [Final acceptance](v3_sim_p6_final_acceptance.md),
+  [contract](v3_sim_p6_contract.md), [plan](v3_sim_p6_plan.md), [fault matrix](v3_sim_p6_fault_matrix.md),
+  [M0 audit](v3_sim_p6_m0_audit.md), [M3 report](v3_sim_p6_m3_offline_report.md),
+  [P3–P5 evidence backup plan](v3_sim_p3_p5_evidence_backup_plan.md). The development dry runs (no credit) remain
+  on record. P7 is the next phase.
+- [ ] P7 Batch evaluation — **planning underway (2026-11-21): plan and draft contract `p7-evaluation-v1`; decisions
+  D1–D14 approved as recommended (2026-11-21); the contract as a whole is not yet approved; nothing implemented or
+  run.** P7-A, the confirmatory part: paired P4 vs P5 SITL flights on fresh pre-registered layouts from the P5
+  layout generator (primary: goal success, exact McNemar; 200 pairs after a 40-flight pilot). D5 was revised to a
+  Selective Dependency Backup: the M0 dependency inventory is done and proposes a ≈ 12.6 GB minimal set
+  ([inventory](v3_sim_p7_m0_dependency_inventory.md)), set and C: destination approved 2026-11-21; **backup executed and verified 2026-11-21** (14 tars, 12.79 GB on
+  C:, restore check 0 problems). **M0 read-only audit done 2026-11-21** ([audit](v3_sim_p7_m0_audit.md));
+  its decisions D13 and D14 were approved as recommended the same day, so **M0 is complete**. **M1 specifications
+  generated and tested 2026-11-21** ([report](v3_sim_p7_m1_specs.md)): layout sets, schedules and analysis plan,
+  **approved 2026-11-21, so M1 is complete**. **M2 (runner and orchestrator, offline) built and tested
+  2026-11-21** ([report](v3_sim_p7_m2_runner.md)): C6 is met offline and 48 P7 tests pass. **Accepted 2026-11-21,
+  so M2 is complete.** **M3 classifier and frozen analysis code built and tested 2026-11-21**
+  ([report](v3_sim_p7_m3_classifier_analysis.md)): 113 P7 tests pass. M3 found that the M0 backup missed
+  `venv-px4`, now added as a verified Part E. **M3 accepted 2026-11-21, so M3 is
+  complete.** **M4 parity dry run done 2026-11-21** ([report](v3_sim_p7_m4_parity_dry_run.md)): S2 was flown
+  by P4 and P5 through the P7 path, the unchanged evaluators passed, and the result is identical to the accepted
+  S2 outcome. **Accepted 2026-11-21, so M4 is complete.** **M5 pilot stopped 2026-11-21 after 6 of 40 flights** ([record](v3_sim_p7_m5_pilot.md)): a safe P2
+  observation-gap RECOVERY was classified safety-unverified. D15 (Option A) fixed it. **The pilot completed
+  2026-11-22 on candidate `0799c37e`:** 40/40 flights, no stop; the pilot rule gives 200 pairs. **2026-11-22: the P7-E engineering-validation contract was
+  approved** ([plan](v3_sim_p7e_engineering_plan.md), [contract](v3_sim_p7e_contract_draft.md)): 30 pairs from pool
+  indices 200–229 in 3 blocks. P7-A is suspended (the selection is not written), and every P7-E step is separately
+  authorized. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
+  decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
 The existing Isaac and Cosys-AirSim integration paths retain their own status.
