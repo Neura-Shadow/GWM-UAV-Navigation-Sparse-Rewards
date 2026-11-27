@@ -4,7 +4,13 @@
 * **RC-1 ACCEPTED** (operator, 2026-11-28, "Accept RC-1"): the documentation corrections D1–D12 of §1.1 stand, as
   committed in `7156017`.
 * **RC-2 DONE** (operator, 2026-11-28, "Write RC-2"): the clarification record of §1.2 is written (`073e4646…`).
-* RC-3 to RC-7 are still open (§5).
+* **RC-3 DONE** (operator, 2026-11-28, "Create the tag"): the annotated tag `v3.7.0-p7e-engineering-validation` exists
+  locally.
+  * Tag object `441ec508101f94578e1892c7032138414e8e0417`, on commit
+    `59a70a142de805d3658f0083182440f2c985e1f0`. That is the closure commit, with RC-1 and RC-2.
+  * Its message is the §3 summary with the identities.
+  * It is not pushed. This note is recorded in the commit after the tagged one.
+* RC-4 to RC-7 are still open (§5).
 * **Authority:** the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation". It authorizes
   read-only auditing and proposal preparation only.
 * **What changed:**
@@ -150,7 +156,7 @@ Every verifier ran from `/tmp` with `GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1` an
   * the 18 hover-timeout failures are the motivation for P8;
   * 30 pairs cannot rank the controllers (McNemar power 3 %).
 
-## 4. Proposed Git tag (not created)
+## 4. Git tag (created locally on 2026-11-28 under RC-3; not pushed)
 
 | Field | Proposal |
 |---|---|
@@ -172,7 +178,7 @@ git push origin v3.7.0-p7e-engineering-validation
 |---|---|---|
 | RC-1 | Accept the documentation corrections D1–D12 (§1.1), as committed locally | **ACCEPTED by the operator on 2026-11-28 ("Accept RC-1")**; the corrections are in commit `7156017` |
 | RC-2 | Write the clarification record of §1.2 (no value changes; the report untouched) | **DONE (operator, 2026-11-28, "Write RC-2")**: `v3_sim_p7e_engineering_report_clarification_1.json` (`073e4646…`) |
-| RC-3 | Create the annotated tag of §4, locally | after RC-1 |
+| RC-3 | Create the annotated tag of §4, locally | **DONE (operator, 2026-11-28, "Create the tag")**: `v3.7.0-p7e-engineering-validation`, tag object `441ec508…` on commit `59a70a1`; local only, not pushed |
 | RC-4 | Push the branch (46 + closure commits) and the tag | separate authorization; no PR or merge implied |
 | RC-5 | Open a PR or merge into `main` | separate; not proposed now |
 | RC-6 | Cleanup | see the [cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md) (decisions C-1 to C-8) |
