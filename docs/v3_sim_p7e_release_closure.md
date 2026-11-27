@@ -9,8 +9,10 @@
   * Tag object `441ec508101f94578e1892c7032138414e8e0417`, on commit
     `59a70a142de805d3658f0083182440f2c985e1f0`. That is the closure commit, with RC-1 and RC-2.
   * Its message is the §3 summary with the identities.
-  * It is not pushed. This note is recorded in the commit after the tagged one.
-* RC-4 to RC-7 are still open (§5).
+  * This note is recorded in the commit after the tagged one.
+* **RC-4 DONE** (operator, 2026-11-28, "Push both"): origin has the branch at `66613f9` (fast-forward from
+  `a5a0df4`, 50 commits) and the tag. Both were checked with `git ls-remote`. This record is a later local commit.
+* RC-5 to RC-7 are still open (§5). No PR is open, and nothing is merged into `main`.
 * **Authority:** the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation". It authorizes
   read-only auditing and proposal preparation only.
 * **What changed:**
@@ -179,7 +181,7 @@ git push origin v3.7.0-p7e-engineering-validation
 | RC-1 | Accept the documentation corrections D1–D12 (§1.1), as committed locally | **ACCEPTED by the operator on 2026-11-28 ("Accept RC-1")**; the corrections are in commit `7156017` |
 | RC-2 | Write the clarification record of §1.2 (no value changes; the report untouched) | **DONE (operator, 2026-11-28, "Write RC-2")**: `v3_sim_p7e_engineering_report_clarification_1.json` (`073e4646…`) |
 | RC-3 | Create the annotated tag of §4, locally | **DONE (operator, 2026-11-28, "Create the tag")**: `v3.7.0-p7e-engineering-validation`, tag object `441ec508…` on commit `59a70a1`; local only, not pushed |
-| RC-4 | Push the branch (46 + closure commits) and the tag | separate authorization; no PR or merge implied |
+| RC-4 | Push the branch (46 + closure commits) and the tag | **DONE (operator, 2026-11-28, "Push both")**: branch `a5a0df4..66613f9` (fast-forward, 50 commits) and tag `v3.7.0-p7e-engineering-validation` (`441ec508…` → `59a70a1`) on origin; no PR or merge |
 | RC-5 | Open a PR or merge into `main` | separate; not proposed now |
 | RC-6 | Cleanup | see the [cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md) (decisions C-1 to C-8) |
 | RC-7 | P8 | see the [P8 proposal](v3_sim_p8_proposal.md) (decisions P8-D1 to P8-D8) |
