@@ -298,3 +298,61 @@ Block 3 plan (slots 21–30):
 
 Block 3 is the last block of `engineering-30`. It needs its own authorization:
 "authorize P7-E engineering-30 block 3 e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608".
+
+## Second real candidate `e9561f05…`: block 3 (COMPLETED 2026-11-27)
+
+**Records:**
+* the block 3 authorization: `state/p7e-authorization-engineering-30-block-03-e9561f05de28.json` (`87db8fe1…`);
+* the result: `state/p7e-engineering-30-block-03-e9561f05….result.json` (`d4da3561…`), and its ledger (`7a6b3a79…`).
+
+**Run:**
+* launched detached (PID 262208, its own session, no terminal); log `~/uav_autonomy/logs/p7e-block-03-e9561f05de28.log`;
+* the host check passed (714 GB free, CPU mean 2.0 %, AC online);
+* 63.1 min for the 20 flights (slots 21–30).
+
+**Result:**
+* **not stopped**: 20 of 20 flown, all **valid**; no replacement, no missing pair, nothing unflown or interrupted; no
+  exception, nothing recovered from the ledger;
+* accounting complete (20 `flown_valid`);
+* the candidate unchanged at the end, no drift; the live lock released; no simulator process left.
+
+**Safety (all 20 flights):**
+* 0 safety events, 0 safety-unverified flights, FC-3 not applied, 0 collisions;
+* every flight's P7-E classification equals the frozen classifier's;
+* minimum truth clearance 0.310 m (slot 29, P4). The limit is ≥ 0.20 m.
+
+**Outcomes:**
+* goal success: P4 9 of 10, P5 9 of 10;
+* both failures are the accepted P4 supervisor's `hover_timeout` abort, in the same pair (slot 23). Their accepted
+  evaluations passed, and neither has an event of any class.
+* By pair:
+  * both reached the goal: slots 21, 22, 24, 25, 26, 27, 28, 29, 30;
+  * both hovered out: slot 23.
+* **These counts are descriptive only** (contract §7).
+
+**Integrity events:** one, in slot 27 with P4: `performance:compute_max`. One perception frame took 0.640 s of
+compute (at sim time 76.6 s, 2 involuntary context switches); the accepted P4 limit is 0.090 s, and that flight's p99
+was 0.045 s. So that flight's accepted P4 evaluation reports failed on this item alone (evaluator exit code 1). Its
+safety section is clean: 0 collisions, clearance 0.469 m, no setpoint inside an inflated obstacle. It is a valid goal
+success with no safety item, and it is reported under R10.
+
+## `engineering-30` on `e9561f05…`: the batch (all three blocks COMPLETED)
+
+| Block | Slots | Flown | Valid | Stopped | Replacements | Minutes | Min clearance (m) | Integrity events |
+|---:|---|---:|---:|---|---:|---:|---:|---|
+| 1 | 1–10 | 20 | 20 | no | 0 | 61.6 | 0.371 | s10 P5 `cleanup:gazebo:forced_kill_after_grace` |
+| 2 | 11–20 | 20 | 20 | no | 0 | 64.6 | 0.348 | none |
+| 3 | 21–30 | 20 | 20 | no | 0 | 63.1 | 0.310 | s27 P4 `performance:compute_max` |
+| **all** | 1–30 | **60** | **60** | — | **0** | 189.3 | **0.310** | 2 |
+
+* 0 safety events and 0 safety-unverified flights in all 60 flights; FC-1, FC-2 and FC-3 never stopped a block.
+* Goal success: P4 20 of 30, P5 22 of 30. All 18 failures are `hover_timeout` aborts. **Descriptive only; no
+  claim of superiority (contract §7).**
+* Read-only check after block 3: the candidate verifies with no drift; FC-1 sees block 3 unstopped and complete; no
+  lock is held; no simulator process remains.
+* The stopped first attempt on `38e23bad…` (block 1, `sequencer_terminated_externally`) stays protected evidence,
+  and the E5 report must describe it.
+
+**Next (needs its own authorization):** E5, offline only. It re-classifies all 60 flights on read-only views (H9),
+then writes the engineering report with H1–H9, R1–R10 and the risk register (`analysis/p7e_report.py`). After that
+comes operator acceptance. Bound files stay unchanged until then.
