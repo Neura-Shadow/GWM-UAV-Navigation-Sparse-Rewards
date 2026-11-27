@@ -239,3 +239,62 @@ with no safety item, and it is reported under R10.
 * FC-1 allows block 2, because block 1 is unstopped and complete;
 * no block 2 result, ledger or marker exists; no lock is held;
 * the host check passes (743 GB free).
+
+## Second real candidate `e9561f05…`: block 2 (COMPLETED 2026-11-27)
+
+**Records:**
+* the block 2 authorization: `state/p7e-authorization-engineering-30-block-02-e9561f05de28.json` (`33256d22…`);
+* the result: `state/p7e-engineering-30-block-02-e9561f05….result.json` (`62c23933…`), and its ledger (`1723d124…`).
+
+**Run:**
+* launched detached (PID 140158, its own session, no terminal); log `~/uav_autonomy/logs/p7e-block-02-e9561f05de28.log`;
+* the host check passed (743 GB free, AC online);
+* 64.6 min for the 20 flights (slots 11–20).
+
+**Result:**
+* **not stopped**: 20 of 20 flown, all **valid**; no replacement, no missing pair, nothing unflown or interrupted; no
+  exception, nothing recovered from the ledger;
+* accounting complete (20 `flown_valid`);
+* the candidate unchanged at the end, no drift; the live lock released; no simulator process left.
+
+**Safety (all 20 flights):**
+* 0 safety events, 0 safety-unverified flights, FC-3 not applied, 0 collisions;
+* every flight's P7-E classification equals the frozen classifier's;
+* minimum truth clearance 0.348 m (slot 15, P4). The limit is ≥ 0.20 m.
+
+**Outcomes:**
+* goal success: P4 5 of 10, P5 6 of 10;
+* all 9 failures are the accepted P4 supervisor's `hover_timeout` abort (final state `COMPLETE`, outcome
+  `supervisor_abort`). Their accepted evaluations passed, and none has an event of any class.
+* By pair:
+  * both reached the goal: slots 11, 13, 17, 19, 20;
+  * both hovered out: slots 12, 14, 16, 18;
+  * slot 15: P5 reached the goal, P4 hovered out.
+* After two blocks: P4 11 of 20, P5 13 of 20. **These counts are descriptive only** (contract §7).
+
+**Integrity events:** none in block 2.
+
+**Block 3 pre-check (read-only):**
+* the candidate verifies, with no drift; development false;
+* FC-1 allows block 3, because block 2 is unstopped and complete and its ledger matches;
+* no block 3 result, ledger or marker exists; no lock is held;
+* the MC-trace build is selected;
+* the host check passes: CPU mean 0.8 % (max 15 %), 714 GB free, AC online, no simulator process.
+
+Block 3 plan (slots 21–30):
+
+| Slot | Layout | Family | Order |
+|---:|---|---|---|
+| 21 | p7c-4000364 | pillars | p5→p4 |
+| 22 | p7c-4000388 | partial_wall | p5→p4 |
+| 23 | p7c-4000366 | mixed | p4→p5 |
+| 24 | p7c-4000368 | pillars | p5→p4 |
+| 25 | p7c-4000378 | mixed | p4→p5 |
+| 26 | p7c-4000356 | wall_with_gap | p5→p4 |
+| 27 | p7c-4000352 | pillars | p4→p5 |
+| 28 | p7c-4000358 | wall_with_gap | p4→p5 |
+| 29 | p7c-4000389 | pillars | p5→p4 |
+| 30 | p7c-4000365 | pillars | p4→p5 |
+
+Block 3 is the last block of `engineering-30`. It needs its own authorization:
+"authorize P7-E engineering-30 block 3 e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608".
