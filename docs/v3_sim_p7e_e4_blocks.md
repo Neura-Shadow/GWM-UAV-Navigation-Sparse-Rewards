@@ -15,7 +15,8 @@
 
 ## Block 1
 
-**Status: PREPARED (2026-11-22), awaiting the operator's authorization. Nothing written or flown.**
+**Status: INTERRUPTED (2026-11-22), with no result written. It is fail-closed: nothing can proceed on this candidate
+until the operator decides.** See "Block 1: what happened" below.
 
 **The plan:** 10 pairs, 20 flights, each pair back to back in the listed order, 5 of them P4 first. It takes about
 65 min and about 26 GB.
@@ -65,3 +66,53 @@
 **While the block runs:**
 * No P7-E, P7 or test file may be edited: drift stops the block.
 * Avoid heavy Windows workloads during the block.
+
+## Block 1: what happened (read-only investigation, 2026-11-27)
+
+**Authorized:** "Authorize (Recommended)" on 2026-11-22. The authorization is
+`state/p7e-authorization-engineering-30-block-01-38e23bad4bd4.json` (`71e81930…`). It was consumed at 16:00:45 (all
+times +08:00), and the live lock was taken.
+
+**Flown:**
+
+| # | Flight | Run | Outcome |
+|---:|---|---|---|
+| 1 | slot 1, P4 | `20261122T080108Z-p7e-p4-p7c-4000351-ce7909e5` | evaluator passed; valid **goal success**; FC-3 no change; in the ledger |
+| 2 | slot 1, P5 | `20261122T080429Z-p7e-p5-p7c-4000351-884f1857` | valid **failure**, no stop reason; in the ledger (details below) |
+| 3 | slot 2, P4 | `20261122T080735Z-p7e-p4-p7c-4000367-65260acf` | runtime finished cleanly at 16:10:22 (COMPLETE, finalized); **never evaluated, classified or put in the ledger** |
+
+**Flight 2.** The P2 controller aborted on `stale_action` during transit and landed fail-closed (RECOVERY).
+* Clearance 0.849 m, 0 collisions.
+* The accepted P2 integrity check raised (`estimator_reference_reset:final_alignment_lost`). Under D15, the ULog facts
+  held: own commands 176/400/21, landed and disarmed, no failsafe, Policy A checked.
+* The frozen classifier filed everything as integrity events, with no stop:
+  * `runtime_status`, `cleanup`, `performance:compute_max`, `rgb_absence`, `p2:timing`, `p2_integrity_error`,
+    `mc_causal_yaw`.
+* It belongs with the risk register's RR1 (a P2 fail-closed RECOVERY after a slowdown). Under the rules, continuing
+  was correct.
+
+**How it stopped:**
+* **The sequencer died without an exception.** It was PID 457251, run as a background child of the Claude Code
+  session. It wrote no result and released no lock.
+* **The likely cause** is a hangup signal (SIGHUP) when that session ended. It arrived some time between 16:07:35
+  and 16:10:22.
+  * A signal is not a Python exception, so the FC-1 handler did not run.
+  * Flight 3 ran as PID 1 of its own namespace. A namespace's PID 1 ignores that signal from outside, so the flight
+    finished alone.
+  * The log was in `/tmp`, so the exact moment is lost.
+* **The WSL VM** stayed up until 16:21:28, then powered off. It was not the cause.
+
+**State now:**
+* marker consumed;
+* ledger with 2 lines (`…block-01-38e23bad….ledger.jsonl`);
+* **no result file**;
+* a **stale live lock** `state/p7e-live-run.lock`, naming the dead PID 457251;
+* no simulator process.
+
+**Effect (fail-closed):**
+* Block 2 is refused, because there is no unstopped, complete block 1 result.
+* Block 1 cannot run again on this candidate: the ledger exists and the marker is consumed.
+* The stale lock blocks every P7 and P7-E sequence and freeze.
+
+**Gap found.** FC-1 turns every exception into a stop. Termination by a signal (SIGHUP, SIGTERM, SIGKILL) or a power
+loss bypasses it. It still ends fail-closed, as above, but it leaves no record.
