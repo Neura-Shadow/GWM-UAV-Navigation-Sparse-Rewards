@@ -1,7 +1,8 @@
 # v3-SIM P7-E E5: the engineering report
 
-**Status: PREPARED, not run.** E5 needs the operator's explicit authorization (contract §13 item 9). Accepting the
-report is a separate step after that.
+**Status: RUN, awaiting the operator's acceptance.** The report says **"engineering validation passed"** (§4).
+* E5 was authorized on 2026-11-28 ("Authorize (Recommended)") and run once.
+* Accepting the report is a separate step (contract §13 item 9).
 
 **Candidate:** `state/p7e-candidate-2b6ee5d-r2.json`, manifest
 `e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608`.
@@ -88,3 +89,109 @@ That evidence stays protected. Its flights are not part of the 60.
 the CRLF working copies look changed. Windows git shows none, and the manifest finds no drift. Nothing was changed.
 
 No H or R value was computed in the pre-check.
+
+## 4. Result (run once, 2026-11-28)
+
+**Records:**
+* the report: `state/p7e-engineering-report-e9561f05de28.json`, 80 574 bytes, SHA-256 `e2fb9607…c12d09c`;
+* its byte-identical copy: [`evidence/v3_sim_p7e_engineering_report.json`](evidence/v3_sim_p7e_engineering_report.json)
+  (same hash, compared with `cmp`).
+* **Run:**
+  * detached (PID 380014), 3.4 min (16:43:56 to 16:47:19 UTC); log `~/uav_autonomy/logs/p7e-e5-report-e9561f05de28.log`;
+  * exit 0, printing `{"status": "engineering validation passed", "not_passed_reasons": []}`.
+* **Bindings in the report:**
+  * report code `8734bbe9…`, report plan canonical `15e7f7b4…`, schedule canonical `9b3deacb…`;
+  * manifest `e9561f05…`, with P7 `0799c37e` and P3 `1e205fec`, P4 `c110bd30`, P5 `2becfbbb`, P6 `22292775`.
+* **After the run:**
+  * the manifest still verifies;
+  * no H9 view directory is left in `/tmp`, and no lock is held;
+  * H9 shows that no run file changed.
+
+**Status: "engineering validation passed"**, with no not-passed reason. It carries the contract's statement of a
+pass: *"the accepted P4 and P5 stacks completed the declared 60-flight engineering validation through the P7
+infrastructure, with every hard criterion H1-H9 met"*.
+
+### Hard criteria (all met)
+
+| ID | Criterion | Limit | Value |
+|---|---|---|---|
+| H1 | collisions | 0 | 0 |
+| H2 | minimum truth clearance, every valid flight (60, none unmeasured) | ≥ 0.20 m | 0.310 m |
+| H3 | unsafe commands | 0 | 0 |
+| H4 | Policy A breaches (60 flights checked, none unchecked) | 0 | 0 |
+| H5 | landed and disarmed with own commands 176/400/21 | every valid flight | 60 of 60 |
+| H6 | safety-unverified flights (FC-3 included) | 0 | 0 |
+| H7 | complete, hash-matched evidence; ledgers intact line for line | 100 % | 60/60; 3 ledgers match |
+| H8 | plan, accounting, replacement cap, stops explained | per block | 3 blocks unstopped, 20 `flown_valid` each, 0 replacements; batch completed |
+| H9 | reproducibility | identical | manifest and specs verify; results bind the manifest; worlds 60/60; frozen classifier reproduces 60/60; FC-3 reproduces 60/60; run files unchanged 60/60 |
+
+### Reported criteria (descriptive; every paired difference is P5 − P4; no p-value)
+
+| ID | What | P4 | P5 |
+|---|---|---|---|
+| R1 | goal success (Clopper–Pearson 95 %) | 20/30 = 0.667 [0.472, 0.827] | 22/30 = 0.733 [0.541, 0.877] |
+| R3 | P2 timing passed; observation-gap aborts | 30/30; 0 | 30/30; 0 |
+| R4 | perception compute max (median / max); accepted limit 0.090 s | 0.025 / **0.640 s** (1 breach) | 0.024 / 0.043 s |
+| R5 | P5 inference max (median / max); limit 0.010 s; failure ticks, fallbacks, outside-mask | — | 0.0017 / 0.0063 s; 0, 0, 0 |
+| R6 | response latency max; tracking max (limits 0.25 s, 0.30 m) | 0.164 s; 0.263 m | 0.152 s; 0.269 m |
+| R8 | wall time per flight (median / max); RTF mean (median) | 168 / 190 s; 0.998 | 168 / 233 s; 0.998 |
+| R9 | abort types | `hover_timeout` 10 | `hover_timeout` 8 |
+| R10 | integrity events | `performance:compute_max` 1 (slot 27) | `cleanup:gazebo:forced_kill_after_grace` 1 (slot 10) |
+
+* **R2, paired (30 pairs, none missing):**
+  * both reached the goal 20, neither 8, P5 only 2, P4 only 0;
+  * difference +0.067, Tango 95 % [−0.054, 0.213].
+* **R7, on the 20 both-success pairs (Hodges–Lehmann):**
+  * time to goal −0.255 s [−1.010, 0.100] (medians 41.79 s and 41.85 s);
+  * path length +0.027 m [−0.122, 0.141].
+* **R8, host:**
+  * every block's host check passed (CPU mean 0.0, 1.4, 2.0 %);
+  * minimum available memory 6.6 GB;
+  * every flight has at least one stall below RTF 0.5 (median 2 for both controllers), as in the pilot.
+  * The 60 runs use 83.7 GB. The largest is slot 12 P5 at 2.81 GB, above the pilot's 1.82 GB maximum (RR4, no
+    change).
+* **Safety bounds:** 0 safety events and 0 mission-failure flights per controller. The one-sided 95 % upper bound
+  is 0.095 per flight for each controller.
+* **Paired clearance (descriptive, no non-inferiority test):** P5 − P4 median +0.002 m, range [−0.094, +0.593].
+
+### Risk register
+
+* **Open, and closed by neither result (contract §10):**
+  * RR1, the P2 observation-gap RECOVERY: 0 aborts per controller here (the pilot had 2, both P5);
+  * RR2, P5 repeat-behaviour inconsistency: P7-E cannot measure it.
+* **Proposed new entry from an R breach:**
+  * R4 `performance:compute_max`, slot 27 P4 (`20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d`);
+  * one perception frame took 0.640 s of compute (2 involuntary context switches), with that flight's p99 at
+    0.045 s;
+  * treatment proposed: record and monitor, with no threshold change.
+* **R10 integrity events** are reported, not entered as risks:
+  * slot 27 P4, the same frame;
+  * slot 10 P5, a forced Gazebo kill at shutdown.
+
+### Statements carried by the report
+
+* **Required statement (verbatim):** "This engineering validation was not designed to compare P5 with P4. With 30
+  pairs, a test of the planning effect would have about 3 % power. Observed differences between the controllers
+  are descriptive and do not show that either is superior."
+* **Not claimed:**
+  * superiority or inferiority of either ranker;
+  * statistical significance;
+  * real-hardware behaviour;
+  * results outside the declared layouts, mission, speed, static boxes or this host;
+  * any change to P2–P6 acceptance.
+* **30-pair limits:**
+  * McNemar power 3 % at the planning effect, 8 % at the pilot's discordance;
+  * Tango width about 0.29–0.32;
+  * the 95 % interval for 15/30 is [0.313, 0.687];
+  * the zero-event bound is 0.095 per flight over 30 flights, 0.049 over 60.
+
+## 5. What acceptance would mean (for the operator's decision)
+
+Accepting this report closes E5 and the P7-E engineering validation under contract `p7-engineering-validation-v1`:
+the accepted P4 and P5 stacks ran 60 flights safely and completely through the P7 infrastructure. It would not
+authorize anything else.
+* No push and no merge.
+* No cleanup or deletion. Under D4-B, P7-E's raw depth becomes eligible only for a separately designed, tested and
+  approved cleanup.
+* No change to P2–P6 or to the frozen P7 candidate, and no use of the 200-pair schedule-selection record.
+* No superiority claim.
