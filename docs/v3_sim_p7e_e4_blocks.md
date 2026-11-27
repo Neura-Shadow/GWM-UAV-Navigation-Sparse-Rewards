@@ -116,3 +116,41 @@ times +08:00), and the live lock was taken.
 
 **Gap found.** FC-1 turns every exception into a stop. Termination by a signal (SIGHUP, SIGTERM, SIGKILL) or a power
 loss bypasses it. It still ends fail-closed, as above, but it leaves no record.
+
+## Block 1: recovery (operator "Authorize recovery", 2026-11-27)
+
+**Tool:** [`p7e_block_recovery.py`](../diagnostics/p7e/p7e_block_recovery.py). It lives in `diagnostics/`, outside the
+P7-E candidate, so the candidate does not drift. Its 13 offline tests are in
+[`test_p7e_block_recovery.py`](../diagnostics/p7e/test_p7e_block_recovery.py), also outside `tests/`, and all pass:
+the stop record, a stop reason carried over from the orphan, and nine refusal cases that change nothing.
+
+**What it did,** after a copy test. The full procedure first ran on a scratch root with copied state and a symlink
+view of flight 3. The real run and the real state were unchanged by that test.
+1. **Checks passed:**
+   * no result existed; the marker matched the authorization;
+   * the lock's PID 457251 is not a live sequencer;
+   * no simulator process was running;
+   * the ledger is the plan's prefix;
+   * exactly one orphaned run, the next planned flight, was not yet evaluated.
+2. **Flight 3** (slot 2, P4, `20261122T080735Z-p7e-p4-p7c-4000367-65260acf`) was verified as the sequencer would have
+   done it. The unchanged `p4_evaluate` **passed** with no failure item. The frozen classifier gave a valid **goal
+   success**, clearance 0.984 m, no event in any class. FC-3 changed nothing. These outputs are identical to the copy
+   test's.
+3. **The stop record** was written: `state/p7e-engineering-30-block-01-38e23bad….result.json` (`5f7c2326…`).
+   * stopped, stop reason `sequencer_terminated_externally`;
+   * flights: the 2 ledger flights; the ledger is unchanged and its hash matches;
+   * interrupted: flight 3, with its record; not flown: 17;
+   * accounting complete: 2 `flown_valid`, 1 `interrupted`, 17 `not_flown`;
+   * marked `reconstructed`.
+4. **The receipt:** `…block-01-38e23bad….recovery.json` (`0c7c3c77…`).
+5. **The stale lock was removed.** Its content and hash are kept in the receipt.
+
+**State after the recovery:**
+* no live lock;
+* the P7-E candidate `38e23bad…` and the P7 candidate `0799c37e…` both verify, with no drift;
+* FC-1 refuses block 2 on this candidate, because block 1 is stopped.
+
+**Safety of all three flown flights is verified:** 0 collisions, minimum clearance 0.849 m, no safety event, no
+safety-unverified flight.
+
+**Open: the operator's decision on how to continue.** Block 1 cannot resume on `38e23bad…`.
