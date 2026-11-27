@@ -1,0 +1,5871 @@
+{
+ "candidate": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+ "config": {
+  "envelope": {
+   "r_body_m": 0.39,
+   "z_max_m": 0.07,
+   "z_min_m": -0.23
+  },
+  "geofence": {
+   "height_max_m": 3.0,
+   "height_min_m": 1.0,
+   "x_max_m": 9.5,
+   "x_min_m": -1.0,
+   "y_abs_max_m": 3.0
+  },
+  "planner": {
+   "clearance_cap_m": 1.0,
+   "d_stop_m": 0.3,
+   "heading_step_deg": 10.0,
+   "heading_steps": 6,
+   "lengths_m": [
+    0.75,
+    1.5
+   ],
+   "min_progress_m": 0.05,
+   "observable_half_angle_deg": 25.0,
+   "r_infl_m": 1.0,
+   "tracking_m": 0.3,
+   "trigger_range_m": 3.0,
+   "weights": {
+    "clearance": 0.3,
+    "deviation": 0.6,
+    "progress": 1.0,
+    "turn": 0.2
+   },
+   "yaw_disc_margin_m": 0.1
+  },
+  "supervisor": {
+   "adapter_health_max_age_sim_s": 2.0,
+   "hover_timeout_sim_s": 20.0,
+   "min_clearance_margin_m": 0.1,
+   "resume_deviation_m": 0.1,
+   "stale_abort_sim_s": 10.0,
+   "transit_deadline_sim_s": 150.0
+  }
+ },
+ "contract": "p8-hover-timeout-analysis-v1",
+ "flights": [
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.781,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 116.392,
+   "family": "pillars",
+   "goal_clearance_truth_m": 6.0616350178559495,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 116.244,
+   "layout": "p7c-4000351",
+   "metrics": {
+    "detour_ratio": 1.2049025548100665,
+    "final_goal_distance_m": 0.008327085896638796,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8419822094143052,
+    "path_length_m": 9.639220438480532,
+    "time_to_goal_sim_s": 41.788
+   },
+   "min_goal_distance_m": 0.008739947632815069,
+   "no_improvement_before_end_s": 0.14799999999999613,
+   "outcome": "goal_success",
+   "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+   "side_switches": {
+    "chosen_sided": 272,
+    "per_min": 1.4376078205865443,
+    "switches": 1
+   },
+   "slot": 1,
+   "snapshot_age_sim_s": {
+    "max": 0.1799999999999926,
+    "median": 0.10000000000000853,
+    "min": 0.031999999999996476,
+    "n": 837
+   },
+   "stale_decisions": {},
+   "ticks": 837,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 9.448,
+    "NORMAL": 11.1,
+    "RESUME": 21.188
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.826,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 116.444,
+   "family": "pillars",
+   "goal_clearance_truth_m": 6.035971009089795,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.744,
+   "layout": "p7c-4000351",
+   "metrics": {
+    "detour_ratio": 1.1787613636681724,
+    "final_goal_distance_m": 0.032093572267905324,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.7864194840364085,
+    "path_length_m": 9.43009090934538,
+    "time_to_goal_sim_s": 41.900000000000006
+   },
+   "min_goal_distance_m": 0.03881187995090073,
+   "no_improvement_before_end_s": 0.7000000000000028,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 429,
+    "interventions": {},
+    "margin": {
+     "max": 0.5268555796845176,
+     "median": 0.07383010820780855,
+     "min": 0.0005472636635897032,
+     "n": 811
+    },
+    "margin_below_0_25_fraction": 0.8828606658446363,
+    "ticks": 838
+   },
+   "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+   "side_switches": {
+    "chosen_sided": 196,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 1,
+   "snapshot_age_sim_s": {
+    "max": 0.15200000000000102,
+    "median": 0.09999999999999432,
+    "min": 0.0519999999999925,
+    "n": 838
+   },
+   "stale_decisions": {},
+   "ticks": 838,
+   "ticks_without_progress_candidate": 27,
+   "time_in_state_sim_s": {
+    "AVOIDING": 8.1,
+    "NORMAL": 7.2,
+    "RESUME": 26.548
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 122.948,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 3.131024903739329,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 122.1,
+   "layout": "p7c-4000367",
+   "metrics": {
+    "detour_ratio": 1.2941007101081357,
+    "final_goal_distance_m": 0.02911582226483425,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9799273825926462,
+    "path_length_m": 10.352805680865085,
+    "time_to_goal_sim_s": 48.27199999999999
+   },
+   "min_goal_distance_m": 0.0500320081372764,
+   "no_improvement_before_end_s": 0.847999999999999,
+   "outcome": "goal_success",
+   "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+   "side_switches": {
+    "chosen_sided": 369,
+    "per_min": 6.22096881220969,
+    "switches": 5
+   },
+   "slot": 2,
+   "snapshot_age_sim_s": {
+    "max": 0.1560000000000059,
+    "median": 0.08800000000000807,
+    "min": 0.036000000000001364,
+    "n": 966
+   },
+   "stale_decisions": {},
+   "ticks": 966,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 21.348,
+    "NORMAL": 13.332,
+    "RESUME": 13.544
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 74
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p5",
+   "end_sim_s": 118.188,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 3.132874552985252,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 117.288,
+   "layout": "p7c-4000367",
+   "metrics": {
+    "detour_ratio": 1.2267672987054117,
+    "final_goal_distance_m": 0.0444538740941002,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9344731244454587,
+    "path_length_m": 9.814138389643293,
+    "time_to_goal_sim_s": 43.384
+   },
+   "min_goal_distance_m": 0.04105077386541215,
+   "no_improvement_before_end_s": 0.9000000000000057,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 590,
+    "interventions": {},
+    "margin": {
+     "max": 0.7701572611617218,
+     "median": 0.14273368054704738,
+     "min": 0.00034627034775391863,
+     "n": 841
+    },
+    "margin_below_0_25_fraction": 0.7491082045184304,
+    "ticks": 868
+   },
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "side_switches": {
+    "chosen_sided": 471,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 2,
+   "snapshot_age_sim_s": {
+    "max": 0.17600000000000193,
+    "median": 0.09199999999999875,
+    "min": 0.03599999999998715,
+    "n": 868
+   },
+   "stale_decisions": {},
+   "ticks": 868,
+   "ticks_without_progress_candidate": 27,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.4,
+    "NORMAL": 13.836,
+    "RESUME": 14.1
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.242,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 119.404,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 99.356,
+    "from": "AVOIDING",
+    "goal_distance_m": 3.188084546452413,
+    "mode": "mid_course",
+    "nearest_stall_s": 95.556,
+    "net_progress_m": 4.62847894465545,
+    "path_length_m": 4.7441104804232035,
+    "position_enu": [
+     4.873012193698431,
+     0.5765086220138543
+    ],
+    "radius_of_gyration_m": 1.4093531802845802,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 2.4751525839559387,
+     "cells": {
+      "free": 7414,
+      "occupied": 149,
+      "unknown": 6937
+     },
+     "frontier_best_goal_distance_m": 7.758737268257114,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 3.188084546452413,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 99.332,
+     "reachable_cells_strict": 1830,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.7129319624964743,
+     "terminal_segment": {
+      "length_m": 3.188084546452413,
+      "occupied_cells": 14,
+      "unknown_beyond_goal_x": 25,
+      "unknown_cells": 36,
+      "unknown_lateral_over_0_39_m": 22
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 28
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9756262978602812,
+    "window_before_s": 30.0,
+    "x_progress_m": 4.8645184750072605
+   },
+   "goal_clearance_truth_m": 2.0507074465218276,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 99.356
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 99.856,
+   "layout": "p7c-4000355",
+   "metrics": {
+    "detour_ratio": 0.8239159088665718,
+    "final_goal_distance_m": 3.2075675253831504,
+    "hover_time_sim_s": 20.048000000000002,
+    "min_truth_clearance_m": 0.6667475355062009,
+    "path_length_m": 6.591327270932575,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 3.168226710259491,
+   "no_improvement_before_end_s": 19.548000000000002,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 420,
+    "interventions": {},
+    "margin": {
+     "max": 0.7351122573002637,
+     "median": 0.12609207694392532,
+     "min": 0.0005678146950032215,
+     "n": 482
+    },
+    "margin_below_0_25_fraction": 0.8921161825726142,
+    "ticks": 896
+   },
+   "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+   "side_switches": {
+    "chosen_sided": 289,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 3,
+   "snapshot_age_sim_s": {
+    "max": 0.132000000000005,
+    "median": 0.08399999999999608,
+    "min": 0.03999999999999204,
+    "n": 896
+   },
+   "stale_decisions": {},
+   "ticks": 896,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 7.652,
+    "HOVER": 20.048,
+    "NORMAL": 17.048
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.242,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 119.74,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 400
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 99.736,
+    "from": "AVOIDING",
+    "goal_distance_m": 3.1408174228697603,
+    "mode": "mid_course",
+    "nearest_stall_s": 95.91600000000001,
+    "net_progress_m": 4.698076163782954,
+    "path_length_m": 4.807676912304512,
+    "position_enu": [
+     4.8679437748422885,
+     0.5130116713449953
+    ],
+    "radius_of_gyration_m": 1.421461854337885,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 2.5574875961349868,
+     "cells": {
+      "free": 7345,
+      "occupied": 140,
+      "unknown": 7015
+     },
+     "frontier_best_goal_distance_m": 7.742972491309729,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 3.1408174228697603,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 99.728,
+     "reachable_cells_strict": 1821,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.5833298267347735,
+     "terminal_segment": {
+      "length_m": 3.1408174228697603,
+      "occupied_cells": 14,
+      "unknown_beyond_goal_x": 23,
+      "unknown_cells": 47,
+      "unknown_lateral_over_0_39_m": 37
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 29
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9772029713059437,
+    "window_before_s": 30.0,
+    "x_progress_m": 4.899997819148567
+   },
+   "goal_clearance_truth_m": 2.0106277970535493,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 99.736
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 100.788,
+   "layout": "p7c-4000355",
+   "metrics": {
+    "detour_ratio": 0.8388370040763397,
+    "final_goal_distance_m": 3.088669860260814,
+    "hover_time_sim_s": 20.00399999999999,
+    "min_truth_clearance_m": 0.5783822448517725,
+    "path_length_m": 6.710696032610717,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 3.1007890469063577,
+   "no_improvement_before_end_s": 18.951999999999998,
+   "outcome": "failure",
+   "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+   "side_switches": {
+    "chosen_sided": 157,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 3,
+   "snapshot_age_sim_s": {
+    "max": 0.17600000000000193,
+    "median": 0.09199999999999875,
+    "min": 0.03999999999999204,
+    "n": 900
+   },
+   "stale_decisions": {},
+   "ticks": 900,
+   "ticks_without_progress_candidate": 400,
+   "time_in_state_sim_s": {
+    "AVOIDING": 8.1,
+    "HOVER": 20.004,
+    "NORMAL": 16.848
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 1,
+   "clearance_capacity_m": 2.248,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 118.404,
+   "family": "partial_wall",
+   "goal_clearance_truth_m": 4.224219530582452,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.304,
+   "layout": "p7c-4000398",
+   "metrics": {
+    "detour_ratio": 1.2317863725287406,
+    "final_goal_distance_m": 0.048824504175027275,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8980304474082539,
+    "path_length_m": 9.854290980229925,
+    "time_to_goal_sim_s": 43.92399999999999
+   },
+   "min_goal_distance_m": 0.01499067543617969,
+   "no_improvement_before_end_s": 0.09999999999999432,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 635,
+    "interventions": {
+     "yaw_to_l4": 1
+    },
+    "margin": {
+     "max": 0.7599804468148124,
+     "median": 0.13254629368263338,
+     "min": 0.0001551690733988531,
+     "n": 853
+    },
+    "margin_below_0_25_fraction": 0.7772567409144197,
+    "ticks": 879
+   },
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "side_switches": {
+    "chosen_sided": 431,
+    "per_min": 1.3674901996535695,
+    "switches": 1
+   },
+   "slot": 4,
+   "snapshot_age_sim_s": {
+    "max": 0.17600000000000193,
+    "median": 0.09600000000000364,
+    "min": 0.04000000000000625,
+    "n": 879
+   },
+   "stale_decisions": {},
+   "ticks": 879,
+   "ticks_without_progress_candidate": 26,
+   "time_in_state_sim_s": {
+    "AVOIDING": 20.444,
+    "NORMAL": 2.948,
+    "RESUME": 20.484
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 1
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 1,
+   "clearance_capacity_m": 2.248,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 123.716,
+   "family": "partial_wall",
+   "goal_clearance_truth_m": 4.180529515762924,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 123.264,
+   "layout": "p7c-4000398",
+   "metrics": {
+    "detour_ratio": 1.266370674992232,
+    "final_goal_distance_m": 0.03528366832423003,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8513629197436978,
+    "path_length_m": 10.130965399937857,
+    "time_to_goal_sim_s": 48.99199999999999
+   },
+   "min_goal_distance_m": 0.00780996944973568,
+   "no_improvement_before_end_s": 0.4519999999999982,
+   "outcome": "goal_success",
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "side_switches": {
+    "chosen_sided": 591,
+    "per_min": 8.581937065794852,
+    "switches": 7
+   },
+   "slot": 4,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.1039999999999992,
+    "min": 0.04399999999999693,
+    "n": 980
+   },
+   "stale_decisions": {},
+   "ticks": 980,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 26.84,
+    "NORMAL": 3.3,
+    "RESUME": 18.8
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 87
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 1,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 116.152,
+   "family": "pillars",
+   "goal_clearance_truth_m": 3.3574012057644493,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.8,
+   "layout": "p7c-4000394",
+   "metrics": {
+    "detour_ratio": 1.1987591768569597,
+    "final_goal_distance_m": 0.043175938265896614,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 1.9091486359125096,
+    "path_length_m": 9.590073414855677,
+    "time_to_goal_sim_s": 41.284000000000006
+   },
+   "min_goal_distance_m": 0.01000806312864317,
+   "no_improvement_before_end_s": 0.35200000000000387,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 533,
+    "interventions": {},
+    "margin": {
+     "max": 0.2101434605182506,
+     "median": 0.04674872002253139,
+     "min": 0.0003527517086308052,
+     "n": 801
+    },
+    "margin_below_0_25_fraction": 1.0,
+    "ticks": 826
+   },
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "side_switches": {
+    "chosen_sided": 5,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 5,
+   "snapshot_age_sim_s": {
+    "max": 0.1599999999999966,
+    "median": 0.10800000000000409,
+    "min": 0.04399999999999693,
+    "n": 826
+   },
+   "stale_decisions": {},
+   "ticks": 826,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.232
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 1,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.452,
+   "family": "pillars",
+   "goal_clearance_truth_m": 3.37548643755857,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.352,
+   "layout": "p7c-4000394",
+   "metrics": {
+    "detour_ratio": 1.1740038043396852,
+    "final_goal_distance_m": 0.01575013018052343,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 2.003035963445183,
+    "path_length_m": 9.392030434717482,
+    "time_to_goal_sim_s": 41.099999999999994
+   },
+   "min_goal_distance_m": 0.01635354029134019,
+   "no_improvement_before_end_s": 0.09999999999999432,
+   "outcome": "goal_success",
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "side_switches": {
+    "chosen_sided": 0,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 5,
+   "snapshot_age_sim_s": {
+    "max": 0.14000000000000057,
+    "median": 0.08800000000000807,
+    "min": 0.036000000000001364,
+    "n": 822
+   },
+   "stale_decisions": {},
+   "ticks": 822,
+   "ticks_without_progress_candidate": 22,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.048
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 3,
+   "clearance_capacity_m": 1.17,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 106.224,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 403
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 86.184,
+    "from": "AVOIDING",
+    "goal_distance_m": 6.1393966239594056,
+    "mode": "mid_course",
+    "nearest_stall_s": 82.316,
+    "net_progress_m": 1.7371069111932345,
+    "path_length_m": 1.922159174495834,
+    "position_enu": [
+     1.9141102312556577,
+     0.6480701324002406
+    ],
+    "radius_of_gyration_m": 0.6151398332735448,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 5.7771105914101915,
+     "cells": {
+      "free": 5931,
+      "occupied": 66,
+      "unknown": 8503
+     },
+     "frontier_best_goal_distance_m": 7.762723739630581,
+     "frontier_cells_strict": 17,
+     "goal_distance_here_m": 6.1393966239594056,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 86.164,
+     "reachable_cells_strict": 615,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.3622860325492141,
+     "terminal_segment": {
+      "length_m": 6.1393966239594056,
+      "occupied_cells": 27,
+      "unknown_beyond_goal_x": 158,
+      "unknown_cells": 656,
+      "unknown_lateral_over_0_39_m": 434
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 26
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9037268787320191,
+    "window_before_s": 30.0,
+    "x_progress_m": 1.9012798741883707
+   },
+   "goal_clearance_truth_m": 2.711624385783202,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 86.184
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 95.324,
+   "layout": "p7c-4000396",
+   "metrics": {
+    "detour_ratio": 0.4537185049886918,
+    "final_goal_distance_m": 6.168106668330985,
+    "hover_time_sim_s": 20.040000000000006,
+    "min_truth_clearance_m": 0.5117251978388546,
+    "path_length_m": 3.6297480399095345,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 6.112511381987141,
+   "no_improvement_before_end_s": 10.900000000000006,
+   "outcome": "failure",
+   "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+   "side_switches": {
+    "chosen_sided": 243,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 6,
+   "snapshot_age_sim_s": {
+    "max": 0.19200000000000728,
+    "median": 0.10800000000000409,
+    "min": 0.03999999999999204,
+    "n": 647
+   },
+   "stale_decisions": {},
+   "ticks": 647,
+   "ticks_without_progress_candidate": 403,
+   "time_in_state_sim_s": {
+    "AVOIDING": 12.088,
+    "HOVER": 20.04
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 30
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 3,
+   "clearance_capacity_m": 1.143,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 105.476,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 85.424,
+    "from": "AVOIDING",
+    "goal_distance_m": 6.2195024017523615,
+    "mode": "mid_course",
+    "nearest_stall_s": 81.59200000000001,
+    "net_progress_m": 1.6640047295684264,
+    "path_length_m": 1.8488020821750542,
+    "position_enu": [
+     1.8367343734161141,
+     0.8412400817023237
+    ],
+    "radius_of_gyration_m": 0.5965217443241521,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 5.759709217489054,
+     "cells": {
+      "free": 5793,
+      "occupied": 47,
+      "unknown": 8660
+     },
+     "frontier_best_goal_distance_m": 7.749364995613505,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 6.2195024017523615,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 85.34,
+     "reachable_cells_strict": 617,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.4597931842633072,
+     "terminal_segment": {
+      "length_m": 6.2195024017523615,
+      "occupied_cells": 28,
+      "unknown_beyond_goal_x": 158,
+      "unknown_cells": 718,
+      "unknown_lateral_over_0_39_m": 457
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 28
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9000448158359818,
+    "window_before_s": 30.0,
+    "x_progress_m": 1.8372877993414323
+   },
+   "goal_clearance_truth_m": 2.732560314972514,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 85.424
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 86.524,
+   "layout": "p7c-4000396",
+   "metrics": {
+    "detour_ratio": 0.45383587745570275,
+    "final_goal_distance_m": 6.1067550705523095,
+    "hover_time_sim_s": 20.051999999999992,
+    "min_truth_clearance_m": 0.7922737331131426,
+    "path_length_m": 3.630687019645622,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 6.195248691903039,
+   "no_improvement_before_end_s": 18.951999999999998,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 164,
+    "interventions": {
+     "yaw_to_l4": 11
+    },
+    "margin": {
+     "max": 1.9047580095650436,
+     "median": 0.21117419841452967,
+     "min": 0.002190259097107128,
+     "n": 211
+    },
+    "margin_below_0_25_fraction": 0.6350710900473934,
+    "ticks": 621
+   },
+   "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+   "side_switches": {
+    "chosen_sided": 209,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 6,
+   "snapshot_age_sim_s": {
+    "max": 0.1519999999999868,
+    "median": 0.09599999999998943,
+    "min": 0.03999999999999204,
+    "n": 621
+   },
+   "stale_decisions": {},
+   "ticks": 621,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 10.948,
+    "HOVER": 20.052
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 11
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.197,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 118.78,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 4.784703988566995,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.68,
+   "layout": "p7c-4000381",
+   "metrics": {
+    "detour_ratio": 1.2433284147129213,
+    "final_goal_distance_m": 0.07151299119947911,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.37134417893968374,
+    "path_length_m": 9.94662731770337,
+    "time_to_goal_sim_s": 44.152
+   },
+   "min_goal_distance_m": 0.02699489879785286,
+   "no_improvement_before_end_s": 0.09999999999999432,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 506,
+    "interventions": {
+     "yaw_to_l4": 14
+    },
+    "margin": {
+     "max": 0.9981457973005714,
+     "median": 0.17772489270462088,
+     "min": 3.346698802531023e-05,
+     "n": 838
+    },
+    "margin_below_0_25_fraction": 0.7816229116945107,
+    "ticks": 883
+   },
+   "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+   "side_switches": {
+    "chosen_sided": 384,
+    "per_min": 1.360544217687075,
+    "switches": 1
+   },
+   "slot": 7,
+   "snapshot_age_sim_s": {
+    "max": 0.14799999999999613,
+    "median": 0.10799999999998988,
+    "min": 0.055999999999997385,
+    "n": 883
+   },
+   "stale_decisions": {},
+   "ticks": 883,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 18.752,
+    "NORMAL": 5.8,
+    "RESUME": 19.548
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 14
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.197,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 108.604,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 88.556,
+    "from": "AVOIDING",
+    "goal_distance_m": 5.7455408257487735,
+    "mode": "mid_course",
+    "nearest_stall_s": 84.67999999999999,
+    "net_progress_m": 2.141665217554949,
+    "path_length_m": 2.5479590946222928,
+    "position_enu": [
+     2.3168634488651314,
+     1.040213238370386
+    ],
+    "radius_of_gyration_m": 0.7223511367762819,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": null,
+     "cells": {
+      "free": 5712,
+      "occupied": 123,
+      "unknown": 8665
+     },
+     "frontier_best_goal_distance_m": null,
+     "frontier_cells_strict": 0,
+     "goal_distance_here_m": 5.7455408257487735,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 88.476,
+     "reachable_cells_strict": 0,
+     "start_cell_usable_strict": false,
+     "strict_gain_m": null,
+     "terminal_segment": {
+      "length_m": 5.7455408257487735,
+      "occupied_cells": 5,
+      "unknown_beyond_goal_x": 153,
+      "unknown_cells": 697,
+      "unknown_lateral_over_0_39_m": 346
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 0
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8405414443564398,
+    "window_before_s": 30.0,
+    "x_progress_m": 2.345185480586604
+   },
+   "goal_clearance_truth_m": 4.7501779682785275,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 88.556
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 89.704,
+   "layout": "p7c-4000381",
+   "metrics": {
+    "detour_ratio": 0.5181435281238607,
+    "final_goal_distance_m": 5.775507843652749,
+    "hover_time_sim_s": 20.048000000000002,
+    "min_truth_clearance_m": 0.4320412891577836,
+    "path_length_m": 4.145148224990885,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 5.711220535100848,
+   "no_improvement_before_end_s": 18.900000000000006,
+   "outcome": "failure",
+   "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+   "side_switches": {
+    "chosen_sided": 195,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 7,
+   "snapshot_age_sim_s": {
+    "max": 0.16800000000000637,
+    "median": 0.08800000000000807,
+    "min": 0.036000000000001364,
+    "n": 683
+   },
+   "stale_decisions": {},
+   "ticks": 683,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 12.1,
+    "HOVER": 20.048,
+    "NORMAL": 1.952
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 11
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 116.004,
+   "family": "mixed",
+   "goal_clearance_truth_m": 4.844180254215469,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.452,
+   "layout": "p7c-4000373",
+   "metrics": {
+    "detour_ratio": 1.1517147622406034,
+    "final_goal_distance_m": 0.0032551707401283197,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.44885724463061516,
+    "path_length_m": 9.213718097924827,
+    "time_to_goal_sim_s": 41.24000000000001
+   },
+   "min_goal_distance_m": 0.017261696039996933,
+   "no_improvement_before_end_s": 0.5520000000000067,
+   "outcome": "goal_success",
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "side_switches": {
+    "chosen_sided": 174,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 8,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.10000000000000853,
+    "min": 0.04399999999999693,
+    "n": 825
+   },
+   "stale_decisions": {},
+   "ticks": 825,
+   "ticks_without_progress_candidate": 22,
+   "time_in_state_sim_s": {
+    "AVOIDING": 4.948,
+    "NORMAL": 13.944,
+    "RESUME": 22.3
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.848,
+   "family": "mixed",
+   "goal_clearance_truth_m": 4.869653779429035,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.396,
+   "layout": "p7c-4000373",
+   "metrics": {
+    "detour_ratio": 1.1824118498025609,
+    "final_goal_distance_m": 0.005938005405986892,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.5144456992961401,
+    "path_length_m": 9.459294798420487,
+    "time_to_goal_sim_s": 41.3
+   },
+   "min_goal_distance_m": 0.025748382885012633,
+   "no_improvement_before_end_s": 0.4519999999999982,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 366,
+    "interventions": {},
+    "margin": {
+     "max": 0.42427292935830074,
+     "median": 0.06028464095566988,
+     "min": 6.20218567690678e-05,
+     "n": 804
+    },
+    "margin_below_0_25_fraction": 0.9291044776119403,
+    "ticks": 826
+   },
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "side_switches": {
+    "chosen_sided": 219,
+    "per_min": 1.454474934548628,
+    "switches": 1
+   },
+   "slot": 8,
+   "snapshot_age_sim_s": {
+    "max": 0.15200000000000102,
+    "median": 0.10799999999999699,
+    "min": 0.06399999999999295,
+    "n": 826
+   },
+   "stale_decisions": {},
+   "ticks": 826,
+   "ticks_without_progress_candidate": 22,
+   "time_in_state_sim_s": {
+    "AVOIDING": 6.948,
+    "NORMAL": 11.252,
+    "RESUME": 23.052
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.296,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 119.424,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 400
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 99.42,
+    "from": "AVOIDING",
+    "goal_distance_m": 4.171016052824185,
+    "mode": "mid_course",
+    "nearest_stall_s": 95.57600000000001,
+    "net_progress_m": 3.7326915678591712,
+    "path_length_m": 4.590649395931038,
+    "position_enu": [
+     4.0648834408913,
+     -1.3948002311283516
+    ],
+    "radius_of_gyration_m": 1.2489565412283434,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 3.607499445737047,
+     "cells": {
+      "free": 7104,
+      "occupied": 132,
+      "unknown": 7264
+     },
+     "frontier_best_goal_distance_m": 7.730894713655017,
+     "frontier_cells_strict": 15,
+     "goal_distance_here_m": 4.171016052824185,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 99.4,
+     "reachable_cells_strict": 1652,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.5635166070871378,
+     "terminal_segment": {
+      "length_m": 4.171016052824185,
+      "occupied_cells": 16,
+      "unknown_beyond_goal_x": 155,
+      "unknown_cells": 510,
+      "unknown_lateral_over_0_39_m": 259
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 24
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8131075248673258,
+    "window_before_s": 30.0,
+    "x_progress_m": 4.084335386911427
+   },
+   "goal_clearance_truth_m": 2.616048053979874,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 99.42
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 107.872,
+   "layout": "p7c-4000377",
+   "metrics": {
+    "detour_ratio": 0.82387313137483,
+    "final_goal_distance_m": 4.181535450887952,
+    "hover_time_sim_s": 20.004000000000005,
+    "min_truth_clearance_m": 1.1053110175585614,
+    "path_length_m": 6.59098505099864,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 4.146844842507683,
+   "no_improvement_before_end_s": 11.552000000000007,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 463,
+    "interventions": {
+     "yaw_to_l4": 20
+    },
+    "margin": {
+     "max": 7.241258778874039,
+     "median": 0.12577076141682753,
+     "min": 0.001152852044682573,
+     "n": 471
+    },
+    "margin_below_0_25_fraction": 0.7791932059447984,
+    "ticks": 896
+   },
+   "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+   "side_switches": {
+    "chosen_sided": 360,
+    "per_min": 1.3407222023596708,
+    "switches": 1
+   },
+   "slot": 9,
+   "snapshot_age_sim_s": {
+    "max": 0.1799999999999926,
+    "median": 0.09600000000000364,
+    "min": 0.04399999999999693,
+    "n": 896
+   },
+   "stale_decisions": {},
+   "ticks": 896,
+   "ticks_without_progress_candidate": 400,
+   "time_in_state_sim_s": {
+    "AVOIDING": 10.248,
+    "HOVER": 20.004,
+    "NORMAL": 14.5
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 20
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 1,
+   "boxes": 2,
+   "clearance_capacity_m": 1.242,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 116.292,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 404
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 96.248,
+    "from": "AVOIDING",
+    "goal_distance_m": 4.2940156316902165,
+    "mode": "mid_course",
+    "nearest_stall_s": 92.412,
+    "net_progress_m": 3.5856460815309026,
+    "path_length_m": 3.7449781026280107,
+    "position_enu": [
+     3.6757347492163666,
+     0.4143469587379877
+    ],
+    "radius_of_gyration_m": 1.1663545071069203,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 4.006351706259459,
+     "cells": {
+      "free": 6347,
+      "occupied": 136,
+      "unknown": 8017
+     },
+     "frontier_best_goal_distance_m": 7.720955292871796,
+     "frontier_cells_strict": 14,
+     "goal_distance_here_m": 4.2940156316902165,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 96.196,
+     "reachable_cells_strict": 1516,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.28766392543075714,
+     "terminal_segment": {
+      "length_m": 4.2940156316902165,
+      "occupied_cells": 44,
+      "unknown_beyond_goal_x": 153,
+      "unknown_cells": 680,
+      "unknown_lateral_over_0_39_m": 380
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 39
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9574544852517834,
+    "window_before_s": 30.0,
+    "x_progress_m": 3.726285366493989
+   },
+   "goal_clearance_truth_m": 2.584949382722378,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 96.248
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 97.636,
+   "layout": "p7c-4000377",
+   "metrics": {
+    "detour_ratio": 0.7050273720813428,
+    "final_goal_distance_m": 4.294970592804687,
+    "hover_time_sim_s": 20.043999999999997,
+    "min_truth_clearance_m": 0.8994306786212913,
+    "path_length_m": 5.6402189766507425,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 4.256459425224152,
+   "no_improvement_before_end_s": 18.656000000000006,
+   "outcome": "failure",
+   "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+   "side_switches": {
+    "chosen_sided": 109,
+    "per_min": 5.785363031530229,
+    "switches": 4
+   },
+   "slot": 9,
+   "snapshot_age_sim_s": {
+    "max": 0.20400000000000773,
+    "median": 0.09600000000000364,
+    "min": 0.036000000000001364,
+    "n": 838
+   },
+   "stale_decisions": {},
+   "ticks": 838,
+   "ticks_without_progress_candidate": 404,
+   "time_in_state_sim_s": {
+    "AVOIDING": 8.54,
+    "HOVER": 20.044,
+    "NORMAL": 12.9
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 41
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 3,
+   "clearance_capacity_m": 1.566,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 119.084,
+   "family": "mixed",
+   "goal_clearance_truth_m": 1.9321194430092798,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.636,
+   "layout": "p7c-4000349",
+   "metrics": {
+    "detour_ratio": 1.2392429843617896,
+    "final_goal_distance_m": 0.04441812368326039,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 1.0925899477839913,
+    "path_length_m": 9.913943874894317,
+    "time_to_goal_sim_s": 44.2
+   },
+   "min_goal_distance_m": 0.020606835552935195,
+   "no_improvement_before_end_s": 0.4480000000000075,
+   "outcome": "goal_success",
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "side_switches": {
+    "chosen_sided": 314,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 10,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.11999999999999744,
+    "min": 0.07200000000000273,
+    "n": 884
+   },
+   "stale_decisions": {},
+   "ticks": 884,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 18.0,
+    "NORMAL": 19.396,
+    "RESUME": 6.752
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 7
+  },
+  {
+   "abort_reason": null,
+   "block": 1,
+   "boxes": 3,
+   "clearance_capacity_m": 1.566,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 118.412,
+   "family": "mixed",
+   "goal_clearance_truth_m": 1.9359870614957202,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 117.712,
+   "layout": "p7c-4000349",
+   "metrics": {
+    "detour_ratio": 1.2426995466165454,
+    "final_goal_distance_m": 0.036810838753915866,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 1.0443962759754617,
+    "path_length_m": 9.941596372932363,
+    "time_to_goal_sim_s": 43.64
+   },
+   "min_goal_distance_m": 0.01744793412767907,
+   "no_improvement_before_end_s": 0.7000000000000028,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 705,
+    "interventions": {},
+    "margin": {
+     "max": 1.1139328795734627,
+     "median": 0.12889239909556682,
+     "min": 5.5257804503661134e-05,
+     "n": 846
+    },
+    "margin_below_0_25_fraction": 0.7801418439716312,
+    "ticks": 873
+   },
+   "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+   "side_switches": {
+    "chosen_sided": 462,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 10,
+   "snapshot_age_sim_s": {
+    "max": 0.132000000000005,
+    "median": 0.09199999999999875,
+    "min": 0.04399999999999693,
+    "n": 873
+   },
+   "stale_decisions": {},
+   "ticks": 873,
+   "ticks_without_progress_candidate": 27,
+   "time_in_state_sim_s": {
+    "AVOIDING": 16.192,
+    "NORMAL": 19.996,
+    "RESUME": 7.4
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.593,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.928,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 2.886165182681559,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.328,
+   "layout": "p7c-4000357",
+   "metrics": {
+    "detour_ratio": 1.1948798808538825,
+    "final_goal_distance_m": 0.03983637814509787,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8059921592757566,
+    "path_length_m": 9.55903904683106,
+    "time_to_goal_sim_s": 41.348
+   },
+   "min_goal_distance_m": 0.015672956367198385,
+   "no_improvement_before_end_s": 0.5999999999999943,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 619,
+    "interventions": {},
+    "margin": {
+     "max": 0.19705619195759194,
+     "median": 0.04021036413994317,
+     "min": 6.025941896581344e-06,
+     "n": 801
+    },
+    "margin_below_0_25_fraction": 1.0,
+    "ticks": 827
+   },
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "side_switches": {
+    "chosen_sided": 5,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 11,
+   "snapshot_age_sim_s": {
+    "max": 0.14000000000000057,
+    "median": 0.1039999999999992,
+    "min": 0.0519999999999925,
+    "n": 827
+   },
+   "stale_decisions": {},
+   "ticks": 827,
+   "ticks_without_progress_candidate": 26,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.3
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.593,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.892,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 2.8937696410851963,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.24,
+   "layout": "p7c-4000357",
+   "metrics": {
+    "detour_ratio": 1.1813062124344091,
+    "final_goal_distance_m": 0.019529427793975186,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.7794417977506696,
+    "path_length_m": 9.450449699475273,
+    "time_to_goal_sim_s": 41.099999999999994
+   },
+   "min_goal_distance_m": 0.0411678838577732,
+   "no_improvement_before_end_s": 0.652000000000001,
+   "outcome": "goal_success",
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "side_switches": {
+    "chosen_sided": 0,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 11,
+   "snapshot_age_sim_s": {
+    "max": 0.14000000000000057,
+    "median": 0.09599999999999653,
+    "min": 0.0519999999999925,
+    "n": 822
+   },
+   "stale_decisions": {},
+   "ticks": 822,
+   "ticks_without_progress_candidate": 22,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.052
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.224,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 188.536,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 400,
+     "SCAN:unknown_blocked": 1
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 168.484,
+    "from": "RESUME",
+    "goal_distance_m": 4.943613284952978,
+    "mode": "mid_course",
+    "nearest_stall_s": 164.62800000000001,
+    "net_progress_m": 0.028350732279888824,
+    "path_length_m": 0.868764244326957,
+    "position_enu": [
+     3.0717822644121635,
+     0.07263666334266955
+    ],
+    "radius_of_gyration_m": 0.023704750425954234,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 4.673460720221168,
+     "cells": {
+      "free": 6463,
+      "occupied": 87,
+      "unknown": 7950
+     },
+     "frontier_best_goal_distance_m": 7.765088825902484,
+     "frontier_cells_strict": 17,
+     "goal_distance_here_m": 4.943613284952978,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 168.436,
+     "reachable_cells_strict": 834,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.27015256473180926,
+     "terminal_segment": {
+      "length_m": 4.943613284952978,
+      "occupied_cells": 36,
+      "unknown_beyond_goal_x": 159,
+      "unknown_cells": 467,
+      "unknown_lateral_over_0_39_m": 323
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 21
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.03263340136869066,
+    "window_before_s": 30.0,
+    "x_progress_m": 3.0565698682523954
+   },
+   "goal_clearance_truth_m": 3.3454998993352483,
+   "hover_entries": [
+    {
+     "from": "RESUME",
+     "reason": "no_progress_candidate",
+     "sim_s": 168.484
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 143.336,
+   "layout": "p7c-4000375",
+   "metrics": {
+    "detour_ratio": 0.7998741569229321,
+    "final_goal_distance_m": 4.891093225180772,
+    "hover_time_sim_s": 20.051999999999992,
+    "min_truth_clearance_m": 0.3972586987741168,
+    "path_length_m": 6.3989932553834565,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 4.903930807121479,
+   "no_improvement_before_end_s": 45.19999999999999,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 722,
+    "interventions": {
+     "yaw_to_l4": 1542
+    },
+    "margin": {
+     "max": 13.393385599458075,
+     "median": 1.7031005398546664,
+     "min": 0.00020299543476376414,
+     "n": 1528
+    },
+    "margin_below_0_25_fraction": 0.14659685863874344,
+    "ticks": 2278
+   },
+   "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+   "side_switches": {
+    "chosen_sided": 1840,
+    "per_min": 6.851480973964372,
+    "switches": 13
+   },
+   "slot": 12,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.11800000000000921,
+    "min": 0.0759999999999934,
+    "n": 2278
+   },
+   "stale_decisions": {},
+   "ticks": 2278,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 3.748,
+    "HOVER": 20.052,
+    "RESUME": 90.044
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 1542
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.206,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 127.068,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 107.024,
+    "from": "RESUME",
+    "goal_distance_m": 4.946882255155852,
+    "mode": "mid_course",
+    "nearest_stall_s": 103.124,
+    "net_progress_m": 2.7526157116946814,
+    "path_length_m": 3.286914668809062,
+    "position_enu": [
+     3.050818019217889,
+     0.22780041725502181
+    ],
+    "radius_of_gyration_m": 0.8389003959014499,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 4.647804455476975,
+     "cells": {
+      "free": 6306,
+      "occupied": 96,
+      "unknown": 8098
+     },
+     "frontier_best_goal_distance_m": 7.741797023864754,
+     "frontier_cells_strict": 17,
+     "goal_distance_here_m": 4.946882255155852,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 106.988,
+     "reachable_cells_strict": 826,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.2990777996788765,
+     "terminal_segment": {
+      "length_m": 4.946882255155852,
+      "occupied_cells": 41,
+      "unknown_beyond_goal_x": 156,
+      "unknown_cells": 556,
+      "unknown_lateral_over_0_39_m": 360
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 23
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.837446660181181,
+    "window_before_s": 30.0,
+    "x_progress_m": 3.05893417601202
+   },
+   "goal_clearance_truth_m": 3.3263772943733234,
+   "hover_entries": [
+    {
+     "from": "RESUME",
+     "reason": "no_progress_candidate",
+     "sim_s": 107.024
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 101.476,
+   "layout": "p7c-4000375",
+   "metrics": {
+    "detour_ratio": 0.6205023637232391,
+    "final_goal_distance_m": 4.941000125718959,
+    "hover_time_sim_s": 20.043999999999997,
+    "min_truth_clearance_m": 0.4195955212281549,
+    "path_length_m": 4.964018909785913,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 4.916816391239674,
+   "no_improvement_before_end_s": 25.592,
+   "outcome": "failure",
+   "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+   "side_switches": {
+    "chosen_sided": 521,
+    "per_min": 17.161162382732055,
+    "switches": 15
+   },
+   "slot": 12,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.11199999999999477,
+    "min": 0.05999999999998806,
+    "n": 1050
+   },
+   "stale_decisions": {},
+   "ticks": 1050,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 5.952,
+    "HOVER": 20.044,
+    "RESUME": 26.448
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 319
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 1,
+   "clearance_capacity_m": 1.799,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 131.228,
+   "family": "pillars",
+   "goal_clearance_truth_m": 5.993875799221114,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 130.628,
+   "layout": "p7c-4000374",
+   "metrics": {
+    "detour_ratio": 1.346245660499934,
+    "final_goal_distance_m": 0.017884168706297433,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4620936746649026,
+    "path_length_m": 10.769965283999472,
+    "time_to_goal_sim_s": 56.77600000000001
+   },
+   "min_goal_distance_m": 0.03935496557823203,
+   "no_improvement_before_end_s": 0.6000000000000227,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 531,
+    "interventions": {
+     "yaw_to_l4": 224
+    },
+    "margin": {
+     "max": 7.212842816529456,
+     "median": 0.11787906241400314,
+     "min": 0.00033396979265321036,
+     "n": 1111
+    },
+    "margin_below_0_25_fraction": 0.6255625562556255,
+    "ticks": 1136
+   },
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "side_switches": {
+    "chosen_sided": 501,
+    "per_min": 2.115506663845991,
+    "switches": 2
+   },
+   "slot": 13,
+   "snapshot_age_sim_s": {
+    "max": 0.1599999999999966,
+    "median": 0.1039999999999992,
+    "min": 0.03999999999999204,
+    "n": 1136
+   },
+   "stale_decisions": {},
+   "ticks": 1136,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 24.748,
+    "NORMAL": 4.9,
+    "RESUME": 27.076
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 224
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 1,
+   "clearance_capacity_m": 1.745,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 118.724,
+   "family": "pillars",
+   "goal_clearance_truth_m": 6.0068602608888195,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.176,
+   "layout": "p7c-4000374",
+   "metrics": {
+    "detour_ratio": 1.2234298853598573,
+    "final_goal_distance_m": 0.07301951536847637,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.36427933409847546,
+    "path_length_m": 9.787439082878858,
+    "time_to_goal_sim_s": 43.988
+   },
+   "min_goal_distance_m": 0.03594133481568972,
+   "no_improvement_before_end_s": 0.5480000000000018,
+   "outcome": "goal_success",
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "side_switches": {
+    "chosen_sided": 388,
+    "per_min": 1.3656227239621266,
+    "switches": 1
+   },
+   "slot": 13,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.11200000000000898,
+    "min": 0.055999999999997385,
+    "n": 880
+   },
+   "stale_decisions": {},
+   "ticks": 880,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 11.988,
+    "NORMAL": 8.1,
+    "RESUME": 23.848
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 30
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.143,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 107.7,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 87.656,
+    "from": "AVOIDING",
+    "goal_distance_m": 5.421408800952332,
+    "mode": "mid_course",
+    "nearest_stall_s": 83.796,
+    "net_progress_m": 2.3694984406051063,
+    "path_length_m": 2.386293657665294,
+    "position_enu": [
+     2.5803841970436445,
+     -0.022482543166978473
+    ],
+    "radius_of_gyration_m": 0.7379017204819603,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 4.552010038593822,
+     "cells": {
+      "free": 6005,
+      "occupied": 121,
+      "unknown": 8374
+     },
+     "frontier_best_goal_distance_m": 7.751956485190226,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 5.421408800952332,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 87.616,
+     "reachable_cells_strict": 1016,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.86939876235851,
+     "terminal_segment": {
+      "length_m": 5.421408800952332,
+      "occupied_cells": 3,
+      "unknown_beyond_goal_x": 158,
+      "unknown_cells": 460,
+      "unknown_lateral_over_0_39_m": 262
+     },
+     "valid_in_place_moves_in_cone": 1,
+     "valid_in_place_moves_out_of_cone": 33
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9929617978884376,
+    "window_before_s": 30.0,
+    "x_progress_m": 2.5785956245189703
+   },
+   "goal_clearance_truth_m": 4.455845624836375,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 87.656
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 89.208,
+   "layout": "p7c-4000379",
+   "metrics": {
+    "detour_ratio": 0.546069746548987,
+    "final_goal_distance_m": 5.415845692278231,
+    "hover_time_sim_s": 20.043999999999997,
+    "min_truth_clearance_m": 0.8139903828675772,
+    "path_length_m": 4.368557972391896,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 5.392720468053425,
+   "no_improvement_before_end_s": 18.492000000000004,
+   "outcome": "failure",
+   "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+   "side_switches": {
+    "chosen_sided": 4,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 14,
+   "snapshot_age_sim_s": {
+    "max": 0.16800000000000637,
+    "median": 0.11200000000000898,
+    "min": 0.031999999999996476,
+    "n": 660
+   },
+   "stale_decisions": {},
+   "ticks": 660,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 3.948,
+    "HOVER": 20.044,
+    "NORMAL": 8.952
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.197,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 107.768,
+   "family": "wall_with_gap",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 87.716,
+    "from": "AVOIDING",
+    "goal_distance_m": 5.381217610586391,
+    "mode": "mid_course",
+    "nearest_stall_s": 83.87599999999999,
+    "net_progress_m": 2.409902670963083,
+    "path_length_m": 2.459068292474807,
+    "position_enu": [
+     2.5957753037912092,
+     -0.0217583546978117
+    ],
+    "radius_of_gyration_m": 0.7445720102182405,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 4.526968348666602,
+     "cells": {
+      "free": 6002,
+      "occupied": 114,
+      "unknown": 8384
+     },
+     "frontier_best_goal_distance_m": 7.726889174808863,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 5.381217610586391,
+     "goal_reachable_optimistic": false,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 87.716,
+     "reachable_cells_strict": 1012,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.8542492619197883,
+     "terminal_segment": {
+      "length_m": 5.381217610586391,
+      "occupied_cells": 3,
+      "unknown_beyond_goal_x": 152,
+      "unknown_cells": 447,
+      "unknown_lateral_over_0_39_m": 257
+     },
+     "valid_in_place_moves_in_cone": 1,
+     "valid_in_place_moves_out_of_cone": 33
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9800064025622308,
+    "window_before_s": 30.0,
+    "x_progress_m": 2.618800093780204
+   },
+   "goal_clearance_truth_m": 4.433168383728373,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 87.716
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 89.168,
+   "layout": "p7c-4000379",
+   "metrics": {
+    "detour_ratio": 0.5222830720305798,
+    "final_goal_distance_m": 5.388024507030789,
+    "hover_time_sim_s": 20.052000000000007,
+    "min_truth_clearance_m": 0.8073388365210512,
+    "path_length_m": 4.178264576244638,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 5.3576774100881845,
+   "no_improvement_before_end_s": 18.599999999999994,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 163,
+    "interventions": {},
+    "margin": {
+     "max": 0.558516145508599,
+     "median": 0.12347510908178982,
+     "min": 0.0021243933845989105,
+     "n": 254
+    },
+    "margin_below_0_25_fraction": 0.8110236220472441,
+    "ticks": 664
+   },
+   "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+   "side_switches": {
+    "chosen_sided": 8,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 14,
+   "snapshot_age_sim_s": {
+    "max": 0.16799999999999216,
+    "median": 0.08799999999999386,
+    "min": 0.03999999999999204,
+    "n": 664
+   },
+   "stale_decisions": {},
+   "ticks": 664,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 4.148,
+    "HOVER": 20.052,
+    "NORMAL": 8.952
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.646,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 144.256,
+   "family": "pillars",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 390,
+     "SCAN:unknown_blocked": 11
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 4
+    },
+    "entry_sim_s": 124.212,
+    "from": "RESUME",
+    "goal_distance_m": 0.24662891413304797,
+    "mode": "near_goal",
+    "nearest_stall_s": 120.416,
+    "net_progress_m": 4.043395179067478,
+    "path_length_m": 5.068065406580887,
+    "position_enu": [
+     8.005173595725257,
+     0.25152775621215734
+    ],
+    "radius_of_gyration_m": 1.474199341342573,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 0.21528167245485347,
+     "cells": {
+      "free": 9604,
+      "occupied": 69,
+      "unknown": 4827
+     },
+     "frontier_best_goal_distance_m": 7.740997532481715,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 0.24662891413304797,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 124.148,
+     "reachable_cells_strict": 1439,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.0313472416781945,
+     "terminal_segment": {
+      "length_m": 0.24662891413304797,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 0,
+      "unknown_cells": 15,
+      "unknown_lateral_over_0_39_m": 13
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 7
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.7978182708173271,
+    "window_before_s": 30.0,
+    "x_progress_m": 8.014502699589986
+   },
+   "goal_clearance_truth_m": 2.2324387409906064,
+   "hover_entries": [
+    {
+     "from": "RESUME",
+     "reason": "no_progress_candidate",
+     "sim_s": 124.212
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 125.956,
+   "layout": "p7c-4000385",
+   "metrics": {
+    "detour_ratio": 1.3393771400235877,
+    "final_goal_distance_m": 0.25162336286544384,
+    "hover_time_sim_s": 20.043999999999997,
+    "min_truth_clearance_m": 0.34781840866338265,
+    "path_length_m": 10.715017120188701,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.21450415654551536,
+   "no_improvement_before_end_s": 18.299999999999997,
+   "outcome": "failure",
+   "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+   "side_switches": {
+    "chosen_sided": 866,
+    "per_min": 5.169145942220434,
+    "switches": 6
+   },
+   "slot": 15,
+   "snapshot_age_sim_s": {
+    "max": 0.16800000000000637,
+    "median": 0.1039999999999992,
+    "min": 0.04800000000000182,
+    "n": 1394
+   },
+   "stale_decisions": {},
+   "ticks": 1394,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 8.4,
+    "HOVER": 20.044,
+    "RESUME": 41.2
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 114
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.611,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 118.88,
+   "family": "pillars",
+   "goal_clearance_truth_m": 2.2578959004695287,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.88,
+   "layout": "p7c-4000385",
+   "metrics": {
+    "detour_ratio": 1.2305229875414445,
+    "final_goal_distance_m": 0.03546459786027378,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.3498009982389789,
+    "path_length_m": 9.844183900331556,
+    "time_to_goal_sim_s": 44.092
+   },
+   "min_goal_distance_m": 0.01751714356487119,
+   "no_improvement_before_end_s": 0.0,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 764,
+    "interventions": {},
+    "margin": {
+     "max": 1.3468370067974889,
+     "median": 0.28589108577323685,
+     "min": 5.380540654575938e-05,
+     "n": 858
+    },
+    "margin_below_0_25_fraction": 0.4696969696969697,
+    "ticks": 882
+   },
+   "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+   "side_switches": {
+    "chosen_sided": 815,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 15,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.08800000000000807,
+    "min": 0.036000000000001364,
+    "n": 882
+   },
+   "stale_decisions": {},
+   "ticks": 882,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 7.5,
+    "NORMAL": 1.748,
+    "RESUME": 34.796
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.548,
+   "clock_stalls_below_0_5": 4,
+   "controller": "p4",
+   "end_sim_s": 140.416,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 390,
+     "SCAN:unknown_blocked": 11
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 4
+    },
+    "entry_sim_s": 120.384,
+    "from": "AVOIDING",
+    "goal_distance_m": 0.31842240565013014,
+    "mode": "near_goal",
+    "nearest_stall_s": 27.019999999999996,
+    "net_progress_m": 4.601421116667103,
+    "path_length_m": 5.8846283435038425,
+    "position_enu": [
+     8.045406118656313,
+     0.297611697873939
+    ],
+    "radius_of_gyration_m": 1.599713230914107,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": null,
+     "cells": {
+      "free": 10031,
+      "occupied": 96,
+      "unknown": 4373
+     },
+     "frontier_best_goal_distance_m": null,
+     "frontier_cells_strict": 0,
+     "goal_distance_here_m": 0.31842240565013014,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 120.352,
+     "reachable_cells_strict": 0,
+     "start_cell_usable_strict": false,
+     "strict_gain_m": null,
+     "terminal_segment": {
+      "length_m": 0.31842240565013014,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 0,
+      "unknown_cells": 9,
+      "unknown_lateral_over_0_39_m": 9
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 0
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.7819391213969702,
+    "window_before_s": 30.0,
+    "x_progress_m": 8.050841761442637
+   },
+   "goal_clearance_truth_m": 1.564188078010152,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 120.384
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 121.232,
+   "layout": "p7c-4000363",
+   "metrics": {
+    "detour_ratio": 1.3106960332688953,
+    "final_goal_distance_m": 0.3058309123137711,
+    "hover_time_sim_s": 20.031999999999996,
+    "min_truth_clearance_m": 0.47131668093789514,
+    "path_length_m": 10.485568266151162,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.28573349631017075,
+   "no_improvement_before_end_s": 19.183999999999997,
+   "outcome": "failure",
+   "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+   "side_switches": {
+    "chosen_sided": 652,
+    "per_min": 3.6474164133738602,
+    "switches": 4
+   },
+   "slot": 16,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.10400000000001342,
+    "min": 0.031999999999996476,
+    "n": 1318
+   },
+   "stale_decisions": {},
+   "ticks": 1318,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 34.988,
+    "HOVER": 20.032,
+    "NORMAL": 10.78
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 17
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.548,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p5",
+   "end_sim_s": 119.876,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 401
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 0
+    },
+    "entry_sim_s": 99.84,
+    "from": "AVOIDING",
+    "goal_distance_m": 3.690690091374829,
+    "mode": "mid_course",
+    "nearest_stall_s": 95.99600000000001,
+    "net_progress_m": 4.12503583240362,
+    "path_length_m": 4.640206742247572,
+    "position_enu": [
+     4.56170184546812,
+     -1.3563224567155803
+    ],
+    "radius_of_gyration_m": 1.3507685274681074,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 3.149506919141543,
+     "cells": {
+      "free": 7228,
+      "occupied": 105,
+      "unknown": 7167
+     },
+     "frontier_best_goal_distance_m": 7.750383234983639,
+     "frontier_cells_strict": 15,
+     "goal_distance_here_m": 3.690690091374829,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 99.76,
+     "reachable_cells_strict": 1555,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.541183172233286,
+     "terminal_segment": {
+      "length_m": 3.690690091374829,
+      "occupied_cells": 56,
+      "unknown_beyond_goal_x": 104,
+      "unknown_cells": 223,
+      "unknown_lateral_over_0_39_m": 102
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 9
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8889767334818321,
+    "window_before_s": 30.0,
+    "x_progress_m": 4.561519343045289
+   },
+   "goal_clearance_truth_m": 1.5695805496828417,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 99.84
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 101.24,
+   "layout": "p7c-4000363",
+   "metrics": {
+    "detour_ratio": 0.7942991898389278,
+    "final_goal_distance_m": 3.618631000674516,
+    "hover_time_sim_s": 20.036,
+    "min_truth_clearance_m": 1.064001667087737,
+    "path_length_m": 6.354393518711422,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 3.6618718001729706,
+   "no_improvement_before_end_s": 18.63600000000001,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 398,
+    "interventions": {
+     "yaw_to_l4": 20
+    },
+    "margin": {
+     "max": 2.556883705151041,
+     "median": 0.12866343407866454,
+     "min": 0.0014694952289118213,
+     "n": 504
+    },
+    "margin_below_0_25_fraction": 0.7857142857142857,
+    "ticks": 906
+   },
+   "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+   "side_switches": {
+    "chosen_sided": 375,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 16,
+   "snapshot_age_sim_s": {
+    "max": 0.1599999999999966,
+    "median": 0.10000000000000853,
+    "min": 0.04399999999999693,
+    "n": 906
+   },
+   "stale_decisions": {},
+   "ticks": 906,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 14.076,
+    "HOVER": 20.036,
+    "NORMAL": 11.1
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 20
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p4",
+   "end_sim_s": 116.12,
+   "family": "mixed",
+   "goal_clearance_truth_m": 2.853340498361485,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 116.072,
+   "layout": "p7c-4000359",
+   "metrics": {
+    "detour_ratio": 1.1500251936956747,
+    "final_goal_distance_m": 0.032644611948407704,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9227947112829575,
+    "path_length_m": 9.200201549565397,
+    "time_to_goal_sim_s": 41.284000000000006
+   },
+   "min_goal_distance_m": 0.01015015452578822,
+   "no_improvement_before_end_s": 0.04800000000000182,
+   "outcome": "goal_success",
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "side_switches": {
+    "chosen_sided": 0,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 17,
+   "snapshot_age_sim_s": {
+    "max": 0.16799999999999216,
+    "median": 0.09599999999998943,
+    "min": 0.04399999999999693,
+    "n": 826
+   },
+   "stale_decisions": {},
+   "ticks": 826,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.236
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 2.437,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.732,
+   "family": "mixed",
+   "goal_clearance_truth_m": 2.8567366848194973,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.144,
+   "layout": "p7c-4000359",
+   "metrics": {
+    "detour_ratio": 1.1818993875800643,
+    "final_goal_distance_m": 0.045749851416908086,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 1.0101484074373868,
+    "path_length_m": 9.455195100640514,
+    "time_to_goal_sim_s": 41.31999999999999
+   },
+   "min_goal_distance_m": 0.03650643047880867,
+   "no_improvement_before_end_s": 0.5879999999999939,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 198,
+    "interventions": {},
+    "margin": {
+     "max": 0.19651576276013571,
+     "median": 0.020186667421523197,
+     "min": 0.00016252023991558673,
+     "n": 803
+    },
+    "margin_below_0_25_fraction": 1.0,
+    "ticks": 828
+   },
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "side_switches": {
+    "chosen_sided": 42,
+    "per_min": 1.4537701104865282,
+    "switches": 1
+   },
+   "slot": 17,
+   "snapshot_age_sim_s": {
+    "max": 0.1600000000000108,
+    "median": 0.09999999999999432,
+    "min": 0.04000000000000625,
+    "n": 828
+   },
+   "stale_decisions": {},
+   "ticks": 828,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.272
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 1,
+   "clearance_capacity_m": 1.997,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p4",
+   "end_sim_s": 136.036,
+   "family": "partial_wall",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 389,
+     "SCAN:unknown_blocked": 12
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 2
+    },
+    "entry_sim_s": 116.004,
+    "from": "AVOIDING",
+    "goal_distance_m": 0.4810831829880897,
+    "mode": "near_goal",
+    "nearest_stall_s": 112.164,
+    "net_progress_m": 5.326993495546,
+    "path_length_m": 5.988348433134099,
+    "position_enu": [
+     7.93117541130223,
+     0.48795239413933356
+    ],
+    "radius_of_gyration_m": 1.6567156351264756,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": null,
+     "cells": {
+      "free": 8844,
+      "occupied": 41,
+      "unknown": 5615
+     },
+     "frontier_best_goal_distance_m": null,
+     "frontier_cells_strict": 0,
+     "goal_distance_here_m": 0.4810831829880897,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 115.996,
+     "reachable_cells_strict": 0,
+     "start_cell_usable_strict": false,
+     "strict_gain_m": null,
+     "terminal_segment": {
+      "length_m": 0.4810831829880897,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 1,
+      "unknown_cells": 31,
+      "unknown_lateral_over_0_39_m": 29
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 0
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8895597099980422,
+    "window_before_s": 30.0,
+    "x_progress_m": 7.928903309018916
+   },
+   "goal_clearance_truth_m": 1.9262721022833142,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 116.004
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 117.156,
+   "layout": "p7c-4000360",
+   "metrics": {
+    "detour_ratio": 1.2738784600570916,
+    "final_goal_distance_m": 0.4498941879371009,
+    "hover_time_sim_s": 20.031999999999996,
+    "min_truth_clearance_m": 0.4054108166297481,
+    "path_length_m": 10.191027680456733,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.4551447538360133,
+   "no_improvement_before_end_s": 18.879999999999995,
+   "outcome": "failure",
+   "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+   "side_switches": {
+    "chosen_sided": 464,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 18,
+   "snapshot_age_sim_s": {
+    "max": 0.1799999999999926,
+    "median": 0.1039999999999992,
+    "min": 0.036000000000001364,
+    "n": 1229
+   },
+   "stale_decisions": {},
+   "ticks": 1229,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 24.968,
+    "HOVER": 20.032,
+    "NORMAL": 16.332
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 4
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 2,
+   "boxes": 1,
+   "clearance_capacity_m": 1.943,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p5",
+   "end_sim_s": 136.104,
+   "family": "partial_wall",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 390,
+     "SCAN:unknown_blocked": 10
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 6
+    },
+    "entry_sim_s": 116.104,
+    "from": "AVOIDING",
+    "goal_distance_m": 0.15342753181349678,
+    "mode": "near_goal",
+    "nearest_stall_s": 112.268,
+    "net_progress_m": 5.548326503273031,
+    "path_length_m": 5.9767425266598435,
+    "position_enu": [
+     7.95194625807,
+     0.175895012291413
+    ],
+    "radius_of_gyration_m": 1.6880610130412648,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": null,
+     "cells": {
+      "free": 9086,
+      "occupied": 44,
+      "unknown": 5370
+     },
+     "frontier_best_goal_distance_m": null,
+     "frontier_cells_strict": 0,
+     "goal_distance_here_m": 0.15342753181349678,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 116.064,
+     "reachable_cells_strict": 0,
+     "start_cell_usable_strict": false,
+     "strict_gain_m": null,
+     "terminal_segment": {
+      "length_m": 0.15342753181349678,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 0,
+      "unknown_cells": 5,
+      "unknown_lateral_over_0_39_m": 5
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 0
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.9283194781311356,
+    "window_before_s": 30.0,
+    "x_progress_m": 7.972918942095765
+   },
+   "goal_clearance_truth_m": 1.903027315974236,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 116.104
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 117.056,
+   "layout": "p7c-4000360",
+   "metrics": {
+    "detour_ratio": 1.2644265379575181,
+    "final_goal_distance_m": 0.18074730496097677,
+    "hover_time_sim_s": 20.000000000000014,
+    "min_truth_clearance_m": 0.40644831862926856,
+    "path_length_m": 10.115412303660145,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.10560170900475482,
+   "no_improvement_before_end_s": 19.048000000000016,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 718,
+    "interventions": {},
+    "margin": {
+     "max": 1.3845215778690938,
+     "median": 0.17430976902714956,
+     "min": 0.0015057727997422887,
+     "n": 830
+    },
+    "margin_below_0_25_fraction": 0.6903614457831325,
+    "ticks": 1231
+   },
+   "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+   "side_switches": {
+    "chosen_sided": 617,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 18,
+   "snapshot_age_sim_s": {
+    "max": 0.18000000000000682,
+    "median": 0.10800000000000409,
+    "min": 0.04799999999998761,
+    "n": 1231
+   },
+   "stale_decisions": {},
+   "ticks": 1231,
+   "ticks_without_progress_candidate": 400,
+   "time_in_state_sim_s": {
+    "AVOIDING": 24.44,
+    "HOVER": 20.0,
+    "NORMAL": 17.036
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.116,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p5",
+   "end_sim_s": 116.444,
+   "family": "mixed",
+   "goal_clearance_truth_m": 3.528793097829997,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.796,
+   "layout": "p7c-4000382",
+   "metrics": {
+    "detour_ratio": 1.2181943325486684,
+    "final_goal_distance_m": 0.030142768351876743,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.47316783404140983,
+    "path_length_m": 9.745554660389347,
+    "time_to_goal_sim_s": 41.8
+   },
+   "min_goal_distance_m": 0.018694996019342783,
+   "no_improvement_before_end_s": 0.6479999999999961,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 455,
+    "interventions": {},
+    "margin": {
+     "max": 12.568177919061055,
+     "median": 0.1353051992730916,
+     "min": 0.0002974372084558752,
+     "n": 810
+    },
+    "margin_below_0_25_fraction": 0.7604938271604939,
+    "ticks": 836
+   },
+   "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+   "side_switches": {
+    "chosen_sided": 197,
+    "per_min": 1.4371945961483183,
+    "switches": 1
+   },
+   "slot": 19,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.10799999999998988,
+    "min": 0.036000000000001364,
+    "n": 836
+   },
+   "stale_decisions": {},
+   "ticks": 836,
+   "ticks_without_progress_candidate": 26,
+   "time_in_state_sim_s": {
+    "AVOIDING": 11.452,
+    "NORMAL": 15.596,
+    "RESUME": 14.7
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 3,
+   "clearance_capacity_m": 1.116,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 116.38,
+   "family": "mixed",
+   "goal_clearance_truth_m": 3.5521721606771144,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 116.08,
+   "layout": "p7c-4000382",
+   "metrics": {
+    "detour_ratio": 1.1914489625731681,
+    "final_goal_distance_m": 0.03297570647556136,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4753437593513773,
+    "path_length_m": 9.531591700585345,
+    "time_to_goal_sim_s": 41.744
+   },
+   "min_goal_distance_m": 0.021797103421046748,
+   "no_improvement_before_end_s": 0.29999999999999716,
+   "outcome": "goal_success",
+   "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+   "side_switches": {
+    "chosen_sided": 189,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 19,
+   "snapshot_age_sim_s": {
+    "max": 0.17200000000001125,
+    "median": 0.08799999999999386,
+    "min": 0.03999999999999204,
+    "n": 835
+   },
+   "stale_decisions": {},
+   "ticks": 835,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 11.948,
+    "NORMAL": 15.552,
+    "RESUME": 14.196
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.593,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 116.076,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 4.539573519310317,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.276,
+   "layout": "p7c-4000354",
+   "metrics": {
+    "detour_ratio": 1.171532878597493,
+    "final_goal_distance_m": 0.03130594521564623,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4540112202645039,
+    "path_length_m": 9.372263028779944,
+    "time_to_goal_sim_s": 41.348
+   },
+   "min_goal_distance_m": 0.047384783458883015,
+   "no_improvement_before_end_s": 0.7999999999999972,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 402,
+    "interventions": {},
+    "margin": {
+     "max": 0.32360388889506986,
+     "median": 0.0704123152619287,
+     "min": 0.00010005561618608994,
+     "n": 804
+    },
+    "margin_below_0_25_fraction": 0.9626865671641791,
+    "ticks": 827
+   },
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "side_switches": {
+    "chosen_sided": 211,
+    "per_min": 1.4527845036319613,
+    "switches": 1
+   },
+   "slot": 20,
+   "snapshot_age_sim_s": {
+    "max": 0.15200000000000102,
+    "median": 0.11599999999999966,
+    "min": 0.06799999999999784,
+    "n": 827
+   },
+   "stale_decisions": {},
+   "ticks": 827,
+   "ticks_without_progress_candidate": 23,
+   "time_in_state_sim_s": {
+    "AVOIDING": 7.948,
+    "NORMAL": 17.0,
+    "RESUME": 16.352
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 2,
+   "boxes": 2,
+   "clearance_capacity_m": 1.593,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.892,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 4.567124134672852,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.344,
+   "layout": "p7c-4000354",
+   "metrics": {
+    "detour_ratio": 1.206293742087716,
+    "final_goal_distance_m": 0.010798109446096797,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4006935728102722,
+    "path_length_m": 9.650349936701728,
+    "time_to_goal_sim_s": 41.348
+   },
+   "min_goal_distance_m": 0.01912772618779731,
+   "no_improvement_before_end_s": 0.5480000000000018,
+   "outcome": "goal_success",
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "side_switches": {
+    "chosen_sided": 180,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 20,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.11599999999999966,
+    "min": 0.06399999999999295,
+    "n": 827
+   },
+   "stale_decisions": {},
+   "ticks": 827,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 9.0,
+    "NORMAL": 16.3,
+    "RESUME": 16.0
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 116.012,
+   "family": "pillars",
+   "goal_clearance_truth_m": 4.095511501460622,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.412,
+   "layout": "p7c-4000364",
+   "metrics": {
+    "detour_ratio": 1.1878399853743988,
+    "final_goal_distance_m": 0.04182843326875539,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.5309203506317354,
+    "path_length_m": 9.50271988299519,
+    "time_to_goal_sim_s": 41.352000000000004
+   },
+   "min_goal_distance_m": 0.01814078426602948,
+   "no_improvement_before_end_s": 0.5999999999999943,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 474,
+    "interventions": {},
+    "margin": {
+     "max": 0.2742500938031869,
+     "median": 0.03207479381299638,
+     "min": 0.0001064225619238357,
+     "n": 802
+    },
+    "margin_below_0_25_fraction": 0.9775561097256857,
+    "ticks": 827
+   },
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "side_switches": {
+    "chosen_sided": 84,
+    "per_min": 1.4527845036319613,
+    "switches": 1
+   },
+   "slot": 21,
+   "snapshot_age_sim_s": {
+    "max": 0.14400000000000546,
+    "median": 0.11199999999999477,
+    "min": 0.05999999999998806,
+    "n": 827
+   },
+   "stale_decisions": {},
+   "ticks": 827,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.3
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.656,
+   "family": "pillars",
+   "goal_clearance_truth_m": 4.119838547971496,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.056,
+   "layout": "p7c-4000364",
+   "metrics": {
+    "detour_ratio": 1.1526651764842997,
+    "final_goal_distance_m": 0.030792916357533673,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.47784003182336043,
+    "path_length_m": 9.221321411874397,
+    "time_to_goal_sim_s": 41.152
+   },
+   "min_goal_distance_m": 0.024577403410536665,
+   "no_improvement_before_end_s": 0.6000000000000085,
+   "outcome": "goal_success",
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "side_switches": {
+    "chosen_sided": 44,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 21,
+   "snapshot_age_sim_s": {
+    "max": 0.1360000000000099,
+    "median": 0.1039999999999992,
+    "min": 0.0519999999999925,
+    "n": 823
+   },
+   "stale_decisions": {},
+   "ticks": 823,
+   "ticks_without_progress_candidate": 22,
+   "time_in_state_sim_s": {
+    "AVOIDING": 2.2,
+    "NORMAL": 38.848,
+    "RESUME": 0.052
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 116.352,
+   "family": "partial_wall",
+   "goal_clearance_truth_m": 4.082986988926082,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.752,
+   "layout": "p7c-4000388",
+   "metrics": {
+    "detour_ratio": 1.186748790548338,
+    "final_goal_distance_m": 0.07552931021751252,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9863422567310486,
+    "path_length_m": 9.493990324386704,
+    "time_to_goal_sim_s": 41.84
+   },
+   "min_goal_distance_m": 0.01950488201451314,
+   "no_improvement_before_end_s": 0.6000000000000085,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 470,
+    "interventions": {},
+    "margin": {
+     "max": 0.7218714516563045,
+     "median": 0.08528700727227623,
+     "min": 3.718587592738132e-05,
+     "n": 811
+    },
+    "margin_below_0_25_fraction": 0.9408138101109741,
+    "ticks": 837
+   },
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "side_switches": {
+    "chosen_sided": 435,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 22,
+   "snapshot_age_sim_s": {
+    "max": 0.17600000000000193,
+    "median": 0.09600000000000364,
+    "min": 0.04399999999999693,
+    "n": 837
+   },
+   "stale_decisions": {},
+   "ticks": 837,
+   "ticks_without_progress_candidate": 26,
+   "time_in_state_sim_s": {
+    "AVOIDING": 11.8,
+    "NORMAL": 12.8,
+    "RESUME": 17.192
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 116.248,
+   "family": "partial_wall",
+   "goal_clearance_truth_m": 4.096636299324197,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.948,
+   "layout": "p7c-4000388",
+   "metrics": {
+    "detour_ratio": 1.1929715768722962,
+    "final_goal_distance_m": 0.03644580449170813,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 1.0297462513823519,
+    "path_length_m": 9.54377261497837,
+    "time_to_goal_sim_s": 41.79600000000001
+   },
+   "min_goal_distance_m": 0.016003031336556124,
+   "no_improvement_before_end_s": 0.30000000000001137,
+   "outcome": "goal_success",
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "side_switches": {
+    "chosen_sided": 334,
+    "per_min": 1.4373323112303567,
+    "switches": 1
+   },
+   "slot": 22,
+   "snapshot_age_sim_s": {
+    "max": 0.1599999999999966,
+    "median": 0.1039999999999992,
+    "min": 0.055999999999997385,
+    "n": 836
+   },
+   "stale_decisions": {},
+   "ticks": 836,
+   "ticks_without_progress_candidate": 23,
+   "time_in_state_sim_s": {
+    "AVOIDING": 14.048,
+    "NORMAL": 12.396,
+    "RESUME": 15.3
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 3,
+   "boxes": 3,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 141.248,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 390,
+     "SCAN:unknown_blocked": 11
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 4
+    },
+    "entry_sim_s": 121.204,
+    "from": "AVOIDING",
+    "goal_distance_m": 0.2273783642434214,
+    "mode": "near_goal",
+    "nearest_stall_s": 117.348,
+    "net_progress_m": 4.696292735224666,
+    "path_length_m": 5.717850243283792,
+    "position_enu": [
+     8.014349716928008,
+     0.22677437213769366
+    ],
+    "radius_of_gyration_m": 1.5765592600422154,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 0.206287013838289,
+     "cells": {
+      "free": 9681,
+      "occupied": 107,
+      "unknown": 4712
+     },
+     "frontier_best_goal_distance_m": 7.758498890004763,
+     "frontier_cells_strict": 16,
+     "goal_distance_here_m": 0.2273783642434214,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 121.144,
+     "reachable_cells_strict": 1589,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.02109135040513238,
+     "terminal_segment": {
+      "length_m": 0.2273783642434214,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 0,
+      "unknown_cells": 5,
+      "unknown_lateral_over_0_39_m": 5
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 16
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8213388835674647,
+    "window_before_s": 30.0,
+    "x_progress_m": 8.006288575221005
+   },
+   "goal_clearance_truth_m": 1.8571320493934962,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 121.204
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 122.356,
+   "layout": "p7c-4000366",
+   "metrics": {
+    "detour_ratio": 1.326836267538618,
+    "final_goal_distance_m": 0.24929762634832964,
+    "hover_time_sim_s": 20.043999999999997,
+    "min_truth_clearance_m": 0.4089479549163503,
+    "path_length_m": 10.614690140308944,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.2058903015370994,
+   "no_improvement_before_end_s": 18.891999999999996,
+   "outcome": "failure",
+   "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+   "side_switches": {
+    "chosen_sided": 720,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 23,
+   "snapshot_age_sim_s": {
+    "max": 0.132000000000005,
+    "median": 0.08800000000000807,
+    "min": 0.03999999999999204,
+    "n": 1329
+   },
+   "stale_decisions": {},
+   "ticks": 1329,
+   "ticks_without_progress_candidate": 401,
+   "time_in_state_sim_s": {
+    "AVOIDING": 38.748,
+    "HOVER": 20.044,
+    "NORMAL": 7.5,
+    "RESUME": 0.1
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 43
+  },
+  {
+   "abort_reason": "hover_timeout",
+   "block": 3,
+   "boxes": 3,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 137.568,
+   "family": "mixed",
+   "final_hover": {
+    "actions_while_hovering": {
+     "HOLD:hover_timeout": 1,
+     "HOLD:no_collision_valid_progress_candidate": 388,
+     "SCAN:unknown_blocked": 12
+    },
+    "candidates_at_entry": {
+     "candidates_progress": 0,
+     "candidates_valid": 2
+    },
+    "entry_sim_s": 117.568,
+    "from": "AVOIDING",
+    "goal_distance_m": 0.37259946867830973,
+    "mode": "near_goal",
+    "nearest_stall_s": 113.712,
+    "net_progress_m": 5.128276908110481,
+    "path_length_m": 6.0241468249704555,
+    "position_enu": [
+     8.105962185029119,
+     0.3418920690174099
+    ],
+    "radius_of_gyration_m": 1.6692916604047163,
+    "reason": "no_progress_candidate",
+    "replanning": {
+     "best_reachable_goal_distance_strict_m": 0.3406825511019292,
+     "cells": {
+      "free": 9335,
+      "occupied": 111,
+      "unknown": 5054
+     },
+     "frontier_best_goal_distance_m": 7.766649519008006,
+     "frontier_cells_strict": 17,
+     "goal_distance_here_m": 0.37259946867830973,
+     "goal_reachable_optimistic": true,
+     "goal_reachable_strict": false,
+     "map_acquisition_sim_s": 117.548,
+     "reachable_cells_strict": 1638,
+     "start_cell_usable_strict": true,
+     "strict_gain_m": 0.031916917576380543,
+     "terminal_segment": {
+      "length_m": 0.37259946867830973,
+      "occupied_cells": 0,
+      "unknown_beyond_goal_x": 0,
+      "unknown_cells": 29,
+      "unknown_lateral_over_0_39_m": 20
+     },
+     "valid_in_place_moves_in_cone": 0,
+     "valid_in_place_moves_out_of_cone": 6
+    },
+    "stalls_within_5_s_before": 0,
+    "straightness": 0.8512868389683765,
+    "window_before_s": 30.0,
+    "x_progress_m": 8.089682936508387
+   },
+   "goal_clearance_truth_m": 1.8689230015820815,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "no_progress_candidate",
+     "sim_s": 117.568
+    }
+   ],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.02,
+   "layout": "p7c-4000366",
+   "metrics": {
+    "detour_ratio": 1.2996034555259792,
+    "final_goal_distance_m": 0.3636798871391873,
+    "hover_time_sim_s": 20.000000000000014,
+    "min_truth_clearance_m": 0.3319782790282072,
+    "path_length_m": 10.396827644207834,
+    "time_to_goal_sim_s": null
+   },
+   "min_goal_distance_m": 0.3440397022192475,
+   "no_improvement_before_end_s": 19.548000000000016,
+   "outcome": "failure",
+   "p5": {
+    "disagreements": 769,
+    "interventions": {
+     "yaw_to_l4": 1
+    },
+    "margin": {
+     "max": 1.2598135319977324,
+     "median": 0.25018962047479487,
+     "min": 0.0003759595727590437,
+     "n": 868
+    },
+    "margin_below_0_25_fraction": 0.4988479262672811,
+    "ticks": 1269
+   },
+   "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+   "side_switches": {
+    "chosen_sided": 868,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 23,
+   "snapshot_age_sim_s": {
+    "max": 0.16400000000000148,
+    "median": 0.09999999999999432,
+    "min": 0.036000000000001364,
+    "n": 1269
+   },
+   "stale_decisions": {},
+   "ticks": 1269,
+   "ticks_without_progress_candidate": 400,
+   "time_in_state_sim_s": {
+    "AVOIDING": 30.74,
+    "HOVER": 20.0,
+    "NORMAL": 12.648
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 1
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 2.293,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.588,
+   "family": "pillars",
+   "goal_clearance_truth_m": 5.831573897274889,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 114.888,
+   "layout": "p7c-4000368",
+   "metrics": {
+    "detour_ratio": 1.1644150923026462,
+    "final_goal_distance_m": 0.056953312922845646,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.849461165009137,
+    "path_length_m": 9.31532073842117,
+    "time_to_goal_sim_s": 41.24799999999999
+   },
+   "min_goal_distance_m": 0.05086407116572093,
+   "no_improvement_before_end_s": 0.6999999999999886,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 452,
+    "interventions": {},
+    "margin": {
+     "max": 0.31591926383006097,
+     "median": 0.03949089320215915,
+     "min": 0.00043977386086702097,
+     "n": 801
+    },
+    "margin_below_0_25_fraction": 0.9712858926342073,
+    "ticks": 825
+   },
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "side_switches": {
+    "chosen_sided": 17,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 24,
+   "snapshot_age_sim_s": {
+    "max": 0.14000000000000057,
+    "median": 0.1039999999999992,
+    "min": 0.055999999999997385,
+    "n": 825
+   },
+   "stale_decisions": {},
+   "ticks": 825,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.2
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 2.266,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.932,
+   "family": "pillars",
+   "goal_clearance_truth_m": 5.83880600754591,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.484,
+   "layout": "p7c-4000368",
+   "metrics": {
+    "detour_ratio": 1.1773166915766424,
+    "final_goal_distance_m": 0.03371088834588171,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8432002641252931,
+    "path_length_m": 9.41853353261314,
+    "time_to_goal_sim_s": 41.292
+   },
+   "min_goal_distance_m": 0.02269566262694726,
+   "no_improvement_before_end_s": 0.4480000000000075,
+   "outcome": "goal_success",
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "side_switches": {
+    "chosen_sided": 0,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 24,
+   "snapshot_age_sim_s": {
+    "max": 0.1280000000000001,
+    "median": 0.08400000000000318,
+    "min": 0.03999999999999204,
+    "n": 826
+   },
+   "stale_decisions": {},
+   "ticks": 826,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.24
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.852,
+   "family": "mixed",
+   "goal_clearance_truth_m": 4.011011362531337,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.252,
+   "layout": "p7c-4000378",
+   "metrics": {
+    "detour_ratio": 1.171281697538496,
+    "final_goal_distance_m": 0.08009053797335348,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9634485516970741,
+    "path_length_m": 9.370253580307969,
+    "time_to_goal_sim_s": 41.2
+   },
+   "min_goal_distance_m": 0.022228050611153762,
+   "no_improvement_before_end_s": 0.6000000000000085,
+   "outcome": "goal_success",
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "side_switches": {
+    "chosen_sided": 0,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 25,
+   "snapshot_age_sim_s": {
+    "max": 0.16800000000000637,
+    "median": 0.12199999999999989,
+    "min": 0.0799999999999983,
+    "n": 824
+   },
+   "stale_decisions": {},
+   "ticks": 824,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.152
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 2.491,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.892,
+   "family": "mixed",
+   "goal_clearance_truth_m": 4.036084391120803,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.792,
+   "layout": "p7c-4000378",
+   "metrics": {
+    "detour_ratio": 1.1893363704076516,
+    "final_goal_distance_m": 0.05740459340208908,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.9562461118392065,
+    "path_length_m": 9.514690963261213,
+    "time_to_goal_sim_s": 41.3
+   },
+   "min_goal_distance_m": 0.042831242896185076,
+   "no_improvement_before_end_s": 0.09999999999999432,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 444,
+    "interventions": {},
+    "margin": {
+     "max": 0.20008611344381766,
+     "median": 0.03155467158640857,
+     "min": 0.00021921836090044167,
+     "n": 801
+    },
+    "margin_below_0_25_fraction": 1.0,
+    "ticks": 826
+   },
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "side_switches": {
+    "chosen_sided": 8,
+    "per_min": 1.454474934548628,
+    "switches": 1
+   },
+   "slot": 25,
+   "snapshot_age_sim_s": {
+    "max": 0.14400000000000546,
+    "median": 0.10199999999999676,
+    "min": 0.055999999999997385,
+    "n": 826
+   },
+   "stale_decisions": {},
+   "ticks": 826,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "NORMAL": 41.252
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.341,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 117.608,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 5.356420650854707,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 116.86,
+   "layout": "p7c-4000356",
+   "metrics": {
+    "detour_ratio": 1.209719192715918,
+    "final_goal_distance_m": 0.008503473459205107,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.35871864623839655,
+    "path_length_m": 9.677753541727345,
+    "time_to_goal_sim_s": 43.08
+   },
+   "min_goal_distance_m": 0.022863668014855842,
+   "no_improvement_before_end_s": 0.7480000000000047,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 522,
+    "interventions": {
+     "yaw_to_l4": 11
+    },
+    "margin": {
+     "max": 0.7494545698321655,
+     "median": 0.12024656760807417,
+     "min": 0.0001108975524601874,
+     "n": 839
+    },
+    "margin_below_0_25_fraction": 0.7389749702026222,
+    "ticks": 862
+   },
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "side_switches": {
+    "chosen_sided": 309,
+    "per_min": 1.3944408292274795,
+    "switches": 1
+   },
+   "slot": 26,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.0940000000000083,
+    "min": 0.04800000000000182,
+    "n": 862
+   },
+   "stale_decisions": {},
+   "ticks": 862,
+   "ticks_without_progress_candidate": 23,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.128,
+    "NORMAL": 4.0,
+    "RESUME": 23.9
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 11
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.395,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p4",
+   "end_sim_s": 119.796,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 5.446266477704048,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 119.596,
+   "layout": "p7c-4000356",
+   "metrics": {
+    "detour_ratio": 1.2463418737990972,
+    "final_goal_distance_m": 0.0688328098796977,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4256282198901521,
+    "path_length_m": 9.970734990392778,
+    "time_to_goal_sim_s": 45.10000000000001
+   },
+   "min_goal_distance_m": 0.02269040981875354,
+   "no_improvement_before_end_s": 0.20000000000000284,
+   "outcome": "goal_success",
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "side_switches": {
+    "chosen_sided": 390,
+    "per_min": 1.3319126265316994,
+    "switches": 1
+   },
+   "slot": 26,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.11599999999999966,
+    "min": 0.036000000000001364,
+    "n": 903
+   },
+   "stale_decisions": {},
+   "ticks": 903,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.292,
+    "NORMAL": 5.072,
+    "RESUME": 24.684
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 34
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 4,
+   "controller": "p4",
+   "end_sim_s": 122.136,
+   "family": "pillars",
+   "goal_clearance_truth_m": 2.752387335375824,
+   "hover_entries": [
+    {
+     "from": "AVOIDING",
+     "reason": "stale_inputs:snapshot_stale",
+     "sim_s": 76.792
+    }
+   ],
+   "hover_exits": 1,
+   "last_best_improvement_sim_s": 121.788,
+   "layout": "p7c-4000352",
+   "metrics": {
+    "detour_ratio": 1.2375378963795338,
+    "final_goal_distance_m": 0.012468446043338726,
+    "hover_time_sim_s": 0.5480000000000018,
+    "min_truth_clearance_m": 0.46880765291305493,
+    "path_length_m": 9.90030317103627,
+    "time_to_goal_sim_s": 48.23599999999999
+   },
+   "min_goal_distance_m": 0.03280957441386377,
+   "no_improvement_before_end_s": 0.347999999999999,
+   "outcome": "goal_success",
+   "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+   "side_switches": {
+    "chosen_sided": 517,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 27,
+   "snapshot_age_sim_s": {
+    "max": 0.7000000000000028,
+    "median": 0.1039999999999992,
+    "min": 0.03999999999999204,
+    "n": 970
+   },
+   "stale_decisions": {
+    "snapshot_stale": 13
+   },
+   "ticks": 970,
+   "ticks_without_progress_candidate": 23,
+   "time_in_state_sim_s": {
+    "AVOIDING": 17.316,
+    "HOVER": 0.548,
+    "NORMAL": 2.948,
+    "RESUME": 27.372
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 71
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.548,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 121.336,
+   "family": "pillars",
+   "goal_clearance_truth_m": 2.7122351752181917,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 120.836,
+   "layout": "p7c-4000352",
+   "metrics": {
+    "detour_ratio": 1.2415843240748936,
+    "final_goal_distance_m": 0.037258537830447774,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.42564947959922117,
+    "path_length_m": 9.932674592599149,
+    "time_to_goal_sim_s": 46.596000000000004
+   },
+   "min_goal_distance_m": 0.022081697148409154,
+   "no_improvement_before_end_s": 0.5,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 605,
+    "interventions": {
+     "yaw_to_l4": 56
+    },
+    "margin": {
+     "max": 1.5690742804912698,
+     "median": 0.15599369390330775,
+     "min": 8.698603243573189e-05,
+     "n": 907
+    },
+    "margin_below_0_25_fraction": 0.6979051819184123,
+    "ticks": 932
+   },
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "side_switches": {
+    "chosen_sided": 474,
+    "per_min": 1.2891027844620147,
+    "switches": 1
+   },
+   "slot": 27,
+   "snapshot_age_sim_s": {
+    "max": 0.1599999999999966,
+    "median": 0.11200000000000188,
+    "min": 0.06799999999999784,
+    "n": 932
+   },
+   "stale_decisions": {},
+   "ticks": 932,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.4,
+    "NORMAL": 3.1,
+    "RESUME": 28.044
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 56
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.296,
+   "clock_stalls_below_0_5": 3,
+   "controller": "p4",
+   "end_sim_s": 119.28,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 4.9235274493992325,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 119.128,
+   "layout": "p7c-4000358",
+   "metrics": {
+    "detour_ratio": 1.2261773549087216,
+    "final_goal_distance_m": 0.007189318805276675,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4570373076059622,
+    "path_length_m": 9.809418839269773,
+    "time_to_goal_sim_s": 44.7
+   },
+   "min_goal_distance_m": 0.002476314784108004,
+   "no_improvement_before_end_s": 0.15200000000000102,
+   "outcome": "goal_success",
+   "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+   "side_switches": {
+    "chosen_sided": 420,
+    "per_min": 4.031174415479709,
+    "switches": 3
+   },
+   "slot": 28,
+   "snapshot_age_sim_s": {
+    "max": 0.1559999999999917,
+    "median": 0.10800000000000409,
+    "min": 0.06400000000000716,
+    "n": 894
+   },
+   "stale_decisions": {},
+   "ticks": 894,
+   "ticks_without_progress_candidate": 25,
+   "time_in_state_sim_s": {
+    "AVOIDING": 16.248,
+    "NORMAL": 6.352,
+    "RESUME": 22.052
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 29
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.296,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 117.492,
+   "family": "wall_with_gap",
+   "goal_clearance_truth_m": 4.938292397215962,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 116.892,
+   "layout": "p7c-4000358",
+   "metrics": {
+    "detour_ratio": 1.219803785588918,
+    "final_goal_distance_m": 0.03493382037992736,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.36715421471455534,
+    "path_length_m": 9.758430284711345,
+    "time_to_goal_sim_s": 42.944
+   },
+   "min_goal_distance_m": 0.005845149575141189,
+   "no_improvement_before_end_s": 0.6000000000000085,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 566,
+    "interventions": {
+     "yaw_to_l4": 8
+    },
+    "margin": {
+     "max": 0.8279431697806778,
+     "median": 0.12731685501052148,
+     "min": 0.00012077242708485869,
+     "n": 835
+    },
+    "margin_below_0_25_fraction": 0.8011976047904191,
+    "ticks": 859
+   },
+   "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+   "side_switches": {
+    "chosen_sided": 346,
+    "per_min": 1.39886225869626,
+    "switches": 1
+   },
+   "slot": 28,
+   "snapshot_age_sim_s": {
+    "max": 0.14000000000000057,
+    "median": 0.1039999999999992,
+    "min": 0.04000000000000625,
+    "n": 859
+   },
+   "stale_decisions": {},
+   "ticks": 859,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.148,
+    "NORMAL": 5.648,
+    "RESUME": 22.096
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 8
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.494,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 115.892,
+   "family": "pillars",
+   "goal_clearance_truth_m": 1.6154640185440368,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.64,
+   "layout": "p7c-4000389",
+   "metrics": {
+    "detour_ratio": 1.1975757208279685,
+    "final_goal_distance_m": 0.057509903276837096,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.39092179441886044,
+    "path_length_m": 9.580605766623748,
+    "time_to_goal_sim_s": 41.85199999999999
+   },
+   "min_goal_distance_m": 0.03828430648638994,
+   "no_improvement_before_end_s": 0.25199999999999534,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 724,
+    "interventions": {},
+    "margin": {
+     "max": 0.92383664356894,
+     "median": 0.1671075932654862,
+     "min": 0.00045123663957546967,
+     "n": 810
+    },
+    "margin_below_0_25_fraction": 0.7617283950617284,
+    "ticks": 837
+   },
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "side_switches": {
+    "chosen_sided": 287,
+    "per_min": 1.4354066985645932,
+    "switches": 1
+   },
+   "slot": 29,
+   "snapshot_age_sim_s": {
+    "max": 0.14400000000000546,
+    "median": 0.1039999999999992,
+    "min": 0.0519999999999925,
+    "n": 837
+   },
+   "stale_decisions": {},
+   "ticks": 837,
+   "ticks_without_progress_candidate": 27,
+   "time_in_state_sim_s": {
+    "AVOIDING": 15.152,
+    "NORMAL": 21.348,
+    "RESUME": 5.3
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 2,
+   "clearance_capacity_m": 1.503,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 115.976,
+   "family": "pillars",
+   "goal_clearance_truth_m": 1.5980817174078081,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 115.276,
+   "layout": "p7c-4000389",
+   "metrics": {
+    "detour_ratio": 1.1939222189097358,
+    "final_goal_distance_m": 0.039912957250069846,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.310398820989346,
+    "path_length_m": 9.551377751277887,
+    "time_to_goal_sim_s": 41.831999999999994
+   },
+   "min_goal_distance_m": 0.022869609837829322,
+   "no_improvement_before_end_s": 0.7000000000000028,
+   "outcome": "goal_success",
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "side_switches": {
+    "chosen_sided": 265,
+    "per_min": 0.0,
+    "switches": 0
+   },
+   "slot": 29,
+   "snapshot_age_sim_s": {
+    "max": 0.17199999999999704,
+    "median": 0.1039999999999992,
+    "min": 0.036000000000001364,
+    "n": 837
+   },
+   "stale_decisions": {},
+   "ticks": 837,
+   "ticks_without_progress_candidate": 27,
+   "time_in_state_sim_s": {
+    "AVOIDING": 13.236,
+    "NORMAL": 22.044,
+    "RESUME": 6.5
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 0
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 1.997,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p4",
+   "end_sim_s": 120.496,
+   "family": "pillars",
+   "goal_clearance_truth_m": 5.135175561368465,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 119.744,
+   "layout": "p7c-4000365",
+   "metrics": {
+    "detour_ratio": 1.2466135223154158,
+    "final_goal_distance_m": 0.029995112550017508,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.4590073999234089,
+    "path_length_m": 9.972908178523326,
+    "time_to_goal_sim_s": 45.69999999999999
+   },
+   "min_goal_distance_m": 0.03468340471090448,
+   "no_improvement_before_end_s": 0.7519999999999953,
+   "outcome": "goal_success",
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "side_switches": {
+    "chosen_sided": 531,
+    "per_min": 1.314290721107509,
+    "switches": 1
+   },
+   "slot": 30,
+   "snapshot_age_sim_s": {
+    "max": 0.1880000000000024,
+    "median": 0.10800000000000409,
+    "min": 0.031999999999996476,
+    "n": 914
+   },
+   "stale_decisions": {},
+   "ticks": 914,
+   "ticks_without_progress_candidate": 24,
+   "time_in_state_sim_s": {
+    "AVOIDING": 22.0,
+    "NORMAL": 3.652,
+    "RESUME": 20.0
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 19
+  },
+  {
+   "abort_reason": null,
+   "block": 3,
+   "boxes": 1,
+   "clearance_capacity_m": 2.042,
+   "clock_stalls_below_0_5": 2,
+   "controller": "p5",
+   "end_sim_s": 118.972,
+   "family": "pillars",
+   "goal_clearance_truth_m": 5.092374482959508,
+   "hover_entries": [],
+   "hover_exits": 0,
+   "last_best_improvement_sim_s": 118.572,
+   "layout": "p7c-4000365",
+   "metrics": {
+    "detour_ratio": 1.249912973503037,
+    "final_goal_distance_m": 0.0358038833256924,
+    "hover_time_sim_s": 0.0,
+    "min_truth_clearance_m": 0.8580518302339701,
+    "path_length_m": 9.999303788024296,
+    "time_to_goal_sim_s": 44.3
+   },
+   "min_goal_distance_m": 0.015957381810714592,
+   "no_improvement_before_end_s": 0.3999999999999915,
+   "outcome": "goal_success",
+   "p5": {
+    "disagreements": 511,
+    "interventions": {
+     "yaw_to_l4": 1
+    },
+    "margin": {
+     "max": 0.8248961739939537,
+     "median": 0.1519559303700202,
+     "min": 0.00011591006925204539,
+     "n": 860
+    },
+    "margin_below_0_25_fraction": 0.7802325581395348,
+    "ticks": 886
+   },
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "side_switches": {
+    "chosen_sided": 411,
+    "per_min": 1.3558709210883126,
+    "switches": 1
+   },
+   "slot": 30,
+   "snapshot_age_sim_s": {
+    "max": 0.14399999999999125,
+    "median": 0.10000000000000142,
+    "min": 0.055999999999997385,
+    "n": 886
+   },
+   "stale_decisions": {},
+   "ticks": 886,
+   "ticks_without_progress_candidate": 26,
+   "time_in_state_sim_s": {
+    "AVOIDING": 20.5,
+    "NORMAL": 3.052,
+    "RESUME": 20.7
+   },
+   "truth_feasible": {
+    "0.49": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "0.79": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    },
+    "1.0": {
+     "feasible": true,
+     "goal_usable": true,
+     "start_usable": true
+    }
+   },
+   "yaw_to_decisions": 1
+  }
+ ],
+ "read_only": true,
+ "stopped_attempt_failures": [
+  {
+   "controller": "p5",
+   "min_interval_rtf": 0.005310676807103981,
+   "p2_failure": "stale_action",
+   "recovery_sim_s": 116.112,
+   "run": "20261122T080429Z-p7e-p5-p7c-4000351-884f1857",
+   "slot": 1,
+   "stalls": 13,
+   "stalls_within_2_s_before_recovery": 0
+  }
+ ],
+ "summary": {
+  "abort_reasons": {
+   "hover_timeout": 18
+  },
+  "actions_while_hovering": {
+   "HOLD:hover_timeout": 18,
+   "HOLD:no_collision_valid_progress_candidate": 7151,
+   "SCAN:unknown_blocked": 68
+  },
+  "both_failed_final_hover_separation": [
+   {
+    "distance_between_final_hover_positions_m": 0.06369891375796624,
+    "slot": 3
+   },
+   {
+    "distance_between_final_hover_positions_m": 0.2080904915890551,
+    "slot": 6
+   },
+   {
+    "distance_between_final_hover_positions_m": 1.8505270219139156,
+    "slot": 9
+   },
+   {
+    "distance_between_final_hover_positions_m": 0.15657359325486106,
+    "slot": 12
+   },
+   {
+    "distance_between_final_hover_positions_m": 0.015408134729869362,
+    "slot": 14
+   },
+   {
+    "distance_between_final_hover_positions_m": 3.8563834937344375,
+    "slot": 16
+   },
+   {
+    "distance_between_final_hover_positions_m": 0.31274788191325786,
+    "slot": 18
+   },
+   {
+    "distance_between_final_hover_positions_m": 0.14712215484578575,
+    "slot": 23
+   }
+  ],
+  "both_failed_slots": [
+   3,
+   6,
+   9,
+   12,
+   14,
+   16,
+   18,
+   23
+  ],
+  "clearance_capacity_below_1_2_m": {
+   "failures": 5,
+   "successes": 3
+  },
+  "clearance_capacity_m": {
+   "failures": {
+    "max": 1.997,
+    "median": 1.242,
+    "min": 1.143,
+    "n": 18
+   },
+   "mid_course_failures": {
+    "max": 1.548,
+    "median": 1.2149999999999999,
+    "min": 1.143,
+    "n": 12
+   },
+   "near_goal_failures": {
+    "max": 1.997,
+    "median": 1.597,
+    "min": 1.494,
+    "n": 6
+   },
+   "successes": {
+    "max": 2.491,
+    "median": 1.763,
+    "min": 1.116,
+    "n": 42
+   }
+  },
+  "discordant_slots": [
+   7,
+   15
+  ],
+  "failure_modes": {
+   "mid_course": 12,
+   "near_goal": 6
+  },
+  "failure_modes_by_controller": {
+   "p4:mid_course": 6,
+   "p4:near_goal": 4,
+   "p5:mid_course": 6,
+   "p5:near_goal": 2
+  },
+  "failures": 18,
+  "failures_by_controller": {
+   "p4": 10,
+   "p5": 8
+  },
+  "failures_by_family": {
+   "mixed": 8,
+   "partial_wall": 2,
+   "pillars": 1,
+   "wall_with_gap": 7
+  },
+  "final_hover_candidates_at_entry": {
+   "0/0": 12,
+   "2/0": 2,
+   "4/0": 3,
+   "6/0": 1
+  },
+  "final_hover_from": {
+   "AVOIDING": 15,
+   "RESUME": 3
+  },
+  "final_hover_goal_distance_m": {
+   "max": 6.2195024017523615,
+   "median": 3.9308530720995067,
+   "min": 0.15342753181349678,
+   "n": 18
+  },
+  "final_hover_reason": {
+   "no_progress_candidate": 18
+  },
+  "final_hover_x_progress_m": {
+   "max": 8.089682936508387,
+   "median": 4.322927364978358,
+   "min": 1.8372877993414323,
+   "n": 18
+  },
+  "flights": 60,
+  "flights_by_family": {
+   "mixed": 18,
+   "partial_wall": 6,
+   "pillars": 18,
+   "wall_with_gap": 18
+  },
+  "goal_clearance_truth_m": {
+   "failures": {
+    "max": 4.7501779682785275,
+    "median": 2.408694061856492,
+    "min": 1.564188078010152,
+    "n": 18
+   },
+   "successes": {
+    "max": 6.0616350178559495,
+    "median": 4.096073900392409,
+    "min": 1.5980817174078081,
+    "n": 42
+   }
+  },
+  "hover_exits": {
+   "failures": {
+    "max": 0,
+    "median": 0.0,
+    "min": 0,
+    "n": 18
+   },
+   "successes": {
+    "max": 1,
+    "median": 0.0,
+    "min": 0,
+    "n": 42
+   }
+  },
+  "max_snapshot_age_sim_s": {
+   "failures": {
+    "max": 0.20400000000000773,
+    "median": 0.16800000000000637,
+    "min": 0.132000000000005,
+    "n": 18
+   },
+   "successes": {
+    "max": 0.7000000000000028,
+    "median": 0.1599999999999966,
+    "min": 0.1280000000000001,
+    "n": 42
+   }
+  },
+  "near_goal_terminal_segment": [
+   {
+    "controller": "p4",
+    "goal_distance_m": 0.24662891413304797,
+    "length_m": 0.24662891413304797,
+    "occupied_cells": 0,
+    "slot": 15,
+    "unknown_beyond_goal_x": 0,
+    "unknown_cells": 15,
+    "unknown_lateral_over_0_39_m": 13
+   },
+   {
+    "controller": "p4",
+    "goal_distance_m": 0.31842240565013014,
+    "length_m": 0.31842240565013014,
+    "occupied_cells": 0,
+    "slot": 16,
+    "unknown_beyond_goal_x": 0,
+    "unknown_cells": 9,
+    "unknown_lateral_over_0_39_m": 9
+   },
+   {
+    "controller": "p4",
+    "goal_distance_m": 0.4810831829880897,
+    "length_m": 0.4810831829880897,
+    "occupied_cells": 0,
+    "slot": 18,
+    "unknown_beyond_goal_x": 1,
+    "unknown_cells": 31,
+    "unknown_lateral_over_0_39_m": 29
+   },
+   {
+    "controller": "p5",
+    "goal_distance_m": 0.15342753181349678,
+    "length_m": 0.15342753181349678,
+    "occupied_cells": 0,
+    "slot": 18,
+    "unknown_beyond_goal_x": 0,
+    "unknown_cells": 5,
+    "unknown_lateral_over_0_39_m": 5
+   },
+   {
+    "controller": "p4",
+    "goal_distance_m": 0.2273783642434214,
+    "length_m": 0.2273783642434214,
+    "occupied_cells": 0,
+    "slot": 23,
+    "unknown_beyond_goal_x": 0,
+    "unknown_cells": 5,
+    "unknown_lateral_over_0_39_m": 5
+   },
+   {
+    "controller": "p5",
+    "goal_distance_m": 0.37259946867830973,
+    "length_m": 0.37259946867830973,
+    "occupied_cells": 0,
+    "slot": 23,
+    "unknown_beyond_goal_x": 0,
+    "unknown_cells": 29,
+    "unknown_lateral_over_0_39_m": 20
+   }
+  ],
+  "nearest_stall_to_final_hover_s": {
+   "max": 164.62800000000001,
+   "median": 95.74600000000001,
+   "min": 27.019999999999996,
+   "n": 18
+  },
+  "net_progress_30_s_before_hover_m": {
+   "max": 5.548326503273031,
+   "median": 3.8880433734633244,
+   "min": 0.028350732279888824,
+   "n": 18
+  },
+  "no_improvement_before_end_s": {
+   "failures": {
+    "max": 45.19999999999999,
+    "median": 18.896,
+    "min": 10.900000000000006,
+    "n": 18
+   }
+  },
+  "p5_margin_below_0_25_fraction": {
+   "failures": {
+    "max": 0.8921161825726142,
+    "median": 0.7347773258639654,
+    "min": 0.14659685863874344,
+    "n": 8
+   },
+   "successes": {
+    "max": 1.0,
+    "median": 0.7914102582424649,
+    "min": 0.4696969696969697,
+    "n": 22
+   }
+  },
+  "p5_margin_median": {
+   "failures": {
+    "max": 1.7031005398546664,
+    "median": 0.15148660155290705,
+    "min": 0.12347510908178982,
+    "n": 8
+   },
+   "successes": {
+    "max": 0.28589108577323685,
+    "median": 0.11906281501103866,
+    "min": 0.020186667421523197,
+    "n": 22
+   }
+  },
+  "radius_of_gyration_30_s_before_hover_m": {
+   "max": 1.6880610130412648,
+   "median": 1.2998625343482253,
+   "min": 0.023704750425954234,
+   "n": 18
+  },
+  "replanning_at_final_hover": {
+   "frontier_cells_strict": {
+    "max": 17,
+    "median": 16.0,
+    "min": 0,
+    "n": 18
+   },
+   "goal_reachable_optimistic": {
+    "false": 8,
+    "true": 10
+   },
+   "goal_reachable_strict": {
+    "false": 18
+   },
+   "maps": 18,
+   "strict_gain_m": {
+    "max": 0.86939876235851,
+    "median": 0.41103960840626064,
+    "min": 0.02109135040513238,
+    "n": 14
+   },
+   "strict_gain_over_0_5_m": 6,
+   "valid_in_place_moves_in_cone": {
+    "max": 1,
+    "median": 0.0,
+    "min": 0,
+    "n": 18
+   },
+   "valid_in_place_moves_out_of_cone": {
+    "max": 39,
+    "median": 22.0,
+    "min": 0,
+    "n": 18
+   }
+  },
+  "side_switches_per_min": {
+   "failures": {
+    "max": 17.161162382732055,
+    "median": 0.0,
+    "min": 0.0,
+    "n": 18
+   },
+   "successes": {
+    "max": 8.581937065794852,
+    "median": 1.3016967527847618,
+    "min": 0.0,
+    "n": 42
+   }
+  },
+  "stale_decisions": {
+   "failures": {},
+   "successes": {
+    "snapshot_stale": 13
+   }
+  },
+  "stalls_within_5_s_before_final_hover": {
+   "0": 18
+  },
+  "straightness_30_s_before_hover": {
+   "max": 0.9929617978884376,
+   "median": 0.8892682217399372,
+   "min": 0.03263340136869066,
+   "n": 18
+  },
+  "time_in_state_sim_s": {
+   "failures": {
+    "AVOIDING": {
+     "max": 38.748,
+     "median": 10.597999999999999,
+     "min": 3.748,
+     "n": 18
+    },
+    "HOVER": {
+     "max": 20.052,
+     "median": 20.044,
+     "min": 20.0,
+     "n": 18
+    },
+    "NORMAL": {
+     "max": 17.048,
+     "median": 9.866,
+     "min": 0.0,
+     "n": 18
+    },
+    "OBSTACLE_DETECTED": {
+     "max": 0.0,
+     "median": 0.0,
+     "min": 0.0,
+     "n": 18
+    },
+    "RESUME": {
+     "max": 90.044,
+     "median": 0.0,
+     "min": 0.0,
+     "n": 18
+    }
+   },
+   "successes": {
+    "AVOIDING": {
+     "max": 26.84,
+     "median": 11.874,
+     "min": 0.0,
+     "n": 42
+    },
+    "HOVER": {
+     "max": 0.548,
+     "median": 0.0,
+     "min": 0.0,
+     "n": 42
+    },
+    "NORMAL": {
+     "max": 41.3,
+     "median": 13.89,
+     "min": 1.748,
+     "n": 42
+    },
+    "OBSTACLE_DETECTED": {
+     "max": 0.0,
+     "median": 0.0,
+     "min": 0.0,
+     "n": 42
+    },
+    "RESUME": {
+     "max": 34.796,
+     "median": 15.65,
+     "min": 0.0,
+     "n": 42
+    }
+   }
+  },
+  "truth_feasible": {
+   "0.49": {
+    "failures": {
+     "true": 18
+    },
+    "successes": {
+     "true": 42
+    }
+   },
+   "0.79": {
+    "failures": {
+     "true": 18
+    },
+    "successes": {
+     "true": 42
+    }
+   },
+   "1.0": {
+    "failures": {
+     "true": 18
+    },
+    "successes": {
+     "true": 42
+    }
+   }
+  },
+  "yaw_to_decisions": {
+   "failures": {
+    "max": 1542,
+    "median": 14.0,
+    "min": 0,
+    "n": 18
+   },
+   "successes": {
+    "max": 224,
+    "median": 0.0,
+    "min": 0,
+    "n": 42
+   }
+  }
+ }
+}

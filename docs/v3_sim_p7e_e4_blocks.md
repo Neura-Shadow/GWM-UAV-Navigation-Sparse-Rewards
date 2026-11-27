@@ -1,7 +1,16 @@
 # v3-SIM P7-E E4 — the engineering blocks (scope `engineering-30`)
 
-**Candidate:** `state/p7e-candidate-2b6ee5d.json`, manifest
-`38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be` (real; production Policy A `26595bba…`).
+**Status: COMPLETE (2026-11-27).** All three blocks were flown on the second real candidate; the report was accepted
+in E5 (2026-11-28).
+
+**Candidates:**
+* **first:** `state/p7e-candidate-2b6ee5d.json`, manifest
+  `38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be` (production Policy A `26595bba…`).
+  * Its block 1 stopped after 3 flights and was recovered into a recorded stop.
+  * The candidate is retired, and its records are protected.
+* **second:** `state/p7e-candidate-2b6ee5d-r2.json`, manifest
+  `e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608` (production Policy A r2 `56c264e0…`). It
+  carries the same code, and it flew blocks 1–3 (60 of 60 valid).
 **Rules:** contract [`p7-engineering-validation-v1`](v3_sim_p7e_contract_draft.md) §4, §8 and §13 item 8.
 * **Authorization:** each block needs its own, written through `p7e_manifest.py authorize`, with `max_attempts` 1 and
   a permanent consumption marker.
@@ -17,6 +26,10 @@
 
 **Status: INTERRUPTED (2026-11-22), with no result written. It is fail-closed: nothing can proceed on this candidate
 until the operator decides.** See "Block 1: what happened" below.
+* **Resolved (2026-11-27):**
+  * the operator authorized the recovery, which wrote stop record `5f7c2326…`;
+  * the operator then chose to re-fly with the same code on a second candidate (sections below);
+  * this candidate flies nothing more.
 
 **The plan:** 10 pairs, 20 flights, each pair back to back in the listed order, 5 of them P4 first. It takes about
 65 min and about 26 GB.

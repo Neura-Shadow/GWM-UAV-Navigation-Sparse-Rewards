@@ -2,6 +2,13 @@
 
 **Status: POLICY APPROVED by the operator (2026-11-22, "Approve retention"): D4-A and D4-B (decision E9) and the
 P7-E rule E10 are in force, as written below.**
+* **Release note (2026-11-28):** the manifest numbers below are version 2 (2026-11-22). For planning, they are
+  superseded by the read-only **version 3** of the
+  [cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md).
+  * Version 3 includes the 65 P7-E runs.
+  * It adds new protections: stale-action and RECOVERY evidence, diagnostics dependencies, and the P8 inputs.
+  * It verifies every eligible file.
+  * Version 2 and its JSON are kept unchanged.
 * **No deletion is authorized by this approval** (contract §11, clarification 5; §5 below). No file was deleted,
   moved or compressed, and the 107 ELIGIBLE, 28 REVIEW and 241 PROTECTED runs, and the protected P2 file, all stay.
 * **Any cleanup still needs:** a separately designed, tested and approved procedure (§4), then a separate

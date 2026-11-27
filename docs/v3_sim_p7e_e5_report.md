@@ -53,7 +53,8 @@ cd /tmp && GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 PYTHONDONTWRITEBYTECODE=1 /us
 This way the end of a session cannot kill it. If it dies before writing, there is no report and nothing changes.
 A second run then needs a new authorization.
 
-**Duration:** minutes (plan §10). I have not timed the classifier on these runs before authorization.
+**Duration:** minutes (plan §10). This was written before the run, when the classifier had not been timed on
+these runs; the run took 3.4 min (§4).
 
 **If the status is "not passed":** the report is kept as written, with no rerun and no change to any threshold.
 The operator then decides (contract §7.3).
@@ -163,8 +164,19 @@ infrastructure, with every hard criterion H1-H9 met"*.
   * every flight has at least one stall below RTF 0.5 (median 2 for both controllers), as in the pilot.
   * The 60 runs use 83.7 GB. The largest is slot 12 P5 at 2.81 GB, above the pilot's 1.82 GB maximum (RR4, no
     change).
-* **Safety bounds:** 0 safety events and 0 mission-failure flights per controller. The one-sided 95 % upper bound
-  is 0.095 per flight for each controller.
+* **Safety bounds:** 0 safety events per controller. The one-sided 95 % upper bound is 0.095 per flight for each
+  controller.
+* **Mission failures (corrected 2026-11-28, release closure).** 18 flights failed the mission: P4 10 of 30 and P5 8 of
+  30 (R1, R9).
+  * All 18 were safe `hover_timeout` aborts by the accepted P4 supervisor: hover, then land and disarm through
+    P2's nominal sequence, with no safety event.
+  * The report's field `safety_per_controller.mission_failure_flights` is 0 for both controllers, but it counts
+    something narrower. It counts flights that carry a D14 mission-failure **class item**: `safety:tracking` or
+    `safety:response_latency` (`p7_classify.MISSION_ITEMS`). There were none.
+  * That field is not a count of failed missions. This document previously read "0 mission-failure flights",
+    which repeated the field without that qualification.
+  * The accepted report JSON is unchanged and correct under its own definitions; see the
+    [release closure](v3_sim_p7e_release_closure.md) §1.2.
 * **Paired clearance (descriptive, no non-inferiority test):** P5 − P4 median +0.002 m, range [−0.094, +0.593].
 
 ### Risk register
@@ -198,11 +210,11 @@ infrastructure, with every hard criterion H1-H9 met"*.
   * the 95 % interval for 15/30 is [0.313, 0.687];
   * the zero-event bound is 0.095 per flight over 30 flights, 0.049 over 60.
 
-## 5. What acceptance would mean (for the operator's decision)
+## 5. What the acceptance means (accepted 2026-11-28, "Accept E5")
 
-Accepting this report closes E5 and the P7-E engineering validation under contract `p7-engineering-validation-v1`:
-the accepted P4 and P5 stacks ran 60 flights safely and completely through the P7 infrastructure. It would not
-authorize anything else.
+Accepting this report closed E5 and the P7-E engineering validation under contract `p7-engineering-validation-v1`:
+the accepted P4 and P5 stacks ran 60 flights safely and completely through the P7 infrastructure. It authorizes
+nothing else.
 * No push and no merge.
 * No cleanup or deletion. Under D4-B, P7-E's raw depth becomes eligible only for a separately designed, tested and
   approved cleanup.

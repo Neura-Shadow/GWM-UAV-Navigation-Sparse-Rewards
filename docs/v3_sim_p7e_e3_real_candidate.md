@@ -1,7 +1,12 @@
 # v3-SIM P7-E E3 — the real P7-E candidate: production Policy A and the real freeze
 
 **Status: DONE (2026-11-22). The real P7-E candidate is frozen:
-`38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be`.** Nothing has been flown on it.
+`38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be`.** Nothing had been flown on it at E3.
+* **Later (release note, 2026-11-28):**
+  * its block 1 stopped after 3 flights (an external termination, recovered into a recorded stop; see
+    [E4](v3_sim_p7e_e4_blocks.md));
+  * the candidate is retired, and its records are protected evidence;
+  * the batch was flown on the second real candidate `e9561f05…`, frozen on 2026-11-27 with the same code.
 * **Authorized:** preparation ("Prepare them"), then two separate answers:
   * item 1, production Policy A: "Approve (Recommended)";
   * item 2, the real freeze: "Freeze it (Recommended)".
