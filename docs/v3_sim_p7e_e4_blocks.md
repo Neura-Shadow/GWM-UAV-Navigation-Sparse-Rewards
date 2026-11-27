@@ -154,3 +154,45 @@ view of flight 3. The real run and the real state were unchanged by that test.
 safety-unverified flight.
 
 **Open: the operator's decision on how to continue.** Block 1 cannot resume on `38e23bad…`.
+
+## Re-fly on a second real candidate (operator "Re-fly, same code", 2026-11-27)
+
+**Decision.** The 60 flights are re-flown from block 1 on a new real candidate, with the same accepted E2 code
+(`2b6ee5d`, 16 files, canonical `003b4d76…`). No code changes.
+* **The stopped attempt on `38e23bad…`** stays: its 3 flights, stop record and receipt are protected evidence. E5
+  reports it as a stopped attempt, and it does not count toward the 60.
+* **Re-flown layouts.** Those 3 flights' layouts (slot 1, and slot 2 with P4) are flown again. E5 states that they
+  were seen once before.
+
+**PREPARED (2026-11-27): three items, each needing its own approval.**
+1. **Production Policy A for the second real candidate:** `state/p7e-policy-A-approval-2b6ee5d-r2.json`.
+   * Policy A `bf1ef9b1…`; `development_only: false`; it binds the same 16 files.
+   * Scope: the 3 blocks of the second real P7-E candidate, each separately authorized, in simulated flight only.
+     It transfers to no other candidate: not to `38e23bad…`, and not to any development candidate.
+2. **The freeze:** `state/p7e-candidate-2b6ee5d-r2.json`, with the absolute approval path, then verified from `/tmp`.
+3. **Block 1 on the new candidate:** the authorization through `p7e_manifest.py authorize` and its phrase, then the
+   run, **launched detached**:
+
+   ```
+   mkdir -p ~/uav_autonomy/logs && cd /tmp && setsid nohup env GWM_ALLOW_OPTIONAL_RUNTIME=1 GWM_RUN_GAZEBO_PX4_TESTS=1 \
+     GWM_ALLOW_PX4_LAUNCH=1 GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 PYTHONDONTWRITEBYTECODE=1 \
+     /usr/bin/python3 …/run_p7e_block.py --scope engineering-30 --block 1 --manifest … --authorization … \
+     > ~/uav_autonomy/logs/p7e-block-01-<sha12>.log 2>&1 < /dev/null &
+   ```
+
+   * **Why detached.** The run gets a new session with no controlling terminal, so the end of a Claude session cannot
+     hang it up.
+   * **Persistent log.** The log is kept in `~/uav_autonomy/logs`, not `/tmp`.
+   * **Watching it.** A separate watcher only waits for the PID and reads the result. If the watcher dies, the block
+     goes on.
+   * **Keeping the host awake.** The app is asked to keep the computer awake during the block. AC sleep is already
+     "never".
+   * **Fallback.** Anything that still kills the sequencer (a hard kill or power loss) is fail-closed, and the
+     recovery tool handles it.
+
+**Read-only pre-check (2026-11-27):**
+* the new candidate computes identically to `38e23bad…`: the same files, specs, P7 binding and baselines;
+* development false;
+* the MC-trace build is selected, and no live lock is held;
+* the host check passes: CPU 0, 0, 1, 3, 3 %, 771 GB free;
+* AC sleep is "never".
