@@ -196,3 +196,46 @@ safety-unverified flight.
 * the MC-trace build is selected, and no live lock is held;
 * the host check passes: CPU 0, 0, 1, 3, 3 %, 771 GB free;
 * AC sleep is "never".
+
+## Second real candidate `e9561f05…`: block 1 (COMPLETED 2026-11-27)
+
+**Records:**
+* production Policy A r2: `state/p7e-policy-A-approval-2b6ee5d-r2.json` (`56c264e0…`);
+* the candidate: `state/p7e-candidate-2b6ee5d-r2.json`, manifest
+  `e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608`;
+* the block 1 authorization (`c85d471d…`);
+* the result: `state/p7e-engineering-30-block-01-e9561f05….result.json` (`1c8672ab…`), and its ledger (`e7bf02ae…`).
+
+**Run:**
+* launched detached (PID 24681, its own session, no terminal); log `~/uav_autonomy/logs/p7e-block-01-e9561f05de28.log`;
+* the host check passed (CPU 0 %);
+* 61.6 min for the 20 flights.
+
+**Result:**
+* **not stopped**: 20 of 20 flown, all **valid**; no replacement, no missing pair, nothing unflown or interrupted;
+* accounting complete (20 `flown_valid`);
+* the candidate unchanged at the end; the live lock released.
+
+**Safety (all 20 flights):**
+* 0 safety events and 0 safety-unverified flights;
+* minimum truth clearance 0.371 m (slot 7, P5). The limit is ≥ 0.20 m.
+
+**Outcomes:**
+* goal success: P4 6 of 10, P5 7 of 10;
+* all 7 failures are the accepted P4 supervisor's `hover_timeout` abort, which hovers and then lands. Their accepted
+  evaluations passed, and none has an event of any class.
+* By pair:
+  * both reached the goal: slots 1, 2, 4, 5, 8, 10;
+  * both hovered out: slots 3, 6, 9;
+  * slot 7: P5 reached the goal, P4 hovered out.
+* **These counts are descriptive only.** This validation was not designed to compare P5 with P4 (contract §7).
+
+**Integrity events:** one, in slot 10 with P5: `cleanup:gazebo:forced_kill_after_grace`. Gazebo needed a forced
+stop at shutdown, so that flight's accepted P5 evaluation reports failed on this item. It is a valid goal success
+with no safety item, and it is reported under R10.
+
+**Block 2 pre-check (read-only):**
+* the candidate verifies, with no drift;
+* FC-1 allows block 2, because block 1 is unstopped and complete;
+* no block 2 result, ledger or marker exists; no lock is held;
+* the host check passes (743 GB free).
