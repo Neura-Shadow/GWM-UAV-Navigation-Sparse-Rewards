@@ -177,6 +177,9 @@ infrastructure, with every hard criterion H1-H9 met"*.
     which repeated the field without that qualification.
   * The accepted report JSON is unchanged and correct under its own definitions; see the
     [release closure](v3_sim_p7e_release_closure.md) §1.2.
+  * The field's meaning is recorded permanently next to the report in
+    [`v3_sim_p7e_engineering_report_clarification_1.json`](evidence/v3_sim_p7e_engineering_report_clarification_1.json)
+    (`073e4646…`; operator "Write RC-2", 2026-11-28). It binds the report's hash, and no value changes.
 * **Paired clearance (descriptive, no non-inferiority test):** P5 − P4 median +0.002 m, range [−0.094, +0.593].
 
 ### Risk register

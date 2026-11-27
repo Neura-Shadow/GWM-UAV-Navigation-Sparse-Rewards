@@ -3,7 +3,8 @@
 **Status: PREPARED FOR THE OPERATOR'S REVIEW (2026-11-28).**
 * **RC-1 ACCEPTED** (operator, 2026-11-28, "Accept RC-1"): the documentation corrections D1–D12 of §1.1 stand, as
   committed in `7156017`.
-* RC-2 to RC-7 are still open (§5).
+* **RC-2 DONE** (operator, 2026-11-28, "Write RC-2"): the clarification record of §1.2 is written (`073e4646…`).
+* RC-3 to RC-7 are still open (§5).
 * **Authority:** the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation". It authorizes
   read-only auditing and proposal preparation only.
 * **What changed:**
@@ -67,8 +68,21 @@ its byte-identical evidence copy:
 **Nothing is overwritten.** The accepted report stays byte-identical; its hash is bound in the E5 records and in
 this audit.
 
-**Proposed, not written: a separate clarification record**, to be written only on the operator's decision. A
+**A separate clarification record: WRITTEN on the operator's decision (2026-11-28, "Write RC-2").** It is a
 clarification rather than an erratum, because no value is wrong.
+* The record: [`v3_sim_p7e_engineering_report_clarification_1.json`](evidence/v3_sim_p7e_engineering_report_clarification_1.json),
+  SHA-256 `073e46467579700d1818a386a1d7750bd087ebc294711324c3042423041b0094`, written with exclusive create.
+* Every value was checked against the report before writing:
+  * the field is 0 for both controllers;
+  * the R1 failures are P4 10 and P5 8, equal to the R9 `hover_timeout` counts;
+  * there are 0 safety events.
+* It also binds:
+  * `p7_classify.MISSION_ITEMS` = `("safety:tracking", "safety:response_latency")`;
+  * the frozen classifier, `7a46258f…`;
+  * `p7_analysis`, `bd036a2b…`.
+* Both copies of the report are unchanged (`e2fb9607…`).
+
+As proposed, its core content:
 ```json
 {"contract": "p7e-report-clarification-v1", "report_sha256": "e2fb96071edb77fdaba7da4f56351b26d1959f850c6e50725e95b0dccc12d09c",
  "field": "safety_per_controller.<controller>.mission_failure_flights",
@@ -76,8 +90,8 @@ clarification rather than an erratum, because no value is wrong.
  "mission_outcome_failures": {"p4": 10, "p5": 8, "source": "reported_criteria.R1 (valid_flights - goal_success) and R9 abort_reason hover_timeout"},
  "values_changed": false}
 ```
-Proposed file: `docs/evidence/v3_sim_p7e_engineering_report_clarification_1.json` (exclusive create), cited from
-the E5 document. Writing it is decision **RC-2** (§5).
+The file is `docs/evidence/v3_sim_p7e_engineering_report_clarification_1.json`, cited from the E5 document
+(decision **RC-2**, §5).
 
 ## 2. Release integrity audit (read-only, 2026-11-28)
 
@@ -157,7 +171,7 @@ git push origin v3.7.0-p7e-engineering-validation
 | ID | Decision | Recommendation |
 |---|---|---|
 | RC-1 | Accept the documentation corrections D1–D12 (§1.1), as committed locally | **ACCEPTED by the operator on 2026-11-28 ("Accept RC-1")**; the corrections are in commit `7156017` |
-| RC-2 | Write the clarification record of §1.2 (no value changes; the report untouched) | write it: it makes the field's meaning permanent next to the report |
+| RC-2 | Write the clarification record of §1.2 (no value changes; the report untouched) | **DONE (operator, 2026-11-28, "Write RC-2")**: `v3_sim_p7e_engineering_report_clarification_1.json` (`073e4646…`) |
 | RC-3 | Create the annotated tag of §4, locally | after RC-1 |
 | RC-4 | Push the branch (46 + closure commits) and the tag | separate authorization; no PR or merge implied |
 | RC-5 | Open a PR or merge into `main` | separate; not proposed now |
