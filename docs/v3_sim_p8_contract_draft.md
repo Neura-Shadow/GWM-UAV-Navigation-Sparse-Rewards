@@ -269,7 +269,15 @@ Setting one would need a separate decision before the specs are frozen.
      **`fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`** (`state/p8-candidate-2a0ae57.json`),
      verified from `/tmp`. P8-M3 is complete.
 7. **The V3, V4 and V5 blocks,** each with its own authorization.
+   * **Flown on 2026-11-28** ("Authorize block 1", "Authorize block 2", "Authorize block 3"):
+     [validation blocks](v3_sim_p8_validation_blocks.md). None stopped; 60 of 60 valid; 0 safety events.
 8. The P8 report, and its acceptance.
+   * **Run once on 2026-11-28** ("Authorize the report"): "engineering validation not passed", reason "H9 not met"
+     ([report](v3_sim_p8_report.md) §4). The cause, finding F-R1, is the bound report code's comparison of the
+     sequencer's `contract` label.
+   * **The H9 addendum** ("Authorize the addendum"), outside the candidate, records "explained" on all 60 flights.
+   * **P8 ACCEPTED on 2026-11-28 ("Accept P8")** on the report and the addendum together. The report keeps its
+     status ([report](v3_sim_p8_report.md) §7).
 9. Any push, tag, merge or cleanup.
 
 ## 14. Choices (decided by the contract's approval, 2026-11-28)

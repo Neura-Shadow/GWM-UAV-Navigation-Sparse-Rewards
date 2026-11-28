@@ -1,7 +1,17 @@
 # v3-SIM P8: the engineering report
 
-**Status: RUN ONCE (2026-11-28, operator "Authorize the report"). The report records "engineering validation not
-passed", with one reason: "H9 not met" (§4).**
+**Status: P8 ACCEPTED by the operator on 2026-11-28 ("Accept P8"), on the report together with the H9 addendum
+(§7). P8 is COMPLETE.**
+* **The acceptance rests on two records together:**
+  * the report `f03253d0…`, which reads "engineering validation not passed" for the single reason "H9 not met";
+  * the addendum `f2903a17…`, which shows that this reason is the sequencer's `contract` label alone (§6.5).
+* **The report is unchanged** and keeps its status. It was not rerun, and no threshold was changed.
+* The acceptance authorizes nothing else (§7).
+
+**The history of this status:**
+
+**Run once (2026-11-28, operator "Authorize the report"). The report records "engineering validation not passed",
+with one reason: "H9 not met" (§4).**
 * **The cause is a defect in the bound report code, not in the flights** (finding F-R1, §5):
   * H9 compares each P8 assessment with a fresh P7-E assessment on every key except `stop_reasons`;
   * that includes the `contract` label, which the P8 sequencer rewrites by design;
@@ -11,9 +21,8 @@ passed", with one reason: "H9 not met" (§4).**
 * **Option (A), an out-of-tree addendum, was run once: status "explained"** (§6; operator "Prepare addendum (A)",
   then "Authorize the addendum"). On all 60 flights, the only difference is the `contract` label, and the stricter
   corrected comparison holds. The report itself is unchanged and still reads "not passed".
-* **P8's acceptance is not decided.** Whether it may rest on the report and the addendum is the operator's decision.
-* It was prepared under "Prepare the P8 report", and nothing else is authorized: no push, merge, tag or cleanup, and
-  no change to any bound file.
+* **P8's acceptance** was the operator's decision, on the report and the addendum: "Accept P8" (§7).
+* The report was prepared under "Prepare the P8 report".
 
 **Candidate:** `state/p8-candidate-2a0ae57.json`, manifest
 `fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a` ([M3 record](v3_sim_p8_m3_candidate.md) §8.3).
@@ -457,3 +466,38 @@ GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/pytho
   * the report is not changed and still reads "engineering validation not passed";
   * the addendum is not a second report, and it sets or relaxes no threshold;
   * whether P8's acceptance may rest on the report and this addendum is the operator's decision, not made here.
+
+## 7. What the acceptance means (accepted 2026-11-28, "Accept P8")
+
+**What was accepted:**
+* The operator accepted P8 under contract `p8-navigation-recovery-v1`, on the report and the H9 addendum together.
+* The two recovery variants P8-P4R and P8-P5R flew the declared 60 flights of `p8-validation-60` safely and
+  completely on candidate `fe2a0c6e…`:
+  * 3 blocks, none stopped; 60 of 60 valid; 0 safety events; 0 collisions; minimum truth clearance 0.342 m;
+  * H1–H8, H10 and H11 met in the report;
+  * H9 met in every substantive part: the report's own checks of the manifest, the worlds, the classifier re-run,
+    H10 and the unchanged run files (60 of 60 each), with the assessment check explained by the addendum (60 of 60).
+
+**How it is to be read:**
+* **The report's status stays "engineering validation not passed".** It is the first and only report, kept as
+  written. The acceptance is the operator's judgement on that report together with finding F-R1 and the addendum.
+  It is not a pass statement by the report.
+* **F-R1 stays recorded** as a defect of the bound report code and a test gap. It is not fixed in the P8 candidate:
+  the 37 bound files must not change. Any later phase that reuses this code must fix it there and test `h9` on a
+  P8-format assessment.
+* **The outcomes stay descriptive** (P8-C1). The report's required statement applies: with 10 layouts per stage they
+  do not establish a rate, and they do not show that any controller or variant is superior.
+* **The risk register is unchanged:** RR1, RR2 and RR-P8-1 to RR-P8-5 stay open. F-B2-1 bears on RR1 and RR-P8-5.
+
+**It authorizes nothing else:**
+* No push, tag or merge.
+* No cleanup or deletion.
+  * The P8 runs keep their complete raw evidence (D4-A).
+  * The proposed rule R-2 of the [retention design](v3_sim_evidence_retention_design.md) would make P8 raw depth
+    eligible after this acceptance, but only with a separate decision and a separately approved cleanup.
+  * Contract §11 kept the P8 inputs protected (cleanup decisions C-2 and C-3) until P8's acceptance, so that period
+    ends now. Nothing becomes deletable by it: the cleanup executor still carries them as named protections, and
+    lifting them needs a separate decision and a separately approved cleanup.
+* No change to P2–P7-E, to the frozen P7 candidate or to the P8 candidate, and no use of the 200-pair
+  schedule-selection record.
+* No superiority claim.
