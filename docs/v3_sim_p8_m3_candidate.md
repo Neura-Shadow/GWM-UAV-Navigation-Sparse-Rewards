@@ -14,7 +14,7 @@
 |---|---|---|---|---|
 | 1 | **Build** the P8 package | `bash simulation/px4_gazebo_p8/scripts/build_p8.sh --build` (WSL). It mirrors `gwm_navigation_recovery` (package hash `1a78c6ba…`) into `~/uav_autonomy/p8_ws/1a78c6ba…/`, runs `colcon build` with the P2–P5 installs sourced, and writes `state/p8-built.json` | the mirror, the install, the receipt | none (no simulator, no node) |
 | 2 | **Development Policy A** for P8 | writes `state/p8-policy-A-approval-dev.json` (§2): Policy A `bf1ef9b1…`, **`development_only: true`**, binding the 37 P8 source and test files (canonical `f6a04d32…`) | that approval | none |
-| 3 | **Freeze the development candidate** | `p8_manifest.py freeze --development --policy-approval /home/joker0625/uav_autonomy/state/p8-policy-A-approval-dev.json --output ~/uav_autonomy/state/p8-candidate-dev-<commit>.json`, with the absolute approval path, then `verify` from `/tmp` | the development manifest | none |
+| 3 | **Freeze the development candidate** | `p8_manifest.py freeze --development --policy-approval ~/uav_autonomy/state/p8-policy-A-approval-dev.json --output ~/uav_autonomy/state/p8-candidate-dev-<commit>.json`, with the absolute approval path, then `verify` from `/tmp` | the development manifest | none |
 | 4 | **The development dry run** | the dry-run approval, then the run: `p8_manifest.py approve-dry-run` (§3), then `run_p8_block.py --scope DRY`, launched detached with a persistent log | the approval, 2 runs, the dry-run result | **2 SITL flights**, simulated flight only, no credit |
 
 **What the dry run is for.** It is the first runtime use of the P8 nodes, runner, launcher, sequencer and H10. Both
@@ -163,7 +163,7 @@ Two items, each needing its own answer. Neither flies anything.
 | # | Item | What happens | Writes |
 |---|---|---|---|
 | 5 | **Production Policy A** for the real P8 candidate | the approval of §8.1, **`development_only: false`**, binding the 37 P8 files with canonical `10eb4660…` | `state/p8-policy-A-approval-<commit>.json` |
-| 6 | **The real freeze** | `p8_manifest.py freeze --policy-approval /home/joker0625/uav_autonomy/state/p8-policy-A-approval-<commit>.json --output ~/uav_autonomy/state/p8-candidate-<commit>.json` (absolute approval path), then `verify` from `/tmp` | the real P8 candidate manifest |
+| 6 | **The real freeze** | `p8_manifest.py freeze --policy-approval ~/uav_autonomy/state/p8-policy-A-approval-<commit>.json --output ~/uav_autonomy/state/p8-candidate-<commit>.json` (absolute approval path), then `verify` from `/tmp` | the real P8 candidate manifest |
 
 **After the freeze,** only the real candidate can fly the 3 blocks of scope `p8-validation-60`.
 * The blocks are V3, V4 and V5, 20 flights each, and **each needs its own authorization**: the phrase "authorize P8

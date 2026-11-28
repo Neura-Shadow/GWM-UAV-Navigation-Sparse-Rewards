@@ -54,9 +54,9 @@ Two of these layouts were flown in the development dry run, on the retired devel
 
 **2. The authorization file is written** (exclusive create):
 ```
-p8_manifest.py authorize /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json --block 1
+p8_manifest.py authorize ~/uav_autonomy/state/p8-candidate-2a0ae57.json --block 1
   --operator Neura-Shadow --confirm "<phrase>"
-  --output /home/joker0625/uav_autonomy/state/p8-authorization-p8-validation-60-block-01-fe2a0c6e9052.json
+  --output ~/uav_autonomy/state/p8-authorization-p8-validation-60-block-01-fe2a0c6e9052.json
 ```
 It authorizes exactly one execution of block 1, `max_attempts: 1`, in simulated flight only.
 
@@ -64,7 +64,7 @@ It authorizes exactly one execution of block 1, `max_attempts: 1`, in simulated 
 * the command, with the three explicit gates and the MC trace selector:
   ```
   run_p8_block.py --scope p8-validation-60 --block 1
-    --manifest /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json --authorization <the file above>
+    --manifest ~/uav_autonomy/state/p8-candidate-2a0ae57.json --authorization <the file above>
   ```
 * the log and PID go to `~/uav_autonomy/logs/p8-block-01-fe2a0c6e9052.{log,pid}`;
 * a watcher, and keep-awake.
@@ -286,9 +286,9 @@ The world check matters here because these 10 worlds have never been flown. A di
 
 **2. The authorization file is written** (exclusive create):
 ```
-p8_manifest.py authorize /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json --block 2
+p8_manifest.py authorize ~/uav_autonomy/state/p8-candidate-2a0ae57.json --block 2
   --operator Neura-Shadow --confirm "<phrase>"
-  --output /home/joker0625/uav_autonomy/state/p8-authorization-p8-validation-60-block-02-fe2a0c6e9052.json
+  --output ~/uav_autonomy/state/p8-authorization-p8-validation-60-block-02-fe2a0c6e9052.json
 ```
 It authorizes exactly one execution of block 2, `max_attempts: 1`, in simulated flight only.
 
@@ -517,9 +517,9 @@ acted. The schedule fixes the order within each pair.
 
 **2. The authorization file is written** (exclusive create):
 ```
-p8_manifest.py authorize /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json --block 3
+p8_manifest.py authorize ~/uav_autonomy/state/p8-candidate-2a0ae57.json --block 3
   --operator Neura-Shadow --confirm "<phrase>"
-  --output /home/joker0625/uav_autonomy/state/p8-authorization-p8-validation-60-block-03-fe2a0c6e9052.json
+  --output ~/uav_autonomy/state/p8-authorization-p8-validation-60-block-03-fe2a0c6e9052.json
 ```
 It authorizes exactly one execution of block 3, `max_attempts: 1`, in simulated flight only.
 

@@ -29,7 +29,7 @@ regression. It stops raw recordings from accumulating after every phase.
 | **Finding F-CL1** | Since manifest v3, P8 evidence and a frozen P8 config name **all 35 eligible P7-E flights**: the V1 replay, the hover-timeout analysis and `p8_recovery.json`. Under the v3 rule ("named → PROTECTED"), the P7-E set would no longer be eligible. | §1.2 |
 | C-11 proof | The three P8 tools reproduce their evidence with every `depth.bin` open refused | `docs/evidence/v3_sim_retention_record_only_p8.json` (`6a8cc770…`) |
 | **C-5:** procedure implemented and tested | `tools/evidence_retention/retention.py` (executor), `p7e_v3_lineage.py` (manifest v3, with C-1 to C-4 and C-11); **29 offline tests pass** (T1–T10 and more) | §3.6 |
-| **C-6:** copy rehearsal | One P6 run and one P7-E run copied to `/home/joker0625/retention-rehearsal/`, then executed there. All checks passed, and the originals are untouched. | `v3_sim_p7e_cleanup_rehearsal_p6.json` (`6253751d…`), `…_p7e.json` (`304d1964…`) |
+| **C-6:** copy rehearsal | One P6 run and one P7-E run copied to `~/retention-rehearsal/`, then executed there. All checks passed, and the originals are untouched. | `v3_sim_p7e_cleanup_rehearsal_p6.json` (`6253751d…`), `…_p7e.json` (`304d1964…`) |
 | P6 set authorization prepared | **78 runs, 624 files (78 `depth.bin` + 546 `tmp/`), 26,682,094,504 bytes.** Every file was re-verified (SHA-256, every frame). | `state/p7e-cleanup-authorization-p6-dev-depth-ec5b22058502.json` (`5b07faa8…`) |
 | **P7-E set executed** ("Prepare P7-E set", "Execute P7-E set") | authorization `b8c8b3ba…` (31 goal successes, no C-3 run); `completed`: 248 of 248, 34,939,082,035 bytes. The frozen classifier reproduced 3 of 3 sampled flight records, and the retained records are unchanged. Free space 709.52 → 744.45 GB. 179 tests pass afterwards. | `state/p7e-cleanup-receipt-p7e-depth-b8c8b3ba1bd1.json` (`68bb51b1…`), copy `docs/evidence/v3_sim_p7e_cleanup_receipt_p7e-depth.json` |
 | **P6 set executed** ("Execute P6 set") | `completed`: 624 of 624 removed, equal to the authorized set. Manifests verify before and after, and the retained records are unchanged. Free space 682.83 → 709.52 GB. | `state/p7e-cleanup-receipt-p6-dev-depth-5b07faa8469f.json` (`ce326ddf…`), copy `docs/evidence/v3_sim_p7e_cleanup_receipt_p6-dev-depth.json` |
@@ -46,7 +46,7 @@ regression. It stops raw recordings from accumulating after every phase.
 | Frozen classifier on the copy without `depth.bin` | not applicable | **reproduces the flight record** |
 | Originals | `depth.bin` present, size and mtime unchanged | same |
 
-The rehearsal copies (198 MB, without their raw depth) stay in `/home/joker0625/retention-rehearsal/` for review. They
+The rehearsal copies (198 MB, without their raw depth) stay in `~/retention-rehearsal/` for review. They
 are outside `~/uav_autonomy` and no record depends on them.
 
 ### 1.2 C-11: the artifact-level dependency rule

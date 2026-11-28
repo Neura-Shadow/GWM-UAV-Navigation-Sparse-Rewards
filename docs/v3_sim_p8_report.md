@@ -43,8 +43,8 @@ It is offline only: no simulator, no flight, and no change to any bound file or 
 ```
 cd /tmp && GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 \
   /mnt/d/GWM-UAV-Navigation-Sparse-Rewards/simulation/px4_gazebo_p8/analysis/p8_report.py \
-  --manifest /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json \
-  --output   /home/joker0625/uav_autonomy/state/p8-engineering-report-fe2a0c6e9052.json
+  --manifest ~/uav_autonomy/state/p8-candidate-2a0ae57.json \
+  --output   ~/uav_autonomy/state/p8-engineering-report-fe2a0c6e9052.json
 ```
 
 **Inputs:**
@@ -407,10 +407,10 @@ version of rule O's key listing.
 cd /tmp && test "$(sha256sum <repo>/diagnostics/p8/p8_h9_addendum.py | cut -d' ' -f1)" = 5ef9d5e9…ca71b && \
 GWM_PX4_MC_TRACE=px4-mc-causal-trace-v1 PYTHONDONTWRITEBYTECODE=1 /usr/bin/python3 \
   <repo>/diagnostics/p8/p8_h9_addendum.py \
-  --manifest      /home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json \
-  --report        /home/joker0625/uav_autonomy/state/p8-engineering-report-fe2a0c6e9052.json \
+  --manifest      ~/uav_autonomy/state/p8-candidate-2a0ae57.json \
+  --report        ~/uav_autonomy/state/p8-engineering-report-fe2a0c6e9052.json \
   --report-sha256 f03253d064be761079a319b024a3540a0eb831a849fc2c76c476125f5ea477ec \
-  --output        /home/joker0625/uav_autonomy/state/p8-h9-addendum-fe2a0c6e9052.json
+  --output        ~/uav_autonomy/state/p8-h9-addendum-fe2a0c6e9052.json
 ```
 * It runs detached, with log `~/uav_autonomy/logs/p8-h9-addendum-fe2a0c6e9052.log`.
 * Exit codes: 0 explained, 1 not explained, 2 refused (nothing written).

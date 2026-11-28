@@ -57,3 +57,6 @@ htmlcov/
 # Environment variables
 .env
 .env.local
+
+# Local tool caches
+.codegraph/

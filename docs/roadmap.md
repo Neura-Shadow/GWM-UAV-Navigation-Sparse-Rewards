@@ -322,6 +322,19 @@ See [P0/P1 validation](v3_sim_p0_p1_validation.md) and [P2 validation](v3_sim_p2
   indices 200–229 in 3 blocks. P7-A is suspended (the selection is not written), and every P7-E step is separately
   authorized. P7-B (repeated P6 fault rates) and P7-C (load sensitivity) follow, each
   decided separately. [Plan](v3_sim_p7_plan.md), [draft contract](v3_sim_p7_contract.md).
+- [x] P7-E Engineering validation — **COMPLETE (2026-11-28; tag `v3.7.0-p7e-engineering-validation`)**: the accepted
+  P4 and P5 stacks flew 60 SITL flights on 30 fresh layouts through the P7 infrastructure on candidate `e9561f05`;
+  report "engineering validation passed" (H1–H9 met), accepted. [Report](v3_sim_p7e_e5_report.md),
+  [release closure](v3_sim_p7e_release_closure.md).
+- [x] P8 Navigation robustness and recovery — **COMPLETE (2026-11-28; tag `v3.8.0-p8-navigation-recovery`)**: a
+  recovery layer around the accepted P4 and P5 stacks (P8-P4R, P8-P5R), candidate `fe2a0c6e`; 60 SITL flights in
+  blocks V3, V4 and V5, none stopped, 60 of 60 valid, 0 safety events. **Accepted by the operator on two records
+  together:** the engineering report, which reads "engineering validation not passed" for the single reason
+  "H9 not met" (finding F-R1, a label comparison in the bound report code), and the independent H9 addendum, which
+  records "explained" on all 60 flights. Outcomes are descriptive only. [Release](v3_sim_p8_release.md),
+  [report](v3_sim_p8_report.md), [validation blocks](v3_sim_p8_validation_blocks.md),
+  [contract](v3_sim_p8_contract_draft.md). The Evidence Retention Manager and the executed cleanup C-7 are part of
+  the same release ([design](v3_sim_evidence_retention_design.md)).
 
 Runtime-free tests and actual simulated-flight evidence are separate categories.
 The existing Isaac and Cosys-AirSim integration paths retain their own status.
