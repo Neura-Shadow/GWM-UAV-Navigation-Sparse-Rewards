@@ -259,8 +259,15 @@ Setting one would need a separate decision before the specs are frozen.
    * 69 P8 tests pass. V1 (`1d6cc0e2…`) and V2 (`912297fb…`) passed.
    * **ACCEPTED on 2026-11-28 ("Accept M2")**, with interpretations I-1 to I-11. P8-M2 is complete.
 4. A development dry run (2 flights) of the new launch path, with its own approval.
+   * **Flown on 2026-11-28** on the development candidate `0a31ecd0…`; [M3 record](v3_sim_p8_m3_candidate.md).
+   * **ACCEPTED on 2026-11-28 ("Accept, take (a)")**, with D-M3-1 (a), the P5 ledger reconciliation in R-P8-10.
 5. The production Policy A approval for the P8 candidate.
+   * **Done on 2026-11-28 ("Approve (Recommended)"):** `state/p8-policy-A-approval-2a0ae57.json` (`befd23a3…`),
+     `development_only: false`, binding the 37 files with canonical `10eb4660…`.
 6. The real freeze of the P8 candidate.
+   * **Done on 2026-11-28 ("Freeze it (Recommended)"):** manifest
+     **`fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`** (`state/p8-candidate-2a0ae57.json`),
+     verified from `/tmp`. P8-M3 is complete.
 7. **The V3, V4 and V5 blocks,** each with its own authorization.
 8. The P8 report, and its acceptance.
 9. Any push, tag, merge or cleanup.

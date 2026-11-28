@@ -8,11 +8,14 @@
 * **P8-M1 specs APPROVED by hash (operator, 2026-11-28, "Approve specs"):** [P8-M1 specs](v3_sim_p8_m1_specs.md).
   * Layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…`.
 * **P8-M2 ACCEPTED (operator, 2026-11-28, "Accept M2"):** [M2 report](v3_sim_p8_m2_code.md), code commit `c991387`.
-  * Next, each with its own authorization: P8-M3, that is the build, the P8 Policy A, the development candidate and
-    its 2-flight dry run, and the real freeze.
-* It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
+* **P8-M3 COMPLETE (operator, 2026-11-28):** [M3 record](v3_sim_p8_m3_candidate.md).
+  * It covered the build, the development dry run (accepted), the production Policy A and the real freeze.
+  * **The real P8 candidate is manifest `fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`.**
+  * Next, each with its own authorization: the V3, V4 and V5 blocks of `p8-validation-60`, then the P8 report.
+* It was prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
   authorizes read-only auditing and proposal preparation only.
-* Nothing is implemented, no SITL ran, no candidate exists, and no frozen P2–P7-E file changed.
+* At that time nothing was implemented, no SITL had run and no candidate existed. No frozen P2–P7-E file has changed
+  since then.
 
 **Evidence:**
 * [`v3_sim_p8_hover_timeout_analysis.json`](evidence/v3_sim_p8_hover_timeout_analysis.json) (`cde7fa52…`);

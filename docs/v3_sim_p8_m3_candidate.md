@@ -1,11 +1,12 @@
 # v3-SIM P8-M3: build, development Policy A, development candidate and dry run (contract §13 items 4–6)
 
-**Status: PREPARED (2026-11-28, operator "Prepare M3"), FOR SEPARATE AUTHORIZATIONS.** Nothing in this note has been
-done.
-* Each of items 1–4 needs its own explicit answer.
-* The production Policy A and the real freeze (§13 items 5–6) come only after the dry run is accepted, under their own
-  authorizations.
-* The V3–V5 blocks come after the real freeze, each under its own authorization.
+**Status: P8-M3 COMPLETE (2026-11-28).** All items were done, each under its own authorization.
+* Items 1–4 were done and the dry run was accepted (§5–§7).
+* The production Policy A and the real freeze (§13 items 5–6) were done (§8.3).
+* **The real P8 candidate is manifest `fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`.**
+* The V3–V5 blocks come next, each under its own authorization. None is authorized yet.
+
+*(Status before the authorizations: PREPARED, 2026-11-28, operator "Prepare M3".)*
 
 ## 1. The items
 
@@ -155,7 +156,7 @@ not a safety item; validity unaffected).
 * the real freeze;
 * then the V3, V4 and V5 blocks.
 
-## 8. The production Policy A and the real freeze (§13 items 5–6): PREPARED (2026-11-28, "Prepare them")
+## 8. The production Policy A and the real freeze (§13 items 5–6): DONE (2026-11-28; prepared under "Prepare them")
 
 Two items, each needing its own answer. Neither flies anything.
 
@@ -191,3 +192,38 @@ It has the same fields as the development approval (§2), except:
 | Development candidate `0a31ecd0…` | drifts (`p8_source_files`), as expected after D-M3-1; retired |
 | Live locks; existing production approval or candidate | none; none (only the development records exist) |
 | Git | HEAD `148bdf3`; clean apart from `.codegraph/` |
+
+### 8.3 Done (operator, 2026-11-28: item 5 "Approve (Recommended)", item 6 "Freeze it (Recommended)")
+
+| # | Item | Record |
+|---|---|---|
+| 5 | Production Policy A | `state/p8-policy-A-approval-2a0ae57.json` (`befd23a3…`), written with exclusive create. It has `development_only: false`, the real-candidate phase and 37 files with canonical `10eb4660…` (asserted at write time), and binds commit `2a0ae57`. It passes the P8 phase check (`check_policy_approval(…, False)`) and the accepted `load_policy`. Policy `bf1ef9b1…`; `allowed` and the QGC fields are unchanged from P7-E. |
+| 6 | Real freeze | `state/p8-candidate-2a0ae57.json` (file `6a8c4c17…`), **manifest `fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`**. Frozen with the absolute approval path and without `--development`. `verify` from `/tmp`: ok. |
+
+What the manifest holds:
+
+| Field | Value |
+|---|---|
+| `development` | `false`; `engineering_credit_possible: true`; `execution_allowed_without_authorization: false` |
+| `frozen_git_head` | `2a0ae57` |
+| `scope`, `blocks` | `p8-validation-60`, 3 (1 = V3, 2 = V4, 3 = V5) |
+| P7-E binding | `e9561f05…` (with the P3 `1e205fec`, P4 `c110bd30`, P5 `2becfbbb`, P6 `22292775` and P7 `0799c37e` baselines) |
+| Build | receipt `ba32f23f…`, package `1a78c6ba…` |
+| Specs | layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…` |
+| Offline records | V1 `1d6cc0e2…`, V2 `912297fb…` |
+| Namespace owner | `0d1c2d27…` |
+| P8 source and test files | 37 |
+
+After the freeze, **74 P8 tests pass**.
+
+**From now on, no P8 bound file may change.** Drift stops a block (FC-7). The development candidate `0a31ecd0…` and
+its approval stay retired.
+
+**Next, each separately authorized:** the blocks of `p8-validation-60`, in order.
+* Block 1 = V3 (10 layouts × P8-P4R and P8-P5R, 20 flights).
+* Block 2 = V4, then block 3 = V5.
+* Each needs its own phrase, "authorize P8 p8-validation-60 block <n>
+  fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a", then a detached launch.
+* A block starts only if the previous block's result exists and is unstopped, with every planned flight accounted for
+  and its ledger intact (FC-1).
+* Then comes the P8 report.
