@@ -1,0 +1,4481 @@
+{
+  "blocks": {
+    "1": {
+      "flights": 20,
+      "stage": "V3",
+      "stop_reason": null,
+      "stopped": false
+    },
+    "2": {
+      "flights": 20,
+      "stage": "V4",
+      "stop_reason": null,
+      "stopped": false
+    },
+    "3": {
+      "flights": 20,
+      "stage": "V5",
+      "stop_reason": null,
+      "stopped": false
+    }
+  },
+  "contract": "p8-engineering-report-v1",
+  "effectiveness": {
+    "decision": "P8-C1: descriptive only (contract \u00a77, \u00a714); no number is set",
+    "target": null
+  },
+  "flights_flown": 60,
+  "generated_unix_ns": 1795869544845454292,
+  "hard_criteria": [
+    {
+      "flights": [],
+      "id": "H1",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "below": [],
+      "comparison": ">=",
+      "id": "H2",
+      "limit": 0.2,
+      "met": true,
+      "unmeasured": [],
+      "valid_flights": 60,
+      "value": 0.34191657411305765
+    },
+    {
+      "events": [],
+      "id": "H3",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "breaches": [],
+      "flights_checked": 60,
+      "id": "H4",
+      "limit": 0,
+      "met": true,
+      "unchecked": [],
+      "value": 0
+    },
+    {
+      "failed": [],
+      "id": "H5",
+      "limit": "every valid flight landed and disarmed, own commands [176, 400, 21]",
+      "met": true,
+      "valid_flights": 60,
+      "value": 60
+    },
+    {
+      "flights": [],
+      "id": "H6",
+      "limit": 0,
+      "met": true,
+      "value": 0
+    },
+    {
+      "id": "H7",
+      "incomplete": [],
+      "ledgers": {
+        "1": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        },
+        "2": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        },
+        "3": {
+          "hash_matches": true,
+          "lines_match_result": true,
+          "present": true
+        }
+      },
+      "limit": "100 %",
+      "met": true,
+      "value": "60/60"
+    },
+    {
+      "batch_completed": true,
+      "blocks": {
+        "1": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "stage": "V3",
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        },
+        "2": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "stage": "V4",
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        },
+        "3": {
+          "accounting_complete": true,
+          "all_flown_or_missing": true,
+          "at_most_one_replacement_per_flight": true,
+          "explained": true,
+          "plan_matches": true,
+          "replacement_cap": 2,
+          "replacements": 0,
+          "replacements_within_cap": true,
+          "result": true,
+          "stage": "V5",
+          "status_counts": {
+            "flown_valid": 20
+          },
+          "stop_reason": null,
+          "stopped": false,
+          "unflown_explained": true
+        }
+      },
+      "id": "H8",
+      "limit": "all 60 flown, or every unflown flight explained by a stop rule",
+      "met": true,
+      "value": "completed"
+    },
+    {
+      "assessment": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": false,
+          "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+          "slot": 30
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": false,
+          "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+          "slot": 30
+        }
+      ],
+      "h10": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "reproduced": true,
+          "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+          "slot": 30
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "reproduced": true,
+          "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+          "slot": 30
+        }
+      ],
+      "id": "H9",
+      "limit": "identical",
+      "manifest": {
+        "sha256": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+        "verified": true
+      },
+      "met": false,
+      "reclassification": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+          "slot": 10
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+          "slot": 12
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+          "slot": 18
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+          "slot": 19
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+          "slot": 20
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+          "slot": 21
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+          "slot": 22
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+          "slot": 23
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+          "slot": 24
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+          "slot": 25
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+          "slot": 26
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+          "slot": 27
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+          "slot": 28
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+          "slot": 29
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+          "slot": 30
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "error": null,
+          "reproduced": true,
+          "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+          "slot": 30
+        }
+      ],
+      "results_bind_manifest": true,
+      "unchanged": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+          "slot": 1,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+          "slot": 2,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+          "slot": 3,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+          "slot": 4,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+          "slot": 5,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+          "slot": 6,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+          "slot": 7,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+          "slot": 8,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+          "slot": 9,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+          "slot": 10,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+          "slot": 10,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+          "slot": 11,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+          "slot": 12,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+          "slot": 12,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+          "slot": 13,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+          "slot": 14,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+          "slot": 15,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+          "slot": 16,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+          "slot": 17,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+          "slot": 18,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+          "slot": 18,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+          "slot": 19,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+          "slot": 20,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+          "slot": 20,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+          "slot": 21,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+          "slot": 21,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+          "slot": 22,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+          "slot": 22,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+          "slot": 23,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+          "slot": 23,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+          "slot": 24,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+          "slot": 24,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+          "slot": 25,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+          "slot": 25,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+          "slot": 26,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+          "slot": 26,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+          "slot": 27,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+          "slot": 27,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+          "slot": 28,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+          "slot": 28,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+          "slot": 29,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+          "slot": 29,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+          "slot": 30,
+          "unchanged": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+          "slot": 30,
+          "unchanged": true
+        }
+      ],
+      "value": "60 checks differ",
+      "worlds": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+          "slot": 1,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+          "slot": 2,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+          "slot": 3,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+          "slot": 4,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+          "slot": 5,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+          "slot": 6,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+          "slot": 7,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+          "slot": 8,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+          "slot": 9,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p4",
+          "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+          "slot": 10,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+          "slot": 10,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+          "slot": 11,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+          "slot": 12,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+          "slot": 12,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+          "slot": 13,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+          "slot": 14,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+          "slot": 15,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+          "slot": 16,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+          "slot": 17,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+          "slot": 18,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+          "slot": 18,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+          "slot": 19,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p4",
+          "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+          "slot": 20,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+          "slot": 20,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+          "slot": 21,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+          "slot": 21,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+          "slot": 22,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+          "slot": 22,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+          "slot": 23,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+          "slot": 23,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+          "slot": 24,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+          "slot": 24,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+          "slot": 25,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+          "slot": 25,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+          "slot": 26,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+          "slot": 26,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+          "slot": 27,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+          "slot": 27,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+          "slot": 28,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+          "slot": 28,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+          "slot": 29,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+          "slot": 29,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p4",
+          "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+          "slot": 30,
+          "verified": true
+        },
+        {
+          "attempt": 1,
+          "block": 3,
+          "controller": "p5",
+          "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+          "slot": 30,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "flights": [],
+      "id": "H10",
+      "limit": "100 % reproduce; 0 violations",
+      "met": true,
+      "recovery_actions": 14647,
+      "value": "60/60"
+    },
+    {
+      "id": "H11",
+      "met": true,
+      "records": {
+        "V1": {
+          "path": "docs/evidence/v3_sim_p8_v1_replay.json",
+          "sha256": "1d6cc0e2341144b021011b8c020c1739eae493470243e54a48439d096152abfc"
+        },
+        "V2": {
+          "path": "docs/evidence/v3_sim_p8_v2_perception.json",
+          "sha256": "912297fb8cef6623f24012234757e25eeae8637a2c439bdebbce706fad2d840e"
+        }
+      },
+      "value": "bound and passed"
+    }
+  ],
+  "manifest": {
+    "baselines": {
+      "p3_sha256": "1e205feca482e11f10d5742fdac0474af3cd5689d4ec9c74d7f38a81eb39510c",
+      "p4_sha256": "c110bd30be22fb43e596cf1f4b01397cb97145138f8912d6535a7dc4c15da42b",
+      "p5_sha256": "2becfbbb794006833d0a224b819db702135b0a0c9ff25da6577a7c1dd5238632",
+      "p6_sha256": "222927752a507fdb2fb0ef13f44d6ce8163d50b7d22f405ebbf27df6c21bfa41",
+      "p7_sha256": "0799c37e800c06c278acbc45fdec90b84159ee9d41eb7aaf868cb65a0b950aa5",
+      "p7e_sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608"
+    },
+    "p7e_sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+    "path": "/home/joker0625/uav_autonomy/state/p8-candidate-2a0ae57.json",
+    "sha256": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a"
+  },
+  "not_claimed": [
+    "superiority of any variant or stack",
+    "statistical significance",
+    "real-hardware behaviour",
+    "results outside the declared layouts, mission, speed, static boxes or this host",
+    "that recovery resolves RR1 or RR2",
+    "any change to P2-P7-E acceptance"
+  ],
+  "not_passed_reasons": [
+    "H9 not met"
+  ],
+  "p_values": "none",
+  "report_code_sha256": "815b0f7c86505136f04607c03d06383c42ca59c21403f2be1531241fd767ca04",
+  "report_plan_canonical_sha256": "a313a034b2c8e481c0a1de651dc9ebc530bdf86736c4577216a281db429c2b14",
+  "reported_criteria": {
+    "R-P8-1": {
+      "id": "R-P8-1",
+      "per_variant_and_stage": {
+        "V3": {
+          "p8_p4r": {
+            "ci95_clopper_pearson": [
+              0.12155225811982712,
+              0.737621923393055
+            ],
+            "goal_success": 4,
+            "valid_flights": 10
+          },
+          "p8_p5r": {
+            "ci95_clopper_pearson": [
+              0.12155225811982712,
+              0.737621923393055
+            ],
+            "goal_success": 4,
+            "valid_flights": 10
+          }
+        },
+        "V4": {
+          "p8_p4r": {
+            "ci95_clopper_pearson": [
+              0.12155225811982712,
+              0.737621923393055
+            ],
+            "goal_success": 4,
+            "valid_flights": 10
+          },
+          "p8_p5r": {
+            "ci95_clopper_pearson": [
+              0.12155225811982712,
+              0.737621923393055
+            ],
+            "goal_success": 4,
+            "valid_flights": 10
+          }
+        },
+        "V5": {
+          "p8_p4r": {
+            "ci95_clopper_pearson": [
+              0.6915028921812392,
+              1.0
+            ],
+            "goal_success": 10,
+            "valid_flights": 10
+          },
+          "p8_p5r": {
+            "ci95_clopper_pearson": [
+              0.6915028921812392,
+              1.0
+            ],
+            "goal_success": 10,
+            "valid_flights": 10
+          }
+        }
+      }
+    },
+    "R-P8-10": {
+      "id": "R-P8-10",
+      "p5_ledger_reconciliation": {
+        "flagged": 14,
+        "flagged_and_explained": 14,
+        "flights": [
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 1459,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 634,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1459,
+            "recovery_actions": 634,
+            "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+            "slot": 1,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 883,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 883,
+            "recovery_actions": 0,
+            "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+            "slot": 2,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 639,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 354,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 639,
+            "recovery_actions": 354,
+            "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+            "slot": 3,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 1976,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 291,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1976,
+            "recovery_actions": 291,
+            "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+            "slot": 4,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 3006,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 1302,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 3006,
+            "recovery_actions": 1302,
+            "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+            "slot": 5,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 885,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 357,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 885,
+            "recovery_actions": 357,
+            "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+            "slot": 6,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 1411,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 322,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1411,
+            "recovery_actions": 322,
+            "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+            "slot": 7,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 1039,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 151,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1039,
+            "recovery_actions": 151,
+            "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+            "slot": 8,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 1616,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 833,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1616,
+            "recovery_actions": 833,
+            "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+            "slot": 9,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "decisions": 896,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 896,
+            "recovery_actions": 0,
+            "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+            "slot": 10,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 1360,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 363,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1360,
+            "recovery_actions": 363,
+            "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+            "slot": 11,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 872,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 872,
+            "recovery_actions": 0,
+            "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+            "slot": 12,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 3002,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 1386,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 3002,
+            "recovery_actions": 1386,
+            "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+            "slot": 13,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 0,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 0,
+            "recovery_actions": 0,
+            "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+            "slot": 14,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 847,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 320,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 847,
+            "recovery_actions": 320,
+            "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+            "slot": 15,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 1289,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 550,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1289,
+            "recovery_actions": 550,
+            "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+            "slot": 16,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 720,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 343,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 720,
+            "recovery_actions": 343,
+            "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+            "slot": 17,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 850,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 850,
+            "recovery_actions": 0,
+            "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+            "slot": 18,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 1236,
+            "evaluator_item": true,
+            "explained": true,
+            "mismatches": 236,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1236,
+            "recovery_actions": 236,
+            "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+            "slot": 19,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "decisions": 921,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 921,
+            "recovery_actions": 0,
+            "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+            "slot": 20,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 836,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 836,
+            "recovery_actions": 0,
+            "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+            "slot": 21,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 823,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 823,
+            "recovery_actions": 0,
+            "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+            "slot": 22,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 1096,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 1096,
+            "recovery_actions": 0,
+            "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+            "slot": 23,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 826,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 826,
+            "recovery_actions": 0,
+            "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+            "slot": 24,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 827,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 827,
+            "recovery_actions": 0,
+            "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+            "slot": 25,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 825,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 825,
+            "recovery_actions": 0,
+            "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+            "slot": 26,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 827,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 827,
+            "recovery_actions": 0,
+            "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+            "slot": 27,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 874,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 874,
+            "recovery_actions": 0,
+            "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+            "slot": 28,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 868,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 868,
+            "recovery_actions": 0,
+            "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+            "slot": 29,
+            "variant": "p8_p5r"
+          },
+          {
+            "attempt": 1,
+            "block": 3,
+            "controller": "p5",
+            "decisions": 863,
+            "evaluator_item": false,
+            "explained": true,
+            "mismatches": 0,
+            "mismatches_equal_recovery_actions": true,
+            "other_field_mismatches": 0,
+            "records": 863,
+            "recovery_actions": 0,
+            "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+            "slot": 30,
+            "variant": "p8_p5r"
+          }
+        ],
+        "rule": "D-M3-1 (a): every policy:ledger:decision_mismatch must equal the flight's recovery actions, tick for tick, in the action field only",
+        "unexplained": []
+      },
+      "per_controller": {
+        "p4": {},
+        "p5": {
+          "cleanup:gazebo:forced_kill_after_grace": 2,
+          "cleanup:ros-controller:nonzero_exit_1": 1,
+          "mc_causal_yaw:p2_integrity_missing": 1,
+          "p2:timing": 1,
+          "p2_integrity_error:ValueError:stale_state:vehicle_local_position": 1,
+          "policy:inference_max": 1,
+          "policy:inference_p99": 1,
+          "policy:ledger:decision_mismatch": 14,
+          "policy:no_policy_decisions": 1,
+          "policy:participation": 1,
+          "rgb_absence:snapshot_missing:window_end": 1,
+          "runtime_status:Abort:controller_failed:stale_action": 1
+        }
+      },
+      "per_flight": [
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+          "slot": 1
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "cleanup:gazebo:forced_kill_after_grace"
+          ],
+          "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+          "slot": 2
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+          "slot": 3
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+          "slot": 4
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+          "slot": 5
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+          "slot": 6
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+          "slot": 7
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+          "slot": 8
+        },
+        {
+          "attempt": 1,
+          "block": 1,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+          "slot": 9
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+          "slot": 11
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "cleanup:gazebo:forced_kill_after_grace",
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+          "slot": 13
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "runtime_status:Abort:controller_failed:stale_action",
+            "cleanup:ros-controller:nonzero_exit_1",
+            "rgb_absence:snapshot_missing:window_end",
+            "p2:timing",
+            "mc_causal_yaw:p2_integrity_missing",
+            "policy:no_policy_decisions",
+            "policy:participation",
+            "policy:inference_p99",
+            "policy:inference_max",
+            "p2_integrity_error:ValueError:stale_state:vehicle_local_position"
+          ],
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+          "slot": 15
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+          "slot": 16
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+          "slot": 17
+        },
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "items": [
+            "policy:ledger:decision_mismatch"
+          ],
+          "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+          "slot": 19
+        }
+      ]
+    },
+    "R-P8-2": {
+      "id": "R-P8-2",
+      "rows": [
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000355",
+          "p8": "failure",
+          "slot": 1,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000355",
+          "p8": "failure",
+          "slot": 1,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000381",
+          "p8": "failure",
+          "slot": 2,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000381",
+          "p8": "goal_success",
+          "slot": 2,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000396",
+          "p8": "failure",
+          "slot": 3,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000396",
+          "p8": "failure",
+          "slot": 3,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000375",
+          "p8": "goal_success",
+          "slot": 4,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000375",
+          "p8": "failure",
+          "slot": 4,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000377",
+          "p8": "failure",
+          "slot": 5,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000377",
+          "p8": "failure",
+          "slot": 5,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000363",
+          "p8": "goal_success",
+          "slot": 6,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000363",
+          "p8": "failure",
+          "slot": 6,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000366",
+          "p8": "failure",
+          "slot": 7,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000366",
+          "p8": "goal_success",
+          "slot": 7,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000360",
+          "p8": "goal_success",
+          "slot": 8,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000360",
+          "p8": "goal_success",
+          "slot": 8,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000379",
+          "p8": "failure",
+          "slot": 9,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000379",
+          "p8": "failure",
+          "slot": 9,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "failure",
+          "layout": "p7c-4000385",
+          "p8": "goal_success",
+          "slot": 10,
+          "stage": "V3",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000385",
+          "p8": "goal_success",
+          "slot": 10,
+          "stage": "V3",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000351",
+          "p8": "goal_success",
+          "slot": 21,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000351",
+          "p8": "goal_success",
+          "slot": 21,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000357",
+          "p8": "goal_success",
+          "slot": 22,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000357",
+          "p8": "goal_success",
+          "slot": 22,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000374",
+          "p8": "goal_success",
+          "slot": 23,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000374",
+          "p8": "goal_success",
+          "slot": 23,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000354",
+          "p8": "goal_success",
+          "slot": 24,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000354",
+          "p8": "goal_success",
+          "slot": 24,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000359",
+          "p8": "goal_success",
+          "slot": 25,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000359",
+          "p8": "goal_success",
+          "slot": 25,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000394",
+          "p8": "goal_success",
+          "slot": 26,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000394",
+          "p8": "goal_success",
+          "slot": 26,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000373",
+          "p8": "goal_success",
+          "slot": 27,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000373",
+          "p8": "goal_success",
+          "slot": 27,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000398",
+          "p8": "goal_success",
+          "slot": 28,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000398",
+          "p8": "goal_success",
+          "slot": 28,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000349",
+          "p8": "goal_success",
+          "slot": 29,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000349",
+          "p8": "goal_success",
+          "slot": 29,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000367",
+          "p8": "goal_success",
+          "slot": 30,
+          "stage": "V5",
+          "variant": "p8_p4r"
+        },
+        {
+          "baseline_p7e": "goal_success",
+          "layout": "p7c-4000367",
+          "p8": "goal_success",
+          "slot": 30,
+          "stage": "V5",
+          "variant": "p8_p5r"
+        }
+      ],
+      "transitions": [
+        {
+          "baseline": "failure",
+          "flights": 12,
+          "p8": "failure",
+          "stage": "V3"
+        },
+        {
+          "baseline": "failure",
+          "flights": 6,
+          "p8": "goal_success",
+          "stage": "V3"
+        },
+        {
+          "baseline": "goal_success",
+          "flights": 2,
+          "p8": "goal_success",
+          "stage": "V3"
+        },
+        {
+          "baseline": "goal_success",
+          "flights": 20,
+          "p8": "goal_success",
+          "stage": "V5"
+        }
+      ]
+    },
+    "R-P8-3": {
+      "id": "R-P8-3",
+      "per_variant": {
+        "p8_p4r": {
+          "actions": 7205,
+          "episodes": 52,
+          "flights": 30,
+          "flights_with_recovery": 17,
+          "guard_starts": 0,
+          "phases": {
+            "R1": 971,
+            "R2": 2206,
+            "R3": 4028
+          },
+          "recovery_time_s": {
+            "max": 61.55199999999995,
+            "median": 17.04400000000004,
+            "min": 0.0,
+            "n": 17
+          },
+          "refusals_fc4": 2
+        },
+        "p8_p5r": {
+          "actions": 7442,
+          "episodes": 40,
+          "flights": 30,
+          "flights_with_recovery": 14,
+          "guard_starts": 0,
+          "phases": {
+            "R1": 709,
+            "R2": 3288,
+            "R3": 3445
+          },
+          "recovery_time_s": {
+            "max": 68.93200000000003,
+            "median": 17.910000000000004,
+            "min": 8.448000000000008,
+            "n": 14
+          },
+          "refusals_fc4": 1
+        }
+      }
+    },
+    "R-P8-4": {
+      "id": "R-P8-4",
+      "per_variant": {
+        "p8_p4r": {
+          "mid_course": 10,
+          "other:transit_deadline": 2
+        },
+        "p8_p5r": {
+          "mid_course": 9,
+          "other:None": 1,
+          "other:transit_deadline": 2
+        }
+      }
+    },
+    "R-P8-5": {
+      "breaches": [
+        {
+          "attempt": 1,
+          "block": 2,
+          "controller": "p5",
+          "item": "p2:timing",
+          "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+          "slot": 14
+        }
+      ],
+      "id": "R-P8-5",
+      "p2_timing_status": {
+        "None": 1,
+        "passed": 59
+      },
+      "recovery_search_wall_s": {
+        "max": 0.026041080003778916,
+        "median": 0.004393230501591461,
+        "min": 0.001808273998904042,
+        "n": 92
+      }
+    },
+    "R-P8-6": {
+      "id": "R-P8-6",
+      "per_variant": {
+        "p8_p4r": {
+          "min_truth_clearance_m": {
+            "max": 1.996735709828841,
+            "median": 0.48826699082309327,
+            "min": 0.34191657411305765,
+            "n": 30
+          },
+          "path_length_m": {
+            "max": 12.094929439129832,
+            "median": 9.510334866826758,
+            "min": 3.6401410405464407,
+            "n": 30
+          },
+          "time_to_goal_sim_s": {
+            "max": 144.76799999999997,
+            "median": 44.818000000000005,
+            "min": 41.048,
+            "n": 18
+          }
+        },
+        "p8_p5r": {
+          "min_truth_clearance_m": {
+            "max": 5.565515260280413,
+            "median": 0.795270917008521,
+            "min": 0.3617479357199571,
+            "n": 30
+          },
+          "path_length_m": {
+            "max": 11.077786523236009,
+            "median": 9.375769383014669,
+            "min": 0.5353824506120064,
+            "n": 30
+          },
+          "time_to_goal_sim_s": {
+            "max": 70.452,
+            "median": 43.49999999999999,
+            "min": 41.144000000000005,
+            "n": 18
+          }
+        }
+      }
+    },
+    "R-P8-7": {
+      "id": "R-P8-7",
+      "inference": {
+        "accepted_limit": {
+          "inference_max_s": 0.01,
+          "inference_p99_s": 0.005,
+          "participation_fraction": 1.0
+        },
+        "breaches": [
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+            "slot": 1
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+            "slot": 3
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+            "slot": 4
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+            "slot": 5
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+            "slot": 6
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+            "slot": 7
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+            "slot": 8
+          },
+          {
+            "attempt": 1,
+            "block": 1,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+            "slot": 9
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+            "slot": 11
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+            "slot": 13
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:no_policy_decisions",
+            "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+            "slot": 14
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:participation",
+            "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+            "slot": 14
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:inference_p99",
+            "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+            "slot": 14
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:inference_max",
+            "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+            "slot": 14
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+            "slot": 15
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+            "slot": 16
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+            "slot": 17
+          },
+          {
+            "attempt": 1,
+            "block": 2,
+            "controller": "p5",
+            "item": "policy:ledger:decision_mismatch",
+            "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+            "slot": 19
+          }
+        ],
+        "id": "R5",
+        "p5_flights": 30,
+        "values": {
+          "failure_ticks": {
+            "max": 0,
+            "median": 0.0,
+            "min": 0,
+            "n": 30
+          },
+          "fallback_decisions": {
+            "max": 0,
+            "median": 0.0,
+            "min": 0,
+            "n": 30
+          },
+          "inference_max_s": {
+            "max": 0.005691500999091659,
+            "median": 0.0020720399988931604,
+            "min": 0.0008182080055121332,
+            "n": 29
+          },
+          "inference_p99_s": {
+            "max": 0.0009415149979759008,
+            "median": 0.0006810630002291873,
+            "min": 0.0005477749946294352,
+            "n": 29
+          },
+          "outside_mask": {
+            "max": 0,
+            "median": 0.0,
+            "min": 0,
+            "n": 30
+          },
+          "participation_fraction": {
+            "max": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "n": 29
+          }
+        }
+      },
+      "perception": {
+        "accepted_limit": {
+          "perception_compute_max_s": 0.09,
+          "perception_compute_p99_s": 0.05,
+          "perception_receipt_gap_max_wall_s": 1.0,
+          "snapshot_latency_max_sim_s": 0.25,
+          "snapshot_latency_p95_sim_s": 0.15,
+          "snapshot_rate_min_hz": 8.0
+        },
+        "breaches": [],
+        "id": "R4",
+        "per_controller": {
+          "p4": {
+            "compute_max_s": {
+              "max": 0.0521079460013425,
+              "median": 0.020795095999346813,
+              "min": 0.017727172999002505,
+              "n": 30
+            },
+            "compute_p99_s": {
+              "max": 0.025572875994839706,
+              "median": 0.017234913000720553,
+              "min": 0.012893437000457197,
+              "n": 30
+            },
+            "depth_delivered_hz_sim": {
+              "max": 30.30382034970626,
+              "median": 30.302852870794762,
+              "min": 30.30224075039083,
+              "n": 30
+            },
+            "depth_receipt_gap_max_wall_s": {
+              "max": 0.06348576599702938,
+              "median": 0.049428717997216154,
+              "min": 0.043079618000774644,
+              "n": 30
+            },
+            "latency_max_sim_s": {
+              "max": 0.07600000000000762,
+              "median": 0.056000000000011596,
+              "min": 0.05200000000000671,
+              "n": 30
+            },
+            "latency_p95_sim_s": {
+              "max": 0.055999999999997385,
+              "median": 0.0519999999999925,
+              "min": 0.04800000000000182,
+              "n": 30
+            },
+            "rate_hz": {
+              "max": 10.005306373233536,
+              "median": 10.000313611599129,
+              "min": 9.9925605302313,
+              "n": 30
+            },
+            "receipt_gap_max_wall_s": {
+              "max": 0.08546689799550222,
+              "median": 0.054992818000755506,
+              "min": 0.050195496005471796,
+              "n": 30
+            }
+          },
+          "p5": {
+            "compute_max_s": {
+              "max": 0.047348038002382964,
+              "median": 0.020499063000897877,
+              "min": 0.017806114003178664,
+              "n": 30
+            },
+            "compute_p99_s": {
+              "max": 0.033992019001743756,
+              "median": 0.017102763998991577,
+              "min": 0.015024155996798072,
+              "n": 30
+            },
+            "depth_delivered_hz_sim": {
+              "max": 30.304096860481486,
+              "median": 30.303030303030305,
+              "min": 30.302242556583824,
+              "n": 30
+            },
+            "depth_receipt_gap_max_wall_s": {
+              "max": 0.06752317800419405,
+              "median": 0.047754469502251595,
+              "min": 0.043294570001307875,
+              "n": 30
+            },
+            "latency_max_sim_s": {
+              "max": 0.07199999999998852,
+              "median": 0.05799999999999983,
+              "min": 0.055999999999997385,
+              "n": 30
+            },
+            "latency_p95_sim_s": {
+              "max": 0.055999999999983174,
+              "median": 0.0519999999999925,
+              "min": 0.04800000000000182,
+              "n": 30
+            },
+            "rate_hz": {
+              "max": 10.005061582588155,
+              "median": 9.997831192336825,
+              "min": 9.983127109111361,
+              "n": 30
+            },
+            "receipt_gap_max_wall_s": {
+              "max": 0.08217247200082056,
+              "median": 0.058602940000128,
+              "min": 0.051202658003603574,
+              "n": 30
+            }
+          }
+        }
+      }
+    },
+    "R-P8-8": {
+      "accepted_limit": "p7_host_check.yaml (9f78af75\u2026)",
+      "breaches": [],
+      "host_check_per_block": {
+        "1": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 1.0,
+          "passed": true
+        },
+        "2": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 0.4,
+          "passed": true
+        },
+        "3": {
+          "ac_overlay": true,
+          "ac_power": true,
+          "cpu_mean_percent": 2.8,
+          "passed": true
+        }
+      },
+      "id": "R-P8-8",
+      "per_controller": {
+        "p4": {
+          "cpu_fraction": {
+            "clock-bridge": {
+              "max": 0.10813547872714592,
+              "median": 0.08637415078979849,
+              "min": 0.07508331694548494,
+              "n": 30
+            },
+            "dds-agent": {
+              "max": 0.04238751497551601,
+              "median": 0.03245581706118661,
+              "min": 0.030251779644309744,
+              "n": 30
+            },
+            "gazebo": {
+              "max": 0.951764413455845,
+              "median": 0.7859013593211992,
+              "min": 0.7294144576074213,
+              "n": 30
+            },
+            "p4-perception": {
+              "max": 0.460092524697564,
+              "median": 0.373969299241224,
+              "min": 0.3105513797019587,
+              "n": 30
+            },
+            "p4-truth-observer": {
+              "max": 0.0335785521481152,
+              "median": 0.029893674338961986,
+              "min": 0.02806381789295347,
+              "n": 30
+            },
+            "px4": {
+              "max": 0.32077635179708264,
+              "median": 0.26208433398129116,
+              "min": 0.24924812599364018,
+              "n": 30
+            },
+            "qgc-monitor": {
+              "max": 0.12462924634935844,
+              "median": 0.1123161323470187,
+              "min": 0.10033480344051643,
+              "n": 30
+            },
+            "ros-controller": {
+              "max": 0.47483212266764147,
+              "median": 0.37363573427500407,
+              "min": 0.339476414729039,
+              "n": 30
+            },
+            "sensor-adapter": {
+              "max": 0.8118309311480372,
+              "median": 0.6124056432552795,
+              "min": 0.5708810366463327,
+              "n": 30
+            },
+            "sensor-bridge": {
+              "max": 0.10784134032021239,
+              "median": 0.09515218583055145,
+              "min": 0.05655224547114177,
+              "n": 30
+            },
+            "source-probe": {
+              "max": 0.11386029818917127,
+              "median": 0.09222992334017698,
+              "min": 0.08402802513812098,
+              "n": 30
+            }
+          },
+          "flights": 30,
+          "flights_with_a_stall": 30,
+          "mem_available_kb_min": {
+            "max": 7124096,
+            "median": 6938940.0,
+            "min": 6657296,
+            "n": 30
+          },
+          "rtf_mean": {
+            "max": 0.9991270114755862,
+            "median": 0.9987088875793773,
+            "min": 0.996252192923382,
+            "n": 30
+          },
+          "run_bytes": {
+            "max": 3385084112,
+            "median": 1459337269.5,
+            "min": 1146660159,
+            "n": 30
+          },
+          "stalls_below_0_5": {
+            "max": 3,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          },
+          "wall_duration_s": {
+            "max": 275.8298306159995,
+            "median": 171.13392310700146,
+            "min": 152.63686918200256,
+            "n": 30
+          }
+        },
+        "p5": {
+          "cpu_fraction": {
+            "clock-bridge": {
+              "max": 0.1144300532142262,
+              "median": 0.08664799725946287,
+              "min": 0.07592320316484603,
+              "n": 30
+            },
+            "dds-agent": {
+              "max": 0.04310179838727617,
+              "median": 0.03255942957669358,
+              "min": 0.0293000480995222,
+              "n": 30
+            },
+            "gazebo": {
+              "max": 1.0006603691388827,
+              "median": 0.7823929699448418,
+              "min": 0.7271608923987523,
+              "n": 30
+            },
+            "p4-perception": {
+              "max": 0.47091657286274125,
+              "median": 0.3756894107395218,
+              "min": 0.3284643562423621,
+              "n": 30
+            },
+            "p4-truth-observer": {
+              "max": 0.034110255498323916,
+              "median": 0.030158946644702235,
+              "min": 0.028412102948777353,
+              "n": 30
+            },
+            "px4": {
+              "max": 0.33692553341971654,
+              "median": 0.2616447791109964,
+              "min": 0.22815785383226694,
+              "n": 30
+            },
+            "qgc-monitor": {
+              "max": 0.13666238062958325,
+              "median": 0.11172796576661902,
+              "min": 0.09844616604239477,
+              "n": 30
+            },
+            "ros-controller": {
+              "max": 0.48059619732175496,
+              "median": 0.3774453765299215,
+              "min": 0.334618167970264,
+              "n": 30
+            },
+            "sensor-adapter": {
+              "max": 0.8102477830086153,
+              "median": 0.6065879705327859,
+              "min": 0.5307261747111252,
+              "n": 30
+            },
+            "sensor-bridge": {
+              "max": 0.1118078064125637,
+              "median": 0.09494468099011938,
+              "min": 0.056502346238633226,
+              "n": 30
+            },
+            "source-probe": {
+              "max": 0.12086214935314146,
+              "median": 0.09259212932026621,
+              "min": 0.08236113559695286,
+              "n": 30
+            }
+          },
+          "flights": 30,
+          "flights_with_a_stall": 30,
+          "mem_available_kb_min": {
+            "max": 7133248,
+            "median": 7028868.0,
+            "min": 6730364,
+            "n": 30
+          },
+          "rtf_mean": {
+            "max": 0.9989061264272214,
+            "median": 0.9986076684597927,
+            "min": 0.99656956153646,
+            "n": 30
+          },
+          "run_bytes": {
+            "max": 3097769289,
+            "median": 1389891487.5,
+            "min": 342460003,
+            "n": 30
+          },
+          "stalls_below_0_5": {
+            "max": 3,
+            "median": 2.0,
+            "min": 2,
+            "n": 30
+          },
+          "wall_duration_s": {
+            "max": 286.048839932002,
+            "median": 170.15761771100006,
+            "min": 79.64531618099863,
+            "n": 30
+          }
+        }
+      }
+    },
+    "R-P8-9": {
+      "id": "R-P8-9",
+      "regressions": []
+    }
+  },
+  "reported_errors": {},
+  "required_statement": "P8 is an engineering validation of a recovery layer. Its per-layout outcomes are descriptive; with 10 layouts per stage they do not establish a rate, and they do not show that any controller or variant is superior.",
+  "risk_register": {
+    "open": [
+      "RR1 P2 observation-gap RECOVERY",
+      "RR2 P5 repeat-behaviour inconsistency",
+      "RR-P8-1 longer flights",
+      "RR-P8-2 escape segments away from the goal",
+      "RR-P8-3 the R4 guard and P5 near-ties",
+      "RR-P8-4 offline replay is not closed-loop",
+      "RR-P8-5 compute spikes"
+    ],
+    "rule": "P8 closes none by itself; no threshold changes in response (contract \u00a710)"
+  },
+  "specs": {
+    "layouts": "62ae950cbcce9981b013992ed7a8d22e1bcbc4436852745e249172de25b40e85",
+    "recovery": "dee90d51098210daf714fe0b875b0e98040195362095800dc48836f78371333b",
+    "report_plan": "a313a034b2c8e481c0a1de651dc9ebc530bdf86736c4577216a281db429c2b14",
+    "schedule": "df90cf7ba1a172a100cad1d5f72cf864088190331ecf11f2af4263f5f8f3da93"
+  },
+  "statement_of_a_pass": null,
+  "status": "engineering validation not passed"
+}

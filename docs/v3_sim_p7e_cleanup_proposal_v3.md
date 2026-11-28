@@ -1,8 +1,11 @@
 # v3-SIM P7-E release closure: selective evidence cleanup proposal (manifest v3)
 
-**Status: PROPOSAL ONLY (2026-11-28).**
-* No file was deleted, moved, compressed or changed, and nothing below authorizes it.
-* No cleanup procedure is implemented.
+**Status (2026-11-28): the operator decided C-1 to C-4 (§6.1), then C-5, C-6 and C-11, and executed both sets
+(C-7, §6.2).**
+* The P6 set (78 runs, 624 files, 26.68 GB) and the P7-E set (31 runs, 248 files, 34.94 GB) were removed, each
+  under its own file-level authorization.
+* Nothing else was deleted, and nothing was moved or compressed. C-8 to C-10 stay open.
+* *(When this proposal was first written, no file had been deleted and no procedure was implemented.)*
 * It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
   authorizes read-only auditing and proposal preparation only.
 * The approved retention policy D4-A/D4-B and rule E10 ([retention proposal](v3_sim_p7e_retention_proposal.md))
@@ -202,13 +205,90 @@ removal. It is a separate decision (C-8), because it costs space elsewhere.
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| C-1 | Adopt manifest v3 for planning, with reading R-E10 (the batch's own records do not protect its raw depth), or the literal E10 (no P7-E flight eligible) | R-E10 |
-| C-2 | Confirm the new protections of §3 | confirm |
-| C-3 | Also protect the narrow-passage successes, slots 19 and 28 (4 flights, 5.09 GB), as contrast for P8's narrow-passage replay | protect |
-| C-4 | Keep the 15 P6 depth-fault fixtures (0.12 GB) permanently: they are the raw evidence of injected depth faults | keep |
-| C-5 | Authorize implementing and testing the cleanup procedure of §5 (no deletion) | when storage matters |
-| C-6 | After C-5, authorize the copy rehearsal | — |
-| C-7 | Each deletion set separately, with its file-level authorization: P6 first (26.68 GB), then P7-E (40.03 GB, or 34.94 GB with C-3) | P6 first |
+| C-1 | Adopt manifest v3 for planning, with reading R-E10 (the batch's own records do not protect its raw depth), or the literal E10 (no P7-E flight eligible) | **DECIDED (operator, 2026-11-28): R-E10** |
+| C-2 | Confirm the new protections of §3 | **DECIDED: confirmed** |
+| C-3 | Also protect the narrow-passage successes, slots 19 and 28 (4 flights, 5.09 GB), as contrast for P8's narrow-passage replay | **DECIDED: protected** (§6.1) |
+| C-4 | Keep the 15 P6 depth-fault fixtures (0.12 GB) permanently: they are the raw evidence of injected depth faults | **DECIDED: kept permanently** |
+| C-5 | Authorize implementing and testing the cleanup procedure of §5 (no deletion) | **DONE (2026-11-28)**: `tools/evidence_retention/`, 29 offline tests (§6.2) |
+| C-6 | After C-5, authorize the copy rehearsal | **DONE (2026-11-28)**: one P6 and one P7-E copy, all checks passed (§6.2) |
+| C-7 | Each deletion set separately, with its file-level authorization: P6 first (26.68 GB), then P7-E (40.03 GB, or 34.94 GB with C-3) | **BOTH EXECUTED (2026-11-28)**: P6, then P7-E (§6.2) |
 | C-8 | Archive before removal | optional |
 | C-9 | Compact the WSL disk image afterwards (separate; needs `wsl --shutdown`) | only after C-7 |
 | C-10 | Housekeeping of the caches (ccache, jedi, pytest, `__pycache__`); keep pip until the `venv-px4` requirements are pinned (RR6) | separate, low value (about 0.4 GB) |
+| C-11 | The dependency rule after P8 named all 35 eligible P7-E flights: per artifact (a source protects raw depth unless a record-only proof covers its exact bytes) or per run | **DECIDED (2026-11-28): per artifact** (§6.2) |
+
+### 6.1 Decisions recorded (operator, 2026-11-28)
+
+The operator chose reading R-E10, confirmed C-2, protected slots 19 and 28 (C-3) and kept the 15 fixtures (C-4).
+Nothing was deleted, and no cleanup is authorized.
+
+**The planning set after these decisions.** The manifest v3 JSON (`ec5b2205…`) is evidence and stays unchanged. C-3
+is applied on top of it, by name. Any later file-level authorization (§5) must exclude these four runs. When the
+procedure of C-5 is built, its re-derived classification must also carry C-3 as a named protection.
+
+| Slot | Controller | Run | `depth.bin` bytes | SHA-256 (from v3) |
+|---:|---|---|---:|---|
+| 19 | P5 | `20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e` | 1,283,209,411 | `8a0c525c9343b65d…` |
+| 19 | P4 | `20261127T150640Z-p7e-p4-p7c-4000382-ca6304df` | 1,258,003,789 | `32b4961a16728e81…` |
+| 28 | P4 | `20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f` | 1,294,159,109 | `7724a77c8495d67f…` |
+| 28 | P5 | `20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23` | 1,254,360,274 | `de70aee4e7953970…` |
+
+| Set (planning, not authorized) | Files | Size |
+|---|---:|---:|
+| Eligible P6 development raw depth | 78 | 26.68 GB |
+| Eligible P7-E raw depth (35 minus the 4 above) | 31 | 34.94 GB |
+| `tmp/` of the remaining eligible runs | — | about 0.01 GB |
+| **Total** | 109 | **about 61.6 GB** |
+| PROTECTED P7-E raw depth (28 + 4 flights) | 32 | 43.46 GB |
+
+### 6.2 Progress recorded (operator, 2026-11-28: "C-5＋C-6＋備妥授權檔 (Recommended)" and C-11 "依檔案判定 (Recommended)")
+
+* **F-CL1.** P8 evidence and a frozen P8 config now name all 35 eligible P7-E flights. These are the V1 replay, the
+  hover-timeout analysis and `p8_recovery.json`.
+* **C-11 proof.** Each of the three tools reproduced its evidence with every `depth.bin` open refused:
+  `docs/evidence/v3_sim_retention_record_only_p8.json` (`6a8cc770…`).
+* **Re-derived now (read-only):**
+  * the P6 set is 78 of 78 ELIGIBLE, identical to v3;
+  * the P7-E set is 31 of 31 ELIGIBLE under C-11;
+  * the C-3 runs are PROTECTED.
+* **C-5:** the executor and the manifest v3 lineage are in `tools/evidence_retention/`. They pass T1–T10 and 19
+  further tests offline.
+  * The cleanup's own records (authorizations, receipts, ledgers, proofs) are excluded as dependency sources.
+    They list runs by design.
+* **C-6:** two rehearsals on copies (`v3_sim_p7e_cleanup_rehearsal_p6.json` `6253751d…`, `…_p7e.json` `304d1964…`).
+  Every check passed, including the frozen classifier reproducing the P7-E flight record without `depth.bin`.
+* **Prepared:** `state/p7e-cleanup-authorization-p6-dev-depth-ec5b22058502.json` (`5b07faa8…`). It lists 78 runs,
+  624 files and 26,682,094,504 bytes, each re-verified.
+* **C-7 (P6) **EXECUTED (operator, 2026-11-28, "Execute P6 set")**: receipt `state/p7e-cleanup-receipt-p6-dev-depth-5b07faa8469f.json` (`ce326ddf…`, copy `docs/evidence/v3_sim_p7e_cleanup_receipt_p6-dev-depth.json`), status `completed`.**
+  * The phrase used was "authorize cleanup p6-dev-depth
+    5b07faa8469fb203d4e27374b2f31cfa9e71c1d05428c0dcec28e5e49ac5b7be removing 624 files 26682094504 bytes".
+  * 624 of 624 files were removed (26,682,094,504 bytes). The removed set equals the authorized set (every SHA-256).
+  * Ledger `p7e-cleanup-ledger-p6-dev-depth-5b07faa8469f.jsonl` (`490009dc…`): a header, 624 `intent` and 624
+    `done` lines.
+  * Before: no live lock, no simulator, re-derivation unchanged. Before and after: P8 `fe2a0c6e…` and P7-E
+    `38e23bad…` verify. The retained records of all 78 runs are unchanged.
+  * Every run keeps its depth index, evaluation (78 of 78 readable), ULog and empty `tmp/`. The other 233 recordings
+    are untouched.
+  * Free space in WSL: 682.83 → 709.52 GB. `runs/`: 258.5 → 231.8 GB. The disk image on D: stays 352.0 GB until
+    C-9.
+* The design for later phases is in [Evidence Retention Manager](v3_sim_evidence_retention_design.md).
+
+* **P7-E set.** Operator "Prepare P7-E set", then "Execute P7-E set".
+  * Authorization `state/p7e-cleanup-authorization-p7e-depth-ec5b22058502.json` (`b8c8b3ba…`): the 31 accepted-batch
+    goal successes of `e9561f05…` that no protection covers (no C-3 run), with 248 files (31 `depth.bin` and 217
+    `tmp/`) and 34,939,082,035 bytes.
+  * Phrase: "authorize cleanup p7e-depth b8c8b3ba1bd1f5edb8eef190570231d046c9f90afb5c3c380afc180025b5d2ca removing
+    248 files 34939082035 bytes".
+  * **Receipt** `state/p7e-cleanup-receipt-p7e-depth-b8c8b3ba1bd1.json` (`68bb51b1…`, copy
+    `docs/evidence/v3_sim_p7e_cleanup_receipt_p7e-depth.json`): `completed`, 248 of 248, equal to the authorized set.
+  * Ledger `8f87528e…`: a header, 248 `intent` and 248 `done` lines.
+  * The re-derivation was unchanged. The manifests verify before and after, and the retained records are unchanged.
+  * **The frozen classifier reproduced the flight records** of the 3 sampled flights (first, middle and last of
+    the 31) without `depth.bin`.
+  * All 31 runs keep their index, flight record, ULog and evaluation.
+  * The 32 other P7-E flights, including C-3, keep their complete raw depth.
+  * 179 tests pass afterwards (P7-E 76, P8 74, retention 29).
+  * Free space in WSL: 709.52 → 744.45 GB. `runs/`: 231.8 → 196.9 GB, with 202 recordings left. The disk image on D:
+    stays 352.0 GB until C-9.
+
+Still open: C-8 to C-10 (C-9 is what shrinks the disk image on D:).

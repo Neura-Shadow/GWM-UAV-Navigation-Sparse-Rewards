@@ -1,0 +1,598 @@
+{
+ "contract": "depth-codec-study-v1",
+ "frame": {
+  "encoding": "32FC1",
+  "height": 480,
+  "processing_hz": 10,
+  "raw_bytes": 1228800,
+  "sensor_hz": 30,
+  "width": 640
+ },
+ "method": "Evidence Retention Manager: an offline study of lossless depth codecs on recorded frames. It reads only.\n\nFor each run it samples `blocks` evenly spaced blocks of `per_block` consecutive accepted frames from\n`sensors/depth.bin`. Every stored frame is checked against its `stored_sha256`, decompressed (the recorder's zlib-1),\nand checked against its `raw_sha256`. The raw 640x480 float32 frame is then encoded by each codec. The result must\ndecode to the identical bytes, or the codec is reported as failed. It measures stored bytes, single-thread encode and\ndecode throughput (CPU time) and a few image statistics.\n\nTransforms are all exactly invertible:\n* `shuffle`: the four byte planes of the float32 values (as in Blosc and HDF5 shuffle);\n* `hdelta`: the row-wise difference of the uint32 bit patterns, modulo 2**32;\n* `txor`: XOR with the previous frame's uint32 bit patterns (temporal); the first frame of each block is a key frame.\n\nRuns are identified by the SHA-256 of their depth index, never by name, so this record is no dependency of any run.",
+ "read_only": true,
+ "runs": {
+  "p7e_p5_goal_success": {
+   "codecs": {
+    "brotli-1": {
+     "available": true,
+     "decode_MBps_one_core": 445.5,
+     "encode_MBps_one_core": 728.9,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 3.143,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.326
+    },
+    "brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 444.2,
+     "encode_MBps_one_core": 74.4,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 5.589,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.746
+    },
+    "hdelta+shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 249.6,
+     "encode_MBps_one_core": 157.1,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 25.424,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.164
+    },
+    "hdelta+shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 296.7,
+     "encode_MBps_one_core": 426.1,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 11.956,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.349
+    },
+    "hdelta+shuffle+lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 185.5,
+     "encode_MBps_one_core": 95.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 27.469,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.152
+    },
+    "hdelta+shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 248.9,
+     "encode_MBps_one_core": 222.4,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 17.332,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.24
+    },
+    "hdelta+shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 229.7,
+     "encode_MBps_one_core": 100.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 20.681,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.201
+    },
+    "lz4": {
+     "available": true,
+     "decode_MBps_one_core": 10295.8,
+     "encode_MBps_one_core": 4265.3,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 2.448,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.702
+    },
+    "lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 117.7,
+     "encode_MBps_one_core": 39.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 8.105,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.514
+    },
+    "shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 225.4,
+     "encode_MBps_one_core": 159.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 10.315,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.404
+    },
+    "shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 349.6,
+     "encode_MBps_one_core": 479.4,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.303,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.571
+    },
+    "shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 269.9,
+     "encode_MBps_one_core": 194.2,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 8.533,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.488
+    },
+    "shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 271.1,
+     "encode_MBps_one_core": 127.6,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 9.608,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.434
+    },
+    "txor+shuffle+zlib-1 (key: hdelta+shuffle+zlib-1)": {
+     "available": true,
+     "decode_MBps_one_core": 266.9,
+     "encode_MBps_one_core": 180.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.029,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.593
+    },
+    "zlib-1 (current recorder)": {
+     "available": true,
+     "decode_MBps_one_core": 462.6,
+     "encode_MBps_one_core": 146.6,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 4.167,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.0
+    },
+    "zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 474.7,
+     "encode_MBps_one_core": 74.4,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 4.305,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.968
+    }
+   },
+   "depth_index_sha256": "7a6e34f279f96e11ac156e0c35502e93dd914c9d66c81ffa6c8f565be3cbc924",
+   "frames_in_run": 4076,
+   "image": {
+    "at_or_beyond_far_clip_fraction": 0.4726,
+    "median_finite_m": 4.453,
+    "non_finite_fraction": 0.4726,
+    "pixels": 46080000
+   },
+   "raw_bytes_in_run": 5008588800,
+   "recorded_ratio_vs_raw": 4.167,
+   "sampled_frames": 150,
+   "sampled_raw_bytes": 184320000,
+   "sampled_recorded_bytes": 44233432,
+   "stored_bytes_in_run": 1259684241
+  },
+  "p8_p4r_dry_goal_via_r1": {
+   "codecs": {
+    "brotli-1": {
+     "available": true,
+     "decode_MBps_one_core": 566.2,
+     "encode_MBps_one_core": 931.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 3.509,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.319
+    },
+    "brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 562.8,
+     "encode_MBps_one_core": 96.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 5.744,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.806
+    },
+    "hdelta+shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 250.6,
+     "encode_MBps_one_core": 160.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 26.592,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.174
+    },
+    "hdelta+shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 323.4,
+     "encode_MBps_one_core": 463.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 12.223,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.379
+    },
+    "hdelta+shuffle+lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 201.9,
+     "encode_MBps_one_core": 106.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 29.311,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.158
+    },
+    "hdelta+shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 263.6,
+     "encode_MBps_one_core": 244.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 18.364,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.252
+    },
+    "hdelta+shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 263.5,
+     "encode_MBps_one_core": 120.3,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 21.88,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.212
+    },
+    "lz4": {
+     "available": true,
+     "decode_MBps_one_core": 10388.0,
+     "encode_MBps_one_core": 3865.0,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 2.8,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.654
+    },
+    "lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 132.1,
+     "encode_MBps_one_core": 47.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 8.508,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.544
+    },
+    "shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 247.1,
+     "encode_MBps_one_core": 187.1,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 10.737,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.431
+    },
+    "shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 388.3,
+     "encode_MBps_one_core": 532.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.942,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.583
+    },
+    "shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 299.8,
+     "encode_MBps_one_core": 226.2,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 9.159,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.506
+    },
+    "shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 300.4,
+     "encode_MBps_one_core": 147.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 10.346,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.448
+    },
+    "txor+shuffle+zlib-1 (key: hdelta+shuffle+zlib-1)": {
+     "available": true,
+     "decode_MBps_one_core": 282.1,
+     "encode_MBps_one_core": 200.4,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.828,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.592
+    },
+    "zlib-1 (current recorder)": {
+     "available": true,
+     "decode_MBps_one_core": 514.4,
+     "encode_MBps_one_core": 165.0,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 4.63,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.0
+    },
+    "zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 540.2,
+     "encode_MBps_one_core": 98.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 4.835,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.958
+    }
+   },
+   "depth_index_sha256": "b51ed989223a208acc03707203d08e3adad161e39e08907574f8564717278df1",
+   "frames_in_run": 4642,
+   "image": {
+    "at_or_beyond_far_clip_fraction": 0.5385,
+    "median_finite_m": 5.32,
+    "non_finite_fraction": 0.5385,
+    "pixels": 46080000
+   },
+   "raw_bytes_in_run": 5704089600,
+   "recorded_ratio_vs_raw": 4.63,
+   "sampled_frames": 150,
+   "sampled_raw_bytes": 184320000,
+   "sampled_recorded_bytes": 39806486,
+   "stored_bytes_in_run": 1322309769
+  },
+  "p8_p5r_dry_hover_timeout": {
+   "codecs": {
+    "brotli-1": {
+     "available": true,
+     "decode_MBps_one_core": 447.6,
+     "encode_MBps_one_core": 721.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 2.783,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.183
+    },
+    "brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 489.5,
+     "encode_MBps_one_core": 70.1,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 4.823,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.683
+    },
+    "hdelta+shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 214.8,
+     "encode_MBps_one_core": 116.3,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 15.581,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.211
+    },
+    "hdelta+shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 286.1,
+     "encode_MBps_one_core": 410.2,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 8.737,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.377
+    },
+    "hdelta+shuffle+lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 151.1,
+     "encode_MBps_one_core": 72.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 17.797,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.185
+    },
+    "hdelta+shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 224.8,
+     "encode_MBps_one_core": 196.7,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 11.541,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.285
+    },
+    "hdelta+shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 214.9,
+     "encode_MBps_one_core": 100.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 13.127,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.251
+    },
+    "lz4": {
+     "available": true,
+     "decode_MBps_one_core": 9931.3,
+     "encode_MBps_one_core": 3029.2,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 2.244,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.467
+    },
+    "lzma-1": {
+     "available": true,
+     "decode_MBps_one_core": 102.9,
+     "encode_MBps_one_core": 32.0,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 6.922,
+     "realtime_30hz_one_core": false,
+     "size_vs_current_recorder": 0.476
+    },
+    "shuffle+brotli-5": {
+     "available": true,
+     "decode_MBps_one_core": 231.1,
+     "encode_MBps_one_core": 134.6,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.906,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.417
+    },
+    "shuffle+lz4": {
+     "available": true,
+     "decode_MBps_one_core": 345.1,
+     "encode_MBps_one_core": 450.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 5.851,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.563
+    },
+    "shuffle+zlib-1": {
+     "available": true,
+     "decode_MBps_one_core": 252.7,
+     "encode_MBps_one_core": 171.8,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 6.398,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.515
+    },
+    "shuffle+zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 247.4,
+     "encode_MBps_one_core": 111.2,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 7.06,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.466
+    },
+    "txor+shuffle+zlib-1 (key: hdelta+shuffle+zlib-1)": {
+     "available": true,
+     "decode_MBps_one_core": 225.5,
+     "encode_MBps_one_core": 146.9,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 5.635,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.584
+    },
+    "zlib-1 (current recorder)": {
+     "available": true,
+     "decode_MBps_one_core": 453.5,
+     "encode_MBps_one_core": 136.9,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 3.293,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 1.0
+    },
+    "zlib-6": {
+     "available": true,
+     "decode_MBps_one_core": 471.9,
+     "encode_MBps_one_core": 84.5,
+     "frames": 150,
+     "lossless": true,
+     "lossless_frames": 150,
+     "ratio_vs_raw": 3.413,
+     "realtime_30hz_one_core": true,
+     "size_vs_current_recorder": 0.965
+    }
+   },
+   "depth_index_sha256": "223e5ce7ad9d9d22b040c0faec7f0ea491e15f666f609a6c93d2e9768acec719",
+   "frames_in_run": 5641,
+   "image": {
+    "at_or_beyond_far_clip_fraction": 0.3911,
+    "median_finite_m": 2.016,
+    "non_finite_fraction": 0.3911,
+    "pixels": 46080000
+   },
+   "raw_bytes_in_run": 6931660800,
+   "recorded_ratio_vs_raw": 3.293,
+   "sampled_frames": 150,
+   "sampled_raw_bytes": 184320000,
+   "sampled_recorded_bytes": 55973003,
+   "stored_bytes_in_run": 2456401808
+  }
+ },
+ "tool_sha256": "56c25b7a6aee8a8be9ef6e0e73fe613fecd2975346d30a889ee8f2a95c6a49a1"
+}

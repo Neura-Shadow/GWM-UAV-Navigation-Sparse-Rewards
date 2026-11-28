@@ -1,0 +1,1798 @@
+{
+ "code_sha256": {
+  "guard.py": "8295efb4f3654f99546f2b244afbb26e9dff93b17b49cbfb1537903278edb631",
+  "p8_v1_replay.py": "f6626ed868b3a216cb65c48ad6556237a3a508436a311137b49acd7fc6f057b7",
+  "recovery.py": "aaa22e6183cee60b48a0cbc68cc89db67a2375319012d3e1377ca2528f3da168",
+  "search.py": "61f3eafc65acbfbdebb43a6d9639c6c6655b94069ebd40d72408f3cd6a903d5c"
+ },
+ "contract": "p8-v1-replay-v1",
+ "flights": [
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "ef081f49ac64147c6b9db949f5d81242ebcf047a2c0b871a5f59b3d6e221af11",
+    "p4/decisions.jsonl": "425a8aa8014af696d4e598d09e84fbb8a985a5dd585e8db502d58de29a239696",
+    "p4/local_map.jsonl": "7acd81da6c7a1956546b4a9e9d9303b22b2d5c6c970c5d4c041296d8d0d3f419"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T130009Z-p7e-p4-p7c-4000351-94254eca",
+   "slot": 1,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "64bd628b8295ec165916ac93d39d2190c64ed1f896c0af017f4f870e52de4b3a",
+    "p4/decisions.jsonl": "cadf623245fa3e611e74475b451df18db3fdc86a256651c58c7a65e2a475873d",
+    "p4/local_map.jsonl": "197bb49a2e0e9d25a7c98dccb32b2ba2fe943d0cdd2227ba96e6393440b3c2fb"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+   "slot": 1,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "31237739ef14cf77e1aa594c1ad7c9465c23e0dc50abb99bb23f58d1e97957d4",
+    "p4/decisions.jsonl": "964ceddd6a8a2c073272da4edda2388d5ff02940e5a434531429715f6905cb24",
+    "p4/local_map.jsonl": "c5b1a864e2c6171eb6d9c09fe0e21ef691f070374e38a0f297326246a8395497"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T130618Z-p7e-p4-p7c-4000367-8fcf9efc",
+   "slot": 2,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "0746605720b4bb64c1f2091367691ef690426bb65a7d01cca2b0f0325ddfbba6",
+    "p4/decisions.jsonl": "10a7b22fd1d693cf7c6e93fd6617786c5893e8cbd4f40e9964be6cf8e29ef8bf",
+    "p4/local_map.jsonl": "d2b47b45ad7089b6856f12c57722eaa1e18e12871e9f050fa02069c7a2cb6f3f"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "slot": 2,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 99.736
+     },
+     "since": 99.736,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 2,
+        "rotation_rad": 3.1173868829901115,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 47,
+        "segments": 0,
+        "segments_found": 5,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 17.86131115047764,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1821,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.004300485001294874
+      },
+      "terminal_occupied": 14,
+      "terminal_unknown": 49,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "970a01cc63063deafbeb9904751a6f099dbda1afd617be8fd71f8ef36734f243",
+    "p4/decisions.jsonl": "311f01f0291ffe00bb46276faef9568535781d0065b476589306f945c96f2767",
+    "p4/local_map.jsonl": "480a3f6f994788deef7d09068f0d1e3ced52f800e4b9b5def511eb9a4756b104"
+   },
+   "outcome": "failure",
+   "run": "20261127T131546Z-p7e-p4-p7c-4000355-254d15cf",
+   "slot": 3,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 99.356
+     },
+     "since": 99.356,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 2,
+        "rotation_rad": 3.128379399902585,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 47,
+        "segments": 0,
+        "segments_found": 5,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 17.92429363300873,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1830,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.004079688998899655
+      },
+      "terminal_occupied": 14,
+      "terminal_unknown": 37,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "435bc42971060d3afac923f347f7fdcc7e3f66715688e73382828de448dedfd4",
+    "p4/decisions.jsonl": "2b1c17b87639751f91e14d25572aeff5c384019870461f0cc5925d2ec37558ec",
+    "p4/local_map.jsonl": "8ae110cddc776bd9a0cac050c495188a7d1023775ca8a9f20a57553e483c919c"
+   },
+   "outcome": "failure",
+   "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+   "slot": 3,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "98ab3d04de94bd4f7fa7163e25bebfed4a0e819362f4b190eee4a92705328279",
+    "p4/decisions.jsonl": "8494896fcb50245b13c251b7e4f2aa1684e16a2555f7ba8ed6db42b44bfd21c0",
+    "p4/local_map.jsonl": "195d28ad7dc9c3d4119367680b5d57e427d1177392df53bb7a19d52c65fdb295"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "slot": 4,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "e8fae5f6c503cd1f04713b4a3861f85794ecaeb9097f3bacbe9437880b485376",
+    "p4/decisions.jsonl": "2c5154fb57979af43224dc5f00dcbfa793dc6ff97f8ceaebeb10b000f5a64adf",
+    "p4/local_map.jsonl": "f10370d5644c8265c92f36446eefa4bc4febb053909d11d88d583fd75ba1a7c3"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "slot": 4,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "0764d46327026b552d01b4278dd47c2bdd53db31b9829227201b763be34ef319",
+    "p4/decisions.jsonl": "83da72aa8a1be3baa53cba4884415927535be868295289dffe745c2297fd03c7",
+    "p4/local_map.jsonl": "6b88417efcf590b9facec9e192b7c3bcf900ecb16d6049a3460513ce5dce1a9f"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "slot": 5,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "8b195901d0ba35d2c167b9d82cf3694a62ddc52722e36d694ecbec9d2dc4cab3",
+    "p4/decisions.jsonl": "21b4d5ee2c2ea7c6157c02c82630b8db5e3ad4ca6d03ccb8016c00f5da43a9f7",
+    "p4/local_map.jsonl": "5a4f37dc48bba553759135829f3f82447d84f5b4c2283dcb763789a57be893ea"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "slot": 5,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 86.184
+     },
+     "since": 86.184,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 1,
+        "rotation_rad": 2.5277872793104716,
+        "sectors": 3
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.05328631946562229,
+        "length_m": 0.9702325791620414,
+        "path_cells": 18,
+        "segments": 1,
+        "segments_found": 2,
+        "target_kind": "frontier",
+        "time_s": 5.156471016926803
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 19.639625278061505,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 17,
+       "reachable_cells": 615,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.002332397998543456
+      },
+      "terminal_occupied": 27,
+      "terminal_unknown": 656,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "bf0018adc381c53a6d050891c84b40d32c9ddda87cbc29a86609a7b53089f77d",
+    "p4/decisions.jsonl": "c95e3b63f37f9e6c6be7190a41ad13dfbed86e4de5a39c61bac0589fb3b48f17",
+    "p4/local_map.jsonl": "076a2cd446c32ca9dee29f1aba911720b0ea8e252e77183fbc84e5c89b936d0c"
+   },
+   "outcome": "failure",
+   "run": "20261127T133131Z-p7e-p4-p7c-4000396-d4b67e6c",
+   "slot": 6,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 85.424
+     },
+     "since": 85.424,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 2,
+        "rotation_rad": 3.2062118183241672,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 17,
+        "segments": 0,
+        "segments_found": 2,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 18.370240541494024,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 617,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0022728140029357746
+      },
+      "terminal_occupied": 28,
+      "terminal_unknown": 718,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "f72dfab9852e30a9a23ca09fff6e3df5b0aa18e5985218402b342c0ab887eb6e",
+    "p4/decisions.jsonl": "15dacb0e1b7d314d266c670db098a64b680d4f673142bc8d3d161c806971b589",
+    "p4/local_map.jsonl": "246c7aefe7179e2d6f68031fc9ad95d4cb5061c82e46af0d520681a2c240789a"
+   },
+   "outcome": "failure",
+   "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+   "slot": 6,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "since": 88.556,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 0,
+        "rotation_rad": 0.0,
+        "sectors": 0
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 0,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": null,
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 0,
+      "planned_time_s": 0.0,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 0,
+       "reachable_cells": 0,
+       "start_usable": false,
+       "target_kind": null,
+       "wall_s": 0.0015339099991251715
+      },
+      "terminal_occupied": 5,
+      "terminal_unknown": 697,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "e7b34508da2e1cd450932499a879dd0afb1425a9449a9757cf4c396fa9dd517c",
+    "p4/decisions.jsonl": "5e7d895ad82b17366c2d9464ef9d7c73c3b93067b9af20188b3fb292ee85e91a",
+    "p4/local_map.jsonl": "91bb1d66357a8f85520eac5469fb808e54d21ae8e65be6d3cc9eb3e08b1f6642"
+   },
+   "outcome": "failure",
+   "run": "20261127T134011Z-p7e-p4-p7c-4000381-3fafaa68",
+   "slot": 7,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "60aca749a0d350887c65f596b9a52e66206ff84eabff056a1c02547afcbd56bf",
+    "p4/decisions.jsonl": "c042ff62114e918e27707125264923f06dc34bceea56d4a56d346001c2a4269b",
+    "p4/local_map.jsonl": "af8813fa08d35f509e60c978475533e33de93c4dc8c5c4ee26ac1d1b7a0e9f27"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+   "slot": 7,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "019d7040e5ad97b7a20346af8e44ae8ae204d6d9c11a11af3f2651b5b7ca8850",
+    "p4/decisions.jsonl": "bfa51b5f6f39d53ec59bb20920ddd7185b5c7385f4a687fe7dd9d7d09f606677",
+    "p4/local_map.jsonl": "7338d26c5e29c9418429539b82142f8f1ded9c61b71ca6b5a07e202328f8f9ba"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "slot": 8,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "38badca9426ab16e8d54201b5619d5638ba656378faa8fdee977261e0ed4ad0e",
+    "p4/decisions.jsonl": "dc0ff9a6c283c86138a902bf387466ed423d2e58a60d9c58bbc12e8aec0e2da6",
+    "p4/local_map.jsonl": "1fa627f2aa129825c1a3ff6bc266127948d2af21f1f8b960bd441d1f459335da"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "slot": 8,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 96.248
+     },
+     "since": 96.248,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 2,
+        "rotation_rad": 2.7628316391976058,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 35,
+        "segments": 0,
+        "segments_found": 3,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 15.829859243123384,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 14,
+       "reachable_cells": 1516,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.003256048003095202
+      },
+      "terminal_occupied": 44,
+      "terminal_unknown": 680,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "15a14410333156f5a3504a3b82cfecd038f7de8c4f56192ae510d92125d0806b",
+    "p4/decisions.jsonl": "5bbf5128a47ce60b4349987520adb968df9924737892cc21830537fdf2c3c9cb",
+    "p4/local_map.jsonl": "5def3bba359387c8aa4bc6c6f6b0c7b25476c94b5e025fee2fc453272a3ad34e"
+   },
+   "outcome": "failure",
+   "run": "20261127T135206Z-p7e-p4-p7c-4000377-3fb83808",
+   "slot": 9,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R3",
+      "sim_s": 99.42
+     },
+     "since": 99.42,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 0,
+        "rotation_rad": 0.0,
+        "sectors": 1
+       },
+       "R3": {
+        "alignment_rotation_rad": 1.6064935634222137,
+        "length_m": 1.4275679413457034,
+        "path_cells": 39,
+        "segments": 1,
+        "segments_found": 4,
+        "target_kind": "frontier",
+        "time_s": 16.342369806631027
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 1,
+      "planned_time_s": 16.342369806631027,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 15,
+       "reachable_cells": 1652,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0036892360003548674
+      },
+      "terminal_occupied": 16,
+      "terminal_unknown": 510,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "badf25c89b1c065b8a7e46cc566f9b25a7b1849dd1cc8f2bf908f34c7042fba4",
+    "p4/decisions.jsonl": "9de0a138550d011bb415d3944ec42345181e23cd668064e028f8bf8c027bb80d",
+    "p4/local_map.jsonl": "73bbc759c7f43893db2e8d70dd3bea680289038bdc7ce26f3d77fe3bca70a806"
+   },
+   "outcome": "failure",
+   "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+   "slot": 9,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "fbf9475bb67f12c0460322b70e941b00374b646ba540340168e1c813af3cf831",
+    "p4/decisions.jsonl": "4fc33a3082490c28b79417925b47dc3ce879f89ce289525ef6d04447d0aadd06",
+    "p4/local_map.jsonl": "bd39d3843d7a276ffb16e70c020e45d4b8826fa38c8368a75bf4a1a2c9bd435e"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "slot": 10,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "202f7c0145cdc2f92da96946402d5ee6404c290da0b89dc21a6705004baceed5",
+    "p4/decisions.jsonl": "5a3b3ce75a1cc9108728e6b4f6c6e5df3c59d02356de37a2cb8cb2c65178a5d6",
+    "p4/local_map.jsonl": "8b945e8176183247ac5a82eddcbd8f2ae3d7bd425cd10bd41d7c42a606ca68b5"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+   "slot": 10,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "add02ae2686ffe13319b9a8313fbaf2d165cece039bc38832b07e1e88f81eb29",
+    "p4/decisions.jsonl": "c681575df143496e3540da196ca98ebae0d73efa94555bd8cf5b1be64f1df346",
+    "p4/local_map.jsonl": "560d87dc759798f693ec43307e7abea159f00eb78fff2c41c104810b4812c80d"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "slot": 11,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "b4b74a94751e740fbdd6af8208385247002987d0f6a852eba16c441e9141bb41",
+    "p4/decisions.jsonl": "337acf001284ec329d0adbd8648c6ade604fb27b53cd14f7418c54ea4d172983",
+    "p4/local_map.jsonl": "4a1c152d916e9a45f01f9c028abb98c706d4803d3a800e8be79aa94951bd6671"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "slot": 11,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 107.024
+     },
+     "since": 107.024,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 1,
+        "rotation_rad": 2.189152064848124,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 1.4008122119362958,
+        "path_cells": 29,
+        "segments": 1,
+        "segments_found": 2,
+        "target_kind": "frontier",
+        "time_s": 7.0040610596814785
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 19.54697846249618,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 17,
+       "reachable_cells": 826,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.002385602998401737
+      },
+      "terminal_occupied": 41,
+      "terminal_unknown": 556,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "af0e499fbbe98b0738d2ac080d151014e72737c358d8404c35c82afc81cbfad6",
+    "p4/decisions.jsonl": "1cd886293ab460d64099fc458fe6d22f7b730d804a53cd29d187299f0e8992d7",
+    "p4/local_map.jsonl": "29f736654e13d44f64417c55cd8145e6bb501ad40932dd69d491f5c54ce3b5e1"
+   },
+   "outcome": "failure",
+   "run": "20261127T142154Z-p7e-p4-p7c-4000375-73a8b562",
+   "slot": 12,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0519999999999925,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 168.536
+     },
+     "since": 168.484,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 1,
+        "rotation_rad": 2.3252027810366243,
+        "sectors": 3
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 1.234447725528399,
+        "path_cells": 29,
+        "segments": 1,
+        "segments_found": 3,
+        "target_kind": "frontier",
+        "time_s": 6.1722386276419945
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 19.494669214190022,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 17,
+       "reachable_cells": 834,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0034018490005109925
+      },
+      "terminal_occupied": 36,
+      "terminal_unknown": 467,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [
+    {
+     "event": "start",
+     "sim_s": 138.784
+    },
+    {
+     "event": "end",
+     "sim_s": 158.784
+    }
+   ],
+   "inputs_sha256": {
+    "controller-result.json": "940d81efcfa7e94815e32ca6c2bb9b8acef4790b5eb685e49a1502887c134815",
+    "p4/decisions.jsonl": "060b2cab614e923f46539f1d9d49019f1870ae9ca74420f9b0e8cd81b11d6a0b",
+    "p4/local_map.jsonl": "1ae4877e07a3a7cdd930f5e14d6e3bbda86a9cc83b1f9c78e98871f1d23028e2"
+   },
+   "outcome": "failure",
+   "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+   "slot": 12,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "f2e1cd1426fb31b5ea4b790bcf87dfa48da51b65b184adc33cdfbaeddfa15379",
+    "p4/decisions.jsonl": "056424d3c72710a47da293bfaf8cd1da67d39d26c9d9d0350c48b1fa8b209dd4",
+    "p4/local_map.jsonl": "a7d767cd32ca83395f049714e707331bf53b262d8f1bf11ac168fd789423779f"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "slot": 13,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "2aa5d7158ca754ee17796aadb6644c019e5ed966c254a1e79fe738ff7e27f40b",
+    "p4/decisions.jsonl": "f7f25ef9292969e98cc75bb4fb59a1e066ab74536da4f4f88ca919aff4ff317f",
+    "p4/local_map.jsonl": "256fa81eba527a01c888fbc2a9eaa92434685269cc1128d245e2fdf5a5e605da"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "slot": 13,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R3",
+      "sim_s": 87.656
+     },
+     "since": 87.656,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 0,
+        "rotation_rad": 0.0,
+        "sectors": 3
+       },
+       "R3": {
+        "alignment_rotation_rad": 1.9205164293268098,
+        "length_m": 1.4551676541619742,
+        "path_cells": 24,
+        "segments": 1,
+        "segments_found": 3,
+        "target_kind": "frontier",
+        "time_s": 18.279586859405974
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 1,
+      "planned_time_s": 18.279586859405974,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1016,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0031958020008460153
+      },
+      "terminal_occupied": 3,
+      "terminal_unknown": 462,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "6d8e3d1a22a264b954513ec4ee735fcd97b7a474cfec51399564d1f912ceb6c6",
+    "p4/decisions.jsonl": "6719f817fb0d89a94e220f32bfb06bdbf0b5b7c8d551ab8f75b5e5faed8297db",
+    "p4/local_map.jsonl": "0e80bab8ce97027a4fca67beea0322c2bcac2400ddca9e125011c2a15fd1c7af"
+   },
+   "outcome": "failure",
+   "run": "20261127T143132Z-p7e-p4-p7c-4000379-c9bb5e81",
+   "slot": 14,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R3",
+      "sim_s": 87.716
+     },
+     "since": 87.716,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 0,
+        "rotation_rad": 0.0,
+        "sectors": 3
+       },
+       "R3": {
+        "alignment_rotation_rad": 1.9208637473854675,
+        "length_m": 1.4661531253886142,
+        "path_cells": 24,
+        "segments": 1,
+        "segments_found": 3,
+        "target_kind": "frontier",
+        "time_s": 18.336504201430152
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 1,
+      "planned_time_s": 18.336504201430152,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1012,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0028262759988137987
+      },
+      "terminal_occupied": 3,
+      "terminal_unknown": 454,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "ec7469cf0601983aa4ef4a22f54b5fb74fa4f62da8743fa086bf8b5602df444a",
+    "p4/decisions.jsonl": "ea9c709fd6a565010e48d0be521d7b39cc21aabbfe9f187d3ecceb2fba753196",
+    "p4/local_map.jsonl": "945a3d7c8eff9a8ff3c848785cbc701f9979d8357c45bc9409e846a7eb7b9204"
+   },
+   "outcome": "failure",
+   "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+   "slot": 14,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.5480000000000018,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 124.76
+     },
+     "since": 124.212,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 6,
+        "rotation_rad": 1.812948360330167,
+        "sectors": 6
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 79,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 6,
+      "planned_time_s": 10.387428952208138,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1439,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0032385790000262205
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 15,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "699248b9638bf2df66d8286659d6095eaeecf3fd3c67c9a7e34fd96bdb0cb9d1",
+    "p4/decisions.jsonl": "5dfc5a29b26cf2d5f30f6aedfba388d6b8537b89f893d1ea50fe6148fb321ef6",
+    "p4/local_map.jsonl": "fc80593d1645702c08ae76d4519622c51fca9cd82b06e0cb2d99d8e457d1c7a1"
+   },
+   "outcome": "failure",
+   "run": "20261127T143713Z-p7e-p4-p7c-4000385-51fb0e2b",
+   "slot": 15,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "e1bfc0c9c22064cfccfa82103e761fc7a83ca45602c1fa0d214169e3876d136e",
+    "p4/decisions.jsonl": "2bd2a2d94400a3f2e30ca8ae8ea44f8d52d8bc96feadc6b8f2f8014905867ecb",
+    "p4/local_map.jsonl": "fd5c6155fd3b1f295d4b67c301f7e853b9ac439884f1af467bb176a28ae04aa4"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+   "slot": 15,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.5480000000000018,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 120.932
+     },
+     "since": 120.384,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 2,
+        "rotation_rad": 1.4054212010797569,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 0,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": null,
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 8.05247032600771,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 0,
+       "reachable_cells": 0,
+       "start_usable": false,
+       "target_kind": null,
+       "wall_s": 0.0015817749990674201
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 9,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "d5f7cab2273b334b4b88a8e7c84587eadcb0bba098e9ba0017b37947100e7792",
+    "p4/decisions.jsonl": "2aa8fa35257fed38f17f99571d3dc8a3fa073f458f662dc5bea4958e5018bc15",
+    "p4/local_map.jsonl": "3b3b27ab5719daedd8b84b9d80a24d0d2451ad8c276a741962c64def168a0d21"
+   },
+   "outcome": "failure",
+   "run": "20261127T144355Z-p7e-p4-p7c-4000363-acb42a3c",
+   "slot": 16,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.0,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R2",
+      "sim_s": 99.84
+     },
+     "since": 99.84,
+     "start": {
+      "phases": {
+       "R2": {
+        "planned": 2,
+        "rotation_rad": 3.1227382903241114,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 44,
+        "segments": 0,
+        "segments_found": 4,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 17.891972455946995,
+      "r1_applies": false,
+      "search": {
+       "frontier_cells": 15,
+       "reachable_cells": 1555,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.0034606059998623095
+      },
+      "terminal_occupied": 56,
+      "terminal_unknown": 223,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "ebca67c1e38799bbe9c2559f0c3c7532a3d7bb4d661fd63c0d8d122763afcc23",
+    "p4/decisions.jsonl": "c3d26e49e85c7ac842465184b2d0e3dc86a62effc347df8dfecc7a91b68ed6d4",
+    "p4/local_map.jsonl": "e1a047a6fc18af9b05014f1f1635ced8e4d4cc90ba6cc0a6e4242951430eaff6"
+   },
+   "outcome": "failure",
+   "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+   "slot": 16,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "e8f79a682873cea04008928ee4ed49312c8ced5df9bbbd79625685b6a7e37af1",
+    "p4/decisions.jsonl": "21cba1b13a0a356b98a4fbf3f0d8e4e18af18eaf4d95f76fd431fcd9c7771d72",
+    "p4/local_map.jsonl": "282751e8524cc6c9a84fdf0f0be3f219cebf5ef20997b3fe03be1e05c8a85f1b"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "slot": 17,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "aff08323587c54aeee212e75d0dff0ce1c5696e7a61a4f8a8b1ab38273ed535e",
+    "p4/decisions.jsonl": "83b0c5d1a8bdd7374e341092993a04b16bd2c5886b360f3203e7cb068e18d55b",
+    "p4/local_map.jsonl": "db2f835c03849b10b35d7fcbe4cde75f5afbfbd62c6fba699cebe2a1e7e09860"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "slot": 17,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.5999999999999943,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 116.604
+     },
+     "since": 116.004,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 5,
+        "rotation_rad": 1.8392896658588636,
+        "sectors": 5
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 0,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": null,
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 5,
+      "planned_time_s": 10.53835351557403,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 0,
+       "reachable_cells": 0,
+       "start_usable": false,
+       "target_kind": null,
+       "wall_s": 0.0015335299976868555
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 31,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "a4e8dc6eaac8095d3a3ef887e64086afaf793b7ca52b2de36fe1b6031e1b15d3",
+    "p4/decisions.jsonl": "ee1f4e742925615d7465a7e04858c55f462a8888e55d7fc57ad1ff82d718be22",
+    "p4/local_map.jsonl": "2f34b3d2fdae1500815d3a2834892c7505099b37f5c8792289732a5f70e6d8ad"
+   },
+   "outcome": "failure",
+   "run": "20261127T145643Z-p7e-p4-p7c-4000360-10b0b237",
+   "slot": 18,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.5,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 116.604
+     },
+     "since": 116.104,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 2,
+        "rotation_rad": 1.5204843443092777,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 0,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": null,
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 8.711733574463793,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 0,
+       "reachable_cells": 0,
+       "start_usable": false,
+       "target_kind": null,
+       "wall_s": 0.0016011640000215266
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 5,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "d4adef77d5174cac4fec21c9b170e0230439c61a95a42213592fbb5455c9571c",
+    "p4/decisions.jsonl": "c9e1fa9e8027838ed9e1a05ac683ee680d1a1d3e9373ff48d458929463a86266",
+    "p4/local_map.jsonl": "d53506685e43a30130baa060680505a899bcf803d8650c6eff23cbd808c9033e"
+   },
+   "outcome": "failure",
+   "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+   "slot": 18,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "2ac30f764a36478d35127b8b42a3bcb8e01d1743fb6bb88faf612aa41169bc38",
+    "p4/decisions.jsonl": "9f3ea81f8ae5f5499f72d089eae15299eea9bf8d7f0907fef33dae6e4bdc5f40",
+    "p4/local_map.jsonl": "e471c072464baacf4d277d98627ada9fba8e2b530f20e7c0ba6c0bc082b0970e"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T150640Z-p7e-p4-p7c-4000382-ca6304df",
+   "slot": 19,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "0f6beb416ccaec88de56b18c772aebda53c9600b916c79b3c938eeb475b9481d",
+    "p4/decisions.jsonl": "1ea8c66c9ecc386cebfd6e63dd2ac3d5f8e10a697d6c3044d26ff8642ed48e86",
+    "p4/local_map.jsonl": "6ee9009761fd9e55b934654d8ad1c02b350ba958a615789b74ae84c4a3ac6fe4"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+   "slot": 19,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "6db8630fd13d7315f935ce947e5e1bbdac349b1f726a57eafb1c72537a2e6ceb",
+    "p4/decisions.jsonl": "7030e34103eb5c0cea7eb22bca14c28aad941fd7004454ba9eb742f13e73ef00",
+    "p4/local_map.jsonl": "e078e6f21fcccfee0456c1ab535b2d30163e1ef8db6d6fd5d5c9a9df56b0917d"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "slot": 20,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "511929a854affa3a8da343f419c62d7dae41c678f9a7772ba1bc6b6043b8a3e2",
+    "p4/decisions.jsonl": "06b7d14367320c0d90ebcf15a13178b259282821cef53a0593eb2ccb58dd3b75",
+    "p4/local_map.jsonl": "b3a679ed6fb5a12983b219b272904bb8a175896f290bba85cade22a2b29520ba"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "slot": 20,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "4bc487289546512abe130b8dd697959f9e257594948ccfaebe1c39100acaa1e1",
+    "p4/decisions.jsonl": "11ba413abebd6d9a26618aa403e4617a1f19ae265c508b8f624e86bd65d7ecd8",
+    "p4/local_map.jsonl": "514a3ea9a859e66bc00af16ec9b9df117ff89c425a8cc5edbb7f5ca4bfb95f02"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "slot": 21,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "6b02c2a2cb210d92c6d2be70fe58fad020a6ac456cd6a61a31dac5c2eeea0a6e",
+    "p4/decisions.jsonl": "70a1b3268e8b93022a774bc9e7561900392e962723b536b7974db7ccd13c10e2",
+    "p4/local_map.jsonl": "03a1456bba2e010ebf024a8201c98c4c3f432136803428cfb2722df8ba8e4079"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "slot": 21,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "df787cd534fb7d856e62d39450a32a63a1f82f9e7a819393ac0287e16ec20f5d",
+    "p4/decisions.jsonl": "9030e670e89043fc30d5d86fecba9368aa5c02188445e17e93b49ad4b79efe04",
+    "p4/local_map.jsonl": "90691bdd60084838532d303c1991e86413d172edb0b82b1a551d4f7715ca1136"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "slot": 22,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "7d44761afbb60e7b6b4ebb7bfc020d203ede1833a228c112bb9d6ca192b34241",
+    "p4/decisions.jsonl": "ecf4ab8862da106f08870ec4e4b15f2ad1f56a10902ced0cd1d9eff902634d57",
+    "p4/local_map.jsonl": "32dc1d265910f30676af2e31512168d7f13f9ac8b60f6a9fb3aa8a53c887cddf"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "slot": 22,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.5520000000000067,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 121.756
+     },
+     "since": 121.204,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 2,
+        "rotation_rad": 1.3231943869320788,
+        "sectors": 2
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 79,
+        "segments": 0,
+        "segments_found": 9,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 2,
+      "planned_time_s": 7.581345384660852,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 16,
+       "reachable_cells": 1589,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.003277682000771165
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 5,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "54e843a4dae36442b8b93c59b339262243f3193920b85c10b6d9fce57b4c5206",
+    "p4/decisions.jsonl": "09d02563e8d40e29d743e5372d7d99590a839d5be73820294c106a8229a001c0",
+    "p4/local_map.jsonl": "47114d2868ca028c558625cb2b265301b447c31d2508d45961b256bc4d29c0a6"
+   },
+   "outcome": "failure",
+   "run": "20261127T153305Z-p7e-p4-p7c-4000366-92cc2bfa",
+   "slot": 23,
+   "triggered": true
+  },
+  {
+   "controller": "p5",
+   "episodes": [
+    {
+     "first": {
+      "action": "YAW_TO",
+      "after_hover_entry_s": 0.6000000000000085,
+      "check": {
+       "function": "planner.yaw_permitted",
+       "result": [
+        true,
+        null
+       ]
+      },
+      "kind": "action",
+      "phase": "R1",
+      "sim_s": 118.168
+     },
+     "since": 117.568,
+     "start": {
+      "phases": {
+       "R1": {
+        "planned": 6,
+        "rotation_rad": 2.0025332878535624,
+        "sectors": 6
+       },
+       "R3": {
+        "alignment_rotation_rad": 0.0,
+        "length_m": 0.0,
+        "path_cells": 80,
+        "segments": 0,
+        "segments_found": 0,
+        "target_kind": "frontier",
+        "time_s": 0.0
+       }
+      },
+      "plan_fits_window": true,
+      "planned_actions": 6,
+      "planned_time_s": 11.473670572846553,
+      "r1_applies": true,
+      "search": {
+       "frontier_cells": 17,
+       "reachable_cells": 1638,
+       "start_usable": true,
+       "target_kind": "frontier",
+       "wall_s": 0.003519425001286436
+      },
+      "terminal_occupied": 0,
+      "terminal_unknown": 29,
+      "window_left_s": 20.0
+     }
+    }
+   ],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "25ae0a1fee7566689de052edb474919ecbd3ad9c78f8a76d7bbfddeb290db992",
+    "p4/decisions.jsonl": "90e8c6e58bd1f08c191f95ce19aefd05201192f792829ace4cb5aa67a6f2884d",
+    "p4/local_map.jsonl": "a57806c1b46af887a633002e898b9f8a170d628c4e367ae50fc6978c90f83ae5"
+   },
+   "outcome": "failure",
+   "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+   "slot": 23,
+   "triggered": true
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "4565ea2c424719f4da44419e3b724d2c83e301fe064f5cb1422174aa16afbce6",
+    "p4/decisions.jsonl": "46dd04f7b6d22efc327127441cdd0231e1e4f4662d9b9001d90ee6e18868d16f",
+    "p4/local_map.jsonl": "8f14c5cf1f75a22caa4676b13da7d4747e5ca60b7cb0e084b1cc727ff10fbc7e"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "slot": 24,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "f2926b16c7c5f7fa0a56d06b1319f7ba30e35535f01c6d7ff82cb5b219f7c35d",
+    "p4/decisions.jsonl": "c75eb4251397f1aeee247fa6cc25f950e76fc3684856016a14f39135c036e51e",
+    "p4/local_map.jsonl": "8ee2f1b58394548e9b91476b32d3584e83b7effa3f55cdb4f231e7b9c28657d0"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "slot": 24,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "749655db78edfd640648ca956172423a3b0bd35ff48ddb2522670dbaccbee733",
+    "p4/decisions.jsonl": "60ee0bb038607e4dd08945c4770f217165ca8f3e75aec5e326faf5e3344dd412",
+    "p4/local_map.jsonl": "7b627de99d87e5f85efe3bd6ca716d46a2ec438644176d47cea4226efb2c033a"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "slot": 25,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "34745f13a3d0aa8eb44721936117a019b32d488442a73f5b23f702c92623e72b",
+    "p4/decisions.jsonl": "cc79b6add5c1a18a0f9e0cb16bebfc98e64dd20a74827b62e99450c2b07d95e6",
+    "p4/local_map.jsonl": "d6b866c188686a703cbc0833abb36d778df5b6afc56a0d30443326ffb3fdb7fd"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "slot": 25,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "ec3ddf81f7162e958e00e2e2fa836420b864596dd0cdaefab8209c92217b39a5",
+    "p4/decisions.jsonl": "6115e5b583bcdabd7bccf923ce11d12b409dfd59c4bd4b1568135d86546992cb",
+    "p4/local_map.jsonl": "27b34c3959f59426cd0c199c3def811da227e9063dfa1a4d3fef3fd0a0ca2d29"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "slot": 26,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "5313fa2edee7ccbb55873cbd69faf9389c05de0b705040bdc1131989ed195117",
+    "p4/decisions.jsonl": "5ca2be7a59fc1e33943eeb034cdd90bdd70e7bef38db94a5ca3abd60f3f8320d",
+    "p4/local_map.jsonl": "f5cfd52b11e7545c088b56b9b3720c822c3229b4ae9c12b45f8325855bc2d737"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "slot": 26,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "af8581835389826d3786614a0a820cfe652423e9b633e2dd02cf6a25ed4360a3",
+    "p4/decisions.jsonl": "b9037ffd1e4afffab1355206d58bcd337f9111733a8e4da2e98f2b503c042766",
+    "p4/local_map.jsonl": "7724a7b995c6bf525ff9d00e6786c36592d70cabc7c2069474fddbb556ec04fd"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T155834Z-p7e-p4-p7c-4000352-8ae0dc7d",
+   "slot": 27,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "cb153010cf6137564eb1fd7719ba2c0c9a03d191387718b26d4fd730d83a4f70",
+    "p4/decisions.jsonl": "3c182d029d65a945debf088793ecefc51dffe6dd5949074b6bace04e74b5e066",
+    "p4/local_map.jsonl": "cb3a36e469a75ac739546748dd095d7d1e323e4bfec3f783036b33ebf6905bd9"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "slot": 27,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "998d717da3cd96a7ca6cc2a09f3c4a14c06f7555b4e9367ca0a67af550678fbd",
+    "p4/decisions.jsonl": "91bf26aeb954a071469a3a1f9b55c033fdde677f9d99c54c5424a9c4add48e9e",
+    "p4/local_map.jsonl": "a0bd0dae3da3adc3f65d7c41ed32d8036e8dcb4b1771b1d0fc66874055523fd3"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f",
+   "slot": 28,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "f0903907dac12a4388f96be9da2cfe8169b1e06284ef23c465a6868203eab6da",
+    "p4/decisions.jsonl": "d5a57e12f27492f35876190254f39868331a9c13de9ea87fcb73dee437cd82d6",
+    "p4/local_map.jsonl": "487046aebfaeeb149a26027059a8c35c9fb331c3a715371e1cbac720da1b0d49"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+   "slot": 28,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "d27ace635a7529288ad02423ab701d5aedc77aeb93d166169741ef385c745c10",
+    "p4/decisions.jsonl": "030ee3b1ab14a9318ac2d40b811519f43e1209df174fd2cdbcfa9682757962a0",
+    "p4/local_map.jsonl": "45741a52af5f649390da6bb4774bed50c9105a97cea5481f73fed892f83e1a94"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "slot": 29,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "5f4819b5097ca0fed2193dfea6125273eac59a587996ebeab18cb276a6aaf464",
+    "p4/decisions.jsonl": "32ca638d7ace9edfd909e90f0493e4f2a879a8bbcdba06d1aa62e884be5da51e",
+    "p4/local_map.jsonl": "f7615ff2973d0a74daae329e005c54fc3c0a93aac51fe37c40dd8aa7fdadcc6b"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "slot": 29,
+   "triggered": false
+  },
+  {
+   "controller": "p4",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "34330d4afbe9eb8ab2a67212733c59a4455d11ea9feedd8252a07e729917c1e5",
+    "p4/decisions.jsonl": "16824d4c6c638ed61c48080d6d4f389ca568159c51864b96ab99507f8f9acb88",
+    "p4/local_map.jsonl": "6b743f5b72734e95b558236b67b2ad1f6fc7da69f0afcb0b4196f3bc4a9241b8"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "slot": 30,
+   "triggered": false
+  },
+  {
+   "controller": "p5",
+   "episodes": [],
+   "guard_events": [],
+   "inputs_sha256": {
+    "controller-result.json": "f7b3eabec57a4c887fad8c8cf4810a3a5ccb65f0bfd17ccac076f04fc9f5fc40",
+    "p4/decisions.jsonl": "9111dd3325f17b8e28604d4a5198b146afbc57872a3754226f7b2f966e4e2957",
+    "p4/local_map.jsonl": "3634e2e42287ad6e34986123d97ff47dc1e4bd39f00bcdcb4b6917cfaefa8f0f"
+   },
+   "outcome": "goal_success",
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "slot": 30,
+   "triggered": false
+  }
+ ],
+ "open_loop_limits": "the recorded vehicle does not follow recovery: only triggers, plans, first actions and the guard are judged; closed-loop effects are V3-V5",
+ "p7e_manifest_sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+ "read_only": true,
+ "recovery_params_canonical_sha256": "dee90d51098210daf714fe0b875b0e98040195362095800dc48836f78371333b",
+ "summary": {
+  "criteria": {
+   "every_first_action_passes_its_frozen_check": true,
+   "every_plan_fits_the_window": true,
+   "guard_fires_only_on_slot_12": true,
+   "no_trigger_in_a_success": true,
+   "triggers_exactly_in_the_failures": true
+  },
+  "episodes": 18,
+  "episodes_with_a_plan": 17,
+  "episodes_without_a_plan": 1,
+  "failures": 18,
+  "first_action_phases": {
+   "R1": 6,
+   "R2": 8,
+   "R3": 3
+  },
+  "first_actions": 17,
+  "first_actions_refused": 0,
+  "flights": 60,
+  "guard_slots": [
+   12
+  ],
+  "passed": true,
+  "planned_time_s": [
+   0.0,
+   7.58,
+   8.05,
+   8.71,
+   10.39,
+   10.54,
+   11.47,
+   15.83,
+   16.34,
+   17.86,
+   17.89,
+   17.92,
+   18.28,
+   18.34,
+   18.37,
+   19.49,
+   19.55,
+   19.64
+  ],
+  "r1_episodes": 6,
+  "search_wall_s_max": 0.004300485001294874,
+  "triggered": 18
+ }
+}

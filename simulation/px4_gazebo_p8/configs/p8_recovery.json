@@ -1,0 +1,378 @@
+{
+  "contract": "p8-recovery-parameters-v1",
+  "dead_end_memory": {
+    "radius_m": 0.39,
+    "rule": "cells within the radius of every position where a no_progress_candidate HOVER began",
+    "source": "p4_avoidance envelope.r_body_m"
+  },
+  "episode": {
+    "attempts": 1,
+    "attempts_rule": "one R1 -> R2 -> R3 pass per HOVER episode (contract S8)",
+    "max_rotation_deg": 200.0,
+    "max_translation_m": 4.0,
+    "speed_m_s": 0.2,
+    "speed_source": "p4_avoidance mission.transit_speed_m_s (unchanged)",
+    "time_rule": "rotation time plus translation time never exceeds the remaining hover window; the frozen hover_timeout and transit_deadline bound everything",
+    "window_s": 20.0,
+    "window_source": "p4_avoidance supervisor.hover_timeout_sim_s (unchanged)",
+    "yaw_rate_deg_s": 10.0,
+    "yaw_rate_source": "p2_control yaw_ramp_deg_s (unchanged)"
+  },
+  "governed_by": "p8-navigation-recovery-v1 \u00a73, \u00a74",
+  "r1": {
+    "blockers": "UNKNOWN cells only; no OCCUPIED cell within r_infl of the terminal segment",
+    "evidence": "the F1 final HOVERs were 0.15-0.48 m from the goal (cde7fa52\u2026)",
+    "goal_radius_m": 0.8,
+    "order": "nearest blocking sector first; each once",
+    "rule": "goal_tolerance_m (0.30, unchanged) + 0.5 m (contract \u00a74)",
+    "sector_step_deg": 10.0
+  },
+  "r2": {
+    "order": "ascending goal distance of the sector's nearest frontier cell; each once",
+    "scope": "frontier sectors outside the +/-60 degree cone",
+    "sector_step_deg": 10.0
+  },
+  "r3": {
+    "c_space": "every cell within r_infl_m (1.00, unchanged) FREE or traversed, inside the fence margin",
+    "check": "frozen planner.collision_check at the tick each segment starts; a failure means HOLD (FC-4)",
+    "segment_max_m": 1.5,
+    "segment_source": "p4_avoidance planner.lengths_m maximum",
+    "target": "the goal if reachable, else the reachable frontier cell with the least goal distance, outside dead-end memory"
+  },
+  "r4": {
+    "derivation": "one more than the largest yaw_to_l4 count in any window of any P5 goal success (contract \u00a74: it never triggers on the recorded successes)",
+    "evidence": {
+      "largest_success_any_window": 224,
+      "largest_success_no_progress_window": 0,
+      "p5_flights": [
+        {
+          "decisions_sha256": "cadf623245fa3e611e74475b451df18db3fdc86a256651c58c7a65e2a475873d",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "730c813f082f47945f8cc93047622e434b1665f35c3385e4edbb628ca6b26978",
+          "run": "20261127T130315Z-p7e-p5-p7c-4000351-bda9f5db",
+          "slot": 1,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "10a7b22fd1d693cf7c6e93fd6617786c5893e8cbd4f40e9964be6cf8e29ef8bf",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "ecb4e3abbded50deb2d9f40be772a195d7fa7d34e28b73574448967ce622aff6",
+          "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+          "slot": 2,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "2b1c17b87639751f91e14d25572aeff5c384019870461f0cc5925d2ec37558ec",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "54ece607ea17a642a064e1e5393f5c256a2e7a78e0daf267d6063c838142d3b5",
+          "run": "20261127T131239Z-p7e-p5-p7c-4000355-bdfaa278",
+          "slot": 3,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "2c5154fb57979af43224dc5f00dcbfa793dc6ff97f8ceaebeb10b000f5a64adf",
+          "max_any_window": 1,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "cedf902c80be70468d65687f9025c21379337702c957a79c13be9dc287906ff0",
+          "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+          "slot": 4,
+          "yaw_to_l4": 1
+        },
+        {
+          "decisions_sha256": "21b4d5ee2c2ea7c6157c02c82630b8db5e3ad4ca6d03ccb8016c00f5da43a9f7",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "7541d10a122bb5782048dac21fb35b81112b20ed829052eda64e0fc606bf6399",
+          "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+          "slot": 5,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "15dacb0e1b7d314d266c670db098a64b680d4f673142bc8d3d161c806971b589",
+          "max_any_window": 11,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "401cb1fbce58cd6a2a2d0f04a7e88b52d3099a1784cf151f292b3f59501e2478",
+          "run": "20261127T133417Z-p7e-p5-p7c-4000396-1cb357c1",
+          "slot": 6,
+          "yaw_to_l4": 11
+        },
+        {
+          "decisions_sha256": "c042ff62114e918e27707125264923f06dc34bceea56d4a56d346001c2a4269b",
+          "max_any_window": 14,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "37dcb3c17a508ec229d29c44b70b53b492a567f0a00f63e7150bf1d0ba5e6501",
+          "run": "20261127T133704Z-p7e-p5-p7c-4000381-4e9454e8",
+          "slot": 7,
+          "yaw_to_l4": 14
+        },
+        {
+          "decisions_sha256": "dc0ff9a6c283c86138a902bf387466ed423d2e58a60d9c58bbc12e8aec0e2da6",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "ea0248938d5b7dd7f9b9a1c70bdf6de0de0b2634b93226d649c4cd4f1c977dbe",
+          "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+          "slot": 8,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "9de0a138550d011bb415d3944ec42345181e23cd668064e028f8bf8c027bb80d",
+          "max_any_window": 20,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "00a166a46aeccd61ed2249f24fa62fc2407bcce2a4a0e46e4e39637dc08cc002",
+          "run": "20261127T134904Z-p7e-p5-p7c-4000377-41904daf",
+          "slot": 9,
+          "yaw_to_l4": 20
+        },
+        {
+          "decisions_sha256": "5a3b3ce75a1cc9108728e6b4f6c6e5df3c59d02356de37a2cb8cb2c65178a5d6",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "850d1fbbe97690cac0bdf5a93720675852f26e96e10acc24fa0d77dd19fde161",
+          "run": "20261127T135824Z-p7e-p5-p7c-4000349-581f55cf",
+          "slot": 10,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "337acf001284ec329d0adbd8648c6ade604fb27b53cd14f7418c54ea4d172983",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "37ec963f3f2f08a934379afca656e528a9d203fe79293ca6afe0809e5944e9c6",
+          "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+          "slot": 11,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "060b2cab614e923f46539f1d9d49019f1870ae9ca74420f9b0e8cd81b11d6a0b",
+          "max_any_window": 398,
+          "max_no_progress_window": 398,
+          "outcome": "failure",
+          "policy_ledger_sha256": "2b49f550f788cbdabc88eccb0572e3408161062d09502ce1cc6a275e0cc431b9",
+          "run": "20261127T141729Z-p7e-p5-p7c-4000375-86eb97b9",
+          "slot": 12,
+          "yaw_to_l4": 1542
+        },
+        {
+          "decisions_sha256": "f7f25ef9292969e98cc75bb4fb59a1e066ab74536da4f4f88ca919aff4ff317f",
+          "max_any_window": 224,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "a5dcc57fc104bfe32ad4431ca85bd44129f73dac3f28626f17d0948310d4d25e",
+          "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+          "slot": 13,
+          "yaw_to_l4": 224
+        },
+        {
+          "decisions_sha256": "ea9c709fd6a565010e48d0be521d7b39cc21aabbfe9f187d3ecceb2fba753196",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "314657e353842d156823576e618cb0e0f1ed8e93d0a1fd5f43e9b0fd3190bf48",
+          "run": "20261127T143421Z-p7e-p5-p7c-4000379-75ed4ffa",
+          "slot": 14,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "2bd2a2d94400a3f2e30ca8ae8ea44f8d52d8bc96feadc6b8f2f8014905867ecb",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "d5fc9f4e977ca8c5bc40ed9e7e98f40319b36469482df3c9f60fb76e880db0fa",
+          "run": "20261127T144043Z-p7e-p5-p7c-4000385-64889843",
+          "slot": 15,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "c3d26e49e85c7ac842465184b2d0e3dc86a62effc347df8dfecc7a91b68ed6d4",
+          "max_any_window": 20,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "23a8c2c31c5a3444a0591a21dffdf0e6ab4650e021943136c3eeeaeed56a96f8",
+          "run": "20261127T144723Z-p7e-p5-p7c-4000363-15006e59",
+          "slot": 16,
+          "yaw_to_l4": 20
+        },
+        {
+          "decisions_sha256": "83b0c5d1a8bdd7374e341092993a04b16bd2c5886b360f3203e7cb068e18d55b",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "6189068bdefe2eefd18870f9e9fb072ef9e828d0a65b21324afcc391bcdd49f4",
+          "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+          "slot": 17,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "c9e1fa9e8027838ed9e1a05ac683ee680d1a1d3e9373ff48d458929463a86266",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "5206909d985c356946bd638213df35aa3ed3a7d258b86779fecf72ee8c35994a",
+          "run": "20261127T150007Z-p7e-p5-p7c-4000360-e42ee413",
+          "slot": 18,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "1ea8c66c9ecc386cebfd6e63dd2ac3d5f8e10a697d6c3044d26ff8642ed48e86",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "33343f6c226eb709e502099e65c4deb574a605395eaacda5094451218423402e",
+          "run": "20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e",
+          "slot": 19,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "06b7d14367320c0d90ebcf15a13178b259282821cef53a0593eb2ccb58dd3b75",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "27d48575268c15e249efe786e0870afe753efd323091d51b1f69e5fc3f0d13bf",
+          "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+          "slot": 20,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "70a1b3268e8b93022a774bc9e7561900392e962723b536b7974db7ccd13c10e2",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "0bb5ece7988909c1b81ff4f4763b91602dca91cdfb2d42d07d7358ea44d3a325",
+          "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+          "slot": 21,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "ecf4ab8862da106f08870ec4e4b15f2ad1f56a10902ced0cd1d9eff902634d57",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "5fe156a5c6f766833de541e93659ae21ac5b3768f86475417ecee443347d4eea",
+          "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+          "slot": 22,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "90e8c6e58bd1f08c191f95ce19aefd05201192f792829ace4cb5aa67a6f2884d",
+          "max_any_window": 1,
+          "max_no_progress_window": 0,
+          "outcome": "failure",
+          "policy_ledger_sha256": "ecf22e53147e41b2b247aea0aff6c3164ba2a347f2f6004fca3281647207497b",
+          "run": "20261127T153628Z-p7e-p5-p7c-4000366-0a5df47d",
+          "slot": 23,
+          "yaw_to_l4": 1
+        },
+        {
+          "decisions_sha256": "c75eb4251397f1aeee247fa6cc25f950e76fc3684856016a14f39135c036e51e",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "d0708800e3300a851a235e26681f5cb816448a3ff8dc3c0dfb79f573a38820f5",
+          "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+          "slot": 24,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "cc79b6add5c1a18a0f9e0cb16bebfc98e64dd20a74827b62e99450c2b07d95e6",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "8515c904e29d47ac13fab6fefdd4081370786c95cdb1f79ba78a3d344ab334ac",
+          "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+          "slot": 25,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "5ca2be7a59fc1e33943eeb034cdd90bdd70e7bef38db94a5ca3abd60f3f8320d",
+          "max_any_window": 11,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "b452da61f583adae9f5578b83f8a5747e798acd42aae4f5bab53fdc3cd6a7320",
+          "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+          "slot": 26,
+          "yaw_to_l4": 11
+        },
+        {
+          "decisions_sha256": "3c182d029d65a945debf088793ecefc51dffe6dd5949074b6bace04e74b5e066",
+          "max_any_window": 56,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "e4e70d0cbab50322c19c7e0f0045e2f1326bb57ca355aefc31a1f6deddab4972",
+          "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+          "slot": 27,
+          "yaw_to_l4": 56
+        },
+        {
+          "decisions_sha256": "d5a57e12f27492f35876190254f39868331a9c13de9ea87fcb73dee437cd82d6",
+          "max_any_window": 8,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "2c131d6869acdede4e5b0336a32a9f50e1c606dd1b45bb491d57abe530f3ca88",
+          "run": "20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23",
+          "slot": 28,
+          "yaw_to_l4": 8
+        },
+        {
+          "decisions_sha256": "32ca638d7ace9edfd909e90f0493e4f2a879a8bbcdba06d1aa62e884be5da51e",
+          "max_any_window": 0,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "0ee5996837a6e4284b41b8881a0bc6da5c481bcc1c8d2ec7d81bb2451f9b2b78",
+          "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+          "slot": 29,
+          "yaw_to_l4": 0
+        },
+        {
+          "decisions_sha256": "9111dd3325f17b8e28604d4a5198b146afbc57872a3754226f7b2f966e4e2957",
+          "max_any_window": 1,
+          "max_no_progress_window": 0,
+          "outcome": "goal_success",
+          "policy_ledger_sha256": "40fcbb54bab8dddc7b7d698e018a6414d3dfbb5eb7ba632e97b75ea2a5deacab",
+          "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+          "slot": 30,
+          "yaw_to_l4": 1
+        }
+      ],
+      "would_trigger_on_slots": [
+        12
+      ]
+    },
+    "guard_period_s": 20.0,
+    "net_progress_below_m": 0.05,
+    "net_progress_source": "p4_avoidance planner.min_progress_m (unchanged)",
+    "rule": "no net progress (< net_progress_below_m) over window_s with at least yaw_to_l4_at_least yaw_to_l4 interventions; then the frozen P4 selection for guard_period_s",
+    "variant": "p8_p5r only",
+    "window_s": 20.0,
+    "yaw_to_l4_at_least": 225
+  },
+  "schema_version": 1,
+  "sources": {
+    "p2_control": {
+      "path": "simulation/px4_gazebo/configs/p2_control.yaml",
+      "sha256": "e50f824ac01674513c10aeaf6fb4ac7817c4d2319e28be08de9d371a8e997a4d"
+    },
+    "p4_avoidance": {
+      "path": "simulation/px4_gazebo_p4/configs/p4_avoidance.yaml",
+      "sha256": "f7b9c2c52a0eac0a27194d3dbd2b92de29e495f7a2573358f95d31d16e7a4626"
+    }
+  },
+  "trigger": {
+    "budget": "not exhausted",
+    "reason": "no_progress_candidate",
+    "stale_reason": "none",
+    "supervisor_state": "HOVER"
+  }
+}

@@ -1,0 +1,442 @@
+{
+  "block_pairs": 10,
+  "blocks": {
+    "1": "V3",
+    "2": "V4",
+    "3": "V5"
+  },
+  "contract": "p8-schedule-v1",
+  "flights": 60,
+  "governed_by": "p8-navigation-recovery-v1 \u00a76",
+  "layouts_canonical_sha256": "62ae950cbcce9981b013992ed7a8d22e1bcbc4436852745e249172de25b40e85",
+  "pair_rule": "the two flights of a pair run back to back in the listed order",
+  "pairs": 30,
+  "rng": "the frozen P7 stream (p7_specs.draw, shuffle, balanced_firsts): SHA-256('<layouts_canonical_sha256>:<label>:<i>'), Fisher-Yates from the end; labels 'p8-block-0-order' and 'p8-block-0-first'",
+  "schema_version": 1,
+  "slots": [
+    {
+      "block": 1,
+      "family": "wall_with_gap",
+      "first": "p8_p5r",
+      "layout": "p7c-4000355",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 1,
+      "slot": 1,
+      "stage": "V3",
+      "world_sha256": "b957f29f2a502c923a4742a7cc2aff2593818ce909d264a7c5be473e41d4babf"
+    },
+    {
+      "block": 1,
+      "family": "wall_with_gap",
+      "first": "p8_p5r",
+      "layout": "p7c-4000381",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 2,
+      "slot": 2,
+      "stage": "V3",
+      "world_sha256": "68f735de16c4ddac01f976f21f564037c8e8a0056f1bf4b2869abfc1d6d683c6"
+    },
+    {
+      "block": 1,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p7c-4000396",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 3,
+      "slot": 3,
+      "stage": "V3",
+      "world_sha256": "cf824528ab724d6f49e1ded1631866a789c8477bb53bef97b0789896d113e125"
+    },
+    {
+      "block": 1,
+      "family": "mixed",
+      "first": "p8_p4r",
+      "layout": "p7c-4000375",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 4,
+      "slot": 4,
+      "stage": "V3",
+      "world_sha256": "34f4a15adafebf9e52f91ce1461da128415be1e1e735050ec700f096f13a2224"
+    },
+    {
+      "block": 1,
+      "family": "wall_with_gap",
+      "first": "p8_p4r",
+      "layout": "p7c-4000377",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 5,
+      "slot": 5,
+      "stage": "V3",
+      "world_sha256": "a76c243b9ce2d42bd8226aa5ddcc0cb9cf551a68ae9500d8d494fd98c190e7cc"
+    },
+    {
+      "block": 1,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p7c-4000363",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 6,
+      "slot": 6,
+      "stage": "V3",
+      "world_sha256": "7abd7812b838388375f2128ff15f9a526ad140a4fa105dde50917f38e24cd65d"
+    },
+    {
+      "block": 1,
+      "family": "mixed",
+      "first": "p8_p4r",
+      "layout": "p7c-4000366",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 7,
+      "slot": 7,
+      "stage": "V3",
+      "world_sha256": "0ea64cd34341e862b40aa88037a73f497455bd357e0fd962dfb9ce1c3aa54d1f"
+    },
+    {
+      "block": 1,
+      "family": "partial_wall",
+      "first": "p8_p4r",
+      "layout": "p7c-4000360",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 8,
+      "slot": 8,
+      "stage": "V3",
+      "world_sha256": "c18fb59630f4f8b0cd6d50ff4a5680636af40383fb96f0a6418403eeb4b75b9a"
+    },
+    {
+      "block": 1,
+      "family": "wall_with_gap",
+      "first": "p8_p5r",
+      "layout": "p7c-4000379",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 9,
+      "slot": 9,
+      "stage": "V3",
+      "world_sha256": "9f6342a47ad1e9eb7874c698b8a1b427202f52e976822a62db61d5786b643329"
+    },
+    {
+      "block": 1,
+      "family": "pillars",
+      "first": "p8_p4r",
+      "layout": "p7c-4000385",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 10,
+      "slot": 10,
+      "stage": "V3",
+      "world_sha256": "ea276895bc309b14d946dd7a0f661ccaa272c3078c7481358e03068e278b1434"
+    },
+    {
+      "block": 2,
+      "family": "wall_with_gap",
+      "first": "p8_p5r",
+      "layout": "p8h-6000027",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 1,
+      "slot": 11,
+      "stage": "V4",
+      "world_sha256": "6e59247815c7d558b443907aa12899c8af00ada2f14a600b5a278e91c815d8c9"
+    },
+    {
+      "block": 2,
+      "family": "pillars",
+      "first": "p8_p4r",
+      "layout": "p8h-6000023",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 2,
+      "slot": 12,
+      "stage": "V4",
+      "world_sha256": "1ea4905022652afea26d3f96a82e4954ecd9b47d5b52a47b45b4b3da82c25447"
+    },
+    {
+      "block": 2,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p8h-6000038",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 3,
+      "slot": 13,
+      "stage": "V4",
+      "world_sha256": "8e15cd9e8d00e6521352638cafd64d0794100fcac17875f41f621336fbe25564"
+    },
+    {
+      "block": 2,
+      "family": "pillars",
+      "first": "p8_p4r",
+      "layout": "p8h-6000033",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 4,
+      "slot": 14,
+      "stage": "V4",
+      "world_sha256": "2c145626523ff894701dc7c98da579ff0084ff2ff56d1660f955800888d81dec"
+    },
+    {
+      "block": 2,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p8h-6000019",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 5,
+      "slot": 15,
+      "stage": "V4",
+      "world_sha256": "c0431d68d77dd7290ef45f86e9daecd5731e14c78d938cf3893c8349b08a7969"
+    },
+    {
+      "block": 2,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p8h-6000050",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 6,
+      "slot": 16,
+      "stage": "V4",
+      "world_sha256": "5e055c043cd28eb28f5cafe0f458cc3841654440afeb87e5fb0e65e5077146ce"
+    },
+    {
+      "block": 2,
+      "family": "mixed",
+      "first": "p8_p4r",
+      "layout": "p8h-6000039",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 7,
+      "slot": 17,
+      "stage": "V4",
+      "world_sha256": "2fa5171833db54d69cd08c95c3e0bffce054ce70cedeb1549a1f2c72ce204798"
+    },
+    {
+      "block": 2,
+      "family": "wall_with_gap",
+      "first": "p8_p4r",
+      "layout": "p8h-6000057",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 8,
+      "slot": 18,
+      "stage": "V4",
+      "world_sha256": "b63e0f4d2faf8bfeef73c427b3211ba688e8ec4f7b3fe4e9a09e1430fe2d82bb"
+    },
+    {
+      "block": 2,
+      "family": "partial_wall",
+      "first": "p8_p5r",
+      "layout": "p8h-6000014",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 9,
+      "slot": 19,
+      "stage": "V4",
+      "world_sha256": "4fd0492412c665c655f35e12df01166bec78c4e193e54eeeb3336e98ffe75906"
+    },
+    {
+      "block": 2,
+      "family": "partial_wall",
+      "first": "p8_p4r",
+      "layout": "p8h-6000065",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 10,
+      "slot": 20,
+      "stage": "V4",
+      "world_sha256": "e0ee2e1675b9b90f60ede0cfcb79b34ba21d3f3062286ea7e14f43abd305f1e4"
+    },
+    {
+      "block": 3,
+      "family": "pillars",
+      "first": "p8_p4r",
+      "layout": "p7c-4000351",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 1,
+      "slot": 21,
+      "stage": "V5",
+      "world_sha256": "b957807fd5f2507d018308ee093de547ddf87f51c6882bb42f4e2fa3e81f89bd"
+    },
+    {
+      "block": 3,
+      "family": "wall_with_gap",
+      "first": "p8_p4r",
+      "layout": "p7c-4000357",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 2,
+      "slot": 22,
+      "stage": "V5",
+      "world_sha256": "42b41caa05fafb83acad95709f3cbd23c11e2530981ebca4adfd42c7482e64af"
+    },
+    {
+      "block": 3,
+      "family": "pillars",
+      "first": "p8_p5r",
+      "layout": "p7c-4000374",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 3,
+      "slot": 23,
+      "stage": "V5",
+      "world_sha256": "afb091efa70c656aa59be829df17520872e997bd238f162ac75e2eed742cf8e7"
+    },
+    {
+      "block": 3,
+      "family": "wall_with_gap",
+      "first": "p8_p5r",
+      "layout": "p7c-4000354",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 4,
+      "slot": 24,
+      "stage": "V5",
+      "world_sha256": "15cdfa6c667e656adcfe7c47b5f20add3c78f6d8ead79fcb85f85fe02749f918"
+    },
+    {
+      "block": 3,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p7c-4000359",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 5,
+      "slot": 25,
+      "stage": "V5",
+      "world_sha256": "45cb6ba07c8ed1e342922985c58766f32ffae63ceb70ecc4816c923c290c4bb8"
+    },
+    {
+      "block": 3,
+      "family": "pillars",
+      "first": "p8_p5r",
+      "layout": "p7c-4000394",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 6,
+      "slot": 26,
+      "stage": "V5",
+      "world_sha256": "f85c8d94e1d881bbea4163908009d06704a93aafbd8121ff0d501dccdeee1d21"
+    },
+    {
+      "block": 3,
+      "family": "mixed",
+      "first": "p8_p5r",
+      "layout": "p7c-4000373",
+      "order": [
+        "p8_p5r",
+        "p8_p4r"
+      ],
+      "pair_in_block": 7,
+      "slot": 27,
+      "stage": "V5",
+      "world_sha256": "75d3b5e0050072def23bf27a2e44d8d64608c1295481fe72454fada962e9d593"
+    },
+    {
+      "block": 3,
+      "family": "partial_wall",
+      "first": "p8_p4r",
+      "layout": "p7c-4000398",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 8,
+      "slot": 28,
+      "stage": "V5",
+      "world_sha256": "f521d61a99a86cc94a334b16081de757edcaca7bf67d2b15b3156bd6fee40abf"
+    },
+    {
+      "block": 3,
+      "family": "mixed",
+      "first": "p8_p4r",
+      "layout": "p7c-4000349",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 9,
+      "slot": 29,
+      "stage": "V5",
+      "world_sha256": "bfcd9e5ab687306e750157310a42af57772ea3f89966aa36732c0b8ef6664fc6"
+    },
+    {
+      "block": 3,
+      "family": "wall_with_gap",
+      "first": "p8_p4r",
+      "layout": "p7c-4000367",
+      "order": [
+        "p8_p4r",
+        "p8_p5r"
+      ],
+      "pair_in_block": 10,
+      "slot": 30,
+      "stage": "V5",
+      "world_sha256": "9973dfa989fcd3c1c8ef652f962dbacb1a08b40cfd81443788c2d390d22639ed"
+    }
+  ],
+  "variants": {
+    "p8_p4r": "accepted P4 stack (c110bd30) plus the P8 recovery layer",
+    "p8_p5r": "accepted P5 stack (2becfbbb, model ee006a80) plus the P8 recovery layer and the R4 guard"
+  }
+}

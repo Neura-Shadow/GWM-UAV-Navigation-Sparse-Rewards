@@ -1,0 +1,1279 @@
+{
+  "box_name_rule": "p7_box_<k> (the P7 rule, so that the reused P7 world path generates the worlds unchanged)",
+  "contract": "p8-layouts-v1",
+  "governed_by": "p8-navigation-recovery-v1 \u00a76",
+  "inputs": {
+    "base_world": {
+      "asset": "Tools/simulation/gz/worlds/default.sdf",
+      "pinned_by": "state/p3-candidate-087722b.json",
+      "sha256": "457a363a22c437b788a4aaf1e2335aa149efce4e5b988cdc108065663cd879b2"
+    },
+    "generator_sha256": {
+      "simulation/px4_gazebo/configs/p2_control.yaml": "e50f824ac01674513c10aeaf6fb4ac7817c4d2319e28be08de9d371a8e997a4d",
+      "simulation/px4_gazebo/configs/p3_sensors.yaml": "e02ae2a4a0d0c577b6d6abbea46de0973b02431cdc7005d2c98dea9e13b0a351",
+      "simulation/px4_gazebo_p4/configs/p4_avoidance.yaml": "f7b9c2c52a0eac0a27194d3dbd2b92de29e495f7a2573358f95d31d16e7a4626",
+      "simulation/px4_gazebo_p4/configs/p4_scenarios.json": "fcddcb3300e7f22ee6427fe81dfae095606b3325270b9d00af2137e92f785362",
+      "simulation/px4_gazebo_p4/scripts/p4_worlds.py": "f04f48121b81cb5a421d6ca86c7ed81cf0925bb808255f2b814bc1f85b646fe1",
+      "simulation/px4_gazebo_p5/training/p5_episode.py": "6f2df4d582432f18df9fce2af18d2c9510b339c9edaf1f013711ff9af8308769",
+      "simulation/px4_gazebo_p5/training/p5_layouts.py": "24a8fbe43db6c68213e81d7a73f9a137c17a0932998ae758bec41633c0cc1240",
+      "simulation/px4_gazebo_p5/training/p5_oracle.py": "bd8c2a5e6df7f85129806c7e172c35616b87f2cf96528179e1c6494434ffdc34",
+      "simulation/px4_gazebo_p5/training/p5_paths.py": "ab4f3e39772e6b83a0de0fa919bc3518f78eddb5de54b96cb1a17023583562d7",
+      "simulation/px4_gazebo_p5/training/p5_render.py": "2be69b0eb260337c4a788bcb254499d1bd575b9cdbaf3153f8b3e8784d29e736"
+    },
+    "p7_layouts_canonical_sha256": "d742b7af47c6339fb6d8478870d0cf767b6f09cf41d0ef23d6661bc0b1d2258d",
+    "p7e_block_results_sha256": {
+      "1": "1c8672ab5d3a10df831a78ee34ea11282983fb9c002d51ef728dcc9884faa441",
+      "2": "62c23933960e256d9fc0d60b3ede008f9b0872752a46bbd4377cdf0783b56064",
+      "3": "d4da3561bfac6158b4992731d7721de3c2082cd0e5003907586e0e937d1a84de"
+    },
+    "p7e_manifest_sha256": "e9561f05de28860d2826ed8c821bde132a8f817db01f7264c262c0ab895c5608",
+    "p7e_schedule_canonical_sha256": "9b3deacb3ee77a0baa38c78fa9197c22e569150ff6d4c76b489c494b6aea377b",
+    "p8_geometry_sha256": "435ec9cfe60729b6d6c9715de644c1c84c7dca825080fb8343c083cf6fe20a55"
+  },
+  "outcome_label": "p7_not_predeclared",
+  "rules": {
+    "V3": "every P7-E layout with a mission failure (any controller); must equal contract \u00a76 [3, 6, 7, 9, 12, 14, 15, 16, 18, 23]",
+    "V4": {
+      "F1": "clearance capacity > 1.35 m and goal clearance <= 2.3 m",
+      "F2": "clearance capacity in [1.10, 1.35] m",
+      "admission": "p5_layouts._screen (accepted P5 filters)",
+      "evidence": "P7-E F2 failures capacity 1.14-1.30 m; F1 failures goal clearance 1.56-2.23 m (cde7fa52\u2026)",
+      "exclusions": [
+        "P5 split match (1,650 layouts, regenerated and checked, as P7)",
+        "P7 layout match (260)"
+      ],
+      "geometry": "p8_geometry at origin (0, 0): 0.05 m grid, fence margin 0.9 m, bisection to 0.01 m",
+      "seed_base": 6000000,
+      "take": "the first 5 of each type in seed order"
+    },
+    "V5": "the first both-success P7-E layouts in slot order, per family, with quotas from the batch's family counts by largest remainder (10 in all)"
+  },
+  "runtime": {
+    "numpy": "1.26.4",
+    "python": "3.12.3"
+  },
+  "schema_version": 1,
+  "stages": {
+    "V3": {
+      "layouts": [
+        {
+          "boxes": [
+            {
+              "center": [
+                5.859,
+                -2.048
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.202,
+                3.905
+              ]
+            },
+            {
+              "center": [
+                5.859,
+                3.204
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.202,
+                1.592
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.242,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 2.042234,
+          "id": "p7c-4000355",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 3,
+          "seed": 4000355,
+          "source": "p7_layouts confirmatory index 204 (P7-E slot 3)",
+          "stage": "V3",
+          "world_sha256": "b957f29f2a502c923a4742a7cc2aff2593818ce909d264a7c5be473e41d4babf"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.108,
+                -1.616
+              ],
+              "name": "p7_box_0",
+              "size": [
+                1.2,
+                0.26
+              ]
+            },
+            {
+              "center": [
+                2.124,
+                -0.742
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.277,
+                0.443
+              ]
+            },
+            {
+              "center": [
+                3.496,
+                1.176
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.534,
+                0.367
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.143,
+          "family": "mixed",
+          "goal_clearance_m": 2.731567,
+          "id": "p7c-4000396",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 6,
+          "seed": 4000396,
+          "source": "p7_layouts confirmatory index 228 (P7-E slot 6)",
+          "stage": "V3",
+          "world_sha256": "cf824528ab724d6f49e1ded1631866a789c8477bb53bef97b0789896d113e125"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.072,
+                -1.788
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.299,
+                4.423
+              ]
+            },
+            {
+              "center": [
+                3.072,
+                3.412
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.299,
+                1.176
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.197,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 4.7785,
+          "id": "p7c-4000381",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 7,
+          "seed": 4000381,
+          "source": "p7_layouts confirmatory index 222 (P7-E slot 7)",
+          "stage": "V3",
+          "world_sha256": "68f735de16c4ddac01f976f21f564037c8e8a0056f1bf4b2869abfc1d6d683c6"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.22,
+                -3.373
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.289,
+                1.253
+              ]
+            },
+            {
+              "center": [
+                5.22,
+                1.884
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.289,
+                4.232
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.242,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 2.6355,
+          "id": "p7c-4000377",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 9,
+          "seed": 4000377,
+          "source": "p7_layouts confirmatory index 219 (P7-E slot 9)",
+          "stage": "V3",
+          "world_sha256": "a76c243b9ce2d42bd8226aa5ddcc0cb9cf551a68ae9500d8d494fd98c190e7cc"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                4.549,
+                1.676
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.269,
+                2.685
+              ]
+            },
+            {
+              "center": [
+                2.025,
+                -0.842
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.402,
+                0.295
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.206,
+          "family": "mixed",
+          "goal_clearance_m": 3.333226,
+          "id": "p7c-4000375",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 12,
+          "seed": 4000375,
+          "source": "p7_layouts confirmatory index 218 (P7-E slot 12)",
+          "stage": "V3",
+          "world_sha256": "34f4a15adafebf9e52f91ce1461da128415be1e1e735050ec700f096f13a2224"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.543,
+                -2.47
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.2,
+                3.059
+              ]
+            },
+            {
+              "center": [
+                3.543,
+                2.702
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.2,
+                2.596
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.197,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 4.457352,
+          "id": "p7c-4000379",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 14,
+          "seed": 4000379,
+          "source": "p7_layouts confirmatory index 221 (P7-E slot 14)",
+          "stage": "V3",
+          "world_sha256": "9f6342a47ad1e9eb7874c698b8a1b427202f52e976822a62db61d5786b643329"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                1.707,
+                -0.849
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.36,
+                0.599
+              ]
+            },
+            {
+              "center": [
+                5.494,
+                0.184
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.454,
+                0.514
+              ]
+            },
+            {
+              "center": [
+                5.503,
+                -0.314
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.52,
+                0.347
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.646,
+          "family": "pillars",
+          "goal_clearance_m": 2.241408,
+          "id": "p7c-4000385",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 15,
+          "seed": 4000385,
+          "source": "p7_layouts confirmatory index 224 (P7-E slot 15)",
+          "stage": "V3",
+          "world_sha256": "ea276895bc309b14d946dd7a0f661ccaa272c3078c7481358e03068e278b1434"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.246,
+                0.294
+              ],
+              "name": "p7_box_0",
+              "size": [
+                1.053,
+                0.271
+              ]
+            },
+            {
+              "center": [
+                6.211,
+                0.358
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.467,
+                0.33
+              ]
+            },
+            {
+              "center": [
+                6.458,
+                -1.911
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.405,
+                0.332
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.593,
+          "family": "mixed",
+          "goal_clearance_m": 1.567428,
+          "id": "p7c-4000363",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 16,
+          "seed": 4000363,
+          "source": "p7_layouts confirmatory index 210 (P7-E slot 16)",
+          "stage": "V3",
+          "world_sha256": "7abd7812b838388375f2128ff15f9a526ad140a4fa105dde50917f38e24cd65d"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.951,
+                -0.626
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.25,
+                1.497
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.943,
+          "family": "partial_wall",
+          "goal_clearance_m": 1.924,
+          "id": "p7c-4000360",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 18,
+          "seed": 4000360,
+          "source": "p7_layouts confirmatory index 209 (P7-E slot 18)",
+          "stage": "V3",
+          "world_sha256": "c18fb59630f4f8b0cd6d50ff4a5680636af40383fb96f0a6418403eeb4b75b9a"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.564,
+                0.465
+              ],
+              "name": "p7_box_0",
+              "size": [
+                1.241,
+                0.228
+              ]
+            },
+            {
+              "center": [
+                4.212,
+                -1.823
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.326,
+                0.354
+              ]
+            },
+            {
+              "center": [
+                3.455,
+                -0.954
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.484,
+                0.47
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.494,
+          "family": "mixed",
+          "goal_clearance_m": 1.849119,
+          "id": "p7c-4000366",
+          "p7e_outcomes": {
+            "p4": "failure",
+            "p5": "failure"
+          },
+          "p7e_slot": 23,
+          "seed": 4000366,
+          "source": "p7_layouts confirmatory index 213 (P7-E slot 23)",
+          "stage": "V3",
+          "world_sha256": "0ea64cd34341e862b40aa88037a73f497455bd357e0fd962dfb9ce1c3aa54d1f"
+        }
+      ]
+    },
+    "V4": {
+      "admitted_not_selected": 18,
+      "layouts": [
+        {
+          "boxes": [
+            {
+              "center": [
+                5.681,
+                -0.369
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.285,
+                1.376
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.799,
+          "family": "partial_wall",
+          "goal_clearance_m": 2.1765,
+          "id": "p8h-6000014",
+          "index": 0,
+          "seed": 6000014,
+          "stage": "V4",
+          "type": "F1",
+          "world_sha256": "4fd0492412c665c655f35e12df01166bec78c4e193e54eeeb3336e98ffe75906"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                4.758,
+                0.216
+              ],
+              "name": "p7_box_0",
+              "size": [
+                2.5,
+                0.296
+              ]
+            },
+            {
+              "center": [
+                5.68,
+                -2.333
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.313,
+                0.224
+              ]
+            },
+            {
+              "center": [
+                6.808,
+                2.759
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.548,
+                0.504
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.143,
+          "family": "mixed",
+          "goal_clearance_m": 1.99316,
+          "id": "p8h-6000019",
+          "index": 1,
+          "seed": 6000019,
+          "stage": "V4",
+          "type": "F2",
+          "world_sha256": "c0431d68d77dd7290ef45f86e9daecd5731e14c78d938cf3893c8349b08a7969"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.777,
+                -1.37
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.544,
+                0.278
+              ]
+            },
+            {
+              "center": [
+                1.527,
+                -0.841
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.301,
+                0.258
+              ]
+            },
+            {
+              "center": [
+                5.832,
+                -0.089
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.413,
+                0.539
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.584,
+          "family": "pillars",
+          "goal_clearance_m": 1.9615,
+          "id": "p8h-6000023",
+          "index": 2,
+          "seed": 6000023,
+          "stage": "V4",
+          "type": "F1",
+          "world_sha256": "1ea4905022652afea26d3f96a82e4954ecd9b47d5b52a47b45b4b3da82c25447"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.007,
+                -2.359
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.226,
+                3.281
+              ]
+            },
+            {
+              "center": [
+                5.007,
+                2.875
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.226,
+                2.249
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.242,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 2.968273,
+          "id": "p8h-6000027",
+          "index": 3,
+          "seed": 6000027,
+          "stage": "V4",
+          "type": "F2",
+          "world_sha256": "6e59247815c7d558b443907aa12899c8af00ada2f14a600b5a278e91c815d8c9"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                6.179,
+                -0.919
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.381,
+                0.51
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.835,
+          "family": "pillars",
+          "goal_clearance_m": 1.760519,
+          "id": "p8h-6000033",
+          "index": 4,
+          "seed": 6000033,
+          "stage": "V4",
+          "type": "F1",
+          "world_sha256": "2c145626523ff894701dc7c98da579ff0084ff2ff56d1660f955800888d81dec"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.827,
+                1.119
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.299,
+                1.981
+              ]
+            },
+            {
+              "center": [
+                3.783,
+                1.16
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.204,
+                0.218
+              ]
+            },
+            {
+              "center": [
+                5.742,
+                -0.335
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.384,
+                0.427
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.548,
+          "family": "mixed",
+          "goal_clearance_m": 2.06957,
+          "id": "p8h-6000038",
+          "index": 5,
+          "seed": 6000038,
+          "stage": "V4",
+          "type": "F1",
+          "world_sha256": "8e15cd9e8d00e6521352638cafd64d0794100fcac17875f41f621336fbe25564"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.934,
+                -1.645
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.208,
+                1.182
+              ]
+            },
+            {
+              "center": [
+                2.912,
+                -0.054
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.203,
+                0.201
+              ]
+            },
+            {
+              "center": [
+                4.132,
+                1.376
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.408,
+                0.282
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.386,
+          "family": "mixed",
+          "goal_clearance_m": 2.227187,
+          "id": "p8h-6000039",
+          "index": 6,
+          "seed": 6000039,
+          "stage": "V4",
+          "type": "F1",
+          "world_sha256": "2fa5171833db54d69cd08c95c3e0bffce054ce70cedeb1549a1f2c72ce204798"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                4.454,
+                0.642
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.205,
+                2.78
+              ]
+            },
+            {
+              "center": [
+                2.212,
+                0.272
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.524,
+                0.341
+              ]
+            },
+            {
+              "center": [
+                5.194,
+                0.935
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.214,
+                0.235
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.341,
+          "family": "mixed",
+          "goal_clearance_m": 2.82009,
+          "id": "p8h-6000050",
+          "index": 7,
+          "seed": 6000050,
+          "stage": "V4",
+          "type": "F2",
+          "world_sha256": "5e055c043cd28eb28f5cafe0f458cc3841654440afeb87e5fb0e65e5077146ce"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.315,
+                -3.107
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.227,
+                1.787
+              ]
+            },
+            {
+              "center": [
+                3.315,
+                2.201
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.227,
+                3.597
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.296,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 4.589185,
+          "id": "p8h-6000057",
+          "index": 8,
+          "seed": 6000057,
+          "stage": "V4",
+          "type": "F2",
+          "world_sha256": "b63e0f4d2faf8bfeef73c427b3211ba688e8ec4f7b3fe4e9a09e1430fe2d82bb"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                2.863,
+                -0.499
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.238,
+                2.493
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.341,
+          "family": "partial_wall",
+          "goal_clearance_m": 5.018,
+          "id": "p8h-6000065",
+          "index": 9,
+          "seed": 6000065,
+          "stage": "V4",
+          "type": "F2",
+          "world_sha256": "e0ee2e1675b9b90f60ede0cfcb79b34ba21d3f3062286ea7e14f43abd305f1e4"
+        }
+      ],
+      "per_type": 5,
+      "rejected": {
+        "goal_unreachable_inflated": 8,
+        "p5_split_match": 13,
+        "p7_layout_match": 7,
+        "start_or_goal_disc": 10
+      },
+      "seed_base": 6000000,
+      "seeds_tried": 66
+    },
+    "V5": {
+      "layouts": [
+        {
+          "boxes": [
+            {
+              "center": [
+                1.636,
+                1.556
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.586,
+                0.342
+              ]
+            },
+            {
+              "center": [
+                1.793,
+                1.004
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.374,
+                0.432
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.781,
+          "family": "pillars",
+          "goal_clearance_m": 6.071354,
+          "id": "p7c-4000351",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 1,
+          "seed": 4000351,
+          "source": "p7_layouts confirmatory index 201 (P7-E slot 1)",
+          "stage": "V5",
+          "world_sha256": "b957807fd5f2507d018308ee093de547ddf87f51c6882bb42f4e2fa3e81f89bd"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                4.766,
+                -3.256
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.27,
+                1.489
+              ]
+            },
+            {
+              "center": [
+                4.766,
+                2.216
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.27,
+                3.568
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.494,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 3.128965,
+          "id": "p7c-4000367",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 2,
+          "seed": 4000367,
+          "source": "p7_layouts confirmatory index 214 (P7-E slot 2)",
+          "stage": "V5",
+          "world_sha256": "9973dfa989fcd3c1c8ef652f962dbacb1a08b40cfd81443788c2d390d22639ed"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.08,
+                0.302
+              ],
+              "name": "p7_box_0",
+              "size": [
+                1.401,
+                0.273
+              ]
+            }
+          ],
+          "clearance_capacity_m": 2.248,
+          "family": "partial_wall",
+          "goal_clearance_m": 4.222744,
+          "id": "p7c-4000398",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 4,
+          "seed": 4000398,
+          "source": "p7_layouts confirmatory index 229 (P7-E slot 4)",
+          "stage": "V5",
+          "world_sha256": "f521d61a99a86cc94a334b16081de757edcaca7bf67d2b15b3156bd6fee40abf"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.401,
+                2.701
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.49,
+                0.57
+              ]
+            }
+          ],
+          "clearance_capacity_m": 2.491,
+          "family": "pillars",
+          "goal_clearance_m": 3.373184,
+          "id": "p7c-4000394",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 5,
+          "seed": 4000394,
+          "source": "p7_layouts confirmatory index 227 (P7-E slot 5)",
+          "stage": "V5",
+          "world_sha256": "f85c8d94e1d881bbea4163908009d06704a93aafbd8121ff0d501dccdeee1d21"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                2.541,
+                -1.719
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.224,
+                2.05
+              ]
+            },
+            {
+              "center": [
+                2.99,
+                -0.858
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.385,
+                0.447
+              ]
+            }
+          ],
+          "clearance_capacity_m": 2.491,
+          "family": "mixed",
+          "goal_clearance_m": 4.859104,
+          "id": "p7c-4000373",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 8,
+          "seed": 4000373,
+          "source": "p7_layouts confirmatory index 216 (P7-E slot 8)",
+          "stage": "V5",
+          "world_sha256": "75d3b5e0050072def23bf27a2e44d8d64608c1295481fe72454fada962e9d593"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                6.054,
+                1.212
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.289,
+                1.028
+              ]
+            },
+            {
+              "center": [
+                7.485,
+                -2.389
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.591,
+                0.237
+              ]
+            },
+            {
+              "center": [
+                5.925,
+                1.256
+              ],
+              "name": "p7_box_2",
+              "size": [
+                0.358,
+                0.242
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.566,
+          "family": "mixed",
+          "goal_clearance_m": 1.931995,
+          "id": "p7c-4000349",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 10,
+          "seed": 4000349,
+          "source": "p7_layouts confirmatory index 200 (P7-E slot 10)",
+          "stage": "V5",
+          "world_sha256": "bfcd9e5ab687306e750157310a42af57772ea3f89966aa36732c0b8ef6664fc6"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                5.225,
+                -2.604
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.292,
+                2.793
+              ]
+            },
+            {
+              "center": [
+                5.225,
+                2.976
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.292,
+                2.047
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.593,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 2.893043,
+          "id": "p7c-4000357",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 11,
+          "seed": 4000357,
+          "source": "p7_layouts confirmatory index 206 (P7-E slot 11)",
+          "stage": "V5",
+          "world_sha256": "42b41caa05fafb83acad95709f3cbd23c11e2530981ebca4adfd42c7482e64af"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                1.863,
+                -0.274
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.225,
+                0.433
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.745,
+          "family": "pillars",
+          "goal_clearance_m": 6.024774,
+          "id": "p7c-4000374",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 13,
+          "seed": 4000374,
+          "source": "p7_layouts confirmatory index 217 (P7-E slot 13)",
+          "stage": "V5",
+          "world_sha256": "afb091efa70c656aa59be829df17520872e997bd238f162ac75e2eed742cf8e7"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                4.481,
+                -1.836
+              ],
+              "name": "p7_box_0",
+              "size": [
+                2.5,
+                0.221
+              ]
+            },
+            {
+              "center": [
+                2.278,
+                -1.55
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.527,
+                0.382
+              ]
+            }
+          ],
+          "clearance_capacity_m": 2.437,
+          "family": "mixed",
+          "goal_clearance_m": 2.850563,
+          "id": "p7c-4000359",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 17,
+          "seed": 4000359,
+          "source": "p7_layouts confirmatory index 208 (P7-E slot 17)",
+          "stage": "V5",
+          "world_sha256": "45cb6ba07c8ed1e342922985c58766f32ffae63ceb70ecc4816c923c290c4bb8"
+        },
+        {
+          "boxes": [
+            {
+              "center": [
+                3.36,
+                -2.288
+              ],
+              "name": "p7_box_0",
+              "size": [
+                0.223,
+                3.424
+              ]
+            },
+            {
+              "center": [
+                3.36,
+                3.287
+              ],
+              "name": "p7_box_1",
+              "size": [
+                0.223,
+                1.427
+              ]
+            }
+          ],
+          "clearance_capacity_m": 1.593,
+          "family": "wall_with_gap",
+          "goal_clearance_m": 4.564985,
+          "id": "p7c-4000354",
+          "p7e_outcomes": {
+            "p4": "goal_success",
+            "p5": "goal_success"
+          },
+          "p7e_slot": 20,
+          "seed": 4000354,
+          "source": "p7_layouts confirmatory index 203 (P7-E slot 20)",
+          "stage": "V5",
+          "world_sha256": "15cdfa6c667e656adcfe7c47b5f20add3c78f6d8ead79fcb85f85fe02749f918"
+        }
+      ]
+    }
+  },
+  "v5_rule_inputs": {
+    "both_success_slots": [
+      1,
+      2,
+      4,
+      5,
+      8,
+      10,
+      11,
+      13,
+      17,
+      19,
+      20,
+      21,
+      22,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30
+    ],
+    "family_counts_p7e": {
+      "mixed": 9,
+      "partial_wall": 3,
+      "pillars": 9,
+      "wall_with_gap": 9
+    },
+    "v5_quota": {
+      "mixed": 3,
+      "partial_wall": 1,
+      "pillars": 3,
+      "wall_with_gap": 3
+    }
+  }
+}

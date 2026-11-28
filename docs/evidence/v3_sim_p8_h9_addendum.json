@@ -1,0 +1,999 @@
+{
+  "bound_by_candidate": false,
+  "contract": "p8-h9-assessment-addendum-v1",
+  "finding": "F-R1",
+  "flights": [
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T072310Z-p8-p8_p5r-p7c-4000355-196c094b",
+      "run_files_unchanged": true,
+      "slot": 1,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T072652Z-p8-p8_p4r-p7c-4000355-255598b1",
+      "run_files_unchanged": true,
+      "slot": 1,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T072958Z-p8-p8_p5r-p7c-4000381-5f1a825f",
+      "run_files_unchanged": true,
+      "slot": 2,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T073324Z-p8-p8_p4r-p7c-4000381-f295fafd",
+      "run_files_unchanged": true,
+      "slot": 2,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T073616Z-p8-p8_p5r-p7c-4000396-aaed11d6",
+      "run_files_unchanged": true,
+      "slot": 3,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T073906Z-p8-p8_p4r-p7c-4000396-d5788c15",
+      "run_files_unchanged": true,
+      "slot": 3,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T074200Z-p8-p8_p4r-p7c-4000375-9630d3b7",
+      "run_files_unchanged": true,
+      "slot": 4,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T074712Z-p8-p8_p5r-p7c-4000375-ea62ec1d",
+      "run_files_unchanged": true,
+      "slot": 4,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T075127Z-p8-p8_p4r-p7c-4000377-05cc06d9",
+      "run_files_unchanged": true,
+      "slot": 5,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T075629Z-p8-p8_p5r-p7c-4000377-b36053df",
+      "run_files_unchanged": true,
+      "slot": 5,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T080138Z-p8-p8_p5r-p7c-4000363-826e631d",
+      "run_files_unchanged": true,
+      "slot": 6,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T080450Z-p8-p8_p4r-p7c-4000363-39da3b9d",
+      "run_files_unchanged": true,
+      "slot": 6,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T080833Z-p8-p8_p4r-p7c-4000366-9ed6403e",
+      "run_files_unchanged": true,
+      "slot": 7,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T081341Z-p8-p8_p5r-p7c-4000366-a9298e10",
+      "run_files_unchanged": true,
+      "slot": 7,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T081730Z-p8-p8_p4r-p7c-4000360-10ef6384",
+      "run_files_unchanged": true,
+      "slot": 8,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T082108Z-p8-p8_p5r-p7c-4000360-8dd65c1d",
+      "run_files_unchanged": true,
+      "slot": 8,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T082430Z-p8-p8_p5r-p7c-4000379-3ad87a84",
+      "run_files_unchanged": true,
+      "slot": 9,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T082820Z-p8-p8_p4r-p7c-4000379-19528637",
+      "run_files_unchanged": true,
+      "slot": 9,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T083144Z-p8-p8_p4r-p7c-4000385-d0b3ef82",
+      "run_files_unchanged": true,
+      "slot": 10,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 1,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T083519Z-p8-p8_p5r-p7c-4000385-ac3d3045",
+      "run_files_unchanged": true,
+      "slot": 10,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T091709Z-p8-p8_p5r-p8h-6000027-c84f91a9",
+      "run_files_unchanged": true,
+      "slot": 11,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T092045Z-p8-p8_p4r-p8h-6000027-1842b4ab",
+      "run_files_unchanged": true,
+      "slot": 11,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T092345Z-p8-p8_p4r-p8h-6000023-66aecff3",
+      "run_files_unchanged": true,
+      "slot": 12,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T092711Z-p8-p8_p5r-p8h-6000023-84a87dca",
+      "run_files_unchanged": true,
+      "slot": 12,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T093020Z-p8-p8_p5r-p8h-6000038-20ac175d",
+      "run_files_unchanged": true,
+      "slot": 13,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T093542Z-p8-p8_p4r-p8h-6000038-a94d80ab",
+      "run_files_unchanged": true,
+      "slot": 13,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T094048Z-p8-p8_p4r-p8h-6000033-d5fee5c8",
+      "run_files_unchanged": true,
+      "slot": 14,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T094355Z-p8-p8_p5r-p8h-6000033-44f39765",
+      "run_files_unchanged": true,
+      "slot": 14,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T094527Z-p8-p8_p5r-p8h-6000019-15768b71",
+      "run_files_unchanged": true,
+      "slot": 15,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T094830Z-p8-p8_p4r-p8h-6000019-d094a8d8",
+      "run_files_unchanged": true,
+      "slot": 15,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T095141Z-p8-p8_p5r-p8h-6000050-31b0a571",
+      "run_files_unchanged": true,
+      "slot": 16,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T095512Z-p8-p8_p4r-p8h-6000050-fc8f5536",
+      "run_files_unchanged": true,
+      "slot": 16,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T095810Z-p8-p8_p4r-p8h-6000039-0b9533ef",
+      "run_files_unchanged": true,
+      "slot": 17,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T100104Z-p8-p8_p5r-p8h-6000039-2aa8ea66",
+      "run_files_unchanged": true,
+      "slot": 17,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T100359Z-p8-p8_p4r-p8h-6000057-365531a9",
+      "run_files_unchanged": true,
+      "slot": 18,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T100709Z-p8-p8_p5r-p8h-6000057-eb367a7a",
+      "run_files_unchanged": true,
+      "slot": 18,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T101019Z-p8-p8_p5r-p8h-6000014-3e9a696e",
+      "run_files_unchanged": true,
+      "slot": 19,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T101350Z-p8-p8_p4r-p8h-6000014-6b5994a7",
+      "run_files_unchanged": true,
+      "slot": 19,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T101713Z-p8-p8_p4r-p8h-6000065-01c7a70d",
+      "run_files_unchanged": true,
+      "slot": 20,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 2,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T102039Z-p8-p8_p5r-p8h-6000065-2cfd17a5",
+      "run_files_unchanged": true,
+      "slot": 20,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T105108Z-p8-p8_p4r-p7c-4000351-4e029132",
+      "run_files_unchanged": true,
+      "slot": 21,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T105416Z-p8-p8_p5r-p7c-4000351-a011dcc6",
+      "run_files_unchanged": true,
+      "slot": 21,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T105725Z-p8-p8_p4r-p7c-4000357-527d5807",
+      "run_files_unchanged": true,
+      "slot": 22,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T110032Z-p8-p8_p5r-p7c-4000357-96b5a600",
+      "run_files_unchanged": true,
+      "slot": 22,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T110339Z-p8-p8_p5r-p7c-4000374-9422931d",
+      "run_files_unchanged": true,
+      "slot": 23,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T110703Z-p8-p8_p4r-p7c-4000374-c942a8fd",
+      "run_files_unchanged": true,
+      "slot": 23,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T111012Z-p8-p8_p5r-p7c-4000354-3df650d9",
+      "run_files_unchanged": true,
+      "slot": 24,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T111320Z-p8-p8_p4r-p7c-4000354-8cf98fba",
+      "run_files_unchanged": true,
+      "slot": 24,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T111626Z-p8-p8_p5r-p7c-4000359-57f0a14b",
+      "run_files_unchanged": true,
+      "slot": 25,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T111934Z-p8-p8_p4r-p7c-4000359-b5e925bc",
+      "run_files_unchanged": true,
+      "slot": 25,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T112242Z-p8-p8_p5r-p7c-4000394-ba4671e1",
+      "run_files_unchanged": true,
+      "slot": 26,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T112550Z-p8-p8_p4r-p7c-4000394-e7e489ae",
+      "run_files_unchanged": true,
+      "slot": 26,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T112856Z-p8-p8_p5r-p7c-4000373-b127db8a",
+      "run_files_unchanged": true,
+      "slot": 27,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T113203Z-p8-p8_p4r-p7c-4000373-cd57cc6d",
+      "run_files_unchanged": true,
+      "slot": 27,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T113509Z-p8-p8_p4r-p7c-4000398-cccff31a",
+      "run_files_unchanged": true,
+      "slot": 28,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T113823Z-p8-p8_p5r-p7c-4000398-417034fa",
+      "run_files_unchanged": true,
+      "slot": 28,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T114133Z-p8-p8_p4r-p7c-4000349-090ea5f8",
+      "run_files_unchanged": true,
+      "slot": 29,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T114444Z-p8-p8_p5r-p7c-4000349-da80d23f",
+      "run_files_unchanged": true,
+      "slot": 29,
+      "variant": "p8_p5r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p4",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T114754Z-p8-p8_p4r-p7c-4000367-3a31fb1f",
+      "run_files_unchanged": true,
+      "slot": 30,
+      "variant": "p8_p4r"
+    },
+    {
+      "attempt": 1,
+      "block": 3,
+      "controller": "p5",
+      "rule_c_holds": true,
+      "rule_c_problems": [],
+      "rule_o_differing_keys": [
+        "contract"
+      ],
+      "rule_o_matches_report": true,
+      "rule_o_reproduced": false,
+      "run": "20261128T115109Z-p8-p8_p5r-p7c-4000367-230ac708",
+      "run_files_unchanged": true,
+      "slot": 30,
+      "variant": "p8_p5r"
+    }
+  ],
+  "generated_unix_ns": 1795871411500007089,
+  "labels": {
+    "p7e_assessment": "p7e-flight-assessment-v1",
+    "p8_assessment": "p8-flight-assessment-v1"
+  },
+  "manifest_sha256": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+  "report": {
+    "not_passed_reasons": [
+      "H9 not met"
+    ],
+    "path": "/home/joker0625/uav_autonomy/state/p8-engineering-report-fe2a0c6e9052.json",
+    "report_code_sha256": "815b0f7c86505136f04607c03d06383c42ca59c21403f2be1531241fd767ca04",
+    "sha256": "f03253d064be761079a319b024a3540a0eb831a849fc2c76c476125f5ea477ec",
+    "status": "engineering validation not passed"
+  },
+  "rules": {
+    "C": "every key equal except contract and stop_reasons; contract exactly the sequencer's relabel; stop_reasons as the sequencer derives them from the H10 record; the h10 summary equal to the H10 record; no other key",
+    "O": "the report's H9 comparison: every key of the fresh P7-E assessment except stop_reasons"
+  },
+  "statement": "This addendum does not change the P8 report, whose status stays as written. It records whether the one failing H9 check is explained by the sequencer's contract label alone. Whether P8's acceptance may rest on the report and this addendum is the operator's decision.",
+  "summary": {
+    "flights": 60,
+    "flights_expected": 60,
+    "rule_c_holds": 60,
+    "rule_o_differs_on_contract_alone": 60,
+    "rule_o_matches_report": 60,
+    "rule_o_reproduced": 0,
+    "run_files_unchanged": 60,
+    "status": "explained"
+  },
+  "tool_path": "diagnostics/p8/p8_h9_addendum.py",
+  "tool_sha256": "5ef9d5e93fd2ea4daa8980837b780d477866b65e735dea9def9a5a94c29ca71b"
+}

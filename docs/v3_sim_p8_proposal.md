@@ -1,9 +1,26 @@
 # v3-SIM P8: Navigation Robustness and Recovery (preliminary proposal)
 
 **Status: PRELIMINARY PROPOSAL FOR THE OPERATOR'S REVIEW (2026-11-28).**
-* It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
+* **Decided (operator, 2026-11-28):** P8 is adopted (P8-D1), with the recovery-wrapper architecture (P8-D2).
+* **Contract APPROVED (operator, 2026-11-28, "Approve contract"):**
+  [`p8-navigation-recovery-v1`](v3_sim_p8_contract_draft.md), with its §14 defaults.
+  * It authorizes nothing to run.
+* **P8-M1 specs APPROVED by hash (operator, 2026-11-28, "Approve specs"):** [P8-M1 specs](v3_sim_p8_m1_specs.md).
+  * Layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…`.
+* **P8-M2 ACCEPTED (operator, 2026-11-28, "Accept M2"):** [M2 report](v3_sim_p8_m2_code.md), code commit `c991387`.
+* **P8-M3 COMPLETE (operator, 2026-11-28):** [M3 record](v3_sim_p8_m3_candidate.md).
+  * It covered the build, the development dry run (accepted), the production Policy A and the real freeze.
+  * **The real P8 candidate is manifest `fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a`.**
+* **The V3, V4 and V5 blocks were flown (2026-11-28):** [validation blocks](v3_sim_p8_validation_blocks.md). None
+  stopped; 60 of 60 valid.
+* **P8 ACCEPTED (operator, 2026-11-28, "Accept P8"):** [report](v3_sim_p8_report.md) §7.
+  * The report reads "not passed" for "H9 not met" (finding F-R1, a label comparison in the bound report code).
+  * The out-of-tree H9 addendum records "explained" on all 60 flights.
+  * The acceptance rests on both together, and authorizes nothing else.
+* It was prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
   authorizes read-only auditing and proposal preparation only.
-* Nothing is implemented, no SITL ran, no candidate exists, and no frozen P2–P7-E file changed.
+* At that time nothing was implemented, no SITL had run and no candidate existed. No frozen P2–P7-E file has changed
+  since then.
 
 **Evidence:**
 * [`v3_sim_p8_hover_timeout_analysis.json`](evidence/v3_sim_p8_hover_timeout_analysis.json) (`cde7fa52…`);
@@ -208,11 +225,14 @@ recorded maps with ±1-frame snapshot shifts and counts decision flips, using th
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| P8-D1 | Adopt P8 with the motivation and evidence of §1–§2 | adopt |
-| P8-D2 | Architecture: a recovery wrapper above the frozen supervisor (P8-P4R, P8-P5R), or a modified P4 supervisor (a new P4 candidate) | wrapper |
+| P8-D1 | Adopt P8 with the motivation and evidence of §1–§2 | **DECIDED (operator, 2026-11-28): adopted** |
+| P8-D2 | Architecture: a recovery wrapper above the frozen supervisor (P8-P4R, P8-P5R), or a modified P4 supervisor (a new P4 candidate) | **DECIDED: the recovery wrapper** |
 | P8-D3 | Recovery set R1–R4 with budgets; no change to `r_infl`, `hover_timeout` or the transit deadline | adopt |
 | P8-D4 | The goal rule: keep the frozen rule (NORMAL and target on the goal), or allow goal capture from HOVER within tolerance | keep it; R1 first |
 | P8-D5 | Validation: V0–V2 offline, then about 60 SITL flights (V3–V5) | adopt |
 | P8-D6 | The held-out layouts: a new seed base, disjoint from every P7 pool | adopt |
 | P8-D7 | Include the optional tracks P8-T and P8-S | P8-S yes (offline); P8-T with V3–V5 |
-| P8-D8 | Retention: protect the P8 inputs (cleanup proposal §3 and C-3) until P8 is accepted | adopt |
+| P8-D8 | Retention: protect the P8 inputs (cleanup proposal §3 and C-3) until P8 is accepted | **covered:** C-2 (confirmed) and C-3 (slots 19 and 28 protected), 2026-11-28 |
+
+**P8-D3 to P8-D7 are DECIDED** by the approval of the [contract](v3_sim_p8_contract_draft.md)
+`p8-navigation-recovery-v1` (operator, 2026-11-28, "Approve contract"), as its §14 defaults. So are P8-C1 to P8-C4.
