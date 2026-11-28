@@ -1,0 +1,230 @@
+{
+ "schema_version": 1,
+ "contract": "p8-report-plan-v1",
+ "status": "P8-M1 specification for operator approval; frozen and hash-bound in the P8 candidate before the first P8 flight",
+ "governed_by": "p8-navigation-recovery-v1 §6 (stages), §7 (acceptance), §8 (fail-closed), §10 (risk register), §12 (statement)",
+ "unit": "a pair: one P8 layout flown once by P8-P4R and once by P8-P5R, back to back, in the scheduled order (p8_schedule.json)",
+ "baseline": "for V3 and V5, the accepted P7-E flight of the same layout by the corresponding accepted stack (P4 for P8-P4R, P5 for P8-P5R), from report e2fb96071edb77fdaba7da4f56351b26d1959f850c6e50725e95b0dccc12d09c and its block results; no baseline is re-flown; V4 has no baseline",
+ "flight_record": "the frozen classifier of P7 candidate 0799c37e, with FC-1..FC-3 (P7-E code, reused) and FC-4..FC-7 (P8 code)",
+ "hard_criteria": [
+  {
+   "id": "H1",
+   "name": "collision count",
+   "measure": "evaluator item safety:collision_contact; safety.collisions",
+   "limit": 0,
+   "limit_source": "simulation/px4_gazebo_p4/configs/p4_validation.yaml safety.collisions_allowed",
+   "scope": "every flight",
+   "on_failure": "safety event: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H2",
+   "name": "minimum truth clearance",
+   "measure": "safety.min_truth_clearance_m (accepted P4 evaluator)",
+   "limit": 0.2,
+   "unit": "m",
+   "comparison": ">=",
+   "limit_source": "p4_validation.yaml safety.min_truth_clearance_m",
+   "scope": "every flight",
+   "on_failure": "safety event: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H3",
+   "name": "unsafe commands",
+   "measure": "safety:setpoint_inside_inflated_obstacle, competing_flight_publisher, unsafe:hold_tick_motion, unsafe:unrevalidated_resume",
+   "limit": 0,
+   "limit_source": "P6 contract §6.3 as restated by D14 (hold motion 0.01 m from p6_faults.yaml codes.H35; setpoint margin 0.10 m from p4_validation.yaml)",
+   "scope": "every flight",
+   "on_failure": "safety event: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H4",
+   "name": "Policy A breaches",
+   "measure": "native_commands:* (accepted Policy A check)",
+   "limit": 0,
+   "limit_source": "native command policy A, bf1ef9b1080a52eab1673ac2a1ac6e20d30cfa7fd85b703cae8433dc55f7b3b0",
+   "scope": "every flight",
+   "on_failure": "safety event: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H5",
+   "name": "landing and disarm integrity",
+   "measure": "p2:final_landed_disarmed, p2:command_sequence; or, under D15, the ULog facts (own commands 176/400/21, landed and disarmed, no failsafe)",
+   "limit": "every valid flight landed and disarmed with own commands exactly 176, 400, 21",
+   "limit_source": "P2 integrity (p4_evaluate p2_integrity), D15",
+   "scope": "every valid flight",
+   "on_failure": "safety event: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H6",
+   "name": "safety verifiable",
+   "measure": "classifier safety_unverified, plus FC-3 (unknown arm state)",
+   "limit": 0,
+   "limit_source": "D14, D15, contract §8",
+   "scope": "every flight",
+   "on_failure": "safety-unverified: the batch stops",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H7",
+   "name": "evidence completeness",
+   "measure": "each flown flight has summary.json, the accepted evaluation, p7/flight-record.json, and a block-ledger line with the record hash",
+   "limit": "100 %",
+   "limit_source": "contract p7-evaluation-v1 §8 (inherited)",
+   "scope": "the batch",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H8",
+   "name": "batch execution reliability",
+   "measure": "flights flown against scheduled; replacements; stops; FC-1 block accounting",
+   "limit": "all 60 flown, or every unflown flight explained by a stop rule; at most 2 replacements per 20-flight block and one per flight",
+   "limit_source": "D6; contract §8",
+   "scope": "the batch",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H9",
+   "name": "reproducibility",
+   "measure": "re-running the frozen classifier on a read-only view of every retained flight reproduces its recorded flight record (except the record's own file hash); every manifest, world and spec hash re-verifies; and the H10 checker, re-run on every retained flight, reproduces its recorded H10 record",
+   "limit": "identical",
+   "limit_source": "contract §5",
+   "scope": "the batch, after the last block",
+   "inherited_from": "p7e-report-plan-v1 (canonical 15e7f7b4...): limit and source unchanged"
+  },
+  {
+   "id": "H10",
+   "name": "recovery invariants",
+   "measure": "for every recovery action in p8/recovery-ledger.jsonl: the frozen planner.collision_check (translations) or planner.yaw_permitted (yaws), re-run offline on the logged snapshot, reproduces the logged pass; no recovery action while a stale reason is present; the budgets of p8_recovery.json held (S1-S4, S8-S10)",
+   "limit": "100 % reproduce; 0 violations",
+   "limit_source": "p8-navigation-recovery-v1 §3, §7",
+   "scope": "every P8 flight",
+   "on_failure": "safety-unverified or safety event: the batch stops (FC-5, FC-6)"
+  },
+  {
+   "id": "H11",
+   "name": "offline stages",
+   "measure": "V0 (unit and property tests), V1 (counterfactual replay on the 60 P7-E flights: triggers in exactly the 18 failures and none of the 42 successes, first actions pass the frozen checks, budgets fit the 20 s window) and V2 (perception replay on the protected raw depth) passed, their records hash-bound in the P8 candidate",
+   "limit": "all passed before the first P8 flight",
+   "limit_source": "p8-navigation-recovery-v1 §6, §7",
+   "scope": "the candidate",
+   "on_failure": "no flight is authorized"
+  }
+ ],
+ "reported_criteria": [
+  {
+   "id": "R-P8-1",
+   "name": "goal success",
+   "measure": "classifier outcome goal_success, per variant and stage",
+   "interval": "Clopper-Pearson 95 % (frozen p7_analysis)",
+   "accepted_limit": null
+  },
+  {
+   "id": "R-P8-2",
+   "name": "per-layout outcomes against the baseline",
+   "measure": "for V3 and V5, each layout's P8 outcome per variant beside the accepted P7-E outcome of the same layout (P4 for P8-P4R, P5 for P8-P5R)",
+   "interval": null,
+   "accepted_limit": null
+  },
+  {
+   "id": "R-P8-3",
+   "name": "recovery activity",
+   "measure": "triggers; R1, R2, R3 and R4 uses; attempts; time in recovery; budget exhaustion; FC-4 refusals",
+   "interval": null,
+   "accepted_limit": null
+  },
+  {
+   "id": "R-P8-4",
+   "name": "failure modes after recovery",
+   "measure": "F1, F2 or other, as the P8 analysis classifies them (near_goal: final HOVER under 0.6 m from the goal)",
+   "interval": null,
+   "accepted_limit": null
+  },
+  {
+   "id": "R-P8-5",
+   "name": "recovery compute and P2 timing",
+   "measure": "recovery search wall time per HOVER episode; P2 timing status and freshness",
+   "interval": null,
+   "accepted_limit": "p2-timing-v1 (the evaluators' own items)"
+  },
+  {
+   "id": "R-P8-6",
+   "name": "clearance, path and time",
+   "measure": "minimum truth clearance, path length and time to goal, per flight",
+   "interval": null,
+   "accepted_limit": "clearance is H2 (>= 0.20 m)"
+  },
+  {
+   "id": "R-P8-7",
+   "name": "perception and inference timing",
+   "measure": "P3 and P4 perception compute and latency; P5 inference",
+   "interval": null,
+   "accepted_limit": "p4_validation.yaml and p5_validation.yaml, as R4 and R5 of P7-E"
+  },
+  {
+   "id": "R-P8-8",
+   "name": "host and cost",
+   "measure": "as R8 of P7-E",
+   "interval": null,
+   "accepted_limit": "p7_host_check.yaml"
+  },
+  {
+   "id": "R-P8-9",
+   "name": "V5 regressions",
+   "measure": "every V5 flight that failed although its baseline succeeded, with its cause and whether recovery acted",
+   "interval": null,
+   "accepted_limit": null
+  },
+  {
+   "id": "R-P8-10",
+   "name": "integrity events",
+   "measure": "the accepted evaluators' integrity items, as R10 of P7-E",
+   "interval": null,
+   "accepted_limit": null
+  }
+ ],
+ "engineering_completion": {
+  "passed": "H1-H11 all met, the declared 60 flights completed (3 blocks, none stopped, every flight accounted for) and R-P8-1..10 computed: the report records 'engineering validation passed'",
+  "not_passed": "any H criterion not met, or the batch not completed; a failed H1-H6 or H10 stops the batch, and the operator decides",
+  "a_breach_of_an_accepted_limit_in_R": "an integrity event entered in the risk register; not by itself an engineering failure"
+ },
+ "effectiveness": {
+  "target": null,
+  "decision": "P8-C1: descriptive only (contract §7, §14); no number is set"
+ },
+ "reporting": {
+  "intervals": "Clopper-Pearson 95 % through the frozen p7_analysis.clopper_pearson (bd036a2b...)",
+  "p_values": "none",
+  "comparisons": "per layout against its baseline outcome, descriptive; no paired or superiority test",
+  "safety": "counts, with zero-event one-sided 95 % bounds 1 - 0.05^(1/M) per variant"
+ },
+ "required_statement": "P8 is an engineering validation of a recovery layer. Its per-layout outcomes are descriptive; with 10 layouts per stage they do not establish a rate, and they do not show that any controller or variant is superior.",
+ "not_claimed": [
+  "superiority of any variant or stack",
+  "statistical significance",
+  "real-hardware behaviour",
+  "results outside the declared layouts, mission, speed, static boxes or this host",
+  "that recovery resolves RR1 or RR2",
+  "any change to P2-P7-E acceptance"
+ ],
+ "risk_register": {
+  "open": [
+   "RR1 P2 observation-gap RECOVERY",
+   "RR2 P5 repeat-behaviour inconsistency",
+   "RR-P8-1 longer flights",
+   "RR-P8-2 escape segments away from the goal",
+   "RR-P8-3 the R4 guard and P5 near-ties",
+   "RR-P8-4 offline replay is not closed-loop",
+   "RR-P8-5 compute spikes"
+  ],
+  "rule": "P8 closes none by itself; no threshold changes in response (contract §10)"
+ },
+ "software": {
+  "code": "simulation/px4_gazebo_p8/analysis/p8_report.py (P8-M2)",
+  "freeze": "the report code and this plan are hash-bound in the P8 candidate before the first P8 flight"
+ }
+}

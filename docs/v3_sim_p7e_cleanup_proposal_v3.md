@@ -1,6 +1,7 @@
 # v3-SIM P7-E release closure: selective evidence cleanup proposal (manifest v3)
 
-**Status: PROPOSAL ONLY (2026-11-28).**
+**Status: PROPOSAL ONLY (2026-11-28). The operator decided C-1 to C-4 the same day (§6.1).** No deletion is
+authorized.
 * No file was deleted, moved, compressed or changed, and nothing below authorizes it.
 * No cleanup procedure is implemented.
 * It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
@@ -202,13 +203,39 @@ removal. It is a separate decision (C-8), because it costs space elsewhere.
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| C-1 | Adopt manifest v3 for planning, with reading R-E10 (the batch's own records do not protect its raw depth), or the literal E10 (no P7-E flight eligible) | R-E10 |
-| C-2 | Confirm the new protections of §3 | confirm |
-| C-3 | Also protect the narrow-passage successes, slots 19 and 28 (4 flights, 5.09 GB), as contrast for P8's narrow-passage replay | protect |
-| C-4 | Keep the 15 P6 depth-fault fixtures (0.12 GB) permanently: they are the raw evidence of injected depth faults | keep |
+| C-1 | Adopt manifest v3 for planning, with reading R-E10 (the batch's own records do not protect its raw depth), or the literal E10 (no P7-E flight eligible) | **DECIDED (operator, 2026-11-28): R-E10** |
+| C-2 | Confirm the new protections of §3 | **DECIDED: confirmed** |
+| C-3 | Also protect the narrow-passage successes, slots 19 and 28 (4 flights, 5.09 GB), as contrast for P8's narrow-passage replay | **DECIDED: protected** (§6.1) |
+| C-4 | Keep the 15 P6 depth-fault fixtures (0.12 GB) permanently: they are the raw evidence of injected depth faults | **DECIDED: kept permanently** |
 | C-5 | Authorize implementing and testing the cleanup procedure of §5 (no deletion) | when storage matters |
 | C-6 | After C-5, authorize the copy rehearsal | — |
 | C-7 | Each deletion set separately, with its file-level authorization: P6 first (26.68 GB), then P7-E (40.03 GB, or 34.94 GB with C-3) | P6 first |
 | C-8 | Archive before removal | optional |
 | C-9 | Compact the WSL disk image afterwards (separate; needs `wsl --shutdown`) | only after C-7 |
 | C-10 | Housekeeping of the caches (ccache, jedi, pytest, `__pycache__`); keep pip until the `venv-px4` requirements are pinned (RR6) | separate, low value (about 0.4 GB) |
+
+### 6.1 Decisions recorded (operator, 2026-11-28)
+
+The operator chose reading R-E10, confirmed C-2, protected slots 19 and 28 (C-3) and kept the 15 fixtures (C-4).
+Nothing was deleted, and no cleanup is authorized.
+
+**The planning set after these decisions.** The manifest v3 JSON (`ec5b2205…`) is evidence and stays unchanged. C-3
+is applied on top of it, by name. Any later file-level authorization (§5) must exclude these four runs. When the
+procedure of C-5 is built, its re-derived classification must also carry C-3 as a named protection.
+
+| Slot | Controller | Run | `depth.bin` bytes | SHA-256 (from v3) |
+|---:|---|---|---:|---|
+| 19 | P5 | `20261127T150333Z-p7e-p5-p7c-4000382-998f6d1e` | 1,283,209,411 | `8a0c525c9343b65d…` |
+| 19 | P4 | `20261127T150640Z-p7e-p4-p7c-4000382-ca6304df` | 1,258,003,789 | `32b4961a16728e81…` |
+| 28 | P4 | `20261127T160514Z-p7e-p4-p7c-4000358-1a9e443f` | 1,294,159,109 | `7724a77c8495d67f…` |
+| 28 | P5 | `20261127T160823Z-p7e-p5-p7c-4000358-3d8d3c23` | 1,254,360,274 | `de70aee4e7953970…` |
+
+| Set (planning, not authorized) | Files | Size |
+|---|---:|---:|
+| Eligible P6 development raw depth | 78 | 26.68 GB |
+| Eligible P7-E raw depth (35 minus the 4 above) | 31 | 34.94 GB |
+| `tmp/` of the remaining eligible runs | — | about 0.01 GB |
+| **Total** | 109 | **about 61.6 GB** |
+| PROTECTED P7-E raw depth (28 + 4 flights) | 32 | 43.46 GB |
+
+Still open: C-5 to C-10.

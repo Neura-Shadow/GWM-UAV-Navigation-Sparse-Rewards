@@ -1,6 +1,13 @@
 # v3-SIM P8: Navigation Robustness and Recovery (preliminary proposal)
 
 **Status: PRELIMINARY PROPOSAL FOR THE OPERATOR'S REVIEW (2026-11-28).**
+* **Decided (operator, 2026-11-28):** P8 is adopted (P8-D1), with the recovery-wrapper architecture (P8-D2).
+* **Contract APPROVED (operator, 2026-11-28, "Approve contract"):**
+  [`p8-navigation-recovery-v1`](v3_sim_p8_contract_draft.md), with its §14 defaults.
+  * It authorizes nothing to run.
+* **P8-M1 specs APPROVED by hash (operator, 2026-11-28, "Approve specs"):** [P8-M1 specs](v3_sim_p8_m1_specs.md).
+  * Layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…`.
+  * Next, with its own authorization: P8-M2, the code and tests with the offline stages V0–V2.
 * It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
   authorizes read-only auditing and proposal preparation only.
 * Nothing is implemented, no SITL ran, no candidate exists, and no frozen P2–P7-E file changed.
@@ -208,11 +215,14 @@ recorded maps with ±1-frame snapshot shifts and counts decision flips, using th
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| P8-D1 | Adopt P8 with the motivation and evidence of §1–§2 | adopt |
-| P8-D2 | Architecture: a recovery wrapper above the frozen supervisor (P8-P4R, P8-P5R), or a modified P4 supervisor (a new P4 candidate) | wrapper |
+| P8-D1 | Adopt P8 with the motivation and evidence of §1–§2 | **DECIDED (operator, 2026-11-28): adopted** |
+| P8-D2 | Architecture: a recovery wrapper above the frozen supervisor (P8-P4R, P8-P5R), or a modified P4 supervisor (a new P4 candidate) | **DECIDED: the recovery wrapper** |
 | P8-D3 | Recovery set R1–R4 with budgets; no change to `r_infl`, `hover_timeout` or the transit deadline | adopt |
 | P8-D4 | The goal rule: keep the frozen rule (NORMAL and target on the goal), or allow goal capture from HOVER within tolerance | keep it; R1 first |
 | P8-D5 | Validation: V0–V2 offline, then about 60 SITL flights (V3–V5) | adopt |
 | P8-D6 | The held-out layouts: a new seed base, disjoint from every P7 pool | adopt |
 | P8-D7 | Include the optional tracks P8-T and P8-S | P8-S yes (offline); P8-T with V3–V5 |
-| P8-D8 | Retention: protect the P8 inputs (cleanup proposal §3 and C-3) until P8 is accepted | adopt |
+| P8-D8 | Retention: protect the P8 inputs (cleanup proposal §3 and C-3) until P8 is accepted | **covered:** C-2 (confirmed) and C-3 (slots 19 and 28 protected), 2026-11-28 |
+
+**P8-D3 to P8-D7 are DECIDED** by the approval of the [contract](v3_sim_p8_contract_draft.md)
+`p8-navigation-recovery-v1` (operator, 2026-11-28, "Approve contract"), as its §14 defaults. So are P8-C1 to P8-C4.

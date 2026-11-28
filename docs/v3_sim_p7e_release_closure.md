@@ -183,5 +183,5 @@ git push origin v3.7.0-p7e-engineering-validation
 | RC-3 | Create the annotated tag of §4, locally | **DONE (operator, 2026-11-28, "Create the tag")**: `v3.7.0-p7e-engineering-validation`, tag object `441ec508…` on commit `59a70a1`; local only, not pushed |
 | RC-4 | Push the branch (46 + closure commits) and the tag | **DONE (operator, 2026-11-28, "Push both")**: branch `a5a0df4..66613f9` (fast-forward, 50 commits) and tag `v3.7.0-p7e-engineering-validation` (`441ec508…` → `59a70a1`) on origin; no PR or merge |
 | RC-5 | Open a PR or merge into `main` | separate; not proposed now |
-| RC-6 | Cleanup | see the [cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md) (decisions C-1 to C-8) |
-| RC-7 | P8 | see the [P8 proposal](v3_sim_p8_proposal.md) (decisions P8-D1 to P8-D8) |
+| RC-6 | Cleanup | see the [cleanup proposal v3](v3_sim_p7e_cleanup_proposal_v3.md). **C-1 to C-4 decided** on 2026-11-28 (R-E10; protections confirmed; slots 19 and 28 protected; fixtures kept). C-5 to C-10 open; nothing is deleted. |
+| RC-7 | P8 | see the [P8 proposal](v3_sim_p8_proposal.md). **P8-D1 and P8-D2 decided** on 2026-11-28 (adopted; recovery wrapper). The contract `p8-navigation-recovery-v1` was **APPROVED** the same day ([contract](v3_sim_p8_contract_draft.md)); its approval decides P8-D3 to P8-D7 and P8-C1 to P8-C4. |
