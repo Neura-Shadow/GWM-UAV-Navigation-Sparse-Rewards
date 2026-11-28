@@ -246,6 +246,51 @@ def test_fc1_requires_the_previous_block_unstopped_and_complete(seq, tmp_path):
 
 
 # ---- report helpers ----------------------------------------------------------------------------------------------------------
+def ledger_run(tmp_path, recovery_ticks=(3, 4), extra=None, state_change=None, drop=False):
+    run = tmp_path / "run"
+    (run / "p5").mkdir(parents=True)
+    records, events, ledger = [], [], []
+    for k in range(8):
+        sim = 100.0 + 0.05 * k
+        records.append({"tick": k + 1, "sim_s": sim, "action": "HOLD", "state": "HOVER"})
+        executed = "YAW_TO" if k in recovery_ticks or k == extra else "HOLD"
+        events.append({"event": "p4_decision", "sim_s": sim, "action": executed,
+                       "state": "AVOIDING" if k == state_change else "HOVER"})
+        if k in recovery_ticks:
+            ledger.append({"kind": "action", "sim_s": sim})
+    if drop:
+        records.pop()
+    (run / "p5/policy-ledger.jsonl").write_text("".join(json.dumps(r) + "\n" for r in records))
+    (run / "ros-events.jsonl").write_text("".join(json.dumps(e) + "\n" for e in events))
+    return {"run": str(run), "controller": "p5", "variant": "p8_p5r", "ledger": ledger, "block": 1, "slot": 1, "attempt": 1,
+            "record": None, "evaluation": {"failures": ["policy:ledger:decision_mismatch"]}}
+
+
+@pytest.mark.parametrize("case,explained", [("exact", True), ("extra mismatch", False), ("state differs", False),
+                                            ("count differs", False)])
+def test_the_p5_ledger_mismatch_is_explained_only_by_the_recovery_actions(tmp_path, case, explained):
+    import p8_report
+    kwargs = {"extra mismatch": {"extra": 6}, "state differs": {"state_change": 3}, "count differs": {"drop": True}}.get(case, {})
+    out = p8_report.ledger_reconciliation(ledger_run(tmp_path, **kwargs))
+    assert out["explained"] is explained and out["evaluator_item"] is True
+    r10 = p8_report.r10([ledger_run(tmp_path / "b", **kwargs)])["p5_ledger_reconciliation"]
+    assert r10["flagged"] == 1 and r10["flagged_and_explained"] == (1 if explained else 0)
+    assert p8_report.ledger_reconciliation(dict(ledger_run(tmp_path / "c"), controller="p4")) is None
+
+
+DRY_RUN_P5 = Path.home() / "uav_autonomy/runs/20261128T025633Z-p8dry-p8_p5r-p7c-4000375-3b109641"
+
+
+@pytest.mark.skipif(not DRY_RUN_P5.exists(), reason="the P8-M3 dry-run evidence is not present")
+def test_the_dry_run_p5_flight_reconciles_tick_for_tick():
+    import p8_report
+    ledger = [json.loads(x) for x in (DRY_RUN_P5 / "p8/recovery-ledger.jsonl").read_text().splitlines()]
+    evaluation = strict_json(DRY_RUN_P5 / "p5-evaluation.json")
+    out = p8_report.ledger_reconciliation({"run": str(DRY_RUN_P5), "controller": "p5", "variant": "p8_p5r", "ledger": ledger,
+                                           "block": 0, "slot": 0, "attempt": 1, "record": None, "evaluation": evaluation})
+    assert out["explained"] and out["mismatches"] == out["recovery_actions"] == 286 and out["other_field_mismatches"] == 0
+
+
 def test_the_report_plan_and_h10_criterion():
     import p8_report
     assert canonical_sha256(p8_report.plan()) == p8_manifest.APPROVED_SPECS["report_plan"]

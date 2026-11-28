@@ -286,13 +286,54 @@ def r9(final, doc):
     return {"id": "R-P8-9", "regressions": rows}
 
 
+LEDGER_MISMATCH = "policy:ledger:decision_mismatch"
+
+
+def ledger_reconciliation(f):
+    """D-M3-1 (a): reconcile the accepted P5 evaluator's `policy:ledger:decision_mismatch` with the recovery ledger.
+
+    The evaluator compares each policy-ledger record with the executed `p4_decision` on `sim`, `action` and `state`.
+    By design (S4) recovery replaces the policy supervisor's HOLD after the P5 ledger records it. The item is
+    explained only if all of these hold:
+    * the record and decision counts are equal;
+    * every mismatch differs in `action` alone;
+    * the set of mismatching ticks equals the set of recovery `action` ticks.
+    Anything else is an unexplained integrity event."""
+    run = Path(f["run"]) if f.get("run") else None
+    if run is None or f.get("controller") != "p5":
+        return None
+    records = rep7.jsonl(run / "p5/policy-ledger.jsonl")
+    decisions = [e for e in rep7.jsonl(run / "ros-events.jsonl") if e.get("event") == "p4_decision"]
+    actions = {round(r["sim_s"], 6) for r in (f.get("ledger") or []) if r.get("kind") == "action"}
+    mism = [(r, e) for r, e in zip(records, decisions)
+            if r.get("sim_s") != e.get("sim_s") or r.get("action") != e.get("action") or r.get("state") != e.get("state")]
+    ticks = {round(e["sim_s"], 6) for _, e in mism}
+    other = sum(1 for r, e in mism if r.get("sim_s") != e.get("sim_s") or r.get("state") != e.get("state"))
+    flagged = LEDGER_MISMATCH in rep7.failures(f)
+    explained = len(records) == len(decisions) and other == 0 and ticks == actions
+    return dict(rep7.ref(f), variant=f.get("variant"), evaluator_item=flagged, records=len(records), decisions=len(decisions),
+                mismatches=len(mism), recovery_actions=len(actions), other_field_mismatches=other,
+                mismatches_equal_recovery_actions=ticks == actions, explained=explained)
+
+
+def r10(flights):
+    rows = [x for x in (ledger_reconciliation(f) for f in flights) if x is not None]
+    flagged = [x for x in rows if x["evaluator_item"]]
+    return dict(rep7.r10(flights), id="R-P8-10",
+                p5_ledger_reconciliation={"rule": "D-M3-1 (a): every policy:ledger:decision_mismatch must equal the "
+                                                  "flight's recovery actions, tick for tick, in the action field only",
+                                          "flights": rows, "flagged": len(flagged),
+                                          "flagged_and_explained": sum(1 for x in flagged if x["explained"]),
+                                          "unexplained": [x for x in rows if not x["explained"]]})
+
+
 def reported(results, flights, final, doc, lim):
     out, errors = {}, {}
     for cid, fn in (("R-P8-1", lambda: r1(final)), ("R-P8-2", lambda: r2(final, doc)), ("R-P8-3", lambda: r3(flights)),
                     ("R-P8-4", lambda: r4(flights)), ("R-P8-5", lambda: r5(flights)), ("R-P8-6", lambda: r6(flights)),
                     ("R-P8-7", lambda: {"id": "R-P8-7", "perception": rep7.r4(flights, lim), "inference": rep7.r5(flights, lim)}),
                     ("R-P8-8", lambda: dict(rep7.r8(results, flights), id="R-P8-8")), ("R-P8-9", lambda: r9(final, doc)),
-                    ("R-P8-10", lambda: dict(rep7.r10(flights), id="R-P8-10"))):
+                    ("R-P8-10", lambda: r10(flights))):
         try:
             out[cid] = fn()
         except Exception as exc:
