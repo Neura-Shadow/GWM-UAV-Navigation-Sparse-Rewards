@@ -1,7 +1,8 @@
 # v3-SIM P8-M2 checkpoint: the recovery core and the offline stages V0–V2
 
-**Status: P8-M2 IN PROGRESS (authorized 2026-11-28, "Authorize P8-M2"). The offline stages V0, V1 and V2 are done
-and pass (§2–§5). Paused at the V1 checkpoint of decision P8-C4 for the operator (§6).**
+**Status: CHECKPOINT PASSED.** The offline stages V0, V1 and V2 are done and pass (§2–§5).
+* The operator chose "Continue M2" at the P8-C4 checkpoint (2026-11-28).
+* The completed milestone is reported in the [M2 report](v3_sim_p8_m2_code.md).
 * Offline only: no simulator, no ROS run, no build, no candidate, no deletion.
 * No P2–P7-E file and no approved P8 spec changed. All seven manifests still verify.
 * The four approved spec hashes are unchanged.

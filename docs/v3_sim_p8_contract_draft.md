@@ -255,6 +255,9 @@ Setting one would need a separate decision before the specs are frozen.
    * Layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…`.
    * **APPROVED by hash on 2026-11-28 ("Approve specs").** P8-M1 is complete.
 3. **P8-M2 code and tests, offline.** The `px4_gazebo_p8` tree and the V0–V2 runs. Its acceptance is separate.
+   * **Written and tested on 2026-11-28** ("Authorize P8-M2", then "Continue M2"): [M2 report](v3_sim_p8_m2_code.md).
+   * 69 P8 tests pass. V1 (`1d6cc0e2…`) and V2 (`912297fb…`) passed.
+   * **ACCEPTED on 2026-11-28 ("Accept M2")**, with interpretations I-1 to I-11. P8-M2 is complete.
 4. A development dry run (2 flights) of the new launch path, with its own approval.
 5. The production Policy A approval for the P8 candidate.
 6. The real freeze of the P8 candidate.

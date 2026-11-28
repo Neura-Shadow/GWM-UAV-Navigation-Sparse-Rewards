@@ -7,7 +7,9 @@
   * It authorizes nothing to run.
 * **P8-M1 specs APPROVED by hash (operator, 2026-11-28, "Approve specs"):** [P8-M1 specs](v3_sim_p8_m1_specs.md).
   * Layouts `62ae950c…`, schedule `df90cf7b…`, recovery `dee90d51…`, report plan `a313a034…`.
-  * Next, with its own authorization: P8-M2, the code and tests with the offline stages V0–V2.
+* **P8-M2 ACCEPTED (operator, 2026-11-28, "Accept M2"):** [M2 report](v3_sim_p8_m2_code.md), code commit `c991387`.
+  * Next, each with its own authorization: P8-M3, that is the build, the P8 Policy A, the development candidate and
+    its 2-flight dry run, and the real freeze.
 * It is prepared under the operator's request "P7-E Release Closure and Engineering Next-Stage Preparation", which
   authorizes read-only auditing and proposal preparation only.
 * Nothing is implemented, no SITL ran, no candidate exists, and no frozen P2–P7-E file changed.
