@@ -1,0 +1,164 @@
+{
+ "authorization": "/home/joker0625/retention-rehearsal/p6-dev-depth/state/p7e-cleanup-authorization-p6-dev-depth-rehearsal.json",
+ "authorization_sha256": "91f76619f1ea9f07459c70e073fadb4a52716b059ca4a8680a1994f169ebec46",
+ "checks": {
+  "free_bytes_after": 683023167488,
+  "free_bytes_before": 683019255808,
+  "live_locks": [],
+  "manifests": {
+   "items": [
+    {
+     "exit_code": 0,
+     "expected": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "manifest": "state/p8-candidate-2a0ae57.json",
+     "printed": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "verified": true
+    },
+    {
+     "exit_code": 0,
+     "expected": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "manifest": "state/p7e-candidate-2b6ee5d.json",
+     "printed": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "verified": true
+    }
+   ],
+   "verified": true
+  },
+  "manifests_after": {
+   "items": [
+    {
+     "exit_code": 0,
+     "expected": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "manifest": "state/p8-candidate-2a0ae57.json",
+     "printed": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "verified": true
+    },
+    {
+     "exit_code": 0,
+     "expected": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "manifest": "state/p7e-candidate-2b6ee5d.json",
+     "printed": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "verified": true
+    }
+   ],
+   "verified": true
+  },
+  "passed": true,
+  "reclassification": {
+   "not_applicable": "no P7-E flight among the removed runs; the retained records are checked unchanged instead",
+   "passed": true
+  },
+  "rederived": {
+   "changed": [],
+   "runs": 1
+  },
+  "retained_records_unchanged": {
+   "changed": [],
+   "runs": 1
+  },
+  "simulator_processes": []
+ },
+ "classifier": {
+  "diagnostics/p7e/p7e_cleanup_manifest.py": "830172ca6f259f232bcb03766bf9fccd3a1c082b9e0f721ce3631e04e256855e",
+  "diagnostics/p7e/p7e_cleanup_manifest_v3.py": "c7be5511e950711c23aea2f379ec8a9036cc02ed57baa90820f7297f66cfe494"
+ },
+ "confirmation_phrase": "authorize cleanup p6-dev-depth 91f76619f1ea9f07459c70e073fadb4a52716b059ca4a8680a1994f169ebec46 removing 8 files 3899991 bytes",
+ "contract": "evidence-removal-receipt-v1",
+ "finished_unix_ns": 1795848262085450660,
+ "ledger": "/home/joker0625/retention-rehearsal/p6-dev-depth/state/p7e-cleanup-ledger-p6-dev-depth-91f76619f1ea.jsonl",
+ "ledger_sha256": "2b87b02166f8abebe31ca3e9462a016e4ed9000897e7c153c1b0917314588efd",
+ "lineage": "p7e-cleanup-manifest-v3",
+ "manifest": {
+  "contract": "p7e-cleanup-manifest-v3",
+  "path": "docs/evidence/v3_sim_p7e_cleanup_manifest_v3.json",
+  "sha256": "ec5b22058502b3b1c5f4548cb47d1f0055e75696c2118e40fe27df0f8bdd4135"
+ },
+ "not_removed": [],
+ "operator": "Neura-Shadow",
+ "rehearsal": true,
+ "removed": [
+  {
+   "bytes": 3810067,
+   "frames": 473,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795848226682401710,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "c6da84543cb0daeb2752fc43d8e48ffd6c6578a8bdafabca204426f681733c9c"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795848226694473009,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795848226706356392,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795848226718510827,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795848226732307272,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795848226744515351,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795848226756332378,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795848226768273845,
+   "run": "20261113T130123Z-p6dry-A-5.F3.01-15f9cf11",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+ ],
+ "removed_bytes": 3899991,
+ "runs_root": "/home/joker0625/retention-rehearsal/p6-dev-depth/runs",
+ "set": "p6-dev-depth",
+ "started_unix_ns": 1795848187742483379,
+ "status": "completed",
+ "stop_reason": null,
+ "tool": {
+  "p7e_v3_lineage.py": "9524d9165622643230b095869931f199c5aea4aae3b62928997f4bd4629ef85e",
+  "record_only_check.py": "5327ecb8112c84a6ea307693398f18e347d0e8fad6e568a4f07a94af0241f867",
+  "retention.py": "f863a6d77f6c9b2172f34bb914961f9c00c12310b3e915c0f54dca0bb593fefc"
+ }
+}

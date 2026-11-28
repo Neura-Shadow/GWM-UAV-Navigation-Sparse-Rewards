@@ -1,0 +1,2343 @@
+{
+ "authorization": "/home/joker0625/uav_autonomy/state/p7e-cleanup-authorization-p7e-depth-ec5b22058502.json",
+ "authorization_sha256": "b8c8b3ba1bd1f5edb8eef190570231d046c9f90afb5c3c380afc180025b5d2ca",
+ "checks": {
+  "free_bytes_after": 744454762496,
+  "free_bytes_before": 709515198464,
+  "live_locks": [],
+  "manifests": {
+   "items": [
+    {
+     "exit_code": 0,
+     "expected": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "manifest": "state/p8-candidate-2a0ae57.json",
+     "printed": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "verified": true
+    },
+    {
+     "exit_code": 0,
+     "expected": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "manifest": "state/p7e-candidate-2b6ee5d.json",
+     "printed": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "verified": true
+    }
+   ],
+   "verified": true
+  },
+  "manifests_after": {
+   "items": [
+    {
+     "exit_code": 0,
+     "expected": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "manifest": "state/p8-candidate-2a0ae57.json",
+     "printed": "fe2a0c6e9052e69a8eb5be6fa2a15b55c13d034f9a9c9d213a3dd3bc73dfdc6a",
+     "verified": true
+    },
+    {
+     "exit_code": 0,
+     "expected": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "manifest": "state/p7e-candidate-2b6ee5d.json",
+     "printed": "38e23bad4bd4f425c1fc47f7d6d50af42ea81a6f5812b56a8c2f709ec7e844be",
+     "verified": true
+    }
+   ],
+   "verified": true
+  },
+  "passed": true,
+  "reclassification": {
+   "of": 31,
+   "passed": true,
+   "sample": [
+    {
+     "error": null,
+     "reproduced": true,
+     "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab"
+    },
+    {
+     "error": null,
+     "reproduced": true,
+     "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a"
+    },
+    {
+     "error": null,
+     "reproduced": true,
+     "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b"
+    }
+   ]
+  },
+  "rederived": {
+   "changed": [],
+   "runs": 31
+  },
+  "retained_records_unchanged": {
+   "changed": [],
+   "runs": 31
+  },
+  "simulator_processes": []
+ },
+ "classifier": {
+  "diagnostics/p7e/p7e_cleanup_manifest.py": "830172ca6f259f232bcb03766bf9fccd3a1c082b9e0f721ce3631e04e256855e",
+  "diagnostics/p7e/p7e_cleanup_manifest_v3.py": "c7be5511e950711c23aea2f379ec8a9036cc02ed57baa90820f7297f66cfe494"
+ },
+ "confirmation_phrase": "authorize cleanup p7e-depth b8c8b3ba1bd1f5edb8eef190570231d046c9f90afb5c3c380afc180025b5d2ca removing 248 files 34939082035 bytes",
+ "contract": "evidence-removal-receipt-v1",
+ "finished_unix_ns": 1795850046790262155,
+ "ledger": "/home/joker0625/uav_autonomy/state/p7e-cleanup-ledger-p7e-depth-b8c8b3ba1bd1.jsonl",
+ "ledger_sha256": "8f87528eae45bdec1de44a76cbcd1f7356d3cb10f42656ac76cbd9a40dce062c",
+ "lineage": "p7e-cleanup-manifest-v3",
+ "manifest": {
+  "contract": "p7e-cleanup-manifest-v3",
+  "path": "docs/evidence/v3_sim_p7e_cleanup_manifest_v3.json",
+  "sha256": "ec5b22058502b3b1c5f4548cb47d1f0055e75696c2118e40fe27df0f8bdd4135"
+ },
+ "not_removed": [],
+ "operator": "Neura-Shadow",
+ "rehearsal": false,
+ "removed": [
+  {
+   "bytes": 1259684241,
+   "frames": 4076,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849950746124084,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "500f934e03e8516c75111729846c124322cede9cffa7f00791d5be9820aa5100"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849950758194441,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849950770158675,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849950782284451,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849950794191056,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849950806054374,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849950818257612,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849950830642069,
+   "run": "20261127T130931Z-p7e-p5-p7c-4000367-7dc882ab",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1021838382,
+   "frames": 4082,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849952448517251,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "9ec655b3b03041afd95f00a7e517ab14e1b81134d7fe36ddc04114758ba32a58"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849952460631244,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849952474811518,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849952486634548,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849952498722086,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849952512722513,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849952524326486,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849952536613593,
+   "run": "20261127T131858Z-p7e-p5-p7c-4000398-0a4e1ed0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1162179858,
+   "frames": 4240,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849954192289849,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "8888400b8d2e9e863972ca6f3b28d3e0b86f9f43f2f4075df922b006227b09f7"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849954208281243,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849954220405018,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849954232375681,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849954244357097,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849954258541899,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849954270570792,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849954282780506,
+   "run": "20261127T132211Z-p7e-p4-p7c-4000398-a16a0a33",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1045445908,
+   "frames": 4016,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849955620925136,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "58475a607f0cd5f5a14531012d72f01f3b9eef89e0d297b2e75bac199eea795a"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849955632906835,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849955644935180,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849955656950633,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849955668953053,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849955683151120,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849955695510488,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849955707151418,
+   "run": "20261127T132524Z-p7e-p5-p7c-4000394-7f7f366b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1047163478,
+   "frames": 3982,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849956978796724,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "f21e94c9c7d9dd050928dbc675561e418d813e200bdd41c697534b1afc163df1"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849956990311029,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849957002689910,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849957016676957,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849957030481049,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849957046344695,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849957058401835,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849957070407969,
+   "run": "20261127T132829Z-p7e-p4-p7c-4000394-7e306b3d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1112350502,
+   "frames": 4009,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849958589167498,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "eb16e4d58d742b0ce11ddf544b738011eddd20430212b6fd78bbb77ef1c7958d"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849958603532498,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849958616789208,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849958628737991,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849958640813844,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849958654783762,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849958667056161,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849958678961951,
+   "run": "20261127T134258Z-p7e-p4-p7c-4000373-391fce64",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1113307757,
+   "frames": 4005,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849960138197983,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "b4ae1360a6a9f9db64dd51b56c19b128b7e2c1a4c3bc1c75cc69be0a838d1f13"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849960150059342,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849960162043363,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849960174034850,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849960186122929,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849960198217581,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849960210265784,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849960222114628,
+   "run": "20261127T134601Z-p7e-p5-p7c-4000373-eecacdc6",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1199963746,
+   "frames": 4101,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849961746841545,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "bc102d96125e34bbbff468b419339b5ccfd2ae11db21a1bab24f2c942546b172"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849961758547489,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849961770552821,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849961782999777,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849961794615103,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849961806694025,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849961818534144,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849961830474278,
+   "run": "20261127T135517Z-p7e-p4-p7c-4000349-191bfc9e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1212330069,
+   "frames": 4007,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849963406295230,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "5b477eab7546db1857b2b9243abd9d8799449f39c485bc041bbdef92dffb1a48"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849963420346406,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849963436284526,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849963450517430,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849963466292269,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849963480262331,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849963492171522,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849963506256358,
+   "run": "20261127T141118Z-p7e-p5-p7c-4000357-54b8e6ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1175293034,
+   "frames": 4006,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849965093049424,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "b156225532cfc2b33258bd4b0c084cd526b3f25e236385583db445e238aa2864"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849965105289109,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849965117356257,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849965129479892,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849965140948343,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849965152886755,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849965164992989,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849965176941733,
+   "run": "20261127T141427Z-p7e-p4-p7c-4000357-79da0662",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1228666733,
+   "frames": 4472,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849966901625984,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "480ed48531504ee6b5cf30d877c2950e4ffec91c691d0436412705f8b125ee14"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849966913744345,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849966927384584,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849966941335340,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849966953186309,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849966965118605,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849966977251881,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849966989531053,
+   "run": "20261127T142502Z-p7e-p5-p7c-4000374-38c2dc51",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1042019423,
+   "frames": 4093,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849968271688567,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "ff031b28e17acb4c2de9f39460c5afd87012f9cfe69c4c776c1777cb4db1867b"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849968283851513,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849968297623667,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849968309742337,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849968321605762,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849968335717923,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849968348047612,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849968359795681,
+   "run": "20261127T142823Z-p7e-p4-p7c-4000374-31e21ca3",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1137896653,
+   "frames": 4011,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849969697699812,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "f94097189caebd689f3ca07fe34948f8c9644f6d9821b5f9c6c0ad8d29a212e9"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849969709706429,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849969723542939,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849969735575664,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849969747613886,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849969761565660,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849969773576410,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849969785688302,
+   "run": "20261127T145028Z-p7e-p4-p7c-4000359-e858f700",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1128023556,
+   "frames": 4005,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849971297072897,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "54fd6907fb7fb15f09860124f1b877e2f98a763a2d538ac19c696a41185402ae"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849971313108184,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849971325056040,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849971337075655,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849971348984718,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849971363119595,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849971374767696,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849971387105427,
+   "run": "20261127T145336Z-p7e-p5-p7c-4000359-12012861",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1182577616,
+   "frames": 4013,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849972942175876,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "8f1de28786f449b3ad68dd8051b97d4d1efded606b95661886cb71f6d32399db"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849972956404295,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849972968269008,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849972982011520,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849972996234614,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849973007859509,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849973019966538,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849973031937143,
+   "run": "20261127T150944Z-p7e-p5-p7c-4000354-0ea88d72",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1214071671,
+   "frames": 4007,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849974535000836,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "347699d07f5e18f41030497825147b9a79da5c8691bdae743ef99863cf33a2c5"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849974546829949,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849974558995835,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849974572759462,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849974585375927,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849974599002840,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849974610927049,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849974623205361,
+   "run": "20261127T151251Z-p7e-p4-p7c-4000354-2713c57a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1088411404,
+   "frames": 4007,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849975882299485,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "43d29d7e7ad6f28aecfed58a28807c2ef918b6bd3a9d1d25d0f0ddd75a69535f"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849975896305805,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849975908631865,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849975922252808,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849975934203538,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849975946523937,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849975962650704,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849975974094498,
+   "run": "20261127T152055Z-p7e-p5-p7c-4000364-c5825ec2",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1113395833,
+   "frames": 3996,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849977423578289,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "639289930251c8178c6697b0a00ef10e4e62a319abb32d960ec4ef87a7ab3911"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849977438923413,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849977450961066,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849977463018989,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849977476858795,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849977490817012,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849977503031191,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849977514804812,
+   "run": "20261127T152358Z-p7e-p4-p7c-4000364-b1473b38",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1123173123,
+   "frames": 4020,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849978926285003,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "e1beb16ea45b9f57128e14722d582f39cd1ad317b0ad63564af01ba6c8258bcd"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849978940619188,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849978957938878,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849978970222971,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849978984469523,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849978997815086,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849979009711787,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849979021922272,
+   "run": "20261127T152700Z-p7e-p5-p7c-4000388-87fa0bb1",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1148623189,
+   "frames": 4013,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849980438907461,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "305cd226c325ea3048164d92f71f01aea488c2fc7e35a74956529c9ef6b0d7ca"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849980450781953,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849980462698767,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849980475025044,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849980486990444,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849980498618412,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849980510850649,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849980522650544,
+   "run": "20261127T153003Z-p7e-p4-p7c-4000388-673c282d",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1068297731,
+   "frames": 3996,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849981832252479,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "e190cd04bcbcf21438bb01f5570e0a15103a03932c150efca93b63949f6acfaa"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849981844050430,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849981856004059,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849981867776538,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849981881926441,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849981893799380,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849981905987523,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849981917986300,
+   "run": "20261127T153950Z-p7e-p5-p7c-4000368-3d749ecf",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1040128586,
+   "frames": 4004,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849983300958755,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "da601b4fd0825e57aa24fe2fd2d777496cf69bb116d3cfa1100738b81c3bc341"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849983312845003,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849983325000010,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849983337088088,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849983348797902,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849983360716298,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849983372779645,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849983384935952,
+   "run": "20261127T154253Z-p7e-p4-p7c-4000368-42112895",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1018547547,
+   "frames": 4011,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849984613084852,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "3b04b39da1c49b2357a035f52e82ebdca39f3d05ceeac751cc7b0a1483af9d3f"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849984625321978,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849984637118484,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849984651223885,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849984663379143,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849984675192168,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849984687377679,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849984699382648,
+   "run": "20261127T154555Z-p7e-p4-p7c-4000378-45b3b79a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1039491229,
+   "frames": 4016,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849985925553236,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "a7e242a32932ee0753fbda97302838a4f0351b930af44a9a834ddd5d18c52f95"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849985937407501,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849985951430175,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849985963682165,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849985975424738,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849985987549102,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849985999862034,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849986013501831,
+   "run": "20261127T154900Z-p7e-p5-p7c-4000378-ae01465c",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1250899922,
+   "frames": 4062,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849987673231038,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "33fa2eb5355d0ca69764289fd5f4880fab6821e7add93b6d7da130408868899f"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849987685260575,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849987697291394,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849987709311296,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849987721310140,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849987735305884,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849987747289809,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849987759419938,
+   "run": "20261127T155210Z-p7e-p5-p7c-4000356-d42393a0",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1363897960,
+   "frames": 4126,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849989576164405,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "00f8d72ec571fc7c96f28b7750ded8e6c56d9adbbebcc7df37dd9212354b5678"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849989589894891,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849989601748270,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849989614014679,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849989625876262,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849989639747857,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849989652288272,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849989664397710,
+   "run": "20261127T155521Z-p7e-p4-p7c-4000356-3b6e09ef",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1170605581,
+   "frames": 4171,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849991068986617,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "d7c1358229136893fc45ad633804b319c71b0353a7590607ca8d40262236206d"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849991080893440,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849991092916004,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849991104846785,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849991116816244,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849991128752319,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849991140715444,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849991152972950,
+   "run": "20261127T160202Z-p7e-p5-p7c-4000352-3807524a",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1048087767,
+   "frames": 4008,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849992393603891,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "ffe02b8350c343186b1bc464170e94ae5b2ef75a25d2a894920f85cece343d8b"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849992410942585,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849992425782093,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849992441229523,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849992453038300,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849992465560735,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849992477046106,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849992490907052,
+   "run": "20261127T161131Z-p7e-p5-p7c-4000389-d4e2d37e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1075667164,
+   "frames": 4008,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849993862862057,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "d4f12c8e70eb44cbfdfcd8e53736a0484020ce31d93110c6bbecae61b971f864"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849993876791569,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849993888870839,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849993900702198,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849993912759058,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849993926601081,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849993940731295,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849993954768188,
+   "run": "20261127T161437Z-p7e-p4-p7c-4000389-d79a64df",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1055992118,
+   "frames": 4144,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849995242028635,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "c69a0e331c175be3ea7cbeedcf9f4957ffdc7ffdd396eb372956aec8cb8df541"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849995253805498,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849995267899798,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849995279860348,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849995291858578,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849995303881986,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849995315981415,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849995327788465,
+   "run": "20261127T161742Z-p7e-p4-p7c-4000365-0521970e",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 1048262610,
+   "frames": 4101,
+   "frames_verified": true,
+   "path": "sensors/depth.bin",
+   "removed_unix_ns": 1795849996530754318,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "0f393ec1e64c8cacb24b9bfb188ca422d2b6cbec87fd1e06336900ff75ff86c8"
+  },
+  {
+   "bytes": 2784,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/actuators.json.xz",
+   "removed_unix_ns": 1795849996542629622,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "989f22defbfa6d59fdad77a5587a10e9dfc77ed81f4bb6b6f6d341d44c65b0d4"
+  },
+  {
+   "bytes": 16972,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/all_events.json.xz",
+   "removed_unix_ns": 1795849996554759978,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "3e07d215b9591c01d9014acff13d780e310b058438b0d7f0423b23bc9fc1f59d"
+  },
+  {
+   "bytes": 364,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/component_general.json.xz",
+   "removed_unix_ns": 1795849996566671976,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "33228eda0b61b019bbc64576b3ae3e85f6dbc9733366bbbab402c3a9768f26bc"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/events_summary.json",
+   "removed_unix_ns": 1795849996579121507,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 69804,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters.json.xz",
+   "removed_unix_ns": 1795849996590589012,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "61415a8803b7983ee5a489e3905fc7fa453b6c68910a132c711be7d8fc008371"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/parameters_summary.json",
+   "removed_unix_ns": 1795849996602714677,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "bytes": 0,
+   "frames": null,
+   "frames_verified": null,
+   "path": "tmp/releases",
+   "removed_unix_ns": 1795849996615230350,
+   "run": "20261127T162051Z-p7e-p5-p7c-4000365-da46370b",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+ ],
+ "removed_bytes": 34939082035,
+ "runs_root": "/home/joker0625/uav_autonomy/runs",
+ "set": "p7e-depth",
+ "started_unix_ns": 1795849906634489620,
+ "status": "completed",
+ "stop_reason": null,
+ "tool": {
+  "depth_codec_study.py": "56c25b7a6aee8a8be9ef6e0e73fe613fecd2975346d30a889ee8f2a95c6a49a1",
+  "p7e_v3_lineage.py": "9524d9165622643230b095869931f199c5aea4aae3b62928997f4bd4629ef85e",
+  "record_only_check.py": "5327ecb8112c84a6ea307693398f18e347d0e8fad6e568a4f07a94af0241f867",
+  "retention.py": "f863a6d77f6c9b2172f34bb914961f9c00c12310b3e915c0f54dca0bb593fefc",
+  "storage_measurements.py": "027b2aaab0b77322e0e6dca63220214714d1598d63083c0cb73928840eea2b40"
+ }
+}

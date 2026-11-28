@@ -1,0 +1,99 @@
+{
+ "conclusion": "all three passed: zero depth.bin opens, outputs reproduced; the files read are records D4-B keeps permanently. The only P8 reader of raw depth is V2 perception (v3_sim_p8_v2_perception.json), whose eligible runs are the C-3 runs; it is not covered here and keeps protecting.",
+ "contract": "evidence-record-only-proofs-v1",
+ "date": "2026-11-28",
+ "decision": "C-11 (operator, 2026-11-28, \"依檔案判定 (Recommended)\"): a dependency protects only the files it reads",
+ "method": "tools/evidence_retention/record_only_check.py: each tool ran in-process under a PEP 578 audit hook that refused every open of sensors/depth.bin (positive control first) and logged every file opened under runs/; its output was compared with the committed evidence",
+ "names_no_run": true,
+ "proofs": {
+  "p8_hover_timeout_analysis": {
+   "comparison": "byte-identical",
+   "contract": "evidence-record-only-check-v1",
+   "depth_bin_open_attempts": 0,
+   "evidence": "docs/evidence/v3_sim_p8_hover_timeout_analysis.json",
+   "evidence_sha256": "cde7fa5262573e2b0c22db4dae322161a637a1dba65b35e9662a3fa31d47235a",
+   "exit_code": 0,
+   "output_sha256": "cde7fa5262573e2b0c22db4dae322161a637a1dba65b35e9662a3fa31d47235a",
+   "passed": true,
+   "positive_control_refused": true,
+   "reproduced": true,
+   "run_files_read": {
+    "controller-result.json": 61,
+    "p4/decisions.jsonl": 60,
+    "p4/local_map.jsonl": 18,
+    "p5/policy-ledger.jsonl": 30,
+    "p7/flight-record.json": 62,
+    "p7/layout.json": 60,
+    "source/clock.jsonl": 61
+   },
+   "runs_read": 62,
+   "script": "diagnostics/p8/p8_hover_timeout_analysis.py",
+   "script_sha256": "7125a9a9354279f7754bef4793d78882d9cfec9ef45a92dd75a688e73fdba983",
+   "tool": "p8_hover_timeout_analysis"
+  },
+  "p8_specs_verify": {
+   "comparison": "p8_specs.py verify: each regenerated document equals its frozen config",
+   "contract": "evidence-record-only-check-v1",
+   "depth_bin_open_attempts": 0,
+   "exit_code": 0,
+   "frozen_configs": {
+    "simulation/px4_gazebo_p8/configs/p8_layouts.json": "859e54abb40a80e1d7dc115a33ead0af895a911032df3084ec134f2adbea3b49",
+    "simulation/px4_gazebo_p8/configs/p8_recovery.json": "a622443b24e2b02d5bd5f623adf69532a013349a096b7df1829969a1f2f390e9",
+    "simulation/px4_gazebo_p8/configs/p8_schedule.json": "875ec923bd2b608ac78578f4459cc6d921dfde042c4afeff6f5000745bcb7428"
+   },
+   "passed": true,
+   "positive_control_refused": true,
+   "reproduced": true,
+   "run_files_read": {
+    "controller-result.json": 30,
+    "p4/decisions.jsonl": 30,
+    "p5/policy-ledger.jsonl": 30,
+    "p7/flight-record.json": 60
+   },
+   "runs_read": 60,
+   "script": "simulation/px4_gazebo_p8/scripts/p8_specs.py",
+   "script_sha256": "2a1b2e1df3e12f346953838e45f3c665f9a1ac7b214612f92f53b727800acf56",
+   "tool": "p8_specs_verify"
+  },
+  "p8_v1_replay": {
+   "comparison": "equal JSON without the wall-clock keys search_wall_s_max, wall_s",
+   "contract": "evidence-record-only-check-v1",
+   "depth_bin_open_attempts": 0,
+   "evidence": "docs/evidence/v3_sim_p8_v1_replay.json",
+   "evidence_sha256": "1d6cc0e2341144b021011b8c020c1739eae493470243e54a48439d096152abfc",
+   "exit_code": 0,
+   "output_sha256": "6d9d78ebb965a3891fd7288bdc1b1e27a7428ab5650e0b07edb25477179aa019",
+   "passed": true,
+   "positive_control_refused": true,
+   "reproduced": true,
+   "run_files_read": {
+    "controller-result.json": 60,
+    "p4/decisions.jsonl": 60,
+    "p4/local_map.jsonl": 60,
+    "p4_avoidance.yaml": 60,
+    "p5/policy-ledger.jsonl": 30,
+    "p7/flight-record.json": 60,
+    "ros-events.jsonl": 60
+   },
+   "runs_read": 60,
+   "script": "simulation/px4_gazebo_p8/replay/p8_v1_replay.py",
+   "script_sha256": "f6626ed868b3a216cb65c48ad6556237a3a508436a311137b49acd7fc6f057b7",
+   "tool": "p8_v1_replay"
+  }
+ },
+ "sources": {
+  "docs/evidence/v3_sim_p8_hover_timeout_analysis.json": {
+   "proof": "p8_hover_timeout_analysis",
+   "sha256": "cde7fa5262573e2b0c22db4dae322161a637a1dba65b35e9662a3fa31d47235a"
+  },
+  "docs/evidence/v3_sim_p8_v1_replay.json": {
+   "proof": "p8_v1_replay",
+   "sha256": "1d6cc0e2341144b021011b8c020c1739eae493470243e54a48439d096152abfc"
+  },
+  "simulation/px4_gazebo_p8/configs/p8_recovery.json": {
+   "proof": "p8_specs_verify",
+   "sha256": "a622443b24e2b02d5bd5f623adf69532a013349a096b7df1829969a1f2f390e9"
+  }
+ },
+ "tool_sha256": "5327ecb8112c84a6ea307693398f18e347d0e8fad6e568a4f07a94af0241f867"
+}

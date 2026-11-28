@@ -1,0 +1,212 @@
+{
+ "composition": {
+  "p4_reference_run": {
+   "depth_index_sha256": "e17015eb965fd82e7b2b8e5e14d626458397cc4ca98851359f3524dc9e90b7b4",
+   "frame_rate_hz": 30.3,
+   "frames": 4097,
+   "groups_top": {
+    "mavlink/": 16863008,
+    "mc-trace.bin": 14799912,
+    "p4/": 9504251,
+    "qgc-cache/": 5432490,
+    "rootfs/": 38882676,
+    "ros-events.jsonl": 19933665,
+    "rosbag/": 9510290,
+    "sensors/": 16270608,
+    "sensors/depth.bin": 1057288594,
+    "timing-trace.jsonl": 41384316
+   },
+   "raw_bytes": 5034393600,
+   "retained_bytes": 174481616,
+   "sim_span_s": 135.2,
+   "stored_bytes": 1057288594,
+   "total_bytes": 1231860134,
+   "zlib1_ratio": 4.762
+  },
+  "p6_development_dry_run": {
+   "depth_index_sha256": "5aa2cda87b7ae32ffbbc6edca33b20ab0586306a5ecf6437bad916367f74f8e1",
+   "frame_rate_hz": 30.3,
+   "frames": 473,
+   "groups_top": {
+    "mavlink/": 2845311,
+    "mc-trace.bin": 1657128,
+    "p4/": 844738,
+    "qgc-cache/": 5432490,
+    "qgc-monitor.log": 97381,
+    "rootfs/": 5798041,
+    "sensors/": 1848399,
+    "sensors/depth.bin": 3810067,
+    "source/": 294721,
+    "summary.json": 167076
+   },
+   "raw_bytes": 581222400,
+   "retained_bytes": 19254172,
+   "sim_span_s": 15.6,
+   "stored_bytes": 3810067,
+   "total_bytes": 23154163,
+   "zlib1_ratio": 152.549
+  },
+  "p7e_p5_goal_success": {
+   "depth_index_sha256": "7a6e34f279f96e11ac156e0c35502e93dd914c9d66c81ffa6c8f565be3cbc924",
+   "frame_rate_hz": 30.3,
+   "frames": 4076,
+   "groups_top": {
+    "mavlink/": 16839513,
+    "mc-trace.bin": 14719688,
+    "p4/": 9501954,
+    "p5/": 11867459,
+    "rootfs/": 38499647,
+    "ros-events.jsonl": 19825919,
+    "rosbag/": 9481618,
+    "sensors/": 17054313,
+    "sensors/depth.bin": 1259684241,
+    "timing-trace.jsonl": 41331906
+   },
+   "raw_bytes": 5008588800,
+   "retained_bytes": 186483564,
+   "sim_span_s": 134.5,
+   "stored_bytes": 1259684241,
+   "total_bytes": 1446257729,
+   "zlib1_ratio": 3.976
+  },
+  "p8_p4r_dry_goal_via_r1": {
+   "depth_index_sha256": "b51ed989223a208acc03707203d08e3adad161e39e08907574f8564717278df1",
+   "frame_rate_hz": 30.31,
+   "frames": 4642,
+   "groups_top": {
+    "mavlink/": 19025493,
+    "mc-trace.bin": 16794176,
+    "p4/": 10985092,
+    "qgc-cache/": 5432490,
+    "rootfs/": 44248846,
+    "ros-events.jsonl": 22820398,
+    "rosbag/": 11214226,
+    "sensors/": 18789147,
+    "sensors/depth.bin": 1322309769,
+    "timing-trace.jsonl": 48106669
+   },
+   "raw_bytes": 5704089600,
+   "retained_bytes": 199755074,
+   "sim_span_s": 153.1,
+   "stored_bytes": 1322309769,
+   "total_bytes": 1522154767,
+   "zlib1_ratio": 4.314
+  },
+  "p8_p5r_dry_hover_timeout": {
+   "depth_index_sha256": "223e5ce7ad9d9d22b040c0faec7f0ea491e15f666f609a6c93d2e9768acec719",
+   "frame_rate_hz": 30.3,
+   "frames": 5641,
+   "groups_top": {
+    "mavlink/": 22976426,
+    "mc-trace.bin": 20348448,
+    "p4/": 13768224,
+    "p5/": 22011422,
+    "rootfs/": 53787080,
+    "ros-events.jsonl": 28950039,
+    "rosbag/": 14232978,
+    "sensors/": 24990765,
+    "sensors/depth.bin": 2456401808,
+    "timing-trace.jsonl": 59890532
+   },
+   "raw_bytes": 6931660800,
+   "retained_bytes": 269122221,
+   "sim_span_s": 186.1,
+   "stored_bytes": 2456401808,
+   "total_bytes": 2725613953,
+   "zlib1_ratio": 2.822
+  }
+ },
+ "contract": "evidence-storage-measurements-v1",
+ "disk": {
+  "runs_bytes": 258497165002,
+  "runs_entries": 445,
+  "vhdx_bytes": 351990185984,
+  "wsl_fs_free_bytes": 682835615744,
+  "wsl_fs_total_bytes": 1081101176832,
+  "wsl_fs_used_bytes": 343273205760
+ },
+ "event_windows_p7e_batch": {
+  "all_kept_fraction": 0.209,
+  "events": "HOLD action, supervisor transition, stale perception, P5 intervention",
+  "failures": {
+   "event_only_median": 0.252,
+   "flights": 18,
+   "kept_fraction_max": 0.591,
+   "kept_fraction_median": 0.277,
+   "kept_fraction_min": 0.237
+  },
+  "key_frame_hz": 1,
+  "successes": {
+   "event_only_median": 0.157,
+   "flights": 42,
+   "kept_fraction_max": 0.275,
+   "kept_fraction_median": 0.185,
+   "kept_fraction_min": 0.084
+  },
+  "window_s": 3.0
+ },
+ "read_only": true,
+ "recompression": {
+  "p4_reference_run": {
+   "all_identical": true,
+   "byte_identical": 586,
+   "frames_checked": 586,
+   "step": 7
+  },
+  "p6_development_dry_run": {
+   "all_identical": true,
+   "byte_identical": 68,
+   "frames_checked": 68,
+   "step": 7
+  },
+  "p7e_p5_goal_success": {
+   "all_identical": true,
+   "byte_identical": 4076,
+   "frames_checked": 4076,
+   "step": 1
+  },
+  "p8_p4r_dry_goal_via_r1": {
+   "all_identical": true,
+   "byte_identical": 664,
+   "frames_checked": 664,
+   "step": 7
+  },
+  "p8_p5r_dry_hover_timeout": {
+   "all_identical": true,
+   "byte_identical": 806,
+   "frames_checked": 806,
+   "step": 7
+  }
+ },
+ "retained_compressibility": {
+  "p7e_p5_goal_success": {
+   "groups": {
+    "json/jsonl": {
+     "bytes": 113489800,
+     "lzma1_ratio": 6.52,
+     "zlib6_ratio": 5.96
+    },
+    "mc-trace.bin": {
+     "bytes": 14719688,
+     "lzma1_ratio": 5.79,
+     "zlib6_ratio": 4.6
+    },
+    "other": {
+     "bytes": 20985371,
+     "lzma1_ratio": 5.05,
+     "zlib6_ratio": 3.81
+    },
+    "ulog": {
+     "bytes": 37288705,
+     "lzma1_ratio": 4.02,
+     "zlib6_ratio": 3.35
+    }
+   },
+   "lzma1_bytes": 33384912,
+   "total_bytes": 186483564,
+   "zlib6_bytes": 38870256
+  }
+ },
+ "tool_sha256": "027b2aaab0b77322e0e6dca63220214714d1598d63083c0cb73928840eea2b40",
+ "zlib_version": "1.3"
+}
